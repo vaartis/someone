@@ -1,0 +1,8 @@
+[package]
+name = "vacances"
+version = "0.1.0"
+authors = ["Ekaterina Vaartis <vaartis@cock.li>"]
+edition = "2018"
+
+[dependencies]
+sfml = "0.14.0"
