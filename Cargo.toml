@@ -6,3 +6,4 @@ edition = "2018"
 
 [dependencies]
 sfml = "0.14.0"
+textwrap = "0.11.0"

@@ -2,6 +2,8 @@ use sfml::system::*;
 use sfml::window::*;
 use sfml::graphics::*;
 
+use textwrap::fill;
+
 pub struct Button {
     pub text: String,
     // action: ButtonAction
@@ -26,7 +28,7 @@ pub fn buttons_to_rects(window: &RenderWindow, buttons: &Vec<Button>) -> Vec<Rec
     let mut rects = vec![];
     let (mut current_x, mut current_y) = (starting_x, starting_y);
 
-    for i in 0..buttons.len() {
+    for _ in 0..buttons.len() {
         rects.push(
             Rect::new(
                 current_x, current_y, width_per_button, height_per_button
@@ -54,7 +56,11 @@ pub fn draw_buttons(window: &mut RenderWindow, button_rects: &Vec<Rect<u32>>, bu
         rect.set_outline_color(&Color::BLACK);
         rect.set_outline_thickness(2.5);
 
-        let mut text = Text::new(&buttons[i].text, &font, 16);
+        let txt = &buttons[i].text;
+        let supposed_text_fit = brect.width / (16 / 2);
+        let wrapped_text = fill(&txt, supposed_text_fit as usize);
+
+        let mut text = Text::new(&wrapped_text, &font, 16);
         text.set_fill_color(&Color::BLACK);
         text.set_position(Vector2f::new(brect.left as f32, brect.top as f32));
 

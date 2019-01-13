@@ -15,7 +15,7 @@ fn main() {
     window.set_framerate_limit(60);
     loop {
         let buttons = vec![
-            Button { text: "Test1".to_string() },
+            Button { text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nibh mi, pharetra sed tempus id, posuere eu magna. In rutrum justo ut augue accumsan porttitor. In ex ipsum, condimentum quis porta vel, facilisis lobortis nunc. Quisque eleifend condimentum tellus, vitae ornare nibh auctor vel.".to_string() },
             Button { text: "Test2".to_string() },
             Button { text: "Test3".to_string() },
             Button { text: "Test4".to_string() },

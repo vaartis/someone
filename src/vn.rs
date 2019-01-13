@@ -1,5 +1,4 @@
 use sfml::system::*;
-use sfml::window::*;
 use sfml::graphics::*;
 
 pub mod buttons;
