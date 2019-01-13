@@ -1,3 +1,5 @@
+use font_loader::system_fonts;
+
 use sfml::system::*;
 use sfml::window::*;
 use sfml::graphics::*;
@@ -43,7 +45,9 @@ pub fn buttons_to_rects(window: &RenderWindow, buttons: &Vec<Answer>) -> Vec<Rec
 }
 
 pub fn draw_buttons(window: &mut RenderWindow, button_rects: &Vec<Rect<u32>>, buttons: &Vec<Answer>) {
-    let font = Font::from_file("/usr/share/fonts/ubuntu-font-family/Ubuntu-B.ttf").unwrap(); // Use fontconfig or something
+    let prop = system_fonts::FontPropertyBuilder::new().family("Ubuntu").build();
+    let (font_data, _) = system_fonts::get(&prop).unwrap();
+    let font = Font::from_memory(&font_data).unwrap();
 
     for (i, brect) in button_rects.iter().enumerate() {
         let mut rect = RectangleShape::with_size(Vector2f::new(brect.width as f32, brect.height as f32));

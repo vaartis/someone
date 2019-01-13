@@ -1,3 +1,5 @@
+use font_loader::system_fonts;
+
 use sfml::system::*;
 use sfml::graphics::*;
 
@@ -36,7 +38,9 @@ pub fn draw_text_frame(window: &mut RenderWindow, scene: &Scene) {
     rect.set_fill_color(&Color::WHITE);
     rect.set_position(Vector2f::new(width_2p as f32, height_2p as f32));
 
-    let font = Font::from_file("/usr/share/fonts/ubuntu-font-family/Ubuntu-B.ttf").unwrap(); // Use fontconfig or something
+    let prop = system_fonts::FontPropertyBuilder::new().family("Ubuntu").build();
+    let (font_data, _) = system_fonts::get(&prop).unwrap();
+    let font = Font::from_memory(&font_data).unwrap();
 
     let txt = &scene.text;
     let supposed_text_fit = rect_width / (16 / 2);
