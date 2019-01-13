@@ -4,9 +4,13 @@ use sfml::graphics::*;
 
 use textwrap::fill;
 
+pub enum ButtonAction {
+    ChangeScene(String)
+}
+
 pub struct Button {
     pub text: String,
-    // action: ButtonAction
+    pub action: ButtonAction
 }
 
 pub fn buttons_to_rects(window: &RenderWindow, buttons: &Vec<Button>) -> Vec<Rect<u32>> {
@@ -41,7 +45,6 @@ pub fn buttons_to_rects(window: &RenderWindow, buttons: &Vec<Button>) -> Vec<Rec
             current_y += height_per_button + (win_size.y / 100 * 1);
         }
     }
-    // panic!();
 
     rects
 }
@@ -69,13 +72,15 @@ pub fn draw_buttons(window: &mut RenderWindow, button_rects: &Vec<Rect<u32>>, bu
     }
 }
 
-pub fn button_events(event: &Event, button_rects: &Vec<Rect<u32>>, buttons: &Vec<Button>) {
+pub fn button_events<'a>(event: &Event, button_rects: &Vec<Rect<u32>>, buttons: &'a Vec<Button>) -> Option<&'a ButtonAction> {
     match event {
         Event::MouseButtonReleased {button: sfml::window::mouse::Button::Left , x, y } => {
             if let Some(button_index) = button_rects.iter().position(|el: &Rect<u32>| el.contains2(*x as u32, *y as u32)) {
-                println!("{}", buttons[button_index].text);
+                Some(&buttons[button_index].action)
+            } else {
+                None
             }
         },
-        _ => {}
+        _ => None
     }
 }

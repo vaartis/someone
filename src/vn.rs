@@ -3,7 +3,12 @@ use sfml::graphics::*;
 
 pub mod buttons;
 
-pub fn draw_text_frame(window: &mut RenderWindow) {
+pub struct Scene {
+    pub text: String,
+    pub answers: Vec<buttons::Button>
+}
+
+pub fn draw_text_frame(window: &mut RenderWindow, scene: &Scene) {
     let win_size = window.size();
 
     let height_2p = win_size.y / 100 * 2;
@@ -19,5 +24,16 @@ pub fn draw_text_frame(window: &mut RenderWindow) {
     rect.set_fill_color(&Color::WHITE);
     rect.set_position(Vector2f::new(width_2p as f32, height_2p as f32));
 
+    let font = Font::from_file("/usr/share/fonts/ubuntu-font-family/Ubuntu-B.ttf").unwrap(); // Use fontconfig or something
+
+    let txt = &scene.text;
+    let supposed_text_fit = rect_width / (16 / 2);
+    let wrapped_text = textwrap::fill(&txt, supposed_text_fit as usize);
+
+    let mut text = Text::new(&wrapped_text, &font, 16);
+    text.set_fill_color(&Color::BLACK);
+    text.set_position(Vector2f::new(width_2p as f32, height_2p  as f32));
+
     window.draw(&rect);
+    window.draw(&text);
 }
