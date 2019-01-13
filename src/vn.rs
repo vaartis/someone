@@ -3,9 +3,21 @@ use sfml::graphics::*;
 
 pub mod buttons;
 
+#[derive(Debug)]
+pub enum SceneAction {
+    ChangeScene(String)
+}
+
+#[derive(Debug)]
+pub struct Answer {
+    pub text: String,
+    pub actions: Vec<SceneAction>
+}
+
+#[derive(Debug)]
 pub struct Scene {
     pub text: String,
-    pub answers: Vec<buttons::Button>
+    pub answers: Vec<Answer>
 }
 
 pub fn draw_text_frame(window: &mut RenderWindow, scene: &Scene) {

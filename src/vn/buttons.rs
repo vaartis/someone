@@ -4,16 +4,9 @@ use sfml::graphics::*;
 
 use textwrap::fill;
 
-pub enum ButtonAction {
-    ChangeScene(String)
-}
+use crate::vn::{Answer, SceneAction};
 
-pub struct Button {
-    pub text: String,
-    pub action: ButtonAction
-}
-
-pub fn buttons_to_rects(window: &RenderWindow, buttons: &Vec<Button>) -> Vec<Rect<u32>> {
+pub fn buttons_to_rects(window: &RenderWindow, buttons: &Vec<Answer>) -> Vec<Rect<u32>> {
     let button_count = buttons.len() as u32;
 
     let win_size = window.size();
@@ -49,7 +42,7 @@ pub fn buttons_to_rects(window: &RenderWindow, buttons: &Vec<Button>) -> Vec<Rec
     rects
 }
 
-pub fn draw_buttons(window: &mut RenderWindow, button_rects: &Vec<Rect<u32>>, buttons: &Vec<Button>) {
+pub fn draw_buttons(window: &mut RenderWindow, button_rects: &Vec<Rect<u32>>, buttons: &Vec<Answer>) {
     let font = Font::from_file("/usr/share/fonts/ubuntu-font-family/Ubuntu-B.ttf").unwrap(); // Use fontconfig or something
 
     for (i, brect) in button_rects.iter().enumerate() {
@@ -72,11 +65,11 @@ pub fn draw_buttons(window: &mut RenderWindow, button_rects: &Vec<Rect<u32>>, bu
     }
 }
 
-pub fn button_events<'a>(event: &Event, button_rects: &Vec<Rect<u32>>, buttons: &'a Vec<Button>) -> Option<&'a ButtonAction> {
+pub fn button_events<'a>(event: &Event, button_rects: &Vec<Rect<u32>>, buttons: &'a Vec<Answer>) -> Option<&'a Vec<SceneAction>> {
     match event {
         Event::MouseButtonReleased {button: sfml::window::mouse::Button::Left , x, y } => {
             if let Some(button_index) = button_rects.iter().position(|el: &Rect<u32>| el.contains2(*x as u32, *y as u32)) {
-                Some(&buttons[button_index].action)
+                Some(&buttons[button_index].actions)
             } else {
                 None
             }

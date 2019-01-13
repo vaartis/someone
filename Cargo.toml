@@ -5,5 +5,11 @@ authors = ["Ekaterina Vaartis <vaartis@cock.li>"]
 edition = "2018"
 
 [dependencies]
-sfml = "0.14.0"
+sfml = { version = "0.14.0", features = ["graphics"] }
 textwrap = "0.11.0"
+regex = "0.2.1"
+maplit = "^1.0"
+
+serde = "^1.0"
+serde_derive = "^1.0"
+serde_yaml = "^0.8"

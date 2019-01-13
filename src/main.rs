@@ -4,8 +4,10 @@ use sfml::window::*;
 use sfml::graphics::*;
 
 mod vn;
+mod scene_parser;
 
 use crate::vn::buttons::*;
+use crate::vn::*;
 
 fn main() {
     let mut window = RenderWindow::new(
@@ -16,39 +18,23 @@ fn main() {
     );
     window.set_framerate_limit(60);
 
-    let mut scenes = HashMap::<String, vn::Scene>::new();
-    scenes.insert(
-        "Scene1".to_string(),
-        vn::Scene {
-            text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit. In nibh mi, pharetra sed tempus id, posuere eu magna. In rutrum justo ut augue accumsan porttitor. In ex ipsum, condimentum quis porta vel, facilisis lobortis nunc. Quisque eleifend condimentum tellus, vitae ornare nibh auctor vel.".to_string(),
-            answers: vec![
-                Button { text: "Change to scene 2".to_string(), action: ButtonAction::ChangeScene("Scene2".to_string()) }
-            ]
-        }
-    );
-    scenes.insert(
-        "Scene2".to_string(),
-        vn::Scene {
-            text: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.".to_string(),
-            answers: vec![
-                Button { text: "Change to scene 1".to_string(), action: ButtonAction::ChangeScene("Scene1".to_string()) }
-            ]
-        }
-    );
-
-    let mut scene = &scenes["Scene1"];
+    let scenes = scene_parser::parse_scene_file();
+    let mut scene = &scenes["start"];
 
     loop {
+        let mut changed_scene = None;
         let button_rects = buttons_to_rects(
             &window,
             &scene.answers
         );
 
         while let Some(event) = window.poll_event() {
-            match button_events(&event, &button_rects, &scene.answers) {
-                Some(ButtonAction::ChangeScene(new_scene)) =>
-                    scene = &scenes[new_scene],
-                None => {}
+            if let Some(bes) = button_events(&event, &button_rects, &scene.answers) {
+                for be in bes  {
+                    match be {
+                        SceneAction::ChangeScene(new_scene) => changed_scene = Some(&scenes[new_scene]),
+                    }
+                }
             }
 
             match event {
@@ -65,6 +51,8 @@ fn main() {
             &button_rects,
             &scene.answers
         );
+
+        if changed_scene.is_some() { scene = changed_scene.unwrap(); }
 
         window.display();
     }
