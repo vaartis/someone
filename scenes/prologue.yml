@@ -37,7 +37,7 @@ start5:
     seconds and the doors staying opened for fiteen seconds at each station.
 
     Two stations remain before you'll need to transfer, the vehicle slows down slightly for a short moment.
-    "Not that important", you think to myself, before the vehicle slows down more until it stops completely just a few meters away from your destination.
+    "Not that important", you think to yourself, before the vehicle slows down more until it stops completely just a few meters away from your destination.
 
 start6:
   text: |
@@ -210,7 +210,7 @@ start21:
 start22:
   text: |
     The door finally closes, and you take a moment to catch your breath, still in the shock from all that
-    happened. You thank my rescuers, shake Ralph’s hand, and you all go get your well deserved seats in a train,
+    happened. You thank your rescuers, shake Ralph’s hand, and you all go get your well deserved seats in a train,
     almost as empty as during off-peak hours, in the comfiest part of the train.
 
 start23:
