@@ -1,7 +1,7 @@
-use std::collections::HashMap;
-
 use sfml::window::*;
 use sfml::graphics::*;
+
+use font_loader::system_fonts;
 
 mod vn;
 mod scene_parser;
@@ -21,15 +21,21 @@ fn main() {
     let scenes = scene_parser::parse_scene_file();
     let mut scene = &scenes["start"];
 
+    let prop = system_fonts::FontPropertyBuilder::new().family("Ubuntu").build();
+    let (font_data, _) = system_fonts::get(&prop).unwrap();
+    let font = Font::from_memory(&font_data).unwrap();
+    let font = &font;
+
     loop {
         let mut changed_scene = None;
-        let button_rects = buttons_to_rects(
+        let renderable_answers = to_renderable_answers(
             &window,
-            &scene.answers
+            &scene.answers,
+            &font
         );
 
         while let Some(event) = window.poll_event() {
-            if let Some(bes) = button_events(&event, &button_rects, &scene.answers) {
+            if let Some(bes) = handle_answer_events(&event, &renderable_answers) {
                 for be in bes  {
                     match be {
                         SceneAction::ChangeScene(new_scene) => changed_scene = Some(&scenes[new_scene]),
@@ -46,10 +52,9 @@ fn main() {
         window.clear(&Color::WHITE);
 
         vn::draw_text_frame(&mut window, &scene);
-        draw_buttons(
+        draw_answers(
             &mut window,
-            &button_rects,
-            &scene.answers
+            &renderable_answers
         );
 
         if changed_scene.is_some() { scene = changed_scene.unwrap(); }
