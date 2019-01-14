@@ -1,5 +1,3 @@
-use font_loader::system_fonts;
-
 use sfml::system::*;
 use sfml::graphics::*;
 
@@ -22,7 +20,7 @@ pub struct Scene {
     pub answers: Vec<Answer>
 }
 
-pub fn draw_text_frame(window: &mut RenderWindow, scene: &Scene) {
+pub fn draw_text_frame(window: &mut RenderWindow, scene: &Scene, font: &Font) {
     let win_size = window.size();
 
     let height_2p = win_size.y / 100 * 2;
@@ -37,10 +35,6 @@ pub fn draw_text_frame(window: &mut RenderWindow, scene: &Scene) {
     rect.set_outline_color(&Color::BLACK);
     rect.set_fill_color(&Color::WHITE);
     rect.set_position(Vector2f::new(width_offset as f32, height_2p as f32));
-
-    let prop = system_fonts::FontPropertyBuilder::new().family("Ubuntu").build();
-    let (font_data, _) = system_fonts::get(&prop).unwrap();
-    let font = Font::from_memory(&font_data).unwrap();
 
     let txt = &scene.text;
     let supposed_text_fit = rect_width / (16 / 2);

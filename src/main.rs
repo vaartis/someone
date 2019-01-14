@@ -24,7 +24,6 @@ fn main() {
     let prop = system_fonts::FontPropertyBuilder::new().family("Ubuntu").build();
     let (font_data, _) = system_fonts::get(&prop).unwrap();
     let font = Font::from_memory(&font_data).unwrap();
-    let font = &font;
 
     loop {
         let mut changed_scene = None;
@@ -51,7 +50,7 @@ fn main() {
 
         window.clear(&Color::WHITE);
 
-        vn::draw_text_frame(&mut window, &scene);
+        vn::draw_text_frame(&mut window, &scene, &font);
         draw_answers(
             &mut window,
             &renderable_answers
