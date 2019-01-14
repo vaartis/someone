@@ -26,17 +26,17 @@ pub fn draw_text_frame(window: &mut RenderWindow, scene: &Scene) {
     let win_size = window.size();
 
     let height_2p = win_size.y / 100 * 2;
-    let width_2p = win_size.x / 100 * 2;
+    let width_offset = win_size.x / 100 * 1;
 
     // most of the window
     let rect_height = win_size.y / 100 * (80 - 10);
-    let rect_width = win_size.x - (width_2p * 2);
+    let rect_width = win_size.x - (width_offset * 2);
 
     let mut rect = RectangleShape::with_size(Vector2f::new(rect_width as f32, rect_height as f32));
     rect.set_outline_thickness(2.0);
     rect.set_outline_color(&Color::BLACK);
     rect.set_fill_color(&Color::WHITE);
-    rect.set_position(Vector2f::new(width_2p as f32, height_2p as f32));
+    rect.set_position(Vector2f::new(width_offset as f32, height_2p as f32));
 
     let prop = system_fonts::FontPropertyBuilder::new().family("Ubuntu").build();
     let (font_data, _) = system_fonts::get(&prop).unwrap();
@@ -48,7 +48,7 @@ pub fn draw_text_frame(window: &mut RenderWindow, scene: &Scene) {
 
     let mut text = Text::new(&wrapped_text, &font, 16);
     text.set_fill_color(&Color::BLACK);
-    text.set_position(Vector2f::new(width_2p as f32, height_2p  as f32));
+    text.set_position(Vector2f::new(width_offset as f32, height_2p  as f32));
 
     window.draw(&rect);
     window.draw(&text);
