@@ -23,7 +23,7 @@ pub struct Scene {
 pub fn draw_text_frame(window: &mut RenderWindow, scene: &Scene, font: &Font) {
     let win_size = window.size();
 
-    let height_2p = win_size.y / 100 * 2;
+    let height_offset = win_size.y / 100 * 2;
     let width_offset = win_size.x / 100 * 1;
 
     // most of the window
@@ -34,7 +34,7 @@ pub fn draw_text_frame(window: &mut RenderWindow, scene: &Scene, font: &Font) {
     rect.set_outline_thickness(2.0);
     rect.set_outline_color(&Color::BLACK);
     rect.set_fill_color(&Color::WHITE);
-    rect.set_position(Vector2f::new(width_offset as f32, height_2p as f32));
+    rect.set_position(Vector2f::new(width_offset as f32, height_offset as f32));
 
     let txt = &scene.text;
     let supposed_text_fit = rect_width / (16 / 2);
@@ -42,7 +42,7 @@ pub fn draw_text_frame(window: &mut RenderWindow, scene: &Scene, font: &Font) {
 
     let mut text = Text::new(&wrapped_text, &font, 16);
     text.set_fill_color(&Color::BLACK);
-    text.set_position(Vector2f::new(width_offset as f32, height_2p  as f32));
+    text.set_position(Vector2f::new((width_offset * 2) as f32, (height_offset * 2)  as f32));
 
     window.draw(&rect);
     window.draw(&text);
