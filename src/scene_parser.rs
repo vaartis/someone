@@ -11,8 +11,8 @@ struct ParsedScene {
     answers: BTreeMap<String, BTreeMap<String, String>>
 }
 
-pub fn parse_scene_file() -> BTreeMap<String, Scene> {
-    let mut parsed: BTreeMap<String, ParsedScene> = serde_yaml::from_str(include_str!("../scenes/prologue.yml")).unwrap();
+pub fn parse_scene_file(text: &str) -> BTreeMap<String, Scene> {
+    let mut parsed: BTreeMap<String, ParsedScene> = serde_yaml::from_str(text).unwrap();
 
     parsed.iter_mut().map(|v: (&String, &mut ParsedScene)| {
         let (scene_name, scene) = v;
@@ -27,7 +27,7 @@ pub fn parse_scene_file() -> BTreeMap<String, Scene> {
             let actions = {
                 // A shortcut to get to the next numbered scene
                 if actions.is_empty() {
-                    let regex = regex::Regex::new(r"\d+").unwrap();
+                    let regex = regex::Regex::new(r"\d+$").unwrap();
                     let fnd = regex.find(scene_name);
                     let name_wo_num = if fnd.is_none() { scene_name } else { &scene_name[..fnd.unwrap().start()] };
                     let num = if fnd.is_none() { 1 } else { scene_name[fnd.unwrap().start()..fnd.unwrap().end()].parse::<u32>().unwrap()  };

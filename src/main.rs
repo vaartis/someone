@@ -18,7 +18,8 @@ fn main() {
     );
     window.set_framerate_limit(60);
 
-    let scenes = scene_parser::parse_scene_file();
+    let mut scenes = scene_parser::parse_scene_file(include_str!("../scenes/chapter_1.yml"));
+    scenes.extend(scene_parser::parse_scene_file(include_str!("../scenes/chapter_2.yml")));
     let mut scene = &scenes["start"];
 
     let prop = system_fonts::FontPropertyBuilder::new().family("Ubuntu").build();
