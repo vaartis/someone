@@ -1,4 +1,5 @@
 use sfml::window::*;
+use sfml::system::*;
 use sfml::graphics::*;
 
 use font_loader::system_fonts;
@@ -45,6 +46,16 @@ fn main() {
 
             match event {
                 Event::Closed => return,
+                Event::Resized { width, height } => {
+                    // Resize the view to the new size and set the center in the center of the width & height,
+                    // so nothing seems to change compared to the default view
+                    window.set_view(
+                        &View::new(
+                            Vector2f::new((width / 2) as f32, (height / 2) as f32),
+                            Vector2f::new(width as f32, height as f32)
+                        )
+                    );
+                },
                 _ => ()
             }
         }
