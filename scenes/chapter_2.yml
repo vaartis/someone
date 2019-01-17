@@ -1,20 +1,22 @@
 ch2-1:
-  text: |
+  text: >
     Thirteen minutes past five post meridiem.
+
 
     It has now been nine minutes since the departure of the empty train you are currently on, during rush hour, sitting on one of the best seats,
     with a dozen people, including one of your friends. Everyone stays silent during the trip, nobody knowing what to say or think of what happened to you.
 
 ch2-2:
-  text: |
+  text: >
     You turn on your phone’s screen and search for news articles about the recent events, but nothing comes up.
     As you go back to contemplating the landscape outside the window, and as the clock turns to fourteen minutes past five, the train is engulfed by a very bright white light, dazzling you.
   answers:
     "A somewhat familiar sound is heard, reminiscent of a rewinding tape": {}
 
 ch2-3:
-  text: |
+  text: >
     Twenty-three minutes past four post meridiem, Central European Time.
+
 
     After finishing your object-oriented programming exam fourty-nine minutes in advance, it is time to leave.
     You abruptly stop the routine task of packing your bag and raise your head to look at the other students and the teacher.
@@ -24,35 +26,36 @@ ch2-3:
     '“What happened?”': {}
 
 ch2-4:
-  text: |
+  text: >
     Merely seconds ago, you were aboard a train after surviving to a massacre equivalent to a zombie attack,
     thinking the incident was dealt with, believing that you could safely go back home to prepare for Christmas and that you could enjoy your seat on the train.
   answers:
     "Now, you have to start everything over": {}
 
 ch2-5:
-  text: |
+  text: >
     While everyone is asking questions, trying to come up with eccentric hypotheses or just panicking, you try to think as hard as you can that the fingers of your left hand are able to go through the palm of your right hand.
     You physically push your fingers against your palm, while imagining this impossible act, and nothing universe-breaking happens.
     The reality check proves that you are not in some sort of nightmare but in a physical reality; either all of you have been victims of a collective hallucination, or you have traveled back in time.
-
   answers:
     "There is only one way to check": {}
 
 ch2-6:
-  text: |
+  text: >
     Twenty-five minutes past four. You pack your bag, drop your answer sheet on the teacher’s desk, and leave the room while said teacher asks everyone to calm down.
+
 
     You run down the stairs, exit the building using the lightest door and run to the metro station to try to catch up with your two minute delay, and take the metro.
 
-    Unlike the first time, there is no slowing down.
 
+    Unlike the first time, there is no slowing down.
   answers:
     "You absentmindedly listen to some passengers talking about theories over a big flash, confirming you were not alone in this event": {}
 
 ch2-7:
-  text: |
+  text: >
     While entering the train station, you reflected about this white flash.
+
 
     The rewinding tape noise it made sounded quite familiar to me.
     While waiting for the announcement of the train’s departure from track three, you chose to call an expert on the question, Valou.
@@ -63,23 +66,33 @@ ch2-7:
     "You press the phone against your left ear": {}
 
 ch2-8:
-  text: |
+  text: >
     After the few moments you needed to salute each other and do some banal conversation, as you did not talk to each other for a while
     you ask him the question that disturbs you.
 
+
     -- “Do you think we've just returned to the past?"
+
+
     -- "Yeah, the noise reminded me of that too, but we should not be remembering anything about it!”
+
 
     While you talk, you look around, and notice the station is unusually empty. All the passengers awaiting in the hall before they ran to the train and became zombies are gone.
 
+
     -- “People who die before a return to the past stay dead afterwards, right?"
+
+
     -- "Yes, why are you asking that? Did someone die?"
+
+
     -- "Maybe, yes. Sorry, I have to go, I will call you back and explain later.”
+
 
     You almost hang up on him, hoping he will not mind too much, when you see Ralph coming at you, with a few of the passengers that were with you aboard the train before that return to the past.
 
 ch2-9:
-  text: |
+  text: >
     They brief you about what they saw at the station right after the flash.
     What you were worried about is real; dozens of people were found dead in the main hall.
   answers:
@@ -89,6 +102,7 @@ ch2-10:
   text:
     Eight minutes to five.
 
+
     Like the last time, the announcement at track three is made.
     You walk calmly and get on the train, taking your seats on the same spots as last time.
     Just to be sure, you check that the previously shattered door window no longer is.
@@ -96,11 +110,13 @@ ch2-10:
     'Tell your “colleagues” about what you know of the situation': {}
 
 ch2-11:
-  text: |
+  text: >
     Your theory is that you have experienced a fifty-one minute long return to the past.
+
 
     From what you know about returns to the past, as they existed in the show you and Valou have been fans of in your childhoods,
     after a time travel, wounded people keep their wounds and dead people stay dead.
+
 
     What does not fit, however, is that we kept memories of what happened.
     In the show, the return to the past procedure is managed by a supercomputer simulating a virtual world inside.
@@ -110,8 +126,9 @@ ch2-11:
     "Continue your trip": {}
 
 ch2-12:
-  text: |
+  text: >
     The trip went by without much trouble, and you have continued your discussions on your theories and read Wikipedia articles on time traveling.
+
 
     You also took the time to explain to Valou all of the things that have happened,
     while regularly getting cut in some zones without network coverage on the train’s path.
@@ -119,10 +136,12 @@ ch2-12:
     "You have arrived to Douai, safe and sound": {}
 
 ch2-13:
-  text: |
+  text: >
     At this moment, you told yourself that this incident won't possibly happen again, that it will never be explained by scientists and that you will just move on.
 
+
     You are just hoping you'll be able to go home and eat some good raclette while waiting for your Christmas presents.
+
 
     But this hope has a hard time staying in your thoughts: Jehovah’s witnesses, standing next to the train station’s bus stops just like every morning and evening on weekdays,
     are this time not just waiting for someone to come by and grab one of their magazines.
@@ -133,17 +152,19 @@ ch2-13:
     # Talk to them
 
 ch2-13-dont-talk:
-  text: |
+  text: >
     You go around them after saluting Ralph on the square in front of the station, and go back to your planned route, heading towards your bed.
+
 
     During the whole walk, you cannot stop looking behind you, all around you, to make sure not to have any blind spots, just to be ready to flee from any kind of danger.
   answers:
     "Next": { SCENE: ch2-14 }
 
 ch2-14:
-  text: |
+  text: >
     Everything was going well until you saw a crowd of people filling the whole width of the street, waiting for something outside, in the cold.
     You might have been able to go through them if you wanted to, but you were afraid this might make some of them angry or annoyed.
+
 
     Due to some construction work on most bridges of the city, you cannot avoid walking in this street to head home.
   answers:
@@ -151,14 +172,14 @@ ch2-14:
     # Alternatively, have a path where you try to go though them
 
 ch2-14-sit:
-  text: |
+  text: >
     You sat on the bench and dicided to wait a little so you'd have a way to walk through while avoiding everyone.
     In the meantime, you take the time to try and  understand what is gathering such a crowd here.
   answers:
     "Observe": { SCENE: ch2-15 }
 
 ch2-15:
-  text: |
+  text: >
     You quickly find the answer; some huge posters on the butchery the crowd is in front of announce some important discounts on foie gras and turkey.
     On this Friday 23rd of December, this could not have been a better time, and it seems it is working pretty well.
     Dozens of parents, sometimes accompanied with their children, waiting for their turn to fatten up at a low cost, are blocking your way.
@@ -166,7 +187,7 @@ ch2-15:
     "Then, you hear screams": {}
 
 ch2-16:
-  text: |
+  text: >
     Those are not human screams, but pig.
     You laugh a bit, telling yourself those children may not be really human, before some people start to run.
     Quickly understanding your wish of going home has not been granted, you look around yourself and try to find some shelter.
@@ -176,25 +197,25 @@ ch2-16:
     # Run or something else
 
 ch2-16-ladder:
-  text: |
+  text: >
     As you decide to join this seemingly smarter human being, you take a look back at the butchery, from where the screams have not ceased.
     The shop’s window gets shattered to pieces and reveals a rather big pig.
   answers:
     "Next": { SCENE: ch2-17 }
 
 ch2-17:
-  text: |
+  text: >
     The crowd quickly spreads out, everyone fleeing as quickly, as Muslims in a racist joke, in front of the animal, who starts chasing and attacking everyone it sees.
     The man you try to join lends you his hand as the sow runs towards you. He pulls you on the roof right before the ladder gets hit and falls on the ground, right over a mother who was trying to get her daughter to come with us.
 
 ch2-18:
-  text: |
+  text: >
     Dozens of other pigs are coming out of the butchery, and you do not even try to ask yourself why is there so much alive livestock in this shop or how there can be so much in such a small space.
     You witness everyone panicking on the street, parents and children agonizing in the middle of the road, their skin wounded by pig trotters.
     A grandmother, up until now miraculously spared, falls after getting hit by two of the enraged animals at once.
 
 ch2-19:
-  text: |
+  text: >
     After successfully reducing every form of human life in this street to a pile of dead meat,
     the pigs head in the direction of the train station, to try to find more victims. It was at this moment you chose to go back down.
 
@@ -203,39 +224,46 @@ ch2-19:
     "Run towards the bridge": {}
 
 ch2-20:
-  text: |
+  text: >
     You are too busy running away to have any time to talk to the person that was with you on the roof.
 
+
     You run towards your home, before noticing one of the sows made a little trip to the bakery right after the bridge.
+
 
     You turn around and see the man waving at you.
   answers:
     "Join the man and hide under the bridge": {}
 
 ch2-21:
-  text: |
+  text: >
     Four minutes past six post meridiem.
 
+
     On a routine day, you would have been home for four minutes, reading e-mails and making sure everything is going well on your blog, after eating a cookie from Subway.
+
 
     You catch your breath, and the man asks you if you believe this is linked to the weird flash from earlier.
   answers:
     "You tell him it is possible, and that you will probably just know with the next return to the past": {}
 
 ch2-22:
-  text: |
+  text: >
     He looks at you with a puzzled face.
     You point your finger at a glowing white sphere spreading towards you, but he does not have time to turn his head.
 
+
     You manage to look at your watch just in time, so to speak.
+
 
     Five minutes and zero seconds past six.
   answers:
     "Flash": {}
 
 ch2-22:
-  text: |
+  text: >
     Fourteen minutes past five post meridiem, Central European Time.
+
 
     It has now been ten minutes since the departure of the empty train you are currently on, during rush hour, sitting on one of the best seats, with a dozen people,
     including one of your friends. With a weary look and a sigh, you speak up.
