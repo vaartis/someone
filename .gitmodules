@@ -1,3 +1,6 @@
 [submodule "deps/csfml"]
 	path = deps/csfml
 	url = https://github.com/SFML/CSFML
+[submodule "deps/sfml"]
+	path = deps/sfml
+	url = https://github.com/SFML/SFML/
