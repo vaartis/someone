@@ -241,4 +241,4 @@ ch2-22:
     including one of your friends. With a weary look and a sigh, you speak up.
 
   answers:
-    '“Some pigs butchered people in a butchery in Douai”': {}
+    '“Some pigs butchered people in a butchery in Douai”': { SCENE: ch3-1 }
