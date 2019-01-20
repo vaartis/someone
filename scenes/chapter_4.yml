@@ -203,3 +203,5 @@ ch4-19:
     You find seats relatively easily, and chat all the way to Saint-Augustin, where you get off and wait for Valou outside.
     You had to wait this time, since Valou seemed to get a bit lost, which is understandable considering the strange transfer he has to make near a train station right after a terrorist attack
     happened on the public transit network, but he manages to find you. Valou and Rémi get to know each other, and you exchange some more salutations before getting back on the route.
+  answers:
+    "Next": { SCENE: ch5-1 }
