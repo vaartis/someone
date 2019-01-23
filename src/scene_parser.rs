@@ -36,6 +36,7 @@ pub fn parse_scene_str(text: &str) -> BTreeMap<String, Scene> {
                     actions.iter().map(|ac: (&String, &String)| {
                         match ac.0.as_str() {
                             "SCENE" => SceneAction::ChangeScene(ac.1.to_string()),
+                            "TERM" => SceneAction::OpenTerminal(ac.1.to_string()),
                             _ => panic!("Invalid action in scene {}", scene_name)
                         }
                     }).collect::<Vec<_>>()

@@ -121,7 +121,7 @@ ch6-14:
   text: >
     Luckily, the terminal that you know more about opens up, and you are surprised to see a dollar sign next to the blinking cursor.
   answers:
-    "Terminal": {}
+    "Terminal": { TERM: "inside-factory" }
 
 # ch6-21:
 #   text: >

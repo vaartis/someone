@@ -5,7 +5,8 @@ pub mod buttons;
 
 #[derive(Debug)]
 pub enum SceneAction {
-    ChangeScene(String)
+    ChangeScene(String),
+    OpenTerminal(String)
 }
 
 #[derive(Debug)]

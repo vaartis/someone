@@ -8,6 +8,7 @@ use font_loader::system_fonts;
 
 mod vn;
 mod scene_parser;
+mod term;
 
 use crate::vn::buttons::*;
 use crate::vn::*;
@@ -15,6 +16,16 @@ use crate::vn::*;
 #[derive(rust_embed::RustEmbed)]
 #[folder = "scenes"]
 struct Scenes;
+
+enum UpperPartState {
+    VN,
+    Terminal
+}
+
+struct State<'a> {
+    current_scene: &'a Scene,
+    upper_part_state: UpperPartState
+}
 
 fn main() {
     let mut window = RenderWindow::new(
@@ -31,29 +42,27 @@ fn main() {
 
         scene_parser::parse_scene_str(&content)
     }).flatten().collect::<HashMap<_, _>>();
-    let mut scene = &scenes["start"];
 
     let prop = system_fonts::FontPropertyBuilder::new().family("Ubuntu").build();
     let (font_data, _) = system_fonts::get(&prop).unwrap();
     let font = Font::from_memory(&font_data).unwrap();
 
+    let mut game_state = State {
+        current_scene: &scenes["start"],
+        upper_part_state: UpperPartState::VN
+    };
+
+    let mut terminal_state = term::TerminalState::default();
+
     loop {
         let mut changed_scene = None;
         let renderable_answers = to_renderable_answers(
             &window,
-            &scene.answers,
+            &game_state.current_scene.answers,
             &font
         );
 
         while let Some(event) = window.poll_event() {
-            if let Some(bes) = handle_answer_events(&event, &renderable_answers) {
-                for be in bes  {
-                    match be {
-                        SceneAction::ChangeScene(new_scene) => changed_scene = Some(&scenes[new_scene]),
-                    }
-                }
-            }
-
             match event {
                 Event::Closed => return,
                 Event::Resized { width, height } => {
@@ -68,17 +77,42 @@ fn main() {
                 },
                 _ => ()
             }
+
+            match game_state.upper_part_state {
+                UpperPartState::VN => {
+                    if let Some(bes) = handle_answer_events(&event, &renderable_answers) {
+                        for be in bes  {
+                            match be {
+                                SceneAction::ChangeScene(new_scene) => changed_scene = Some(&scenes[new_scene]),
+                                SceneAction::OpenTerminal(term) => { game_state.upper_part_state = UpperPartState::Terminal; }
+                            }
+                        }
+                    }
+                }
+
+                UpperPartState::Terminal => {
+                    term::handle_term_events(&event, &mut terminal_state);
+                }
+            }
         }
 
         window.clear(&Color::WHITE);
 
-        vn::draw_text_frame(&mut window, &scene, &font);
-        draw_answers(
-            &mut window,
-            &renderable_answers
-        );
+        match game_state.upper_part_state {
+            UpperPartState::VN => {
+                vn::draw_text_frame(&mut window, &game_state.current_scene, &font);
+                draw_answers(
+                    &mut window,
+                    &renderable_answers
+                );
 
-        if changed_scene.is_some() { scene = changed_scene.unwrap(); }
+                if changed_scene.is_some() { game_state.current_scene = changed_scene.unwrap(); }
+            }
+
+            UpperPartState::Terminal => {
+                term::draw_terminal(&mut window, &font, &mut terminal_state);
+            }
+        }
 
         window.display();
     }
