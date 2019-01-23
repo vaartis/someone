@@ -24,6 +24,7 @@ fn main() {
     scenes.extend(scene_parser::parse_scene_file(include_str!("../scenes/chapter_3.yml")));
     scenes.extend(scene_parser::parse_scene_file(include_str!("../scenes/chapter_4.yml")));
     scenes.extend(scene_parser::parse_scene_file(include_str!("../scenes/chapter_5.yml")));
+    scenes.extend(scene_parser::parse_scene_file(include_str!("../scenes/chapter_6.yml")));
     let mut scene = &scenes["start"];
 
     let prop = system_fonts::FontPropertyBuilder::new().family("Ubuntu").build();
