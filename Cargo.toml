@@ -13,3 +13,5 @@ font-loader = "0.7.0"
 serde = "^1.0"
 serde_derive = "^1.0"
 serde_yaml = "^0.8"
+
+rust-embed = "4.3.0"

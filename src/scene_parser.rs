@@ -11,7 +11,7 @@ struct ParsedScene {
     answers: BTreeMap<String, BTreeMap<String, String>>
 }
 
-pub fn parse_scene_file(text: &str) -> BTreeMap<String, Scene> {
+pub fn parse_scene_str(text: &str) -> BTreeMap<String, Scene> {
     let mut parsed: BTreeMap<String, ParsedScene> = serde_yaml::from_str(text).unwrap();
 
     parsed.iter_mut().map(|v: (&String, &mut ParsedScene)| {

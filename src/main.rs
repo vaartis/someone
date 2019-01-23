@@ -1,3 +1,5 @@
+use std::collections::HashMap;
+
 use sfml::window::*;
 use sfml::system::*;
 use sfml::graphics::*;
@@ -10,6 +12,10 @@ mod scene_parser;
 use crate::vn::buttons::*;
 use crate::vn::*;
 
+#[derive(rust_embed::RustEmbed)]
+#[folder = "scenes"]
+struct Scenes;
+
 fn main() {
     let mut window = RenderWindow::new(
         (1280, 1024),
@@ -19,12 +25,12 @@ fn main() {
     );
     window.set_framerate_limit(60);
 
-    let mut scenes = scene_parser::parse_scene_file(include_str!("../scenes/chapter_1.yml"));
-    scenes.extend(scene_parser::parse_scene_file(include_str!("../scenes/chapter_2.yml")));
-    scenes.extend(scene_parser::parse_scene_file(include_str!("../scenes/chapter_3.yml")));
-    scenes.extend(scene_parser::parse_scene_file(include_str!("../scenes/chapter_4.yml")));
-    scenes.extend(scene_parser::parse_scene_file(include_str!("../scenes/chapter_5.yml")));
-    scenes.extend(scene_parser::parse_scene_file(include_str!("../scenes/chapter_6.yml")));
+    let scenes = Scenes::iter().map(|scene_name| {
+        let content_utf = Scenes::get(&scene_name).unwrap();
+        let content = std::str::from_utf8(&content_utf).unwrap();
+
+        scene_parser::parse_scene_str(&content)
+    }).flatten().collect::<HashMap<_, _>>();
     let mut scene = &scenes["start"];
 
     let prop = system_fonts::FontPropertyBuilder::new().family("Ubuntu").build();
