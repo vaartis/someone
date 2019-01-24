@@ -1,73 +1,83 @@
 start:
   text: >
-    Twenty-three minutes past four post meridiem, Central European Time.
+    16:23
 
 
-    After finishing your object-oriented programming exam fourty-nine minutes in advance, it is time to leave.
-    You quickly pack your bag, drop your sheet on the teacher's desk, and hastily leave the room.
+    After finishing your programming exam fourty-nine minutes in advance, it is time to leave. You pack your bag, drop your sheet on the teacher's desk, and leave the room.
   answers:
-    "Run down the stairs as fast as you can": {}
+    "Go down the stairs": {}
 
 start2:
   text: >
-    You run down the stairs and exit the building using the only door equipped with crash bars: it is lighter and faster to open, so you can save a few seconds.
+    There's nobody around, since people are doing their exams, so it's really quiet in the building.
+    You get to the first floor and go not to the main entrance, but to the one on the side of the building, that way you can cut a little,
+    as you'd need to go around there anyway.
+  answers:
+    "Go outside": {}
 
 start3:
   text: >
-    After a few minutes of fast-paced walking, you arrive at the metro station.
-    You scan your metro card quickly, walking around a cleaning employee and other travelers,
-    unaware of the situation you and hundreds of other people will soon be a part of.
+    After about ten minutes of walking, you arrive at the metro station.
+    You scan your card, walk around a cleaning employee and other travelers, unaware of the situation you and hundreds of other people will soon be a part of.
   answers:
-    "Run up the escalator": {}
+    "Get on the escalator": {}
 
 start4:
   text: >
-    On the platform, you lean on the far right glass door, the "number 6" door, where you will be able to get off
-    as quick as possible.
+    On the platform, you lean on the far right glass door, which separates the station and the railway. That door is the closest one
+    to the exit on your destination station, so you choose to get to it, since you'll be waiting for the train for some time anyway.
 
 
-    The platform fills up with passengers, and you are the first one to  to enter the train.
+    The platform fills up with passengers, and you are the first one to enter the train.
 
 
-    Right as the doors open, you manage to take a seat, this allows you to rest and recharge your batteries for the rest of the
-    mission.
+    Right as the doors open, you manage to take a seat, this allows you to rest for a bit, since the rest of the trip is going to be somewhat long.
   answers:
     "Rest": {}
 
 start5:
   text: >
-    The trip goes along as usual, the time between stations always in the usual average of forty-five to sixty
-    seconds and the doors staying opened for fiteen seconds at each station.
-
-
-    Two stations remain before you'll need to transfer, the vehicle slows down slightly for a short moment.
-    "Not that important", you think to yourself, before the vehicle slows down more until it stops completely just a few meters away from your destination.
+    The ride goes along as usual, the time between stations always something around a minute and the doors are staying opened for around fiteen seconds at each station,
+    although two stations before your destination the train has to stay on the station for a longer time, because of people who've never heard of neither the rush hour,
+    nor the the existence of a maximum passenger capacity of vehicles.
 
 start6:
   text: >
-    You've lost a dozen of seconds from doors that could not close due to people having the bad habit of
-    knowing neither the optimization rules of public transport on rush hour, nor the existence of a maximum passenger capacity of vehicles.
-
-
-    Your ride finally comes in at the  station. You get off and run towards the escalators. Everyone is going straight forward and taking the same
-    escalator.
+    Your ride finally comes in at the station. You get off and go towards the escalators. Everyone is going straight forward and taking the same escalator.
   answers:
-    "Rotate anti-clockwise by an angle of thirty degrees and take another, completely empty, escalator": {}
+    "Take the escalator with everyone else": { SCENE: start6-crowded }
+    "Obviously, take another, almost completely empty, escalator": { SCENE: start6-empty }
+
+start6-crowded:
+  text: >
+    You get on the escalator with other people and while riding it you wish there were seats there just like in vehicle you just got out of,
+    as the escalator is quiet long and is filled with people. Some of them even try to climb up faster, but they don't succeed at that much, since everyone
+    is already uncofortable with their position and can't do anything but wait until they're finally at the top and can continue their journey to wherever the fuck
+    they so desperately try to get while ignoring everyone else.
+  answers:
+    "Finally, you're at the top": { SCENE: start7 }
+
+start6-empty:
+  text: >
+    You get on the empty escalator with some people following your example, now probably thinking about why'd they even want to go on the other one, if it's
+    so tightly packed. As you run up the escalator to cut some time, yoy see someone on the other escalator trying to climb through the people and failing miserably, leaving them
+    in an even more uncomfortable pose, between the stairs, than the other people there.
+  answers:
+    "You reach the top": { SCENE: start7 }
 
 start7:
   text: >
-    Some more fast-paced walking for a few dozen meters, to notice with some regret on the train departures LED matrixes, that the multiple-unit B 82500
-    heading to Rouen, whose first stop is Douai, your destination, has no assigned track. From your experience, you know it will probably depart from track three.
+    After a little more walking, you notice, with some regret, that the train you're going to use hasn't been assigned a track yet.
+    From your experience, though, you know it will probably depart from track three.
   answers:
     "Get closer to it's platform": {}
 
 start8:
   text: >
-    Eight minutes before five post meridiem, Central European Time.
+    16:52
 
 
-    Only ten minutes left before your train's planned departure time. Masses of regulars are already forming in front of the train's six cars,
-    only waiting for the authorization to open the doors.
+    Only ten minutes left before your train's planned departure time. Masses of regulars are already forming in front of the train's six cars, only waiting for the authorization to open the doors.
 
 
     The newbies are forming a crowd in the main hall, first into a properly spaced crowd letting others walk through, then into a more and more compact crowd.
@@ -76,16 +86,16 @@ start8:
 
 start9:
   text: >
-    Here they are. The voice recordings, played one after the other, announce to the public that the regional train going to Rouen Rive Droite and departing at five hours and two minutes
+    Here they are. The voice recordings, played one after the other, announce to the public that the regional train departing at five hours and two minutes
     will depart from track three. From there starts the usual flow of people on the platform, walking fast, almost running, with the only goal to find a seat on one of the carriages.
 
 
-    Nothing unusual could be expected out of this.
+    "Nothing unusual could be expected out of this", you say to yourself.
 
 start10:
   text: >
-    But said unusual materialized itself in how strong some of those passengers' will to find a seat is;
-    how much they want to travel comfortably while laughing at the less courageous people, standing between rows of seats, or staying outside the train, in the event of it being really overcrowded.
+    Yet somehow said unusual materialized itself in how strong some of those passengers' will to find a seat is, how much they want to travel comfortably while laughing at the less courageous people,
+    standing between rows of seats, or staying outside the train, in the event of it being so overcrowded people wouldn't be able to get in anymore.
 
 start11:
   text: >
@@ -94,20 +104,22 @@ start11:
     to take a high-speed train and transfer to another station to arrive at their destination.
 
 
-    This is the only time in your whole career as an in-a-hurry train rider that you saw people actually running.
-    Not just the ones who were late, but the whole crowd of passengers.
+    That was the only time that you saw people actually running for their seats at the station. Not just the ones who were late, but the whole crowd of passengers.
 
 start12:
   text: >
     This is the second time.
+
+
     Travelers from the main hall are running on the platform, forcing regulars to also run to not get overtaken.
     Some wheeled suitcases, the worst inventions of humanity on par with strollers, collide with each other during this ever-hastening run.
 
 
-    Behind a group of people trying to get on, you see the train’s middle carriages approaching, these are the best option to get off quickly at your destination.
+    Behind a group of people trying to get on, you see the train’s middle carriages approaching, these are the best option to get off quickly at your destination and
+    have a chance to not get stuck in the crowd, waiting for everyone to make up their mind on where they need to go now.
 
 
-    As you are about to leave the platform’s side opposite to the train, where running faster is easier, to cross the platform and the passengers in fury to reach a door,
+    As you are about to leave the opposite side of the platform, where you've been staying up until now, since going along that side is easier, to cross the platform and get to your train,
     you see someone stumbling on a suitcase and falling on the rails.
   answers:
     "Help them get up, at the risk of losing your seat": { SCENE: start12-help }
@@ -115,9 +127,12 @@ start12:
 
 start12-help:
   text: >
-    You start fighting through the crowd to the edge of the platform to that person. As you are about to open your mouth and yell that they should give their hand,
+    You start fighting through the crowd to the edge of the platform to help that person. As you are about to open your mouth and yell that they should give their hand,
     the train arrives. Hemoglobine-filled body fluids splatter on the platform and everyone near it, including you. Nobody had seen
     it come, and the driver did not have the time to stop.
+
+
+    Also, you better hurry for your train now.
   answers:
     "Run for your train": { SCENE: start13 }
     # Set the "bloody" variable here
@@ -128,26 +143,23 @@ start12-dont-help:
     side, since you slowed down a bit after that fall. This little shine isn’t alone in getting smashed to pieces;
     hemoglobine-filled body fluids splatter on the platform, after a train arrived on the rails. Nobody had seen it come, and the driver did not have the time to stop.
   answers:
-    "Run for your train": { SCENE: start13 }
+    "Keep pushing through the crowd to your train": { SCENE: start13 }
 
 start13:
   text: >
-    In normal circumstances, this event would have stopped everyone, horrified by the spectacle that
-    happened right before their eyes due to their individualism, their only will of sitting on a piece of fabric
-    for a few dozens of minutes, and their very mediocre sense of prorities. But before anyone had time to
-    imagine themselves being a doctor in philosophy or sociology, panic comes in.
+    In normal circumstances, this event would have stopped everyone, horrified by the spectacle that happened right before
+    their eyes due to their individualism, their only will of sitting on a piece of fabric for half an hour,
+    and their very mediocre sense of prorities. But before anyone had time to imagine themselves being a doctor in philosophy or sociology, panic comes in.
 
 start14:
   text: >
-    Not to get away from this dead body, but to get on the train even faster. Some start making
-    roars, like animals ready to attack, and everyone starts charging, running faster and faster. Luggage
-    starts flying above the crowd, some trying to get rid of their belongings just to go faster.
+    Not to get away from this dead body, but to get on the train even faster. Some start making roars, like animals ready to attack,
+    and everyone starts charging, running faster and faster. Luggages starts flying above the crowd, some trying to get rid of their belongings just to go faster.
 
 start15:
   text: >
-    You notice two women besides you trying to tear off each other’s hair for some reason, in a position
-    reminding you of a rugby melee, and you hear a scream of pain to your right coming from a kid, laying on the
-    ground, their body covered in blood, mutilated by kicks of this enraged horde.
+    You notice two women besides you trying to tear off each other’s hair for some reason, in a position reminding you of a rugby melee,
+    and you hear a scream of pain to your right coming from a kid, laying on the ground, their body covered in blood, mutilated by kicks of this enraged horde.
   answers:
     "Help the kid": { SCENE: start15-help }
     "Move along": { SCENE: start15-dont-help }
@@ -155,13 +167,13 @@ start15:
 start15-help:
   text: >
     You turn to the right, where the kid is, bear though the all the mad people running for their seats.
-    Someone pushes you and you fall over, ready to get up immediatly, but some crazed man stomp your hand with his heeled boot.
+    Someone pushes you and you fall over, ready to get up immediatly, but some crazed man stomps your hand with his heeled boot.
 
 
     It hurts a lot, but you manage to get up.
 
 
-    The crowd pushes you farther and from the poor child, you can't even see them anymore,
+    The crowd pushes you farther and farther from the child, you can't even see them anymore,
     you have no choice but to continue running with the crowd.
   answers:
     "Move along": { SCENE: start16 }
@@ -169,10 +181,10 @@ start15-help:
 
 start15-dont-help:
   text: >
-    Your primal instincts do not let you have any kind of altruism; in such a situation, there is only a single
-    hope left, a single shelter where you can be safe from all of this: your seat.
+    Your decide to not let you have any kind of altruism; in such a situation, there is only a single
+    hope left, a single shelter where you can be safe from all of this madness: your seat.
   answers:
-    "Next": { SCENE: start16 }
+    "Move along": { SCENE: start16 }
 
 start16:
   text: >
@@ -185,14 +197,15 @@ start16:
 start17:
   text: >
     At the train door you try to reach, a few people are blocking your way, doing their best to fend off those
-    inhuman seat-hungry creatures. One of your friends, Ralph, with whom you share your train rides from time
-    to time when your schedules meet, is on board and recognizes you.
+    inhuman seat-hungry creatures. You see a familiar face: it's your friends, with whom you share your train rides from time to time when your schedules meet, he is on board and recognizes you.
+
+
     You see him warning others of your presence and they wave at you to tell you to get closer.
 
 start18:
   text: >
     Only two meters left. You punch some hefty man’s private parts with your cane before he manages to crush
-    your skull with his decapitated woman’s, and you somehow manage to get a grip of Ralph’s hands. He pulls
+    your skull with his decapitated woman’s, and you somehow manage to get a grip of your friend's hand. He pulls
     on your arm to help you reach the doorstep. An old woman, very old, tries to cling to your bag,
     but someone in the train throws an empty can at her, it hits hard enough to knock her out.
   answers:
@@ -200,7 +213,7 @@ start18:
 
 start19:
   text: >
-    Stumbling on the doorstep and saying hi to the floor, you do finally get in the train.
+    Stumbling on the doorstep and saying hello to the floor, you finally get in the train.
     You quickly notice your saviours did a really good job: the train is almost empty.
     They must have gotten in way before others.
 
@@ -209,7 +222,7 @@ start19:
 
 start20:
   text: >
-    One minute past five post meridiem.
+    17:01
 
 
     There has not been any announcement made inside the train by the controller, for obvious reasons.
@@ -217,24 +230,21 @@ start20:
 
 start21:
   text: >
-    As you start to run out of ammunition, the uniform alarm announcing the doors’ imminent closing is
-    music to your ears. You use your last strengths to help the door slide more quickly and push all those weird
-    arms covered in wounds trying to keep you from leaving out of the train. An arm stays stuck in the door, but the oldest
-    of you gets an axe and chops it.
-
+    As you start to run out of ammunition, the uniform alarm announcing the doors’ imminent closing is music to your ears.
+    You use your last strengths to help the door slide more quickly and push all those weird arms covered in wounds trying to keep you from leaving out of the train.
+    An arm stays stuck in the door, but the oldest of you gets an axe and chops it off.
 
 start22:
   text: >
-    The door finally closes, and you take a moment to catch your breath, still in the shock from all that
-    happened. You thank your rescuers, shake Ralph’s hand, and you all go get your well deserved seats in a train,
-    almost as empty as during off-peak hours, in the comfiest part of the train.
+    The door finally closes, and you take a moment to catch your breath, still in the shock from all that happened.
+    You thank your rescuers and you all go get your well deserved seats in a train, almost as empty as during off-peak hours, in the comfiest part of the train.
 
 start23:
   text: >
-    Four minutes past five post meridiem.
+    17:04
 
 
-    While your train leaves with its usual small delay, you hear knocks on the windows from the few survivors of this butchery, followed by gunshots.
+    While your train leaves with its usual small delay, you hear knocks on the windows from the few survivors of the past butchery, followed by gunshots.
 
 
     You do not know where they come from.
@@ -244,16 +254,13 @@ start23:
 
 start24:
   text: >
-    A very loud and acute scream is heard throughout the train, scaring you more that the window shattering
-    sound itself, and all of you duck.
+    A very loud and acute scream is heard throughout the train, scaring you more that the window shattering sound itself, and all of you duck.
 
 
     Luckily enough, the train leaves the station just in time to avoid additionnal damage.
 
 
-    You look into your bag, grab a big unused plastic bag and Ralph offers his help. You manage to close the hole in the window and keep the heat inside the train.
-
-
+    You look into your bag, grab a big unused plastic bag and your friend offers his help. You manage to close the hole in the window and keep the heat inside the train.
   answers:
     "Go back to your seats": {}
 
@@ -261,7 +268,6 @@ start25:
   text: >
     Back on your seats you have fought so much for, you all look at each other in silence.
     No verbal communication is required for all of you to know all of you are asking yourselves the same questions.
-
 
   answers:
     "What just happened? How did it come to this?": {}
