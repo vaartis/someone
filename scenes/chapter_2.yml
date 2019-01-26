@@ -1,196 +1,236 @@
 ch2-1:
   text: >
-    Thirteen minutes past five post meridiem.
+    17:13
 
 
     It has now been nine minutes since the departure of the empty train you are currently on, during rush hour, sitting on one of the best seats,
-    with a dozen people, including one of your friends. Everyone stays silent during the trip, nobody knowing what to say or think of what happened to you.
+    with a couple people, including one of your friends. Everyone stays silent during the trip, nobody knowing what to say or think of what happened to you.
 
 ch2-2:
   text: >
     You turn on your phone’s screen and search for news articles about the recent events, but nothing comes up.
-    As you go back to contemplating the landscape outside the window, and as the clock turns to fourteen minutes past five, the train is engulfed by a very bright white light, dazzling you.
+    As you go back to contemplating the landscape outside the window, and as the clock turns to 17:14, the train is engulfed by a very bright white light, dazzling you.
   answers:
-    "A somewhat familiar sound is heard, reminiscent of a rewinding tape": {}
+    "You heard a sound reminiscent of a rewinding tape": {}
 
 ch2-3:
   text: >
-    Twenty-three minutes past four post meridiem, Central European Time.
+    16:23
 
 
-    After finishing your object-oriented programming exam fourty-nine minutes in advance, it is time to leave.
+    After finishing your programming exam fourty-nine minutes in advance, it is time to leave.
     You abruptly stop the routine task of packing your bag and raise your head to look at the other students and the teacher.
-    You all look at each other in confusion, and one student dares to ask the question
+    You all look at each other in confusion, and one student dares to ask the question:
 
   answers:
     '“What happened?”': {}
 
 ch2-4:
   text: >
-    Merely seconds ago, you were aboard a train after surviving to a massacre equivalent to a zombie attack,
-    thinking the incident was dealt with, believing that you could safely go back home to prepare for Christmas and that you could enjoy your seat on the train.
+    Merely seconds ago, you were aboard a train after surviving to a massacre equivalent to a zombie attack, thinking the incident was dealt with,
+    believing that you could safely go back home to prepare for Christmas and that you could enjoy your seat on the train.
   answers:
     "Now, you have to start everything over": {}
 
 ch2-5:
   text: >
-    While everyone is asking questions, trying to come up with eccentric hypotheses or just panicking, you try to think as hard as you can that the fingers of your left hand are able to go through the palm of your right hand.
-    You physically push your fingers against your palm, while imagining this impossible act, and nothing universe-breaking happens.
-    The reality check proves that you are not in some sort of nightmare but in a physical reality; either all of you have been victims of a collective hallucination, or you have traveled back in time.
+    While everyone is asking questions, trying to come up with eccentric hypotheses or just panicking,
+    you try to think as hard as you can that the fingers of your left hand are able to go through the palm of your right hand. You physically push your fingers against your palm,
+    while imagining this impossible act, and nothing universe-breaking happens. The reality check proves that you are not in some sort of nightmare,
+    but in a physical reality. So.. either all of you have been victims of a collective hallucination, or you have traveled back in time.
   answers:
     "There is only one way to check": {}
 
 ch2-6:
   text: >
-    Twenty-five minutes past four. You pack your bag, drop your answer sheet on the teacher’s desk, and leave the room while said teacher asks everyone to calm down.
+    16:25. You pack your bag, drop your answer sheet on the teacher’s desk, and leave the room while the teacher tries to calm everyone down.
 
 
-    You run down the stairs, exit the building using the lightest door and run to the metro station to try to catch up with your two minute delay, and take the metro.
+    You go donwn the stairs once again, it's not that quiet anymore, you hear people from other rooms talking loudly, tryuing to figure out what happened and
+    other teachers trying to calm everyone down.
 
 
-    Unlike the first time, there is no slowing down.
+    You exit the building and run to the metro statio, catching up with your two minute delay.
   answers:
-    "You absentmindedly listen to some passengers talking about theories over a big flash, confirming you were not alone in this event": {}
+    "In the train, you absentmindedly listen to some passengers talking about theories over a big flash, confirming you were not alone in this event": {}
 
 ch2-7:
   text: >
-    While entering the train station, you reflected about this white flash.
+    While waiting for the announcement of the train’s departure from track three, you decide to post your thoughts on a local anonymous forum. While
+    these tend to have many rambling, some people give their genuine thoughts there and your post will reach a big amount of people, who might
+    at least give you an interesting read later on.
 
-
-    The rewinding tape noise it made sounded quite familiar to me.
-    While waiting for the announcement of the train’s departure from track three, you chose to call an expert on the question, Valou.
-    You unlock your phone and look for the right contact, then start the call.
-    You keep the phone away from your head for a few seconds, waiting to hear the beeping,
-    to reduce the dose of electromagnetic waves it may send in your brain in an instinct you may be inheriting from a conspirationist ancestor.
+    You write something in the spirit of "Did the time just rewind? I was in the train and after the flash i was back at my exam classroom! What do you people think?"
+    and attach a cute image to make the post stand out more.
   answers:
-    "You press the phone against your left ear": {}
-
-ch2-8:
-  text: >
-    After the few moments you needed to salute each other and do some banal conversation, as you did not talk to each other for a while
-    you ask him the question that disturbs you.
-
-
-    -- “Do you think we've just returned to the past?"
-
-
-    -- "Yeah, the noise reminded me of that too, but we should not be remembering anything about it!”
-
-
-    While you talk, you look around, and notice the station is unusually empty. All the passengers awaiting in the hall before they ran to the train and became zombies are gone.
-
-
-    -- “People who die before a return to the past stay dead afterwards, right?"
-
-
-    -- "Yes, why are you asking that? Did someone die?"
-
-
-    -- "Maybe, yes. Sorry, I have to go, I will call you back and explain later.”
-
-
-    You almost hang up on him, hoping he will not mind too much, when you see Ralph coming at you, with a few of the passengers that were with you aboard the train before that return to the past.
+    "Send": {}
 
 ch2-9:
   text: >
-    They brief you about what they saw at the station right after the flash.
-    What you were worried about is real; dozens of people were found dead in the main hall.
+    After some time, you check your post again and after the obligatory insults, you see some actuall answers on the topic.
+    One of the users says they were at home for the day, so they didn't even notice anything except a flash, and then the time on their
+    computer changed, which they ignored, because computers are sometimes dumb like that, but now that they see that other people are talking about it,
+    it seems strange.
+
+
+    The other user seems to agree with your point and says that their office had a shorter shift today and they were already at home, but after
+    the flash they were back at their workplace, together with their coworkers, and one of them suddenly fell on the floor, when they checked on him,
+    he had no pulse.
+
+
+    Having read that, you actually notice that the stations is a lot less crowded. Maybe people freaked out and
+    decided to stay at home, instead of taking their train. Either that, or the people who were murdered by other mindless zombies
+    the last time you were here (several minutes in the future, according to your phone's clock), stayed dead even after the time went back,
+    and that coworker was unlucky enough to get crushed by the..
+
+    There's also a good chance that the people on the forum are just a bunch of trolls playing together, which seems to be the case a lot of the times on
+    the internet.
+
+
+    Finally, the announcement is made and the train arrives on the track three.
   answers:
-    "The dead died again": {}
+    "Board the train": {}
 
 ch2-10:
-  text:
-    Eight minutes to five.
+  text: >
+    16:52
 
 
-    Like the last time, the announcement at track three is made.
-    You walk calmly and get on the train, taking your seats on the same spots as last time.
-    Just to be sure, you check that the previously shattered door window no longer is.
+    You walk calmly and get on the train, you notice the same people you rode with the last time are there too,
+    you all take your seats on the same spots as last time. Just to be sure, you check that the previously shattered door window no longer is.
+    It seems that when the time rewinds, the physical state of the objects is restored, but living beings only have their bodies restored,
+    not their "minds", or "souls", or whatever, you're not sure.
   answers:
-    'Tell your “colleagues” about what you know of the situation': {}
+    "Tell your fellow travelers about what you know of the situation": {}
 
 ch2-11:
   text: >
-    Your theory is that you have experienced a fifty-one minute long return to the past.
+    Your theory is that you have gone fifty-one back to the past.
 
+    Also, living beings, most importantly humans, stay dead even after the time rewinds, although their bodies looks fine.
 
-    From what you know about returns to the past, as they existed in the show you and Valou have been fans of in your childhoods,
-    after a time travel, wounded people keep their wounds and dead people stay dead.
-
-
-    What does not fit, however, is that we kept memories of what happened.
-    In the show, the return to the past procedure is managed by a supercomputer simulating a virtual world inside.
-    The only people able to keep memories of the erased future are those who've been to this world at least once.
-    What is certain, considering the people that have died before being.. dead, is that you have not been victims of a collective hallucination, neither did all of you have the same nightmares.
+    You are now pretty certain though, considering the people who died before the return to the past have actually died once again, that you have not been victims of a collective hallucination,
+    neither did all of you have the same nightmares.
   answer:
     "Continue your trip": {}
 
 ch2-12:
   text: >
-    The trip went by without much trouble, and you have continued your discussions on your theories and read Wikipedia articles on time traveling.
+    The trip goes by without much trouble, and you continue your discussions on your theories and read Wikipedia articles on time traveling.
 
-
-    You also took the time to explain to Valou all of the things that have happened,
-    while regularly getting cut in some zones without network coverage on the train’s path.
+    You check your post on the forum again, but it seems that people have already lost interest in it, the only new response to your post reads
+    "i was asleep the whole time, yes i have a fucked up sleep schedule, don't judge me, but i feel like i got more sleep then usual".
   answers:
-    "You have arrived to Douai, safe and sound": {}
+    "You arrive to your destination, safe and sound": {}
 
 ch2-13:
   text: >
-    At this moment, you told yourself that this incident won't possibly happen again, that it will never be explained by scientists and that you will just move on.
+    At this moment, you tell yourself that this won't possibly happen again, that it will never be explained by scientists and that you will just move on. Things like
+    that probably happen from time to time.
 
 
-    You are just hoping you'll be able to go home and eat some good raclette while waiting for your Christmas presents.
+    You just hope that you'll be able to go home and eat some good raclette while waiting for your Christmas presents.
 
 
     But this hope has a hard time staying in your thoughts: Jehovah’s witnesses, standing next to the train station’s bus stops just like every morning and evening on weekdays,
-    are this time not just waiting for someone to come by and grab one of their magazines.
-    They are screaming at people, saying the end is nigh, inviting passersby to join their cause, to waste their money in this cult to be forgiven for their sins and to go to heaven,
-    hoping someone will be gullible enough to believe them.
+    are this time not just waiting for someone to come by and grab one of their magazines. They are screaming at people, saying the end is nigh, inviting passersby to join their cause,
+    to waste their money in this cult to be forgiven for their sins and to go to heaven, hoping someone will be gullible enough to believe them.
   answers:
     "Keep your distance": { SCENE: ch2-13-dont-talk }
     # Talk to them
 
 ch2-13-dont-talk:
   text: >
-    You go around them after saluting Ralph on the square in front of the station, and go back to your planned route, heading towards your bed.
+    You go around them and go back to your planned route, heading towards your sweet bed and lovely blanket.
 
 
-    During the whole walk, you cannot stop looking behind you, all around you, to make sure not to have any blind spots, just to be ready to flee from any kind of danger.
+    During the whole walk, you can't throw what happened before out of your head, feeling a little paranoid, you cannot stop looking behind you, all around you,
+    to make sure not to have any blind spots, just to be ready to flee from any kind of danger.
   answers:
     "Next": { SCENE: ch2-14 }
 
 ch2-14:
   text: >
-    Everything was going well until you saw a crowd of people filling the whole width of the street, waiting for something outside, in the cold.
-    You might have been able to go through them if you wanted to, but you were afraid this might make some of them angry or annoyed.
+    Everything is going well until you see a crowd of people filling the whole width of the street, waiting for something outside, in the cold.
+    You might be able to go through them if you really want to, but this might make some of them angry or annoyed.
 
 
     Due to some construction work on most bridges of the city, you cannot avoid walking in this street to head home.
   answers:
     "Stay safe, lower on the street, sit on a bench and wait until the crowd disperses": { SCENE: "ch2-14-sit" }
-    # Alternatively, have a path where you try to go though them
+    "Try to go through the crowd": { SCENE: "ch2-14-go" }
+
+
+ch2-14-go:
+  text: >
+    You go closer, to first figure out why's there so much people. Quickly, you notice a huge poster in front of the butchery,
+    announcing there are huge discounds on duck, goose and turkey meat, and it's friday, too, the sale seems to go pretty well.
+    A huge amount of people waiting to get their hands on some good meat for a low price for their christmas table.
+
+
+    You try to push through the crowd, being as polite as possible, not to angry them. Almost halfway through, you hear a scream.
+    Not a human scream though, but that of a pig. People in front seem concerned, and then suddenly turn around to run from the shop,
+    some buping into the people behind them. Then, the shop's window shatters, and a huge pig comes ramming out of it, right into the crowd.
+  answers:
+    "Run": {}
+
+ch2-14-go-2:
+  text: >
+    You quickly turn around in search of something reminiscent of a shelter, when you see someone climbing on the ladder to a rooftop of a building the
+    huge pig is heading to. The person is lucky to get up successfully, just before the pig smashes it's head against the ledder, which makes the ladder fall
+    down, on the head of an unlucky mother, which seemed to want to go for that same ladder.
+
+    Since the crowd is now gone, you run in the direction of your home, trying to get as far away from this butchery as possible, when you hear more screams,
+    and when you turn your head back, you see a bunch of smaller pigs running out of the butchery (for a moment, you wonder how did all of them even got there
+    in the first place, and why's there so much livestock in such a place).
+  answers:
+    "Turn to alleyways, in search of a higher spot": { SCENE: ch2-14-go-alleys }
+    "Go for the bridge nearby, to hide under it": { SCENE: ch2-14-go-bridge }
+
+ch2-14-go-alleys:
+  text: >
+    You suddenly turn to the side and run into the alleyway, which turns out to have a wall with trash container put right besides it.
+    You get up the container, as the pigs seem to catch up with you, but are too stupid to get up on the container to go after you,
+    so they just pile up one on another, screaming, and when the pile is hight enough for them to get up on the container, you've already
+    climbed on the wall.
+
+
+    You look on your phone's clock. 18:04. If the flashes rewiding time were not a one-time thing, which is what you have assumed until now,
+    the next flash should come right about now, and if that really was a one-time phenomenon, you'll have to come up with something else.
+
+    The clock turns to 18:05 and you see a bright light sphere coming from afar, you're safe for now, but what bothers you is that there will
+    probably be more flashes and more disasters, if there's already been two.
+  answers:
+    "Flash": { SCENE: ch2-22 }
+
+ch2-14-go-bridge:
+  text: >
+    You continue running and soon reach the bridge, under which you're able to hide from the pig horde.
+    Under the bridge, you find the man that you saw on the rooftop, aparently when pigs oliterated everyone who lingered near the shop for a little longer,
+    they went for the train station, giving him a chance to get down from the roof and hide under the bridge.
+  answers:
+    "Next": { SCENE: ch2-21 }
+
 
 ch2-14-sit:
   text: >
-    You sat on the bench and dicided to wait a little so you'd have a way to walk through while avoiding everyone.
-    In the meantime, you take the time to try and  understand what is gathering such a crowd here.
+    You sit on the bench and dicide to wait a little so you'd have a way to walk through while avoiding everyone.
+    In the meantime, you try to understand what is gathering such a crowd here.
   answers:
     "Observe": { SCENE: ch2-15 }
 
 ch2-15:
   text: >
-    You quickly find the answer; some huge posters on the butchery the crowd is in front of announce some important discounts on foie gras and turkey.
-    On this Friday 23rd of December, this could not have been a better time, and it seems it is working pretty well.
+    You quickly find the answer: some huge posters on the butchery the crowd is in front of announce some important discounts on duck, goose and turkey meat.
+    Today's friday, this could not have been a better time for such a sale, and it seems to be working pretty well.
     Dozens of parents, sometimes accompanied with their children, waiting for their turn to fatten up at a low cost, are blocking your way.
   answers:
     "Then, you hear screams": {}
 
 ch2-16:
   text: >
-    Those are not human screams, but pig.
-    You laugh a bit, telling yourself those children may not be really human, before some people start to run.
-    Quickly understanding your wish of going home has not been granted, you look around yourself and try to find some shelter.
+    Those are not human screams, but pig. You laugh a bit, telling yourself those children may not be really human, before some people start to run.
+    Quickly understanding your wish of going home safely has not been granted, you look around yourself and try to find some shelter.
     You see someone climbing up a ladder left on a construction site to get on a roof.
   answers:
     "Climb the ladder": { SCENE: ch2-16-ladder }
@@ -205,21 +245,22 @@ ch2-16-ladder:
 
 ch2-17:
   text: >
-    The crowd quickly spreads out, everyone fleeing as quickly, as Muslims in a racist joke, in front of the animal, who starts chasing and attacking everyone it sees.
-    The man you try to join lends you his hand as the sow runs towards you. He pulls you on the roof right before the ladder gets hit and falls on the ground, right over a mother who was trying to get her daughter to come with us.
+    The crowd quickly spreads out in front of the animal, who starts chasing and attacking everyone it sees.
+    The man you try to join lends you his hand as the sow runs towards you. He pulls you on the roof right before the ladder gets hit and falls on the ground,
+    right over a mother who was trying to get her daughter to come with us, bashing her on the head and probably killing her instantly.
 
 ch2-18:
   text: >
     Dozens of other pigs are coming out of the butchery, and you do not even try to ask yourself why is there so much alive livestock in this shop or how there can be so much in such a small space.
-    You witness everyone panicking on the street, parents and children agonizing in the middle of the road, their skin wounded by pig trotters.
+    You witness everyone panicking on the street, parents and children agonizing in the middle of the road, including the now-orphan daughter of the woman hit by the ladder, their skin wounded by pig trotters.
     A grandmother, up until now miraculously spared, falls after getting hit by two of the enraged animals at once.
 
 ch2-19:
   text: >
-    After successfully reducing every form of human life in this street to a pile of dead meat,
-    the pigs head in the direction of the train station, to try to find more victims. It was at this moment you chose to go back down.
+    After successfully reducing every form of human life in this street to a pile of dead meat, the pigs head in the direction of the train station, to try to find more victims.
+    It was at this moment you chose to go back down.
 
-    You mess up your jump, scratch your right hand, and keep going.
+    You mess up your jump, scratch your right hand, but keep going.
   answers:
     "Run towards the bridge": {}
 
@@ -237,36 +278,35 @@ ch2-20:
 
 ch2-21:
   text: >
-    Four minutes past six post meridiem.
+    18:04
 
 
-    On a routine day, you would have been home for four minutes, reading e-mails and making sure everything is going well on your blog, after eating a cookie from Subway.
+    On a routine day, you would have already been home, reading e-mails, checking comments on your blog, eating something sweet, like a cookie or a chocolate bar, whatever comes.
 
 
-    You catch your breath, and the man asks you if you believe this is linked to the weird flash from earlier.
+    The man asks you if you believe this is linked to the weird flash from earlier.
   answers:
     "You tell him it is possible, and that you will probably just know with the next return to the past": {}
 
 ch2-22:
   text: >
-    He looks at you with a puzzled face.
-    You point your finger at a glowing white sphere spreading towards you, but he does not have time to turn his head.
+    He looks at you with a puzzled face. You point your finger at a glowing white sphere spreading towards you, but he does not have time to turn his head.
 
 
     You manage to look at your watch just in time, so to speak.
 
 
-    Five minutes and zero seconds past six.
+    18:05
   answers:
     "Flash": {}
 
 ch2-22:
   text: >
-    Fourteen minutes past five post meridiem, Central European Time.
+    17:14
 
-
-    It has now been ten minutes since the departure of the empty train you are currently on, during rush hour, sitting on one of the best seats, with a dozen people,
-    including one of your friends. With a weary look and a sigh, you speak up.
+    It has now been ten approximately ten minutes since the departure of the empty train you are currently on, during rush hour, sitting on one of the best seats, with a couple of other people, including one of your friends.
+    With a weary look and a sigh, you speak up.
 
   answers:
-    '“Some pigs butchered people in a butchery in Douai”': { SCENE: ch3-1 }
+
+    '“There has been a butchery, pigs slaughtered a whole bunch of people"': { SCENE: ch3-1 }
