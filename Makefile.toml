@@ -1,0 +1,44 @@
+[env]
+CSFML_HOME = "${CARGO_MAKE_WORKING_DIRECTORY}/deps/csfml" # Full paths are important
+SFML_HOME = "${CARGO_MAKE_WORKING_DIRECTORY}/deps/sfml"
+LD_RUN_PATH = "lib"  # This will be needed when/if we build a release, the libraries will be in lib
+
+[tasks.update-submodules]
+command = "git"
+args = ["submodule", "update", "--init", "--recursive"]
+
+[tasks.build-sfml]
+dependencies = ["update-submodules"]
+cwd = "deps/sfml"
+script = [
+    "cmake .",
+    "cmake --build ."
+]
+
+[tasks.build-csfml]
+dependencies = ["build-sfml"]
+cwd = "deps/csfml"
+script = [
+    "cmake .",
+    "cmake --build ."
+]
+
+[tasks.build]
+dependencies = ["build-csfml"]
+
+[tasks.run]
+dependencies = ["build"]
+env = { "LD_LIBRARY_PATH" = "deps/sfml/lib:deps/csfml/lib" }
+command = "cargo"
+args = ["run"]
+
+[tasks.build-release]
+dependencies = ["build-csfml"]
+
+[tasks.release]
+dependencies = ["build-release"]
+script = [
+    "mkdir -p _rel/lib",
+    "cp target/release/vacances _rel/vacances",
+    "cp -r deps/{csfml,sfml}/lib/ _rel/" # Copy libraries into _rel/lib
+]
