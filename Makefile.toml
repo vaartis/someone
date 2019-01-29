@@ -2,6 +2,7 @@
 CSFML_HOME = "${CARGO_MAKE_WORKING_DIRECTORY}/deps/csfml" # Full paths are important
 SFML_HOME = "${CARGO_MAKE_WORKING_DIRECTORY}/deps/sfml"
 LD_RUN_PATH = "lib"  # This will be needed when/if we build a release, the libraries will be in lib
+TARGET = "${CARGO_MAKE_RUST_TARGET_ARCH}-${CARGO_MAKE_RUST_TARGET_VENDOR}-${CARGO_MAKE_RUST_TARGET_OS}-${CARGO_MAKE_RUST_TARGET_ENV}"
 
 [tasks.update-submodules]
 command = "git"
@@ -11,7 +12,7 @@ args = ["submodule", "update", "--init", "--recursive"]
 dependencies = ["update-submodules"]
 cwd = "deps/sfml"
 script = [
-    "cmake .",
+    "cmake . ${SFML_CMAKE_ARGS}",
     "cmake --build ."
 ]
 
@@ -19,26 +20,40 @@ script = [
 dependencies = ["build-sfml"]
 cwd = "deps/csfml"
 script = [
-    "cmake . -DSFML_DIR=$SFML_HOME",
+    "cmake . -DSFML_DIR=$SFML_HOME ${CSFML_CMAKE_ARGS}",
     "cmake --build ."
 ]
 
 [tasks.build]
 dependencies = ["build-csfml"]
+args = [
+    "build",
+    "--target=${TARGET}"
+]
+
+[tasks.build-release]
+dependencies = ["build-csfml"]
+args = [
+    "build",
+    "--release",
+    "--target=${TARGET}"
+]
+
+[tasks.release]
+dependencies = ["build-release"]
+script = [
+    "mkdir -p _rel/lib",
+    "cp target/${TARGET}/release/vacances _rel/vacances",
+    "cp -r deps/{csfml,sfml}/lib/ _rel/" # Copy libraries into _rel/lib
+]
+
+[tasks.release-32]
+comment = "Build a release for 32bit linux"
+env = { CC = "cc -m32", TARGET = "i686-unknown-linux-gnu", CSFML_CMAKE_ARGS = "-DCMAKE_CXX_FLAGS=-m32", SFML_CMAKE_ARGS = "-DCMAKE_CXX_FLAGS=-m32" }
+run_task = "release"
 
 [tasks.run]
 dependencies = ["build"]
 env = { "LD_LIBRARY_PATH" = "deps/sfml/lib:deps/csfml/lib" }
 command = "cargo"
 args = ["run"]
-
-[tasks.build-release]
-dependencies = ["build-csfml"]
-
-[tasks.release]
-dependencies = ["build-release"]
-script = [
-    "mkdir -p _rel/lib",
-    "cp target/release/vacances _rel/vacances",
-    "cp -r deps/{csfml,sfml}/lib/ _rel/" # Copy libraries into _rel/lib
-]
