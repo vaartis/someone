@@ -19,7 +19,7 @@ script = [
 dependencies = ["build-sfml"]
 cwd = "deps/csfml"
 script = [
-    "cmake .",
+    "cmake . -DSFML_DIR=$SFML_HOME",
     "cmake --build ."
 ]
 
