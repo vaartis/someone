@@ -68,7 +68,7 @@ ch2-7:
   answers:
     "Send": {}
 
-ch2-9:
+ch2-8:
   text: >
     After some time, you check your post again and after the obligatory insults, you see some actuall answers on the topic.
     One of the users says they were at home for the day, so they didn't even notice anything except a flash, and then the time on their
@@ -94,7 +94,7 @@ ch2-9:
   answers:
     "Board the train": {}
 
-ch2-10:
+ch2-9:
   text: >
     16:52
 
@@ -106,7 +106,7 @@ ch2-10:
   answers:
     "Tell your fellow travelers about what you know of the situation": {}
 
-ch2-11:
+ch2-10:
   text: >
     Your theory is that you have gone fifty-one back to the past.
 
@@ -117,7 +117,7 @@ ch2-11:
   answer:
     "Continue your trip": {}
 
-ch2-12:
+ch2-11:
   text: >
     The trip goes by without much trouble, and you continue your discussions on your theories and read Wikipedia articles on time traveling.
 
@@ -126,7 +126,7 @@ ch2-12:
   answers:
     "You arrive to your destination, safe and sound": {}
 
-ch2-13:
+ch2-12:
   text: >
     At this moment, you tell yourself that this won't possibly happen again, that it will never be explained by scientists and that you will just move on. Things like
     that probably happen from time to time.
@@ -139,10 +139,10 @@ ch2-13:
     are this time not just waiting for someone to come by and grab one of their magazines. They are screaming at people, saying the end is nigh, inviting passersby to join their cause,
     to waste their money in this cult to be forgiven for their sins and to go to heaven, hoping someone will be gullible enough to believe them.
   answers:
-    "Keep your distance": { SCENE: ch2-13-dont-talk }
+    "Keep your distance": { SCENE: ch2-12-dont-talk }
     # Talk to them
 
-ch2-13-dont-talk:
+ch2-12-dont-talk:
   text: >
     You go around them and go back to your planned route, heading towards your sweet bed and lovely blanket.
 
@@ -150,9 +150,9 @@ ch2-13-dont-talk:
     During the whole walk, you can't throw what happened before out of your head, feeling a little paranoid, you cannot stop looking behind you, all around you,
     to make sure not to have any blind spots, just to be ready to flee from any kind of danger.
   answers:
-    "Next": { SCENE: ch2-14 }
+    "Next": { SCENE: ch2-13 }
 
-ch2-14:
+ch2-13:
   text: >
     Everything is going well until you see a crowd of people filling the whole width of the street, waiting for something outside, in the cold.
     You might be able to go through them if you really want to, but this might make some of them angry or annoyed.
@@ -160,11 +160,11 @@ ch2-14:
 
     Due to some construction work on most bridges of the city, you cannot avoid walking in this street to head home.
   answers:
-    "Stay safe, lower on the street, sit on a bench and wait until the crowd disperses": { SCENE: "ch2-14-sit" }
-    "Try to go through the crowd": { SCENE: "ch2-14-go" }
+    "Stay safe, lower on the street, sit on a bench and wait until the crowd disperses": { SCENE: ch2-13-sit }
+    "Try to go through the crowd": { SCENE: ch2-13-go-1 }
 
 
-ch2-14-go:
+ch2-13-go-1:
   text: >
     You go closer, to first figure out why's there so much people. Quickly, you notice a huge poster in front of the butchery,
     announcing there are huge discounds on duck, goose and turkey meat, and it's friday, too, the sale seems to go pretty well.
@@ -177,7 +177,7 @@ ch2-14-go:
   answers:
     "Run": {}
 
-ch2-14-go-2:
+ch2-13-go-2:
   text: >
     You quickly turn around in search of something reminiscent of a shelter, when you see someone climbing on the ladder to a rooftop of a building the
     huge pig is heading to. The person is lucky to get up successfully, just before the pig smashes it's head against the ledder, which makes the ladder fall
@@ -187,10 +187,10 @@ ch2-14-go-2:
     and when you turn your head back, you see a bunch of smaller pigs running out of the butchery (for a moment, you wonder how did all of them even got there
     in the first place, and why's there so much livestock in such a place).
   answers:
-    "Turn to alleyways, in search of a higher spot": { SCENE: ch2-14-go-alleys }
-    "Go for the bridge nearby, to hide under it": { SCENE: ch2-14-go-bridge }
+    "Turn to alleyways, in search of a higher spot": { SCENE: ch2-13-go-alleys }
+    "Go for the bridge nearby, to hide under it": { SCENE: ch2-13-go-bridge }
 
-ch2-14-go-alleys:
+ch2-13-go-alleys:
   text: >
     You suddenly turn to the side and run into the alleyway, which turns out to have a wall with trash container put right besides it.
     You get up the container, as the pigs seem to catch up with you, but are too stupid to get up on the container to go after you,
@@ -206,7 +206,7 @@ ch2-14-go-alleys:
   answers:
     "Flash": { SCENE: ch2-22 }
 
-ch2-14-go-bridge:
+ch2-13-go-bridge:
   text: >
     You continue running and soon reach the bridge, under which you're able to hide from the pig horde.
     Under the bridge, you find the man that you saw on the rooftop, aparently when pigs oliterated everyone who lingered near the shop for a little longer,
@@ -215,14 +215,14 @@ ch2-14-go-bridge:
     "Next": { SCENE: ch2-21 }
 
 
-ch2-14-sit:
+ch2-13-sit:
   text: >
     You sit on the bench and dicide to wait a little so you'd have a way to walk through while avoiding everyone.
     In the meantime, you try to understand what is gathering such a crowd here.
   answers:
-    "Observe": { SCENE: ch2-15 }
+    "Observe": { SCENE: ch2-14 }
 
-ch2-15:
+ch2-14:
   text: >
     You quickly find the answer: some huge posters on the butchery the crowd is in front of announce some important discounts on duck, goose and turkey meat.
     Today's friday, this could not have been a better time for such a sale, and it seems to be working pretty well.
@@ -230,35 +230,35 @@ ch2-15:
   answers:
     "Then, you hear screams": {}
 
-ch2-16:
+ch2-15:
   text: >
     Those are not human screams, but pig. You laugh a bit, telling yourself those children may not be really human, before some people start to run.
     Quickly understanding your wish of going home safely has not been granted, you look around yourself and try to find some shelter.
     You see someone climbing up a ladder left on a construction site to get on a roof.
   answers:
-    "Climb the ladder": { SCENE: ch2-16-ladder }
+    "Climb the ladder": { SCENE: ch2-15-ladder }
     # Run or something else
 
-ch2-16-ladder:
+ch2-15-ladder:
   text: >
     As you decide to join this seemingly smarter human being, you take a look back at the butchery, from where the screams have not ceased.
     The shop’s window gets shattered to pieces and reveals a rather big pig.
   answers:
     "Next": { SCENE: ch2-17 }
 
-ch2-17:
+ch2-16:
   text: >
     The crowd quickly spreads out in front of the animal, who starts chasing and attacking everyone it sees.
     The man you try to join lends you his hand as the sow runs towards you. He pulls you on the roof right before the ladder gets hit and falls on the ground,
     right over a mother who was trying to get her daughter to come with us, bashing her on the head and probably killing her instantly.
 
-ch2-18:
+ch2-17:
   text: >
     Dozens of other pigs are coming out of the butchery, and you do not even try to ask yourself why is there so much alive livestock in this shop or how there can be so much in such a small space.
     You witness everyone panicking on the street, parents and children agonizing in the middle of the road, including the now-orphan daughter of the woman hit by the ladder, their skin wounded by pig trotters.
     A grandmother, up until now miraculously spared, falls after getting hit by two of the enraged animals at once.
 
-ch2-19:
+ch2-18:
   text: >
     After successfully reducing every form of human life in this street to a pile of dead meat, the pigs head in the direction of the train station, to try to find more victims.
     It was at this moment you chose to go back down.
@@ -267,7 +267,7 @@ ch2-19:
   answers:
     "Run towards the bridge": {}
 
-ch2-20:
+ch2-19:
   text: >
     You are too busy running away to have any time to talk to the person that was with you on the roof.
 
@@ -279,7 +279,7 @@ ch2-20:
   answers:
     "Join the man and hide under the bridge": {}
 
-ch2-21:
+ch2-20:
   text: >
     18:04
 
@@ -291,7 +291,7 @@ ch2-21:
   answers:
     "You tell him it is possible, and that you will probably just know with the next return to the past": {}
 
-ch2-22:
+ch2-21:
   text: >
     He looks at you with a puzzled face. You point your finger at a glowing white sphere spreading towards you, but he does not have time to turn his head.
 
