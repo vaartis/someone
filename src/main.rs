@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use sfml::window::*;
 use sfml::system::*;
 use sfml::graphics::*;
@@ -13,10 +11,6 @@ mod term;
 use crate::vn::buttons::*;
 use crate::vn::*;
 
-#[derive(rust_embed::RustEmbed)]
-#[folder = "scenes"]
-struct Scenes;
-
 enum UpperPartState {
     VN,
     Terminal
@@ -28,6 +22,11 @@ struct State<'a> {
 }
 
 fn main() {
+    simplelog::TermLogger::init(
+        if cfg!(debug_assertions) { simplelog::LevelFilter::Debug } else { simplelog::LevelFilter::Warn },
+        simplelog::Config::default()
+    ).unwrap();
+
     let mut window = RenderWindow::new(
         (1280, 1024),
         "Vacances",
@@ -36,12 +35,7 @@ fn main() {
     );
     window.set_framerate_limit(60);
 
-    let scenes = Scenes::iter().map(|scene_name| {
-        let content_utf = Scenes::get(&scene_name).unwrap();
-        let content = std::str::from_utf8(&content_utf).unwrap();
-
-        scene_parser::parse_scene_str(&content)
-    }).flatten().collect::<HashMap<_, _>>();
+    let scenes = scene_parser::parse_scene_file("chapter_1.yml");
 
     let prop = system_fonts::FontPropertyBuilder::new().family("Ubuntu").build();
     let (font_data, _) = system_fonts::get(&prop).unwrap();

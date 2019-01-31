@@ -309,7 +309,7 @@ ch2-22:
 
     It has now been ten approximately ten minutes since the departure of the empty train you are currently on, during rush hour, sitting on one of the best seats, with a couple of other people, including one of your friends.
     With a weary look and a sigh, you speak up.
-
+  import:
+    - chapter_3
   answers:
-
     '“There has been a butchery, pigs slaughtered a whole bunch of people"': { SCENE: ch3-1 }

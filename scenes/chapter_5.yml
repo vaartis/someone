@@ -174,5 +174,7 @@ ch5-19:
 
 
     The plan is to try every single possibliity: scan for Wi-Fi networks, Bluetooth devices or radio transmissions around the island, analyze the electrical network, and maybe even try to map out the sewers.
+  import:
+    - chapter_6
   answers:
     "Equipped with your phones, two talkie-walkies, a ThinkPad with a brand new Kali Linux setup, flashlights, paper, pencils, food and drinks, you went out to chase every possible clue on the Seguin island and its surroundings, at eighteen minutes past five post meridiem, Central European Time, on this Saturday, the twenty-fourth of December.": { SCENE: ch6-1 }

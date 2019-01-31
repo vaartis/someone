@@ -192,5 +192,7 @@ ch3-18:
     You turn on your phone and restart the video call.
     Valou answers immediately, but Rémi takes some time. After a few stressful seconds, he answers and says he is fine, but certainly not everyone is.
     In the background, you hear people crying in front of the corpses of their relatives, killed in a fire that never happened.
+  import:
+    - chapter_4
   answers:
     "Next": { SCENE: ch4-1 }

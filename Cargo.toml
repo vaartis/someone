@@ -15,3 +15,6 @@ serde_derive = "^1.0"
 serde_yaml = "^0.8"
 
 rust-embed = "4.3.0"
+
+log = "0.4.6"
+simplelog = "0.5.3"

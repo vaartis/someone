@@ -275,5 +275,7 @@ start25:
 start26:
   text: >
     As far as you are concerned, those questions may find their answer at some point, but for now, you are on your Christmas holidays and have a warm seat on the train.
+  import:
+    - chapter_2
   answers:
     "Next": { SCENE: ch2-1 }
