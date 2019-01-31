@@ -135,12 +135,14 @@ ch2-12:
     You just hope that you'll be able to go home and eat some good raclette while waiting for your Christmas presents.
 
 
-    But this hope has a hard time staying in your thoughts: Jehovah’s witnesses, standing next to the train station’s bus stops just like every morning and evening on weekdays,
+    But this hope has a hard time staying in your thoughts: jehovah’s witnesses, standing next to the train station’s bus stops just like every morning and evening on weekdays,
     are this time not just waiting for someone to come by and grab one of their magazines. They are screaming at people, saying the end is nigh, inviting passersby to join their cause,
     to waste their money in this cult to be forgiven for their sins and to go to heaven, hoping someone will be gullible enough to believe them.
+  import:
+    - chapter_2/jehovah
   answers:
     "Keep your distance": { SCENE: ch2-12-dont-talk }
-    # Talk to them
+    "Approach him": { SCENE: ch2-jehovah-1 }
 
 ch2-12-dont-talk:
   text: >
