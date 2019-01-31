@@ -56,4 +56,7 @@ run_task = "release"
 dependencies = ["build"]
 env = { "LD_LIBRARY_PATH" = "deps/sfml/lib:deps/csfml/lib" }
 command = "cargo"
-args = ["run"]
+args = [
+    "run",
+    "--target=${TARGET}"
+]
