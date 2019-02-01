@@ -12,12 +12,12 @@ ch2-jehovah-2:
   text: >
     You too, stranger, must listen me out, for i have brought you the truth!
   answers:
-    'Ask him, what is "the trush" he wants to tell you': {}
+    'Ask him, what is "the truth" he wants to tell you': {}
 
 ch2-jehovah-3:
   text: >
     "First off", he says, "thank you for listening.", and then, after a short pause, continues:
-    "You have of course heard of the madness happening, making people kill their brosers and sister, making them destroy what surrounds them".
+    "You have of course heard of the madness happening, making people kill their brothers and sisters, making them destroy what surrounds them".
 
     Indeed, you have seen what happened, and news spread fast. It seems this man has a theory on what's happening, "Maybe he isn't really all that bonkers", you think to yourself.
     You should consider all the theories out there if you want to dig out the truth.
@@ -60,7 +60,7 @@ ch2-jehovah-8:
 
     Why did you even think he was NOT bonkers? You can probably safely disregard their theory, but you decide to stay for a little more and ask some questions, just to see him react to them.
   answers:
-    '"And by the forces of the good participating in the war, you, of course, mean, that you, the jehovah witnesses, will be participating in the battle too, right?"': {}
+    '"And by the forces of the good participating in the war, you, of course, mean, that you, the Jehovah witnesses, will be participating in the battle too, right?"': {}
 
 ch2-jehovah-9:
   text: >
@@ -68,48 +68,48 @@ ch2-jehovah-9:
     "We admit, that many will die as a result of this battle, that includes us, but we, Jehovah's Witnesses, actuall avoid any violence at all. The true belivers do. The great and righteous people of our
     ranks are already in heaven, and they have becames the spirits of our God, they will battle in the war, and thouse of us, who will die in the last battles, will be revived after some times, when Jesus will rule the world."
   answers:
-    '"So, the world will be populated by jehovahs witnesses, then, while other people will go to hell?"': {}
+    '"So, the world will be populated by Jehovah's witnesses, then, while other people will go to hell?"': {}
 
 ch2-jehovah-10:
   text: >
-    "Do I have to answer honestly?", he asks, surprised. "Answer the way your beliefs, the ones you try to make people belive in, tell you to answer", you tell him.
+    "Do I have to answer, honestly?", he asks, surprised. "Answer the way your beliefs, the ones you try to make people believe in, tell you to answer", you tell him.
 
-    He, once again, takes a breather, and continues: "No. Now, I know, there are many delusion about our religion. Yes, our teachings are the most correct in explaning
-    what the humanity should expect, but practicers of other religions can join the holy spirits, too. Some of my collegues, if i may say so, say, that that includes even non-christians, although
-    i do not belive that myself, considering that the might of Jesus, and not anybody else, shall lead the world soon, not some Magomed or Buddah, not to mention pagan gods, that man have come up with and that have never existed.
+    He, once again, takes a breather, and continues: "No. Now, I know, there are many delusions about our religion. Yes, our teachings are the most correct in explaning
+    what the humanity should expect, but practicers of other religions can join the holy spirits, too. Some of my collegues, if I may say so, say that that includes even non-christians, although
+    U do not believe that myself, considering that the might of Jesus, and not anybody else, shall lead the world soon, not some Magomed or Buddah, not to mention pagan gods, that men have come up with and that have never existed.
     One just has to give up any violence, in any form, avoid sins, confess one's eveil deeds, and, of course, avoid them in the future."
   answers:
     '"So, why do you think that what is happening is the "Armageddon"? Many mass hysterias have happened before, as far as i remember. The diseases of dances, of laughter, of violence.."': {}
 
 ch2-jehovah-11:
   text: >
-    "Alas, that we can just belive in", he says, somewhat disappointed, "but the proofs shall come soon. You'll see."
+    "Alas, that we can just believe in", he says, somewhat disappointed, "but the proofs shall come soon. You'll see."
   answers:
-    '"Well, then, i refuse"': {}
+    '"Well, then, I refuse"': {}
 
 ch2-jehovah-12:
   text: >
     "Refuse to what?", he asks, somewhat confused.
   answers:
-    '"To belive. To do that, i will have to think everything out. And get proofs of the fact that i really should do it."': {}
+    '"To believe. To do that, i will have to think everything out. And get proof of the fact that I really should do it."': {}
 
 ch2-jehovah-13:
   text: >
-    "This is reasonable for many things, i cannot argue. But in spiritual matters like that, there's always a risk of dying, before you choose the right side", he says,
+    "This is reasonable for many things, I cannot argue. But in spiritual matters like that, there's always a risk of dying, before you choose the right side", he says,
     finally loosing confidence in getting you involved, but still trying his best to convince you.
   answers:
-    '"Then it is even more impoerant to have proofs, to know the rightness of your side"': {}
+    '"Then it is even more important to have proof, to know the rightness of your side"': {}
 
 ch2-jehovah-14:
   text: >
-    Maybe, that is true, but even if the "hysteria" of people is just a temporary effect, and not the sign of the Armageddon being here, not just being close.. Is confessing your sins evil?
-    It will cleanse your, bring you closer to the trush". It seems that he has completely given up.
+    Maybe, that is true, but even if the "hysteria" of people is just a temporary effect, and not the sign of the Armageddon being here, not just being close... Is confessing your sins evil?
+    It will cleanse you, bring you closer to the truth". It seems that he has completely given up.
   answers:
     '"Oh well. It has been interesting to talk to you, but now, i should get going. Have fun", you tell him, turning around': {}
 
 ch2-jehovah-15:
-  text: >-
-    "As you wish", he sighs, "Goodbye, i hope you will be back someday"
+  text: >
+    "As you wish", he sighs, "Goodbye, I hope you will be back someday"
 
   answers:
     "Move along": { SCENE: "ch2-13" }
