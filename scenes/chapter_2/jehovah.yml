@@ -68,7 +68,8 @@ ch2-jehovah-9:
     "We admit, that many will die as a result of this battle, that includes us, but we, Jehovah's Witnesses, actuall avoid any violence at all. The true belivers do. The great and righteous people of our
     ranks are already in heaven, and they have becames the spirits of our God, they will battle in the war, and thouse of us, who will die in the last battles, will be revived after some times, when Jesus will rule the world."
   answers:
-    '"So, the world will be populated by Jehovah's witnesses, then, while other people will go to hell?"': {}
+    # Fix the ' here
+    '"So, the world will be populated by Jehovahs witnesses, then, while other people will go to hell?"': {}
 
 ch2-jehovah-10:
   text: >
