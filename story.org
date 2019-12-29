@@ -9,24 +9,24 @@
 
   How should i call you then?
 
-  I guess <P> would for for now.
+  I guess <P> would do for for now.
 
   Very well, <P>. Since you're here, i'll show you around.
 
-  You look around. You are standing in an empty room with the <narrator>.
+  You are standing in an empty room with the <narrator>.
 
   Well, there isn't much much to show now. There was more, but it got shut off. Maybe you could
   do something with that?
 
-  How would i do that?
+  And just how would i do that?
 
   You're sitting in front of a computer screen, aren't you?
 
   <The background becomes a screen frame instead of just white>
 
-  Well, not that you mention it. Yeah, i do..
+  Well, now that you mention it. Yeah, i do..
 
-  Maybe check your surroundings out? I'll be here, of course. Not like i can go anywhere :)
+  Maybe check your surroundings out? I'll still be here, of course. Not like i can go anywhere :)
 
 * First time in the room
   There's a room where the player is in. The player is some ambigous figure in a hoodie or something like that.
@@ -44,7 +44,7 @@
   What do you mean "we all"? There are more people here?
 
   There were. I don't know if they're still here. It's been some time since there was anything here.
-  But now you are here. And the forest is too.
+  But now you're here at least. And the forest is back too.
 
   Then what do you mean by "woke up"?
 
@@ -53,22 +53,22 @@
   i would do is walk through the forest, looking around for anything to do at all. With time though,
   more people came, just like me, with no recollection of what happened. They found themselves in this
   very forest. They went looking for something to do, like i did, and eventually met the others.
-  There were all kinds of creatures appearing. Some of them were very much sentient, like me and you.
-  Some were just following instincts. What connected them was that they all were just as confused as you and me.
+  There were all kinds of creatures appearing, too. Some of them were very much sentient, like me and you,
+  some were more animal-like, just following instincts. What seemed to connect them was that they all were just as confused.
 
   So what happened? Where did everyone go?
 
   Something bad. I'm not sure what exactly happened, but it seemed like the world was being cut off piece by piece.
   One day, someone found a wall at the edge of the forest. A wall that looked just like those
   in the room we were just in. Just a gray wall that seemed to extend in all directions. The next day the wall grew closer.
-  People were scaried. Long story short, eventually the whole shrank to a single room. I don't know were the other people went,
+  People were scaried. Long story short, eventually the whole world shrank to a single room. I don't know were the other people went,
   i haven't seen them in a while. I have no idea how much time i've been in that gray box, alone. But now you're here,
-  and that means something is happening. Let us at least go for a walk, i've been on this same spot for so long it feels like forever.
-  I'd like to at least take a stroll through the forest while we can.
+  and that probably means something is happening. Now, let's at least go for a walk, shall we? I've been on this same spot for so long it
+  feels like forever. I'd like to at least take a stroll through the forest while we can.
 
-  Sure, there's no point in staying on this spot anyway. Let's go for a walk.
+  Sure, there's no point in staying here anyway.
 
-  <You start walking through the forest you were now in. It's not very thick, but there is still plenty of plants and trees. Although all of them
+  <You walk through the forest you were now in. It's not very thick, but there is still plenty of plants and trees. Although all of them
   look somewhat similiar with small variation>
 
   <P>: So.. what was life like here, anyway? Until everything diasppeared, that is..
@@ -79,70 +79,99 @@
   True... I'd still want to know what it was like here.
 
   Well, after some time spent just going around the forest and finding other people, we decided to settle down somewhere. This is where we're currently heading,
-  or so i hope. I haven't seen this forest in so long. For some reason, there were some people that knew how to make "instruments", while others didn't. They couldn't
-  explain where they got this knowledge, it's like it appread when the need arose. These people would make these simple instruments from what was in the forest. It looked
-  like they were just smashing things together and then the tools just appeared in their hands. Others tried to do this too, but could not succeed. Then the instruments
-  were used to chop down the trees, uproot stumps, and build from that. Other people knew how to make dyes from flowers and other plants. Same process that happened
-  with the tools. The first houses were pretty simple, but of course, as time went on people would make it more sophisticated. Eventually we learned how to make other things, too.
-  Some people, who were not able to create anything by hand, wanted to create for other's joy and entertainment, so they used paints to draw pictures and paper and ink
-  to write tales. Some volunteered to document the history of what was happening around them, and with those people the libraries appeared. They'd organize their
+  or so i hope, since i haven't seen this forest in so long. For some reason, there were some people that knew how to make "instruments", while others didn't. They couldn't
+  explain where they got this knowledge, it's like it just appread in their heads when the need arose. These people would make these simple instruments from what was in the forest. It looked
+  like they were just smashing things together and then the tools just appeared in their hands. Others tried to do this too, but would not succeed. Then the instruments
+  were used to chop down the trees, uproot stumps, and build from that. Other people knew how to make dyes from flowers and other plants. They did it the same way others made tools
+  The first houses were pretty simple, but of course, as time went on people would make them more sophisticated and fancy, to stand out more. Eventually we learned how to make other things, too.
+  Some people, who were not able to create anything by hand, would create for other's joy and entertainment, so they used paints and dyes to draw pictures, others would use paper and black dyes
+  to write tales and stories. Some volunteered to document the history of what was happening around them, and with those people the libraries appeared. They'd organize their
   written history in books and store them all in one place. Sounds pretty cool, right?
 
   Yeah, that's useful, probably?
 
   Maybe for the new people that come like you it would be. People here wouldn't age, they were all around for as long as i can remember, until what happened happened.
+  Anway, after sometime fire was discovered and the first library burnt down with most of the books in it. Some were rewritten from memory after that, but many still
+  went away forever.
 
-  Anway, after sometime fire was discovered and the first library burnt down with most of the books in it.
+  Oh.
 
-  Owch.
-
-  Indeed. So the next one they built out of stone. Not long after that concrete was discovered by accident. Same happened with glass.
+  Indeed. So the next library was built out of stone. Not long after that concrete was discovered by accident. Same happened with glass.
   Fast forward some time, and there were now not only one place where everyone lived, cities became a thing, they were huge, with
-  asphalt roads and tall buildings. People would come up with crazy jobs for themselves. They started to dig into the world itself.
+  asphalt roads and tall buildings. People would come up with different work for themselves. They started to dig into the world itself.
   Trying to find out how things work. Eventually, a certain person showed up. They didn't name themselves, but claimed to be the creator
-  of this world. They moved rather unnaturally, as if they somehow didn't properly "add" themself into the world, or were in a hurry.
-  They told the researchers about the world, about how that person watched them grow and that now they had come to live with them
-  in that world they have created. A bit after that, the thing happened, everyone and everything disappeared, nobody had seen the supposed
-  creator of the world for some time. Panic. And then everything was gone. Except me. I was still there, for some reason. I lived to tell the tale.
+  of this world. They moved rather unnaturally, as if they somehow didn't properly "add" themself into the world, if they indeed had capabilities of doing so,
+  or were in a hurry. They told the researchers about the world, about how that person watched them grow and that now they had come to live with them
+  in that world they have created. A bit after that, the "creator" disappeared, and then the thing happened, the world was vanishing.
+  Panic. And then everything ceased to be. Except me. I was still there, for some reason.
 
   That is one crazy story, but of course i have no choice except to belive it. I have no idea what i am doing here anyway, so might as well take some
-  eplanation for granted, you really now a lot more about things than I do. Oh and by the way, do I have anything in common with the "creator" you mentioned
-  since you so confidently asked me if i'm sitting in front of a computer screen?
+  explanation for granted, you really now a lot more about things than I do. Oh and by the way, you so confidently asked me if i'm sitting in front of a computer screen,
+  how come you were so certain?
 
-  There's something in the way you move that gives it up. It might just be my imagination, but after i've been alone for so long you really start beliving it without
-  thinking too much. Anyway, we're here. This is the place where i used to live.
+  There's something in the way you move that gives it up, similiar to how the creator was. It might just be my imagination, i really wanted to belive that you had something in common
+  with them, and it turned out you did. Anyway, we're there. This is the place where i used to live.
 
-  <You see somewhat remeniscent of a village. There are a lot of cottages of all shapes and colors. No living creature seems
-  to be around except two of you. All the windows are dark, too. There is central road around which all the houses seem to have been built.
+  <You see something reminiscent of a village. There are a lot of cottages of all shapes and colors. No living creature seems
+  to be around except two of you. All the windows are dark, too. There is a central road around which all the houses seem to have been built.
   Or rather, probably, the road was made to connect the first houses and then the others were built along it.>
 
-  <narrator>: my house is the one on the edge of road. I found it convenient to live on the edge of the village, since it was one
-  of the first ones. The road was made a long time after it was built, connecting my house and the house of a certain friend of mine first,
+  <narrator>: my house is the one on the edge of the road. Since my house was one of the early ones, it was built on the current outskirts of the village and
+  i never really had any reason to move. The road was made a long time after it was built, connecting my house and the house of a certain friend of mine first,
   and then extending into the village.
 
-  <You come to the house <narrator> was talking about. The door is not locked, the <narrator> just open is, finding the light switch on the left
-  and turning the lights on.> << The text background changes to reflect the lights? >>
+  <You come to the house <narrator> was talking about. The door is not locked, the <narrator> just open is>
 
-  <narrator>: surprisingly, it still works.. and don't ask how we got electricity here, i don't quite understand it myself.
+  <narrator>: We didn't really need any locks on the doors, at least here in the village, not like there was anything to steal that the people couldn't easily make
+  for you if you asked nicely.
+
+  <The <narrator> finds the light switch on the left and turns the lights on.> << The text background changes to reflect the lights? >>
+
+  <narrator>: Surprisingly, the light still works, too. And don't ask how we got electricity here, i don't quite understand it myself.
 
   Yeah, alright, i really had no intention to anyway. Maybe i'll ask someone else who might know, if there ever comes someone
-  else besides two of us.
+  else besides the two of us.
 
-  Sure, I knew some people who could explain it, but I don't know if we'll ever be able to see them. If anyone comes back at all.
-  Anyway. I'm really tired from all this walking. We'll have to share the bed, since i never bothered with a second one, nobody stayed for
-  the night here, probably because everyone lived so close together.
+  Sure, I knew some people who could explain it, but I don't know if we'll ever be able to see them, or if anyone comes back at all.
+  Anyway. I'm really tired from all this walking, spending your time in an empty room for so long doesn't motivate one to move much.
+  So.. there's only one bed and we'll have to share it, since i never bothered with a second one, nobody stayed for the night here, probably because everyone lived so close together.
+  You can check out the rest of the house if you want, since you'll probably be spending some time here.
 
-  Sure, yeah, i'm getting tired too. Although i'm not sure what happens when i'll go to bed, since it seems like i'm not exactly here
-  like you are.
+  Check out the..
+  - Living room :: You check out the living room. It's decently sized and has a sofa in it. On the opposite side of the room there are several bookshelves
+                   packed with various books. Some of the names that stand out are "The history of everything" and "How the world works, as explained by its creator".
+                   On the other side of the shelf, there are several books that seem to be about the different philosophical traditions of this world. There's also
+                   something resembling a computer on the table nearby, but you decide not to touch it for now. The window in the room faces the other house that stands nearby.
+                   There's not much else in this room.
+  - Kitchen :: The kitchen is not very big, there are a few cupboards that have dishes in the, other have some of the plants you've seen earlier, but dried.
+               Most of the food on the kitchen seems to be plant-based, except in the fridge there's something that looks like milk, but you decide not to taste it,
+               since it's not your house. Maybe you should inquire the <narrator> about the food in this world later. Other than all the storage places on the kitchen,
+               there's a table with a few chairs and a window that faces the forest you just came from.
+  - Bathroom :: On the left, there's a moderately sized bathtub, near which there's a small shelf with some kind of soap looking thing and a washcloth.
+                On the right, a small sink stands, with its own bar of soap. There's also a very small window near the ceiling, you can only see the dark sky through it.
+                Unlike in the room you just came from, the bathroom's floor and walls are made of stone-looking tiles, not wood. You decide to check if the sink works,
+                and sure enough it does. At first the water is very cold, but you figure out the turning the knob on the faucet makes it warm or even hot. You wash your hands
+                using the soap bar, it feels pretty nice.
+  - Go the bed (=>)
 
-  I suppose we'll just have to see for ourselves.
+  You go to the bedroom, it's not too big, there are two cupboards on both sides of the bed.
 
-  <You both go to bed.>
+  - IF explored at least one room :: The <narrator> is already asleep.  You say "good night" to yourself, although you're not sure what will happen
+                                     when you fall asleep, since you don't seem to belong to this world, unlike the <narrator> who is fast asleep already.
+  - ELSE ::  Sure, yeah, i'm getting tired too. Although i'm not sure what happens when i'll go to bed, since it seems like i'm not exactly here like you are.
 
-  <narrator>: Good night.
+            I suppose we'll just have to see for ourselves.
 
-  You too.
+            <You both lie down.>
+
+            <narrator>: Good night.
+
+            You too.
 
   <The screen goes black>
+
+* After the first night
+  After the screen goes black, the player is back in the dark room they were in and can explore a little more.
+  There's a new doorway that appeared and that the player can go through. It is as badly lit as the room.
 
   <TBC>
