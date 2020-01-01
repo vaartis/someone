@@ -1,5 +1,6 @@
 #include "string_utils.hpp"
 
+#include <algorithm>
 #include <vector>
 #include <sstream>
 
@@ -31,4 +32,8 @@ std::string StringUtils::wrap_words_at(const std::string &str_to_fit, uint32_t w
     }
 
     return result;
+}
+
+bool StringUtils::is_number(const std::string &str) {
+    return std::all_of(str.begin(), str.end(), ::isdigit);
 }

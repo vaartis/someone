@@ -1,13 +1,12 @@
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/System/Clock.hpp>
+
+#include "logger.hpp"
 
 #include "string_utils.hpp"
 #include "fonts.hpp"
 #include "term.hpp"
-
-#include <SFML/System/Clock.hpp>
-#include <SFML/Window/Window.hpp>
-#include <iostream>
 
 using namespace sf;
 
@@ -17,7 +16,7 @@ int main() {
 
     StaticFonts::initFonts();
 
-    Terminal term(window, "test");
+    Terminal term(window, "prologue/1");
 
     sf::Clock clock;
     while (true) {

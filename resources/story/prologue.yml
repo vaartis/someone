@@ -1,0 +1,84 @@
+config:
+  colors:
+    narrator: [211, 0, 0]
+    player: [0, 0, 0]
+    description: [127, 0, 255]
+
+1:
+  char: narrator
+  text: >-
+    Hello? Can you hear me?
+
+2:
+  char: player
+  responses:
+  - text: >-
+      Who are you? And who am I?
+    next: 3
+
+3:
+  char: narrator
+  text: >-
+    I'm <narrator>, who you are I do not know, you just appeared here. Can you at least remember your name?
+
+4:
+  char: player
+  responses:
+  - text: >-
+      No, i don't think i can actually.
+    next: 5
+
+5:
+  char: narrator
+  text: >-
+    How should i call you then?
+
+6:
+  char: player
+  responses:
+  - text: >-
+      I guess <P> would do for for now.
+    next: 7
+
+7:
+  char: narrator
+  text: >-
+    Very well, <P>. Since you're here, i'll show you around.
+
+# TODO: make a special line for descriptions
+8:
+  char: description
+  text: >-
+    You are standing in an empty room with the <narrator>.
+
+9:
+  char: narrator
+  text: >-
+    Well, there isn't much much to show now. There was more, but it got shut off. Maybe you could
+    do something with that?
+
+10:
+  char: player
+  responses:
+  - text: >-
+      And just how would i do that?
+    next: 11
+
+11:
+  char: narrator
+  text: >-
+    You're sitting in front of a computer screen, aren't you?
+
+  # <The background becomes a screen frame instead of just white>
+
+12:
+  char: player
+  responses:
+  - text: >-
+      Well, now that you mention it. Yeah, i do..
+    next: 13
+
+13:
+  char: narrator
+  text: >-
+    Maybe check your surroundings out? I'll still be here, of course. Not like i can go anywhere :)
