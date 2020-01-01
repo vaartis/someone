@@ -1,8 +1,11 @@
 config:
-  colors:
-    narrator: [211, 0, 0]
-    player: [0, 0, 0]
-    description: [127, 0, 255]
+  chars:
+    narrator:
+      color: [211, 0, 0]
+    player:
+      color: [255, 255, 255]
+    description:
+      color: [127, 0, 255]
 
 1:
   char: narrator

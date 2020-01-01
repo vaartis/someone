@@ -10,18 +10,54 @@
 #include "logger.hpp"
 #include "string_utils.hpp"
 
+namespace YAML {
+
+template <> struct convert<sf::Color> {
+    static bool decode(const Node& node, sf::Color &rhs) {
+        if(!node.IsSequence() || node.size() != 3) return false;
+
+        rhs.r = node[0].as<uint32_t>();
+        rhs.g = node[1].as<uint32_t>();
+        rhs.b = node[2].as<uint32_t>();
+        rhs.a = 255;
+
+        return true;
+    }
+};
+
+template <> struct convert<CharacterConfig> {
+    static bool decode(const Node& node, CharacterConfig &rhs) {
+        if(!node.IsMap()) return false;
+
+        if (node["color"])
+            rhs.color = node["color"].as<sf::Color>();
+
+        return true;
+    }
+};
+}
+
 struct StoryParser {
     static std::map<std::string, std::shared_ptr<TerminalLine>> parse(std::string file_name, Terminal &term) {
         std::string nmspace = std::filesystem::path(file_name).stem();
 
         YAML::Node root_node = YAML::LoadFile(file_name);
 
-        std::map<std::string, std::shared_ptr<TerminalLine>> result;
+        std::map<std::string, CharacterConfig> character_configs;
+        if (root_node["config"]) {
+            auto config = root_node["config"];
 
+            if (config["chars"]) {
+                character_configs = config["chars"].as<decltype(character_configs)>();
+            }
+        }
+
+        std::map<std::string, std::shared_ptr<TerminalLine>> result;
         for (auto name_and_val : root_node) {
             auto name = name_and_val.first.as<std::string>();
             auto node = name_and_val.second;
 
+            // Skip the config node
             if (name == "config") continue;
 
             auto node_char = node["char"].as<std::string>();
@@ -62,9 +98,21 @@ struct StoryParser {
                 if (next != "" && next.find('/') == std::string::npos)
                     next = fmt::format("{}/{}", nmspace, next);
 
+                CharacterConfig char_config;
+                auto found_char_config = character_configs.find(node_char);
+                if (found_char_config == character_configs.end()) {
+                    spdlog::warn(
+                        "{} uses the character {}, but it does not exist",
+                        inserted_name,
+                        node_char
+                    );
+                } else {
+                    char_config = found_char_config->second;
+                }
+
                 result.insert({
                         inserted_name,
-                        std::make_shared<TerminalOutputLine>(text, next, term)
+                        std::make_shared<TerminalOutputLine>(text, next, char_config, term)
                 });
             } else if (node["responses"]) {
                 // Construct an empty vector
@@ -94,9 +142,21 @@ struct StoryParser {
                     variants.push_back({resp_text, resp_next});
                 }
 
+                CharacterConfig char_config;
+                auto found_char_config = character_configs.find(node_char);
+                if (found_char_config == character_configs.end()) {
+                    spdlog::warn(
+                        "{} uses the character {}, but it does not exist",
+                        inserted_name,
+                        node_char
+                    );
+                } else {
+                    char_config = found_char_config->second;
+                }
+
                 result.insert({
                         inserted_name,
-                        std::make_shared<TerminalVariantInputLine>(variants, term)
+                        std::make_shared<TerminalVariantInputLine>(variants, char_config, term)
                 });
             }
         }

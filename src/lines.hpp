@@ -3,9 +3,19 @@
 #include "string_utils.hpp"
 #include "term.hpp"
 
+struct CharacterConfig {
+    sf::Color color;
+
+    CharacterConfig(sf::Color color_ = sf::Color::White) : color(color_) {}
+};
+
 struct TerminalLine {
 protected:
-    sf::Color color;
+    TerminalLine(CharacterConfig config, Terminal &term) : character_config(config), terminal(term) { }
+
+    Terminal &terminal;
+
+    CharacterConfig character_config;
 public:
     uint32_t letters_output = 0;
     float time_since_last_letter = 0.0f;
@@ -25,13 +35,12 @@ public:
 
 class TerminalOutputLine : public TerminalLine {
 private:
-    Terminal &terminal;
-
     std::string text;
 public:
     std::string next_line;
 
-    TerminalOutputLine(std::string text_, std::string next_, Terminal &term) : text(text_), terminal(term), next_line(next_) { }
+    TerminalOutputLine(std::string text_, std::string next_, CharacterConfig config, Terminal &term)
+        : TerminalLine(config, term), text(text_), next_line(next_) { }
 
     sf::Text current_text();
 
@@ -48,15 +57,13 @@ public:
 
 class TerminalVariantInputLine : public TerminalLine {
 private:
-    Terminal &terminal;
-
     std::vector<std::tuple<std::string, std::string>> variants;
 
     std::optional<uint32_t> selected_variant;
 
     uint32_t longest_var_length;
 public:
-    TerminalVariantInputLine(std::vector<std::tuple<std::string, std::string>> vars, Terminal &term);
+    TerminalVariantInputLine(std::vector<std::tuple<std::string, std::string>> vars, CharacterConfig config, Terminal &term);
 
     float max_line_height(uint32_t variant);
 
@@ -105,7 +112,7 @@ sf::Text TerminalOutputLine::current_text() {
         StaticFonts::main_font,
         StaticFonts::font_size
     );
-    txt.setFillColor(sf::Color::White);
+    txt.setFillColor(character_config.color);
 
     return txt;
 }
@@ -115,8 +122,10 @@ const std::string TerminalOutputLine::next() const { return next_line; }
 // TerminalVariantInputLine
 
 TerminalVariantInputLine::TerminalVariantInputLine(
-    std::vector<std::tuple<std::string, std::string>> vars, Terminal &term
-) : variants(vars), terminal(term) {
+    std::vector<std::tuple<std::string, std::string>> vars,
+    CharacterConfig config,
+    Terminal &term
+) : TerminalLine(config, term), variants(vars) {
 
     auto longest_var = std::max_element(variants.begin(), variants.end(),
                      [&](auto a, auto b) {
@@ -175,7 +184,7 @@ std::vector<sf::Text> TerminalVariantInputLine::current_text() {
             StaticFonts::main_font,
             StaticFonts::font_size
         );
-        txt.setFillColor(sf::Color::White);
+        txt.setFillColor(character_config.color);
 
         if (selected_variant.has_value() && selected_variant.value() == i) {
             txt.setStyle(sf::Text::Underlined);
