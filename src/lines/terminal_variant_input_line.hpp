@@ -1,61 +1,6 @@
 #pragma once
 
-#include "string_utils.hpp"
-#include "term.hpp"
-
-struct CharacterConfig {
-    sf::Color color;
-
-    CharacterConfig(sf::Color color_ = sf::Color::White) : color(color_) {}
-};
-
-struct TerminalLine {
-protected:
-    TerminalLine(CharacterConfig config, Terminal &term) : character_config(config), terminal(term) { }
-
-    Terminal &terminal;
-
-    CharacterConfig character_config;
-public:
-    uint32_t letters_output = 0;
-    float time_since_last_letter = 0.0f;
-
-    virtual bool should_wait() = 0;
-
-    virtual void maybe_increment_letter_count() = 0;
-
-    virtual void tick_letter_timer(float dt) {
-        time_since_last_letter += dt;
-    }
-
-    virtual const std::string next() const = 0;
-
-    virtual ~TerminalLine() { }
-};
-
-class TerminalOutputLine : public TerminalLine {
-private:
-    std::string text;
-public:
-    std::string next_line;
-
-    TerminalOutputLine(std::string text_, std::string next_, CharacterConfig config, Terminal &term)
-        : TerminalLine(config, term), text(text_), next_line(next_) { }
-
-    sf::Text current_text();
-
-    float max_line_height();
-
-    bool should_wait() override;
-
-    void maybe_increment_letter_count() override;
-
-    const std::string next() const override;
-
-    ~TerminalOutputLine() override { }
-};
-
-class TerminalVariantInputLine : public TerminalLine {
+class TerminalVariantInputLine : public TerminalInteractiveLine {
 private:
     std::vector<std::tuple<std::string, std::string>> variants;
 
@@ -75,51 +20,9 @@ public:
 
     const std::string next() const override;
 
-    bool is_interactive() const;
-    void handle_interaction(sf::Event event);
+    bool is_interactive() const override;
+    void handle_interaction(sf::Event event) override;
 };
-
-float TerminalOutputLine::max_line_height() {
-    auto term_width = terminal.calc_max_text_width();
-
-    auto fit_str = StringUtils::wrap_words_at(text, term_width);
-
-    auto temp_text = sf::Text(fit_str, StaticFonts::main_font, StaticFonts::font_size);
-
-    return temp_text.getGlobalBounds().height;
-}
-
-bool TerminalOutputLine::should_wait() {
-    return letters_output < text.length() && time_since_last_letter < terminal.time_per_letter;
-}
-
-void TerminalOutputLine::maybe_increment_letter_count() {
-    if (letters_output < text.length() && time_since_last_letter >= terminal.time_per_letter) {
-        time_since_last_letter = 0.0;
-
-        letters_output += 1;
-    }
-}
-
-sf::Text TerminalOutputLine::current_text() {
-    auto substr = StringUtils::wrap_words_at(
-        text.substr(0, letters_output),
-        terminal.calc_max_text_width()
-    );
-
-    auto txt = sf::Text(
-        substr,
-        StaticFonts::main_font,
-        StaticFonts::font_size
-    );
-    txt.setFillColor(character_config.color);
-
-    return txt;
-}
-
-const std::string TerminalOutputLine::next() const { return next_line; }
-
-// TerminalVariantInputLine
 
 TerminalVariantInputLine::TerminalVariantInputLine(
     std::vector<std::tuple<std::string, std::string>> vars,

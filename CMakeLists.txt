@@ -27,6 +27,7 @@ set(vacances_src
 add_executable(vacances ${vacances_src})
 
 target_link_libraries(vacances sfml-graphics fmt yaml-cpp spdlog)
+target_include_directories(vacances PRIVATE "src")
 
 # Copy all resources
 add_custom_target(copy-resources ALL

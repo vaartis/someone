@@ -13,8 +13,9 @@
 
 #include "fonts.hpp"
 #include "term.hpp"
-#include "lines.hpp"
 #include "story_parser.hpp"
+
+#include "lines/lines.hpp"
 
 Terminal::Terminal(sf::RenderWindow &window_, std::string first_line) : window(window_), first_line_on_screen(first_line) {
     lines = StoryParser::parse("resources/story/prologue.yml", *this);
@@ -73,26 +74,37 @@ void Terminal::draw(float dt) {
             line->maybe_increment_letter_count();
         }
 
-        if (auto text_outp = dynamic_cast<TerminalOutputLine *>(line.get())) {
-            auto text = text_outp->current_text();
+        if (auto curr_line = dynamic_cast<TerminalOutputLine *>(line.get())) {
+            auto text = curr_line->current_text();
 
             text.setPosition({line_width_offset, line_height_offset});
 
-            auto line_height = text_outp->max_line_height();
+            auto line_height = curr_line->max_line_height();
 
             total_line_height += line_height + (StaticFonts::font_size / 2);
             line_height_offset = beginning_line_height_offset + total_line_height;
 
             window.draw(text);
-        } else if (auto text_inp_vars = dynamic_cast<TerminalVariantInputLine *>(line.get())) {
-            auto variants = text_inp_vars->current_text();
+        } else if (auto curr_line = dynamic_cast<TerminalDescriptionLine *>(line.get())) {
+            auto text = curr_line->current_text();
+
+            text.setPosition({line_width_offset, line_height_offset});
+
+            auto line_height = curr_line->max_line_height();
+
+            total_line_height += line_height + (StaticFonts::font_size / 2);
+            line_height_offset = beginning_line_height_offset + total_line_height;
+
+            window.draw(text);
+        } else if (auto curr_line = dynamic_cast<TerminalVariantInputLine *>(line.get())) {
+            auto variants = curr_line->current_text();
 
             for (int i = 0; i < variants.size(); i++) {
                 auto variant = variants[i];
 
                 variant.setPosition({line_width_offset, line_height_offset});
 
-                auto line_height = text_inp_vars->max_line_height(i);
+                auto line_height = curr_line->max_line_height(i);
 
                 total_line_height += line_height + (StaticFonts::font_size / 2);
                 line_height_offset = beginning_line_height_offset + total_line_height;
@@ -102,6 +114,10 @@ void Terminal::draw(float dt) {
 
             total_line_height += StaticFonts::font_size / 2;
             line_height_offset = beginning_line_height_offset + total_line_height;
+        } else {
+            spdlog::error("Unknown line type at {}", current_line_name);
+
+            std::terminate();
         }
 
         if (should_wait || line->next() == "") break;
@@ -125,11 +141,9 @@ void Terminal::processEvent(sf::Event event) {
 
         auto should_wait = line->should_wait();
 
-        if (auto text_outp = dynamic_cast<TerminalOutputLine *>(line.get())) {
-            // TODO: allow skipping
-        } else if (auto text_inp_vars = dynamic_cast<TerminalVariantInputLine *>(line.get())) {
-            if (text_inp_vars->should_wait() && text_inp_vars->is_interactive()) {
-                text_inp_vars->handle_interaction(event);
+        if (auto int_line = dynamic_cast<TerminalInteractiveLine *>(line.get())) {
+            if (int_line->should_wait() && int_line->is_interactive()) {
+                int_line->handle_interaction(event);
             }
         }
 

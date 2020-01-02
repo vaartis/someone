@@ -6,9 +6,9 @@
 #include "yaml-cpp/yaml.h"
 
 #include "term.hpp"
-#include "lines.hpp"
 #include "logger.hpp"
 #include "string_utils.hpp"
+#include "lines/lines.hpp"
 
 namespace YAML {
 
@@ -110,10 +110,17 @@ struct StoryParser {
                     char_config = found_char_config->second;
                 }
 
-                result.insert({
-                        inserted_name,
-                        std::make_shared<TerminalOutputLine>(text, next, char_config, term)
-                });
+                if (node_char != "description") {
+                    result.insert({
+                            inserted_name,
+                            std::make_shared<TerminalOutputLine>(text, next, char_config, term)
+                        });
+                } else {
+                    result.insert({
+                            inserted_name,
+                            std::make_shared<TerminalDescriptionLine>(text, next, char_config, term)
+                        });
+                }
             } else if (node["responses"]) {
                 // Construct an empty vector
                 std::vector<std::tuple<std::string, std::string>> variants;
