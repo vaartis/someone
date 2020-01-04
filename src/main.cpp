@@ -8,6 +8,8 @@
 #include "fonts.hpp"
 #include "term.hpp"
 
+#include "mainchar.hpp"
+
 using namespace sf;
 
 int main() {
@@ -16,13 +18,15 @@ int main() {
 
     StaticFonts::initFonts();
 
-    Terminal term(window, "prologue/1");
+    MainChar mainChar(window, "resources/sprites/mainchar");
+
+    // Terminal term(window, "prologue/1");
 
     sf::Clock clock;
     while (true) {
         auto dt = clock.restart().asSeconds();
 
-        window.clear(sf::Color::White);
+        window.clear(sf::Color::Black);
 
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -45,10 +49,12 @@ int main() {
             default: break;
             }
 
-            term.processEvent(event);
+            //term.processEvent(event);
         }
+        mainChar.update(dt);
 
-        term.draw(dt);
+        //term.draw(dt);
+        mainChar.display();
         window.display();
     }
 }

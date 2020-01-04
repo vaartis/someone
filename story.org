@@ -29,10 +29,10 @@
   Maybe check your surroundings out? I'll still be here, of course. Not like i can go anywhere :)
 
 * First time in the room
-  There's a room where the player is in. The player is some ambigous figure in a hoodie or something like that.
-  Or maybe the player isn't even seen, the view might be first-person.
-  The room around the player is badly lit, there's a lever on one of the walls.
-  When the player presses it, a sound is heard from the computer. The player then goes back to the computer.
+  There's a room where the player is in. The player is some ambigous figure in a hoodie.
+
+  The room around the player is badly lit, there's a lever on the wall on the right, while the wall on the left is the wall where
+  the computer is.  When the player presses the lever, a sound is heard from the computer. The player then goes back to the computer.
 
 * At the computer after the room
   You're no longer standing in the room, now around you is a midnight forest. You ask <narrator>, who is still
