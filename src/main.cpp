@@ -18,6 +18,20 @@ int main() {
 
     StaticFonts::initFonts();
 
+    sf::Texture lightTexture;
+    lightTexture.loadFromFile("resources/sprites/room/light.png");
+    sf::Sprite lightSprite(lightTexture);
+    auto rect = lightSprite.getTextureRect();
+    lightSprite.setOrigin(rect.width / 2, rect.height / 2);
+    lightSprite.setPosition(387, 600);
+
+    sf::Texture roomTexture;
+    roomTexture.loadFromFile("resources/sprites/room/room.png");
+
+    sf::Sprite roomSprite(roomTexture);
+    roomSprite.setColor(sf::Color(100, 100, 100));
+
+
     MainChar mainChar(window, "resources/sprites/mainchar");
 
     // Terminal term(window, "prologue/1");
@@ -54,6 +68,8 @@ int main() {
         mainChar.update(dt);
 
         //term.draw(dt);
+        window.draw(roomSprite);
+        //window.draw(lightSprite);
         mainChar.display();
         window.display();
     }
