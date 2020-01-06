@@ -1,5 +1,6 @@
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/Shader.hpp>
 #include <SFML/System/Clock.hpp>
 
 #include "logger.hpp"
@@ -28,9 +29,19 @@ int main() {
     sf::Texture roomTexture;
     roomTexture.loadFromFile("resources/sprites/room/room.png");
 
-    sf::Sprite roomSprite(roomTexture);
-    roomSprite.setColor(sf::Color(100, 100, 100));
+    sf::Shader roomDarkerShader;
+    roomDarkerShader.loadFromFile("resources/shaders/room_darker.frag", sf::Shader::Fragment);
+    roomDarkerShader.setUniform("currentTexture", roomTexture);
 
+    roomDarkerShader.setUniform("screenSize", sf::Vector2f(window.getSize()));
+    roomDarkerShader.setUniform("monitorTop", sf::Vector2f(237, 708));
+    roomDarkerShader.setUniform("monitorBottom", sf::Vector2f(237, 765));
+
+    roomDarkerShader.setUniform("lightTint", sf::Glsl::Vec4(0.2, 0, 0, 0));
+    roomDarkerShader.setUniform("ambientLightLevel", 0.5f);
+    roomDarkerShader.setUniform("lightPower", 0.1f);
+
+    sf::Sprite roomSprite(roomTexture);
 
     MainChar mainChar(window, "resources/sprites/mainchar");
 
@@ -68,7 +79,7 @@ int main() {
         mainChar.update(dt);
 
         //term.draw(dt);
-        window.draw(roomSprite);
+        window.draw(roomSprite, &roomDarkerShader);
         //window.draw(lightSprite);
         mainChar.display();
         window.display();
