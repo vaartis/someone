@@ -97,12 +97,11 @@
   Oh.
 
   Indeed. So the next library was built out of stone. Not long after that concrete was discovered by accident. Same happened with glass.
-  Fast forward some time, and there were now not only one place where everyone lived, cities became a thing, they were huge, with
-  asphalt roads and tall buildings. People would come up with different work for themselves. They started to dig into the world itself.
-  Trying to find out how things work. Eventually, a certain person showed up. They didn't name themselves, but claimed to be the creator
-  of this world. They moved rather unnaturally, as if they somehow didn't properly "add" themself into the world, if they indeed had capabilities of doing so,
-  or were in a hurry. They told the researchers about the world, about how that person watched them grow and that now they had come to live with them
-  in that world they have created. A bit after that, the "creator" disappeared, and then the thing happened, the world was vanishing.
+  Fast forward some time, and there were now not only one place where everyone lived, a city was built, and it was big, with
+  asphalt roads and tall buildings. People would come up with different work for themselves to spend time. Now they were trying to understand the world even more throughly.
+  Trying to find out how things work. Eventually, a person showed up. They didn't name themselves, but claimed to be the creator
+  of this world. They moved rather unnaturally, as if controlled by strings by a puppetmaster, and not a good one at that. They told the researchers about the world,
+  about how that person watched them grow and that now they had come to them in person. A bit after that, the "creator" disappeared, and then the thing happened, the world was vanishing.
   Panic. And then everything ceased to be. Except me. I was still there, for some reason.
 
   That is one crazy story, but of course i have no choice except to belive it. I have no idea what i am doing here anyway, so might as well take some
@@ -172,6 +171,166 @@
 
 * After the first night
   After the screen goes black, the player is back in the dark room they were in and can explore a little more.
-  There's a new doorway that appeared and that the player can go through. It is as badly lit as the room.
+  There's a new doorway that appeared and that the player can go through. It is as badly lit as the room and has a
+  simple puzzle with three switches that need to be pressed in a certain order or something similiar (TBD). After that
+  a sound is heard and the player goes back to the computer. It's now the next day.
+* Day 2
+*** Morning
+    <It seems like it's already morning and the <narrator> is already out somewhere. After a bit of searching you find them
+    in the kitchen having breakfast>.
 
-  <TBC>
+    <narrator>: Hey. Mornin'.
+
+    Yeah.. Morning
+
+    Slept well?
+
+    Not really. When i "went to sleep" the screen went black and i was unable to do anything. So i figured i'll
+    go look around again. Unsurprisingly, there was a new place to look at. Nothing too interesting though, a very basic
+    puzzle, if you can even call it that. I wonder why it was there. But when i activated it, something happened, i guess?
+    There was some kind of sound. And then i went back to the computer and it was already morning.
+
+    Interesting.. As for me, i slept in an actual bed this time, haven't done that in a while.
+
+    No bed here in the room i'm in. It's quite empty actually.
+
+    Could you elaborate?
+
+    Not much to say. It's just me and a table with the computer. Well, there's this new hallway, but it's pretty
+    empty too. There really isn't anything of interest here besides the computer. Which is also the only source of light here, it seems.
+    Otherwise it's dark as hell.
+
+    Scary.
+
+    I dunno.. Didn't really think about that until now. Well, at least for now, i'm pretty sure there's nobody else here,
+    there's simply no place to hide in the two empty rooms, and the screen of this computer is taking care of darkness around too.
+    It's not that bright, but it's something. Let's see if i can find something to brighten this place up in the future.
+
+    Yeah, even if you aren't afraid, sitting in the darkness doesn't do you any good.
+
+    Anyway, what is this you're having for breakfast?
+
+    <The <narrator> seems to have something that looks like cereal with milk in the bowl>
+
+    The liquid in the bowl is a juice of a plant that grows in a region far from here. The region and the plant were discovered in an expedition
+    to a place outside the known land of that time. When they were there, they discovered a different biome, a colder one. They told that it was
+    a bit more chilly out there and that the plants and trees there were different. They took some samples back, then the local
+    people discovered various applications for them. One of which was to use them as food, because of their taste. You see, we don't really
+    need food to survive. We don't feel hunger. But we do feel the taste, and that is what food is used here for. To satisfy one's curiosity in new tastes and
+    to feel good after an interesting meal. Wanna check the juice out?
+
+    <The narrator passes you a carton, presumably full of juice>
+
+    Yeah, i'm curious how it tastes now.
+
+    <You take a sip. It tastes like milk with a slight bit of grass>
+
+    <p>: This taste reminds me of a certain drink i know about for some reason. This seems to be a reoccuring pattern, too..
+    I know about something, but i can't remember where i got that knowledge from.
+
+    That's.. unusual. I felt like this too, but when the "creator" came and told us how this world came to be, it became ovious.
+
+    Well, that doesn't really work in my case, since i'm here and you're there, does it?
+
+    Indeed. You'll have to figure it out in some other way.
+
+    So.. What about the other part of your meal?
+
+    Oh, it's the leaves of a bush growing around, people have been using it as food for a long time. When dried, it changes its taste,
+    and some people like it more in that state. I do, for example. Do you wish to taste this too?
+
+    Since we're on it, yeah i'll take a bite.
+
+    <You take a few from the box and taste them. It's really just dried leaves>
+
+    Uh i dunno about this one. Really, it tastes like leaves.
+
+    That's because they are leaves?
+
+    Yeah. I just thought it'd be something more surprising.
+
+    Sorry to disappoint! I like it, though. Now, let me finish my breakfast and we'll go take a stroll outside.
+
+    Sure, take you time.
+
+    <You spend a few minutes in the kitchen while the <narrator> finishes their breakfast>
+
+    <narrator>: Well, i'm done.. Let's go.
+
+    <You go outside. The <narrator> turns the lights off as they close the door. They then look somewhere behind you with a confused look>.
+
+    <narrator>: Ah. This wasn't here yesterday. Might be the result of you solving that "puzzle" you talked about yesterday.
+
+    <You turn around and see that in the distance, there are now tall buildings>
+
+    <p> So this is the city you talked about yesterday?
+
+    It seems like that's the one. Indeed.
+
+    So, now we'll go check it out, right?
+
+    If you insist. It's going to be a long walk though.
+
+    It's not like we're short on time.. If i were to describe how much time we have, i'd say we've got all of it. Besides,
+    not like there's anything else to do. Boredom really is a big problem around here..
+
+    Oh yes, it very much is. So, there was a stone pathway that lead from here to the city. It was layed a bit
+    after the city was started, before the tall buildings were there to help people find where the city was.
+    Let's see if we can find it..
+
+    <After a short walk you find the stone road on the other side of the village>
+
+    <narrator>: Here it is. Let's go here, then. It's far more comfortable to walk on the road instead of going through the bushes and grass.
+
+    Yeah. Getting through that forest yesterday was no fun. Well, the getting throught the forest part was no fun, but listening
+    you talk about the world was alright. So i guess i'll get to have more of that but without the no fun part.
+*** The long walk questions
+    Sure. What do you want to talk about?
+
+**** IF (explored the living room) THEN the computers here, how do they work?
+     <p>: I saw a computer in your living room. Of course, i didn't do anything with it.. So i'm interested
+     in how do they actually work around here? Your computers seems way more cool than the one i have here. The one
+     i have has a huge ugly screen. Pretty dim, too.
+
+     Oh, that one.. I've got it recenly before, if you don't count all the time i've spent alone in that room. I used to have a big one too,
+     until it eventually broke down, just refused to boot.. So i got a new one. Couldn't really get the same one, since they didn't make them like that anymore.
+     So i got a new shiny slick one. It was faster, but i really don't use it much. I'm not very good with computers, you see. Checking mail, reading
+     people's blogs and writing in my own blog was good enough for me. We had a network that connected all computers together, but once again,
+     i have no idea how it works, so you'll have to ask someone else about that, provided we ever find anyone else..
+
+     You have a blog? What is it about?
+
+     Oh all the things. It's more like a micro-blog, you know? Where you put all the things that are happening to you right now. And check what other people
+     are doing. It's pretty fun. That way it's easier to keep up with your friends even when they move. I was really happy when i was told about it, and that
+     people i wanted to keep talking with were on there. So i started using it a lot. Of course, now that everyone's gone, there is probably nobody on there..
+     We could still check it later when we get back. Or maybe we could find some kind of computer cafe in the city.
+
+     Yeah, for sure. I wanna see it.
+
+**** IF (explored kitchen) THEN what's with the food here, it's all made from plants?
+     <p>: When looking through the kitchen yesterday, i noticed that all the food seemed to be made out of various plants. Do all people here only eat that?
+
+     Yes? Well, we wouldn't eat each other, would we?
+
+     Fair.. Here we have other foods, which are made of various creatures that are deemed not self-aware. People would raise them specifically to
+     cook them later. I can't remember why i do, but i know that it exists and how it happens..
+
+     That sounds pretty awful.
+
+     It does, kind of. But these creatures live their best lives before they are made into food. They're well fed and cleaned. I can't say i'm too much against that,
+     especially if they really don't even recognize themselves, just follow the instincts.
+
+     While i can understand that, we never really sank that low as to abuse the less aware creatures.
+
+     Yeah, i guess some of the reasoning for that would be that people in your world don't actually need to eat to survive. Eating other creatures gives one way more
+     nutrients. Maybe that was the main reason people eat them: to survive the tougher times. I'm sure there are people out there that still only eat plant-based foods like you here do.
+
+     Requiring food to survive indeed makes it a lot more difficult, it does make sense that people would use any means necessary to survive of course.
+     Still, i'm glad that for us this problem never existed and we could circumvent it entirely and don't have a dire need to abuse creatures to survive and it makes
+     me feel unwell that this had to happen in your case.
+
+     Again, surely there must be other people that feel like you out there. Although i bet the opposite is also true, there might be people that enjoy it.
+
+     What an awful world that must be. Still, surely, not all hope is lost if someone understand that it's bad.
+
+     I suppose that's just how it is. The world is cruel like that sometimes.
