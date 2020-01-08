@@ -11,8 +11,7 @@
 
 class MainChar {
 private:
-    sf::RenderWindow &window;
-    sf::View view;
+    sf::RenderTarget &target;
 
     sf::Texture char_texture;
     sf::Sprite char_sprite;
@@ -31,7 +30,7 @@ private:
 public:
     sf::Vector2f position = sf::Vector2f(180, 880);
 
-    MainChar(sf::RenderWindow &window_, std::string sprite_dir_path) : window(window_), view(window_.getDefaultView()) {
+    MainChar(sf::RenderTarget &target_, std::string sprite_dir_path) : target(target_) {
         std::filesystem::path dir_path(sprite_dir_path);
 
         if (sprite_dir_path[sprite_dir_path.length() - 1] == '/') {
@@ -64,7 +63,6 @@ public:
             std::terminate();
         }
         char_sprite.setTexture(char_texture);
-        char_sprite.setColor(sf::Color(100, 100, 100));
 
         // Set the pivot to the center of the sprite
         auto firstFrame = frames.front();
@@ -126,6 +124,6 @@ public:
     void display() {
         char_sprite.setTextureRect(frames[current_frame]);
 
-        window.draw(char_sprite);
+        target.draw(char_sprite);
     }
 };

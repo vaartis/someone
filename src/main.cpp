@@ -1,5 +1,6 @@
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Shader.hpp>
 #include <SFML/System/Clock.hpp>
 
@@ -11,11 +12,17 @@
 
 #include "mainchar.hpp"
 
-using namespace sf;
-
 int main() {
-    RenderWindow window(VideoMode(1280, 1024), "Vacances");
+    sf::RenderWindow window(sf::VideoMode(1280, 1024), "Vacances");
     window.setFramerateLimit(60);
+
+    sf::RenderTexture target;
+    {
+        auto winSize = window.getSize();
+        target.create(winSize.x, winSize.y);
+    }
+    auto &targetTexture = target.getTexture();
+    sf::Sprite targetSprite(targetTexture);
 
     StaticFonts::initFonts();
 
@@ -29,21 +36,18 @@ int main() {
     sf::Texture roomTexture;
     roomTexture.loadFromFile("resources/sprites/room/room.png");
 
-    sf::Shader roomDarkerShader;
-    roomDarkerShader.loadFromFile("resources/shaders/room_darker.frag", sf::Shader::Fragment);
-    roomDarkerShader.setUniform("currentTexture", roomTexture);
-
-    roomDarkerShader.setUniform("screenSize", sf::Vector2f(window.getSize()));
-    roomDarkerShader.setUniform("monitorTop", sf::Vector2f(237, 708));
-    roomDarkerShader.setUniform("monitorBottom", sf::Vector2f(237, 765));
-
-    roomDarkerShader.setUniform("lightTint", sf::Glsl::Vec4(0.2, 0, 0, 0));
-    roomDarkerShader.setUniform("ambientLightLevel", 0.5f);
-    roomDarkerShader.setUniform("lightPower", 0.1f);
-
     sf::Sprite roomSprite(roomTexture);
 
-    MainChar mainChar(window, "resources/sprites/mainchar");
+    MainChar mainChar(target, "resources/sprites/mainchar");
+
+    sf::Shader roomDarkerShader;
+    roomDarkerShader.loadFromFile("resources/shaders/room_darker.frag", sf::Shader::Fragment);
+
+    roomDarkerShader.setUniform("screenSize", sf::Vector2f(target.getSize()));
+    roomDarkerShader.setUniform("monitorTop", sf::Vector2f(237, 708));
+    roomDarkerShader.setUniform("monitorBottom", sf::Vector2f(237, 765));
+    roomDarkerShader.setUniform("ambientLightLevel", 0.4f);
+    roomDarkerShader.setUniform("currentTexture", targetTexture);
 
     // Terminal term(window, "prologue/1");
 
@@ -51,7 +55,7 @@ int main() {
     while (true) {
         auto dt = clock.restart().asSeconds();
 
-        window.clear(sf::Color::Black);
+        target.clear(sf::Color::Black);
 
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -64,7 +68,7 @@ int main() {
             case sf::Event::Resized: {
                 float width = event.size.width,
                     height = event.size.height;
-                window.setView(View(
+                target.setView(sf::View(
                                    {width / 2, height / 2},
                                    {width, height}
                                ));
@@ -76,12 +80,19 @@ int main() {
 
             //term.processEvent(event);
         }
-        mainChar.update(dt);
 
         //term.draw(dt);
-        window.draw(roomSprite, &roomDarkerShader);
+
+        mainChar.update(dt);
+
+        target.draw(roomSprite);
         //window.draw(lightSprite);
         mainChar.display();
+
+        target.display();
+
+        window.clear();
+        window.draw(targetSprite, &roomDarkerShader);
         window.display();
     }
 }
