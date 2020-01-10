@@ -13,3 +13,12 @@
 [submodule "deps/nlohmann-json"]
 	path = deps/nlohmann-json
 	url = https://github.com/nlohmann/json
+[submodule "deps/sol2"]
+	path = deps/sol2
+	url = https://github.com/ThePhD/sol2
+[submodule "deps/lua"]
+	path = deps/lua
+	url = https://github.com/lua/lua
+[submodule "deps/luarocks"]
+	path = deps/luarocks
+	url = https://github.com/luarocks/luarocks

@@ -4,6 +4,8 @@
 #include <SFML/Graphics/Shader.hpp>
 #include <SFML/System/Clock.hpp>
 
+#include "sol/sol.hpp"
+
 #include "logger.hpp"
 
 #include "string_utils.hpp"
@@ -39,6 +41,13 @@ int main() {
     sf::Sprite roomSprite(roomTexture);
 
     MainChar mainChar(target, "resources/sprites/mainchar");
+
+
+    sol::state lua;
+    lua.open_libraries(sol::lib::base, sol::lib::table, sol::lib::package, sol::lib::coroutine);
+
+    lua["package"]["path"] = std::string("resources/lua/share/lua/" VACANCES_LUA_VERSION "/?.lua;resources/lua/share/lua/" VACANCES_LUA_VERSION "/?/init.lua;") + std::string(lua["package"]["path"]);
+    lua["package"]["cpath"] = std::string("resources/lua/lib/lua/" VACANCES_LUA_VERSION "/?.so;") + std::string(lua["package"]["cpath"]);
 
     sf::Shader roomDarkerShader;
     roomDarkerShader.loadFromFile("resources/shaders/room_darker.frag", sf::Shader::Fragment);

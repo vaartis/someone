@@ -1,0 +1,17 @@
+package = "vacances"
+version = "vacances-1"
+
+dependencies = {
+    "tiny-ecs==1.3-3"
+}
+
+source = {
+    url = ""
+}
+
+build = {
+    type = "builtin",
+    modules = {
+       main = "vacances.lua"
+    }
+}
