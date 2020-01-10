@@ -17,13 +17,13 @@
 
 #include "lines/lines.hpp"
 
-Terminal::Terminal(sf::RenderWindow &window_, std::string first_line) : window(window_), first_line_on_screen(first_line) {
+Terminal::Terminal(sf::RenderTexture &target_, std::string first_line) : target(target_), first_line_on_screen(first_line) {
     lines = StoryParser::parse("resources/story/prologue.yml", *this);
 }
 
 
 uint32_t Terminal::calc_max_text_width() {
-    auto win_size = window.getSize();
+    auto win_size = target.getSize();
 
     float width_offset = win_size.x / 100,
         height_offset = win_size.y / 100 * 2;
@@ -36,7 +36,7 @@ uint32_t Terminal::calc_max_text_width() {
 }
 
 void Terminal::draw(float dt) {
-    auto win_size = window.getSize();
+    auto win_size = target.getSize();
 
     float width_offset = win_size.x / 100,
         height_offset = win_size.y / 100 * 2;
@@ -53,7 +53,7 @@ void Terminal::draw(float dt) {
     rect.setFillColor(sf::Color::Black);
     rect.setPosition({width_offset, height_offset});
 
-    window.draw(rect);
+    target.draw(rect);
 
     const auto beginning_line_height_offset = (height_offset * 2);
 
@@ -84,7 +84,7 @@ void Terminal::draw(float dt) {
             total_line_height += line_height + (StaticFonts::font_size / 2);
             line_height_offset = beginning_line_height_offset + total_line_height;
 
-            window.draw(text);
+            target.draw(text);
         } else if (auto curr_line = dynamic_cast<TerminalDescriptionLine *>(line.get())) {
             auto text = curr_line->current_text();
 
@@ -95,7 +95,7 @@ void Terminal::draw(float dt) {
             total_line_height += line_height + (StaticFonts::font_size / 2);
             line_height_offset = beginning_line_height_offset + total_line_height;
 
-            window.draw(text);
+            target.draw(text);
         } else if (auto curr_line = dynamic_cast<TerminalVariantInputLine *>(line.get())) {
             auto variants = curr_line->current_text();
 
@@ -109,7 +109,7 @@ void Terminal::draw(float dt) {
                 total_line_height += line_height + (StaticFonts::font_size / 2);
                 line_height_offset = beginning_line_height_offset + total_line_height;
 
-                window.draw(variant);
+                target.draw(variant);
             }
 
             total_line_height += StaticFonts::font_size / 2;

@@ -58,7 +58,7 @@ int main() {
     roomDarkerShader.setUniform("ambientLightLevel", 0.4f);
     roomDarkerShader.setUniform("currentTexture", targetTexture);
 
-    // Terminal term(window, "prologue/1");
+    // Terminal term(target, "prologue/1");
 
     sf::Clock clock;
     while (true) {

@@ -4,19 +4,19 @@
 #include <memory>
 #include <optional>
 
-#include <SFML/Graphics/RenderWindow.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
 
 class TerminalLine;
 
 class Terminal {
 private:
-    sf::RenderWindow &window;
+    sf::RenderTexture &target;
 
     std::map<std::string, std::shared_ptr<TerminalLine>> lines;
 
     std::string first_line_on_screen;
 public:
-    Terminal(sf::RenderWindow &window_, std::string first_line);
+    Terminal(sf::RenderTexture &target_, std::string first_line);
 
     static constexpr float time_per_letter = 0.001f;
 
