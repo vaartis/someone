@@ -2,8 +2,9 @@
 
 class TerminalOutputLine : public TerminalLine {
 private:
-    std::string text;
+
 public:
+    std::string text;
     std::string next_line;
 
     TerminalOutputLine(std::string text_, std::string next_, CharacterConfig config, Terminal &term)
@@ -22,7 +23,7 @@ public:
     ~TerminalOutputLine() override { }
 };
 
-float TerminalOutputLine::max_line_height() {
+inline float TerminalOutputLine::max_line_height() {
     auto term_width = terminal.calc_max_text_width();
 
     auto fit_str = StringUtils::wrap_words_at(text, term_width);
@@ -32,11 +33,11 @@ float TerminalOutputLine::max_line_height() {
     return temp_text.getGlobalBounds().height;
 }
 
-bool TerminalOutputLine::should_wait() {
+inline bool TerminalOutputLine::should_wait() {
     return letters_output < text.length() && time_since_last_letter < terminal.time_per_letter;
 }
 
-void TerminalOutputLine::maybe_increment_letter_count() {
+inline void TerminalOutputLine::maybe_increment_letter_count() {
     if (letters_output < text.length() && time_since_last_letter >= terminal.time_per_letter) {
         time_since_last_letter = 0.0;
 
@@ -44,7 +45,7 @@ void TerminalOutputLine::maybe_increment_letter_count() {
     }
 }
 
-sf::Text TerminalOutputLine::current_text() {
+inline sf::Text TerminalOutputLine::current_text() {
     auto substr = StringUtils::wrap_words_at(
         text.substr(0, letters_output),
         terminal.calc_max_text_width()
@@ -60,4 +61,4 @@ sf::Text TerminalOutputLine::current_text() {
     return txt;
 }
 
-const std::string TerminalOutputLine::next() const { return next_line; }
+inline const std::string TerminalOutputLine::next() const { return next_line; }

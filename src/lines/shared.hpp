@@ -12,11 +12,10 @@ protected:
 
     Terminal &terminal;
 
-    CharacterConfig character_config;
-
     uint32_t letters_output = 0;
     float time_since_last_letter = 0.0f;
 public:
+    CharacterConfig character_config;
 
     virtual bool should_wait() = 0;
 

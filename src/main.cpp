@@ -1,8 +1,10 @@
+#include <SFML/Graphics/Transformable.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
 #include <SFML/Graphics/Shader.hpp>
 #include <SFML/System/Clock.hpp>
+#include <SFML/Graphics/Text.hpp>
 
 #include "sol/sol.hpp"
 
@@ -12,7 +14,11 @@
 #include "fonts.hpp"
 #include "term.hpp"
 
+#include "usertypes.hpp"
+
 #include "mainchar.hpp"
+
+#include "lines/terminal_output_line.hpp"
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(1280, 1024), "Vacances");
@@ -44,27 +50,40 @@ int main() {
 
 
     sol::state lua;
-    lua.open_libraries(sol::lib::base, sol::lib::table, sol::lib::package, sol::lib::coroutine);
+    lua.open_libraries(sol::lib::base, sol::lib::table, sol::lib::string, sol::lib::package, sol::lib::coroutine, sol::lib::math, sol::lib::debug);
 
     lua["package"]["path"] = std::string("resources/lua/share/lua/" VACANCES_LUA_VERSION "/?.lua;resources/lua/share/lua/" VACANCES_LUA_VERSION "/?/init.lua;") + std::string(lua["package"]["path"]);
     lua["package"]["cpath"] = std::string("resources/lua/lib/lua/" VACANCES_LUA_VERSION "/?.so;") + std::string(lua["package"]["cpath"]);
 
+    register_usertypes(lua);
+
+    auto t = sf::Text("test", StaticFonts::main_font, StaticFonts::font_size);
+    lua["DRAWING_TARGET"] = &target;
+
+    /*
     sf::Shader roomDarkerShader;
-    roomDarkerShader.loadFromFile("resources/shaders/room_darker.frag", sf::Shader::Fragment);
+    roomDarkerShader.loadFromFile("resources/shaders/room_darker.frag",
+sf::Shader::Fragment);
 
     roomDarkerShader.setUniform("screenSize", sf::Vector2f(target.getSize()));
     roomDarkerShader.setUniform("monitorTop", sf::Vector2f(237, 708));
     roomDarkerShader.setUniform("monitorBottom", sf::Vector2f(237, 765));
     roomDarkerShader.setUniform("ambientLightLevel", 0.4f);
     roomDarkerShader.setUniform("currentTexture", targetTexture);
+    */
 
-    // Terminal term(target, "prologue/1");
+    Terminal term(target, "prologue/1");
+
+    sol::protected_function add_f = lua.script("return require(\"terminal\").add");
+    auto line = dynamic_cast<TerminalOutputLine *>(term.lines["prologue/1"].get());
+    add_f(line->text, line->next_line, line->character_config);
+
 
     sf::Clock clock;
     while (true) {
         auto dt = clock.restart().asSeconds();
 
-        target.clear(sf::Color::Black);
+        target.clear(sf::Color::White);
 
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -87,21 +106,29 @@ int main() {
             default: break;
             }
 
-            //term.processEvent(event);
+            term.processEvent(event);
         }
 
-        //term.draw(dt);
+        term.draw(dt);
 
-        mainChar.update(dt);
+        sol::protected_function draw_f = lua.script("return require(\"terminal\").draw");
+        auto res = draw_f(dt);
+        if (!res.valid()) {
+            spdlog::error("{}", sol::error(res).what());
+            return 1;
+        }
 
-        target.draw(roomSprite);
+        //mainChar.update(dt);
+
+        //target.draw(roomSprite);
         //window.draw(lightSprite);
-        mainChar.display();
+        //mainChar.display();
 
         target.display();
 
         window.clear();
-        window.draw(targetSprite, &roomDarkerShader);
+        window.draw(targetSprite);
+        //window.draw(targetSprite, &roomDarkerShader);
         window.display();
     }
 }

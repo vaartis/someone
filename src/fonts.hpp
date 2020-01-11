@@ -7,5 +7,5 @@ struct StaticFonts {
 
     static void initFonts();
 
-    static const uint32_t font_size = 16;
+    static const uint32_t font_size;
 };
