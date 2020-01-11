@@ -28,13 +28,15 @@ add_custom_command(
   OUTPUT "${PROJECT_BINARY_DIR}/deps/lua/"
   COMMAND cmake -E copy_directory "${PROJECT_SOURCE_DIR}/deps/lua/" "${PROJECT_BINARY_DIR}/deps/lua/"
 )
+add_custom_target(copy-lua-before-build DEPENDS "${PROJECT_BINARY_DIR}/deps/lua/")
+
 add_custom_command(
   OUTPUT "${PROJECT_BINARY_DIR}/deps/lua/liblua.a" "${PROJECT_BINARY_DIR}/deps/lua/lua"
-  DEPENDS "${PROJECT_BINARY_DIR}/deps/lua/"
+  DEPENDS copy-lua-before-build
   COMMAND make CC=${CMAKE_C_COMPILER} lua liblua.a
   WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/deps/lua/"
 )
-add_custom_target(lua DEPENDS "${PROJECT_BINARY_DIR}/deps/lua/liblua.a")
+add_custom_target(lua DEPENDS "${PROJECT_BINARY_DIR}/deps/lua/liblua.a" "${PROJECT_BINARY_DIR}/deps/lua/lua")
 set(LUA_LIBRARIES "${PROJECT_BINARY_DIR}/deps/lua/liblua.a" dl)
 set(LUA_INCLUDE_DIR "${PROJECT_BINARY_DIR}/deps/lua")
 add_definitions(-DVACANCES_LUA_VERSION="5.3")
@@ -45,12 +47,13 @@ add_definitions(-DVACANCES_LUA_VERSION="5.3")
 
 add_custom_command(
   OUTPUT "${PROJECT_BINARY_DIR}/deps/luarocks/"
-  DEPENDS "${PROJECT_BINARY_DIR}/deps/lua/lua"
   COMMAND cmake -E copy_directory "${PROJECT_SOURCE_DIR}/deps/luarocks/" "${PROJECT_BINARY_DIR}/deps/luarocks/"
 )
+add_custom_target(copy-luarocks-before-build DEPENDS "${PROJECT_BINARY_DIR}/deps/luarocks/")
+
 add_custom_command(
   OUTPUT "${PROJECT_BINARY_DIR}/deps/luarocks/luarocks"
-  DEPENDS lua "${PROJECT_BINARY_DIR}/deps/luarocks/"
+  DEPENDS lua copy-luarocks-before-build
   COMMAND ./configure --with-lua-bin=${PROJECT_BINARY_DIR}/deps/lua --with-lua-include=${PROJECT_BINARY_DIR}/deps/lua && make
   WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/deps/luarocks/"
 )
@@ -62,7 +65,7 @@ add_custom_target(luarocks DEPENDS "${PROJECT_BINARY_DIR}/deps/luarocks/luarocks
 
 add_custom_command(
   OUTPUT "${PROJECT_BINARY_DIR}/resources/lua/"
-  DEPENDS luarocks "${PROJECT_SOURCE_DIR}/src/lua"
+  DEPENDS luarocks lua "${PROJECT_SOURCE_DIR}/src/lua"
   COMMAND ${PROJECT_BINARY_DIR}/deps/luarocks/luarocks --tree=${PROJECT_BINARY_DIR}/resources/lua build
   WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/src/lua"
 )
