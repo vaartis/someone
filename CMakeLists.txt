@@ -23,7 +23,7 @@ set(JSON_BuildTests OFF CACHE INTERNAL "")
 add_subdirectory("${PROJECT_SOURCE_DIR}/deps/nlohmann-json")
 
 # === Building lua ===
-
+# TODO: might need to be built as C++: https://sol2.readthedocs.io/en/latest/errors.html#destructors-and-safety
 add_custom_command(
   OUTPUT "${PROJECT_BINARY_DIR}/deps/lua/"
   COMMAND cmake -E copy_directory "${PROJECT_SOURCE_DIR}/deps/lua/" "${PROJECT_BINARY_DIR}/deps/lua/"
@@ -79,8 +79,6 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/deps/sol2")
 set(vacances_src
   "src/fonts.cpp"
   "src/string_utils.cpp"
-  "src/term.cpp"
-
   "src/main.cpp"
 )
 

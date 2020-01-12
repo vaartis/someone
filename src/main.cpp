@@ -9,16 +9,11 @@
 #include "sol/sol.hpp"
 
 #include "logger.hpp"
-
 #include "string_utils.hpp"
 #include "fonts.hpp"
-#include "term.hpp"
-
+#include "story_parser.hpp"
 #include "usertypes.hpp"
-
 #include "mainchar.hpp"
-
-#include "lines/terminal_output_line.hpp"
 
 int main() {
     sf::RenderWindow window(sf::VideoMode(1280, 1024), "Vacances");
@@ -72,12 +67,18 @@ sf::Shader::Fragment);
     roomDarkerShader.setUniform("currentTexture", targetTexture);
     */
 
-    Terminal term(target, "prologue/1");
+    auto lines = StoryParser::parse("resources/story/prologue.yml", lua);
 
-    sol::protected_function add_f = lua.script("return require(\"terminal\").add");
-    auto line = dynamic_cast<TerminalOutputLine *>(term.lines["prologue/1"].get());
-    add_f(line->text, line->next_line, line->character_config);
+    sol::table terminal_module = lua.script("return require('terminal')");
+    sol::protected_function add_lines = terminal_module["add"];
+    {
+        auto res = add_lines(lines);
+        if (!res.valid())
+            throw sol::error(res);
+    }
 
+    sol::protected_function draw_terminal = terminal_module["draw"];
+    sol::protected_function process_terminal_event = terminal_module["process_event"];
 
     sf::Clock clock;
     while (true) {
@@ -106,16 +107,17 @@ sf::Shader::Fragment);
             default: break;
             }
 
-            term.processEvent(event);
+            {
+                auto res = process_terminal_event(event);
+                if (!res.valid())
+                    throw sol::error(res);
+            }
         }
 
-        term.draw(dt);
-
-        sol::protected_function draw_f = lua.script("return require(\"terminal\").draw");
-        auto res = draw_f(dt);
-        if (!res.valid()) {
-            spdlog::error("{}", sol::error(res).what());
-            return 1;
+        {
+            auto res = draw_terminal(dt);
+            if (!res.valid())
+                throw sol::error(res);
         }
 
         //mainChar.update(dt);

@@ -5,10 +5,9 @@
 #include "fmt/format.h"
 #include "yaml-cpp/yaml.h"
 
-#include "term.hpp"
 #include "logger.hpp"
 #include "string_utils.hpp"
-#include "lines/lines.hpp"
+#include "line_data.hpp"
 
 namespace YAML {
 
@@ -38,7 +37,7 @@ template <> struct convert<CharacterConfig> {
 }
 
 struct StoryParser {
-    static std::map<std::string, std::shared_ptr<TerminalLine>> parse(std::string file_name, Terminal &term) {
+    static std::map<std::string, sol::object> parse(std::string file_name, sol::state &lua) {
         std::string nmspace = std::filesystem::path(file_name).stem();
 
         YAML::Node root_node = YAML::LoadFile(file_name);
@@ -52,7 +51,7 @@ struct StoryParser {
             }
         }
 
-        std::map<std::string, std::shared_ptr<TerminalLine>> result;
+        std::map<std::string, sol::object> result;
         for (auto name_and_val : root_node) {
             auto name = name_and_val.first.as<std::string>();
             auto node = name_and_val.second;
@@ -113,12 +112,12 @@ struct StoryParser {
                 if (node_char != "description") {
                     result.insert({
                             inserted_name,
-                            std::make_shared<TerminalOutputLine>(text, next, char_config, term)
+                            sol::make_object<TerminalOutputLineData>(lua, text, next, char_config)
                         });
                 } else {
                     result.insert({
                             inserted_name,
-                            std::make_shared<TerminalDescriptionLine>(text, next, char_config, term)
+                            sol::make_object<TerminalDescriptionLineData>(lua, text, next, char_config)
                         });
                 }
             } else if (node["responses"]) {
@@ -163,7 +162,7 @@ struct StoryParser {
 
                 result.insert({
                         inserted_name,
-                        std::make_shared<TerminalVariantInputLine>(variants, char_config, term)
+                        sol::make_object<TerminalVariantInputLineData>(lua, variants, char_config)
                 });
             }
         }
