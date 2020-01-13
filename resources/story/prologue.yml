@@ -48,7 +48,6 @@ config:
   text: >-
     Very well, <P>. Since you're here, i'll show you around.
 
-# TODO: make a special line for descriptions
 8:
   char: description
   text: >-
@@ -57,8 +56,7 @@ config:
 9:
   char: narrator
   text: >-
-    Well, there isn't much much to show now. There was more, but it got shut off. Maybe you could
-    do something with that?
+    Well, there isn't much much to show now. There was more, but it got cut off. Maybe you could do something about that?
 
 10:
   char: player

@@ -15,8 +15,7 @@
 
   You are standing in an empty room with the <narrator>.
 
-  Well, there isn't much much to show now. There was more, but it got shut off. Maybe you could
-  do something with that?
+  Well, there isn't much much to show now. There was more, but it's got cut off. Maybe you could do something about that?
 
   And just how would i do that?
 
