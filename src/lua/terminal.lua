@@ -243,8 +243,10 @@ function draw(dt)
    -- Offset for the first line to start at
    local first_line_height_offset = height_offset * 2
 
+   -- Actual offsets that will be used for line positioning
    local line_width_offset, line_height_offset = width_offset * 2, first_line_height_offset
 
+   -- The total height of the text to compare it with the terminal rectangle
    local total_text_height = 0
 
    local current_line_name = first_line_on_screen
