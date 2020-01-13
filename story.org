@@ -141,10 +141,12 @@
                    On the other side of the shelf, there are several books that seem to be about the different philosophical traditions of this world. There's also
                    something resembling a computer on the table nearby, but you decide not to touch it for now. The window in the room faces the other house that stands nearby.
                    There's not much else in this room.
+                   # Set want to talk about the computers
   - Kitchen :: The kitchen is not very big, there are a few cupboards that have dishes in the, other have some of the plants you've seen earlier, but dried.
                Most of the food on the kitchen seems to be plant-based, except in the fridge there's something that looks like milk, but you decide not to taste it,
                since it's not your house. Maybe you should inquire the <narrator> about the food in this world later. Other than all the storage places on the kitchen,
                there's a table with a few chairs and a window that faces the forest you just came from.
+               # Set want to talk about plant based food
   - Bathroom :: On the left, there's a moderately sized bathtub, near which there's a small shelf with some kind of soap looking thing and a washcloth.
                 On the right, a small sink stands, with its own bar of soap. There's also a very small window near the ceiling, you can only see the dark sky through it.
                 Unlike in the room you just came from, the bathroom's floor and walls are made of stone-looking tiles, not wood. You decide to check if the sink works,
@@ -286,13 +288,15 @@
 *** The long walk questions
     Sure. What do you want to talk about?
 
-**** IF (explored the living room) THEN the computers here, how do they work?
-     <p>: I saw a computer in your living room. Of course, i didn't do anything with it.. So i'm interested
-     in how do they actually work around here? Your computers seems way more cool than the one i have here. The one
-     i have has a huge ugly screen. Pretty dim, too.
+     # If the food is good
+     # Where you are staying the night
+     # The weather (?)
+     # The sights to see
+**** IF (want to talk about the computers) THEN the computers here, what are they like and how do they work?
+     So.. You have computers here? How do they actually work?
 
-     Oh, that one.. I've got it recenly before, if you don't count all the time i've spent alone in that room. I used to have a big one too,
-     until it eventually broke down, just refused to boot.. So i got a new one. Couldn't really get the same one, since they didn't make them like that anymore.
+     Yes! I actually have one, too. You might've seen it in my living room. I got it recenly, if you don't count all the time i've spent alone in that empty room alone.
+     I used to have a big one, until it eventually broke down, just refused to boot.. So i got a new one. Couldn't really get the same one, since they didn't make them like that anymore.
      So i got a new shiny slick one. It was faster, but i really don't use it much. I'm not very good with computers, you see. Checking mail, reading
      people's blogs and writing in my own blog was good enough for me. We had a network that connected all computers together, but once again,
      i have no idea how it works, so you'll have to ask someone else about that, provided we ever find anyone else..
@@ -306,8 +310,8 @@
 
      Yeah, for sure. I wanna see it.
 
-**** IF (explored kitchen) THEN what's with the food here, it's all made from plants?
-     <p>: When looking through the kitchen yesterday, i noticed that all the food seemed to be made out of various plants. Do all people here only eat that?
+**** IF (want to talk about plant based food) THEN What's with the food here, it's all made from plants?
+     <p>: It seems like all the food is made out of various plants. Do all people here only eat that?
 
      Yes? Well, we wouldn't eat each other, would we?
 
@@ -337,13 +341,40 @@
 **** Do people always look the same since they don't age?
      <p>: So.. if people here don't age, does that mean their appearance doesn't change since when they first find themselves here?
 
-     Pretty much. Since i woke up here my appearance didn't change mostly. The hair and the nails still grow, but that's practically it.
-     So i still have to look after my hair and nails, but except that.. not much changes. You can get new clothes to change your looks
-     a bit, certainly, but you other than that the looks don't change too much. Some people actually wondered if anything could be done
+     Pretty much. Since i woke up here my appearance didn't change at all. The hair and the nails still grow, but that's practically it.
+     So i still have to look after them, but except that.. not much changes. You can get new clothes to change your looks
+     a bit, certainly, but other than that the looks don't change too much. Some people actually wondered if anything could be done
      about that, but the research was started relatively late and didn't go that far.
 
-     I see.. So after people wake up here, they are all already aged and are of some certain age that never changes. Were all people here grown-ups?
+     I see.. So after people wake up here, they are all already aged and that never changes. Were all people here grown-ups?
 
      Not all of them, no. The "age" ranged considerably, there were all kinds of people. You couldn't really judge anyone by their appearance, because someone
      could look like a child, but have lived a long life already. Perhaps, we could talk to the people who did research on the topic, provided we'd find someone like that.
      Maybe in the city, since most of them lived there, it was the place for researchers to gather.
+**** What's the city like in general?
+     <p>: What's the city we're heading to like in general?
+
+     Uhm.. It's big! And it had a lot of people doing many things. A lot bigger than the village, you know.
+     The buildings there were also actually placed in places specifically designated for them, unlike in our village,
+     where things were just made up as the time progressed and then were connected with a road. For the city,
+     they've actually made a plan.. And uhm.. the building there are tall and they house many people on many floors.
+     And since it's that big there are also means of easier transportation between the parts of the city. Although they
+     wouldn't help us since they require someone to operate them and I sure as hell have no idea how to do it. We can probably
+     see some of them though, or at least i hope we can.
+
+     Interesting.. so, it's big, that's not really new.. What about nighttime, how's it at night?
+
+     It'd be all lit up if there were people, night life there is a normal thing there, unlike in the village where we mostly go to bed and get up early; in the city,
+     many people are more active at night, just because of the way they made their schedule; there are entertainment places where they go to meet their friends and make new ones,
+     have a drink, dance. I tried that lifestyle for some time when i was in the city but i really just couldn't handle it, i think it takes a lot of time to get used to it; getting up
+     so late just feels wrong.. and staying up after midnight is just too tiring for me..
+**** Is the food in the city any different?
+     <p>: Since the city is so big, they probably have some interesting different cuisine, right?
+
+     Precicely so. The food there is made of things delivered there from different places. Since they don't have
+     much of their own food growing, they have to import it from all the places around the world, while the rest of the world
+     gets the "techonolgy" pieces from them, like computers, and phones. As a consequence, you can also get food from other parts of the world there for
+     yourself if you go to the city. The juice you saw this morning, for example, i got from my last trip to the city. I try all kinds of food there and those i like i
+     take back with me to enjoy at home.
+
+     # Set want to talk about plant based food AND want to talk about the computers
