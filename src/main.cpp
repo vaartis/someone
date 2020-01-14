@@ -41,7 +41,7 @@ int main() {
 
     sf::Sprite roomSprite(roomTexture);
 
-    MainChar mainChar(target, "resources/sprites/mainchar");
+    //MainChar mainChar(target, "resources/sprites/mainchar");
 
 
     sol::state lua;
