@@ -288,8 +288,6 @@
 *** The long walk questions
     Sure. What do you want to talk about?
 
-     # If the food is good
-     # Where you are staying the night
      # The weather (?)
      # The sights to see
 **** IF (want to talk about the computers) THEN the computers here, what are they like and how do they work?
@@ -373,8 +371,113 @@
 
      Precicely so. The food there is made of things delivered there from different places. Since they don't have
      much of their own food growing, they have to import it from all the places around the world, while the rest of the world
-     gets the "techonolgy" pieces from them, like computers, and phones. As a consequence, you can also get food from other parts of the world there for
+     gets the "techonolgy" pieces from them, like computers and phones. As a consequence, you can also get food from other parts of the world there for
      yourself if you go to the city. The juice you saw this morning, for example, i got from my last trip to the city. I try all kinds of food there and those i like i
      take back with me to enjoy at home.
 
-     # Set want to talk about plant based food AND want to talk about the computers
+     # Set want to talk about plant based food AND want to talk about the computers UNLESS already talked about them
+**** Are we going to stay in the city for the night?
+     Are we gonna stay in the city this night? Do you know anywhere to stay in case we have to?
+
+     I hope we won't have to.. We got up pretty early and the day is still young, so there's a good chance we won't.
+     Still, if we have to, we'll probably be able to stay at some kind of hotel, especially if there's nobody else there
+     besides us. There are a few of those in the city, so finding one wouldn't be a problem. They were made especially
+     for people like us, who come to the city for a short time and don't have any other place to stay at.
+
+     Pretty convinient.. So finding where to stay for the night, if we need to, shouldn't be a problem. Got it.
+*** Arrive & in the city
+    <Finally, after the long walk, you arrive at the city. Judging by the position of the sun, it's somewhere around noon.
+    The stone road you've been walking gradually changes to asphalt>
+
+    <narrator>: We're here, finally! That was hell of a walk. I guess we could just keep going on the road and not the sidewalk, since,
+    presumably, there's no transport on the roads right now.. We're in the suburbs currenly, so the buildings here aren't as big and
+    are mostly houses, not some services or entertainment ones.
+
+    Yeah.. These look smaller compared to those in the distance. Are we heading deeper into the city?
+
+    I'd say we should check a few houses first, to see if anyone's there. The chance is small but that's the main point why we're here:
+    to try to find someone else besides us..
+
+    OK, gotcha. So, are we gonna split and just go check a few houses here and there?
+
+    I'd really rather not split. I'm afraid that something might go wrong, like you'd get lost, and i'll be left alone again.
+
+    Understood. Of course, we'll check some houses together then.
+
+    <Both of you go off the road, to the first house on the right, going up a stairway to the first floor>
+
+    <narrator>: Let's check the doors on this floor..
+
+    <The <narrator> comes to the first door and carefully turns the knob. The door is not locked. The <narrator> looks at you
+    somewhat worryingly>
+
+    <narrator>: So.. should we go in?
+
+    That's what we're here for, right?
+
+    Yeah.. right..
+
+*** Flat on the first floor
+    <The <narrator> goes through the door and you go after. You're now in the first flat on the first floor. It's not very big:
+    there's what seems to be a bathroom, and the living room and the kitchen are made into a single room, with a kitchen counter inbetween them.
+    The living room part has a sofa and a small coffee table. There's a laptop on the table.>
+**** Check the laptop
+     <player> Should we.. check the laptop?
+
+     I'm.. not sure. It's somebode else's! That'd be kinda rude..
+
+     Well it's not like we're gonna go snooping around too much in there. Let's just see if there's anything that can help us "on the surface", alright?
+
+     OK.. I guess that's fine..
+
+     <You come up to the laptop and press the spacebar key. The laptop wakes up. The screen is locked, but there's no password, you just click the log in button
+     and it does so. The only window on the computer seems to be a blog, you assume, on the same platform the <narrator> talked about before. The top post says
+     "Just got some new flavored noodles, gonna check em out soon", underneath the text it says "posted undefined ago">
+
+     <p>: Is that the blogging thing you told me about?
+
+     Yes.. Well, the interface looks like it, at least.. The date of the post says "undefined" ago, but what does that mean? And, looking at it, other posts' dates
+     are like that too.
+
+     No idea! It wasn't able to determine the date, obviously, but what that actually means I don't know. Probably not much else to see here, since this is the only window on the computer,
+     it was probably only used for writing on the blog.
+**** Check the kitchen part of the room
+     <You walk up to the fridge and open it. There's a bunch of different foods in there, some in bags, most unopened at all>
+
+     <narrator>: So many interesting kinds of meals could be made from this.. But I wouldn't dare to touch someone else's supplies. Maybe we could take some from the city center when
+     we're there. That's where i'd usually get all the cooking stuff.
+
+**** Check the bathroom
+     <You open the bathroom door and turn on the light. It blinks a few times at first, and then stays on as it should. The bathroom is mostly the same as the <narrator>'s, maybe even a little smaller.>
+
+     <p>: Not much to see here.. Good thing we checked, anyway.
+*** Leave the first flat
+    <p>: Not much else to look at here. Should we go check out the other flats?
+
+    Yea. Nothing more catches the eye here.
+
+    <You leave the flat. The <narrator> closes the door, leaving it as it was when you arrived>
+
+    <narrator>: Let's check the other flats, then.
+
+    <You nod. The <narrator> come to the opposite side of the corridor and turns the knob. The door is locked>
+
+    <narrator>: Interesting.. So, the person who lived in that flat just forgot to lock their door? And their computer didn't have any password,
+    too. Guess someone didn't really care about invaders at all.
+
+    Means they had nothing to hide, right?
+
+    Not sure about that. But we can assume that for now.
+
+    <You check the other floors, all the doors are locked. Same happens in the adjacent house>
+
+    <narrator>: Seems like we just got lucky with that one.. All the others are probably locked, too.
+    Let's head into the city and see what's up there.
+
+    Agreed. This was getting boring anyway. You come up to the door and you just know it's locked, but you still try,
+    with no luck. That first one was a big surprise.
+
+    <You head into the city, going along the road, past all the same-looking houses. After some time, you reach the more
+    service-oriented part of the city, where all the night and day life happened>
+
+    <narrator>: Never seen this street so empty, it was bright and full of people even at night. Not anymore, though.
