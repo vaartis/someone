@@ -477,7 +477,76 @@
     Agreed. This was getting boring anyway. You come up to the door and you just know it's locked, but you still try,
     with no luck. That first one was a big surprise.
 
-    <You head into the city, going along the road, past all the same-looking houses. After some time, you reach the more
-    service-oriented part of the city, where all the night and day life happened>
+    <You head into the city, going along the road, past all the same-looking houses. After some time, you reach the center
+    part of the city, where all the night and day life happened>
 
-    <narrator>: Never seen this street so empty, it was bright and full of people even at night. Not anymore, though.
+    <narrator>: Never seen these streets so empty, it was bright and full of people even at night. Not anymore. Didn't think
+    they'd ever end up like this. I hope they'll be the way they were before someday, even though i didn't like it at the time,
+    it's sad to see them so devoid of life.
+
+    <The <narrator> stops for a few second, looking at the building to the right>
+
+    <narrator>: Let's go see this one. This club was a hugely popular place to hang out at night, i got invited to go there at night
+    a few times, but after the first one i didn't want to go there any more at all, too crowded.
+
+    Shouldn't it be closed though? It's day after all.
+
+    They didn't close it for the day, it's just that there weren't a lot of people there. That was the sweet time for me to go
+    enjoy a few drinks.
+
+**** Club
+    <You go throuth the glass doors of the parade entrance, then through the long hallway, and to the actual dancefloor and the bar.
+    As expected, there's nobody there.>
+
+***** The bar
+      <You come over to the bar. There are a few drinks on the bar.>
+
+      <p> Well, if nobody else is there, we might as well have them, right?
+
+      Uh.. sure. The drinks here were nice after all. I missed them.
+
+      <You sit on the stool and take one the glasses, then have a sip. It's very, very sweet and has a slight strawberry flavor>
+
+      <p>: Yuck.. it's so sweet!
+
+      Yes! This one was called "strawberry boom", because it's so sweet. But the aftertaste is nice.
+
+      Actually.. it kinda is.. huh
+
+      The one i have here is a mix of milk-juice and various syrops. It's not exactly a thing you'd get at the club, more like a coctail.
+
+      Wait, you're gonna straight up call it milk-juice?
+
+      Yeah. That's what it's called.
+
+      Huh.. I wonder about the origins of that name.
+
+      No idea, really. I just used the name the people gave it, i weren't the one who made it up or anything. Anyway.. wanna try it?
+
+      Alright.. here goes
+
+      <You take a sip of the coctail. It is, indeed, a mixture of milk and various sweet syrops, although the exact names of those you can't quite figure out>
+
+      Eh.. It is as you described, i don't know if i like it.
+
+      Well. To each their own. Let's finish those and continue our "investigation".
+
+      Yeah. Investigation.
+
+***** The dance floor
+      <The tiles of the dance floor don't change colors. It seems like the program that controls them doesn't run during the day.
+      There are a few tables around it, one of which has a small white pack of someting, with "6" written on it.>
+
+      <p>: Any idea what this pack is?
+
+      Oh that one.. It's probably the popular bubble-gum. Yeah it's called "6". Because there are 6 of them in the pack.
+
+      <You come up to the table and take a gander into the pack. There are 5 strips of gum in there>
+
+      <p>: Five. They left an almost full pack here. How unthoughtful.
+
+      Maybe someone didn't like 'em. They don't exactly taste like.. anything. Just dull.
+
+      Not too fancy of a gum, eh?
+
+      Yep. It's very basic. If you want to just chew on something, maybe or have no time to brush your teeth at all.
