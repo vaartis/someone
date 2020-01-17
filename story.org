@@ -541,7 +541,7 @@
 
       Oh that one.. It's probably the popular bubble-gum. Yeah it's called "6". Because there are 6 of them in the pack.
 
-      <You come up to the table and take a gander into the pack. There are 5 strips of gum in there>
+      <You come up to the table and peek into the pack. There are 5 strips of gum in there.
 
       <p>: Five. They left an almost full pack here. How unthoughtful.
 
@@ -549,4 +549,88 @@
 
       Not too fancy of a gum, eh?
 
-      Yep. It's very basic. If you want to just chew on something, maybe or have no time to brush your teeth at all.
+      Yep. It's very basic. If you want to just chew on something, maybe, or have no time to brush your teeth at all, although..
+      i'm not sure it helps with that?
+**** After the club
+     <narrator>: That was a whole bunch of nothing, huh? I'm getting really desperate for something to change already! Come on..
+     Did we go all the way for nothing?
+
+     Yeah.. Jeez. So boring! Maybe we should head back already?
+
+     Come on, let's check a few more places, OK? And on our way, let's try to find a few bicycles to go back on, that should ease our way a bit.
+
+     Oh, sure.. If you know where to get them.
+
+     Yeah. We'll head for the big mall for now, there's a bike place there, i hope nobody is going to mind if we take them?
+
+     There's probably nobody to do so..
+
+     Yes. That's what i'm talking about. Let's go.
+
+     <You walk for bit more deeper into the city, until you see the big mall building. You know it's a mall because it has
+     "City Mall" written on it. Who could've thought>
+
+     <narrator>: I'll try to remember where exactly the bike place is, while you look around and see if there's anything interesting while
+     we're on the way. This place is pretty big after all.
+
+     <While you go, you notice a few clothing places, cosmetics stuff, lingerie, a huge food section, general applience stuff, and then,
+     finlly, you're at the bike place>
+
+     Well, just take the first one that fits you and let's go already.
+
+     <The <narrator> tries out a few bikes, stopping on a sporty looking green one. You grab the first one you see, the seat feels alright and the pedals
+     are at the comfortable height, so you don't hesitate too much. Your bike is red, the fastest color. You set out on your way back immediately. The sun seems to already be setting.
+     Just how much have you been walking here?>
+
+     <narrator>: What a disappointment. Not like it really matters, since the time is not a constraint, but still, having no results is disappointing. Now we know there's probably nothing there, at least,
+     so we wouldn't need to go all the way back again for a while.
+
+     I guess that's true.. That wasn't very exciting, except when we actually did find something, you know?
+
+     Not a lot of that, but yes..
+
+**** Back in the village
+     <After the back, you spend most of the time focusing on the road. The bikes make the journey quite a bit shorter. When you arrive,
+     almost set and it's pretty dark. On your way to <narrator>'s house you suddenly notice that the house on opposite side of the street
+     has its lights turned on. You look at the <narrator>. The <narrator> looks at you>
+
+     <narrator>: What the hell?! Is he.. actually in here?
+
+     Is this your friend's house?
+
+     Yes! Oh wow, can it be that he's somehow back? That we aren't alone here? We have to check RIGHT NOW.
+
+     <You both abandon the bikes in the middle of the road and run up to the house. The <narrator> knocks on the door a few times and carefully opens it>
+
+     <narrator>: Hey?
+
+     <Behind the door, you see a guy, not too hight, with shoulder length black hair and wearing glasses. He jumps back, producing a high-pitched yell>
+
+     <maj>: aaHHH!!
+
+     <You see <narrator> giggle a little>
+
+     <narrator>: Hi, Maj! Long time no see!!
+
+     # Possible names: Rüd, Maj, Jörg?
+
+     <maj>: ah.. ha.. Not sure about the time, but hi! I'm really lost.. since everything went down i can't remember much..
+     The panic, then darkness, and then i wake up in the forest this morning, in the same place i was the first time. I didn't understand anything,
+     so i thought i'd just head back home, what else could i do? So I there i was, alone.. Which was scary.. so i just
+     spent the whole day at home..
+
+     <narrator>: Oh wow.. That's a bit different.. but.. uh.. let's come in and not just stand here, eh?
+
+     <maj>: ohh.. yeah! sure.. and who's the person behind you might be..? if you don't mind me asking..
+
+     <narratoro>: Ah, that's <p>. They're.. uh.. new here. Apparently they're from the "outside", like the "creator" was..
+
+     <maj>: wow! i never thought i'd meet someone like that ever again..
+
+     <p>: Hello! While i suppose it's true i'm from the "outside" I don't really know anything about that person you refer to as the "creator",
+     nor do I know anything about myself.. or anything outside the room i'm in, really..
+
+     <maj>: oh wow.. shame.. but still, welcome! let's head into the kitchen and have some tea at least, like the <narrator> suggested, we shouldn't just stand in the doors.
+
+     <You all head to a room on the left, it's a medium-sized kitchen. You and <narrator> sit at the table, while Maj puts some water into the electric kettle,
+     the water boils rather fast, and after a minute you all sit at the table with some tea, which is still too hot to taste, but already smells minty>
