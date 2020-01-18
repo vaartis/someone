@@ -604,33 +604,129 @@
 
      <narrator>: Hey?
 
-     <Behind the door, you see a guy, not too hight, with shoulder length black hair and wearing glasses. He jumps back, producing a high-pitched yell>
+     <Behind the door, you see a guy, not too tall, with shoulder length black hair and wearing glasses. He jumps back, producing a high-pitched yell>
 
      <maj>: aaHHH!!
 
      <You see <narrator> giggle a little>
 
-     <narrator>: Hi, Maj! Long time no see!!
+     <narrator>: Maj! Long time no see!!
 
      # Possible names: Rüd, Maj, Jörg?
 
-     <maj>: ah.. ha.. Not sure about the time, but hi! I'm really lost.. since everything went down i can't remember much..
+     <maj>: Ah.. ha.. Not sure about the time, but hi! I'm really lost.. since everything went down i can't remember much..
      The panic, then darkness, and then i wake up in the forest this morning, in the same place i was the first time. I didn't understand anything,
      so i thought i'd just head back home, what else could i do? So I there i was, alone.. Which was scary.. so i just
      spent the whole day at home..
 
      <narrator>: Oh wow.. That's a bit different.. but.. uh.. let's come in and not just stand here, eh?
 
-     <maj>: ohh.. yeah! sure.. and who's the person behind you might be..? if you don't mind me asking..
+     <maj>: Ohh.. yeah! sure.. and who's the person behind you might be..? if you don't mind me asking..
 
      <narratoro>: Ah, that's <p>. They're.. uh.. new here. Apparently they're from the "outside", like the "creator" was..
 
-     <maj>: wow! i never thought i'd meet someone like that ever again..
+     <maj>: Wow! i never thought i'd meet someone like that ever again..
 
      <p>: Hello! While i suppose it's true i'm from the "outside" I don't really know anything about that person you refer to as the "creator",
      nor do I know anything about myself.. or anything outside the room i'm in, really..
 
-     <maj>: oh wow.. shame.. but still, welcome! let's head into the kitchen and have some tea at least, like the <narrator> suggested, we shouldn't just stand in the doors.
+     <maj>: Oh wow.. shame.. but still, welcome! let's head into the kitchen and have some tea at least, like the <narrator> suggested, we shouldn't just stand in the doors.
 
      <You all head to a room on the left, it's a medium-sized kitchen. You and <narrator> sit at the table, while Maj puts some water into the electric kettle,
      the water boils rather fast, and after a minute you all sit at the table with some tea, which is still too hot to taste, but already smells minty>
+
+     <maj>: So, <narrator>, what about time that you wanted to say, what was so different?
+
+     <narrator>: You said that you only remember darkness and then you woke up back in the forest, but it was very different for me. It has actually been a very long wait for me.
+     All that was left of the world was a single room with gray walls, and nothing else, and that's where i was all that time. I'm a bit envious of you not having to experience that.
+     I never want to stay alone with nothing and nobody else but myself. I'm glad you're back too now, it's been about a day since the world has returned back to normal.. well.. except
+     all the people. <p> helped me get out of that room by doing somethig on the outside. Something also changed this night, while I was asleep, isn't that right, <p>?
+
+     <p>: Yeah.. There was some kind of a corridor, with a stupid puzzle. So i solved it, there was some kind of sound, and that somehow brought back the city. And you, too, it seems. I'm looking
+     forward to more changes like that in the future.
+
+     <maj>: Wow.. that is a lot to process.. First off, it's very sad you had to experience this, <narrator>.. But that's behind you now, and we can start living again, right?
+
+     <narrator>: I.. sure hope so. There are still so many people missing.. But we'll try to get them back. We've been to the city with <p> today, it's as empty as everything else,
+     so we really just wasted a lot of time.
+
+     <maj>: Such a big city and nobody there too.. So we're the only people here..
+
+     <narrator>: We haven't found anyone else.. But seeing you now makes me excited! More people might be coming back soon..
+
+     <maj>: Oh i can't wait for that..! I really really want everyone to be back.. I already miss all the life around here..
+
+     <narrator>: We'll be progressing with that soon, i hope. In the meantime, <p>, Maj was one of the people who designed the first computers around here!
+     So you can ask something about them..
+
+     <p>: Oh!
+
+     <maj>: Well.. i only participated in the initial design and development of the first ones, they were quite clumsy and big.. Nowadays computers
+     are a lot more slim, all of that happened after they moved to the city, and i mostly resigned from duty and stayed here. We made the micro-blogging thing, i'm sure <narrator>
+     told you about it, so we could keep each other up to date on things, so i still get the news about new inventions and research and even get to participate sometimes, but a lot of the
+     time that still requires being there in person, so it rarely happens.
+
+     <p> Why didn't you want to go to the city with them and continue working on the cool stuff?
+
+     <maj>: You see.. i really don't like big crowds of people and the city is ALL about that.. I get all anxious and trembly.. So i'd rather stay.. besides, the scientific
+     community has grown a lot since the beginning and i'm sure they can go on without me.
+
+     <narrator>: Don't you belittle your part in that community, you dummy! They wouldn't be able to make it like it is without your work, and you know it. You didn't really leave or anything,
+     you still kept up with people from there, didn't you?
+
+     <maj>: Yes.. ok, ok, you got me. I don't really like to admit it, because i'd sound like a hypocrit, though. But enough about that, the interesting part in the design of the computers is
+     that we designed them with long range networking in mind, and put some big servers in places where they'd be neede and where we could connect computers to them and then connect the server together.
+     One of them is actually right here, in the basement of my house, i rarely go down there so it might be a bit dusty, but we can go see it if you want.
+
+     <p>: Oh sure, let's go!
+
+     <Since you all are already done with the tea, you all stand up, and wait for Maj to lead the way. However, he just moves his chair and you notice that there's a trapdoor underneath.
+     He lifts it, then reaches inside to find the light switch and turns it on. He then steps on the ledder there and starts going down. You look as he goes down, it's not that deep down there,
+     just a few meters. He waves at you, telling you can go down now. You climb down the ladder first, then the <narrator> climbs afterwards>
+
+     <p>: You know.. this really looks like the room I am in. I mean, on the outside. Except yours is way better lit.
+
+     <maj>: Do you really spend all your time in an almost empty concrete box? That's just sad.
+
+     <p>: Not like i have any choice..
+
+     <maj>: Anyway. Here it is, this big boy handles all the communication between the village and the city
+
+     <You look at the server. It's a rack filled with all kinds of boxes and wires, all blinking with different colors>
+
+     <maj>: In the city, there are a few of servers like this once, since it's a lot bigger. The city is like a hub for communication.
+
+     <p>: I think I'm noticing a pattern here, same happens with the foods you guys have.
+
+     <maj>: Precicely. I wasn't sure about how to use the basement for a while, but this thingy here fit in quite well, and now it doesn't take space in the house, plus it gets all the underground coolness.
+
+     <p>: So it's not just me, it really is colder in here?
+
+     <narrator>: I've noticed, too.
+
+     <maj>: Yes! Besides being underground, this place is also additionally cooled down artificially. Otherwise it'd get pretty hot in here, this baby produces a lot of heat.
+     There's not much to see other than the server, but i am proud of it and will take any opportunity to show this setup to someone, albeit it might sound like braggning, it did
+     took some planning to set up. Now, let's get out of here, i'm feeling cold myself.
+
+     <You all get out of the basement in the reverse order. Maj closes the trapdoor and moves his chair back>
+
+     <maj>: Now, it's getting really late, i'd love to talk some more, but maybe we should continue tomorrow?
+
+     <narrator>: Oh, i'm since the trip, i just realized it, i didn't notice it because i was so excited to see you. We'll probably head back to my place then,
+     <p> is staying at my house for now, until we figure out something better.
+
+     <maj>: See you tomorrow, then.
+
+     <p>: I wonder what'll happen tomorrow.. and how today's night will go. On my side, the the computer screen just goes black for a while.
+
+     <maj>: We'll know sooner if we go to sleep sonner, haha.
+
+     <p>: Yeah, good night!
+
+     <You and the <narrator> leave the house and get back to the <narrator>'s place, <narrator> takes a shower, and you both head to bed>
+
+     <narrator>: I'm exhausted.. Goodnight, i guess, even though it doesn't mean much for you apparently.
+
+     <p>: I still appreciate the kind words. Here goes nothing, let's see what tomorrow brings.
+
+     <The <narrator> falls asleep very fast, after you notice that, your screen goes black again>
