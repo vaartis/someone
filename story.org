@@ -1,4 +1,5 @@
 # -*- fill-column: 150 -*-
+#+STARTUP: inlineimages
 
 * Prologue
   Hello? Can you hear me?
@@ -16,6 +17,7 @@
   Very well, <P>. Since you're here, i could show you around.
 
   <You are standing in an empty room with the <narrator>>
+  <Environment: [[./resources/sprites/environments/gray_room.png]]>
 
   However, there isn't anything to show now. There was more, but it's gone now. Maybe you could do something about that?
 
@@ -28,7 +30,6 @@
   Well, now that you mention it. Yeah, i do..
 
   Maybe check your surroundings out? I'll still be here, of course. Not like i can go anywhere :)
-
 * First time in the room
   There's a room where the player is in. The player is some ambigous figure in a hoodie.
 
@@ -36,6 +37,8 @@
   is. When the player presses the lever, a sound is heard from the computer. The player then goes back to the computer.
 
 * At the computer after the room
+  <Environment: [[./resources/sprites/environments/midnight_forest.png]]>
+
   <You're no longer standing in the room, now around you is a midnight forest. You ask <narrator>, who is still standing near, what happened>
 
   <p>: Well, you did something, and now there's the forest. That is what i was talking about when I told you that there was more. This forest is
@@ -728,4 +731,4 @@
 
      <p>: I still appreciate the kind words. Let's see what tomorrow brings.
 
-     <The <narrator> falls asleep very fast, your screen goes black again>
+     <The <narrator> falls asleep very fast and your screen goes black again>

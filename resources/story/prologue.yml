@@ -52,6 +52,7 @@ config:
   char: description
   text: >-
     You are standing in an empty room with the <narrator>.
+  script: TerminalModule.set_environment_image('gray_room')
 
 9:
   char: narrator

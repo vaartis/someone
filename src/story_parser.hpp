@@ -59,9 +59,27 @@ struct StoryParser {
             // Skip the config node
             if (name == "config") continue;
 
-            auto node_char = node["char"].as<std::string>();
-
             auto inserted_name = fmt::format("{}/{}", nmspace, name);
+
+            auto node_char = node["char"].as<std::string>();
+            CharacterConfig char_config;
+            auto found_char_config = character_configs.find(node_char);
+            if (found_char_config == character_configs.end()) {
+                spdlog::warn(
+                    "{} uses the character {}, but it does not exist",
+                    inserted_name,
+                    node_char
+                );
+            } else {
+                char_config = found_char_config->second;
+            }
+
+            std::optional<std::string> node_script;
+            if (node["script"])
+                node_script = node["script"].as<std::string>();
+
+            sol::object result_object;
+
             if (node["text"]) {
                 // Get the text of the node
                 auto text = node["text"].as<std::string>();
@@ -97,28 +115,10 @@ struct StoryParser {
                 if (next != "" && next.find('/') == std::string::npos)
                     next = fmt::format("{}/{}", nmspace, next);
 
-                CharacterConfig char_config;
-                auto found_char_config = character_configs.find(node_char);
-                if (found_char_config == character_configs.end()) {
-                    spdlog::warn(
-                        "{} uses the character {}, but it does not exist",
-                        inserted_name,
-                        node_char
-                    );
-                } else {
-                    char_config = found_char_config->second;
-                }
-
                 if (node_char != "description") {
-                    result.insert({
-                            inserted_name,
-                            sol::make_object<TerminalOutputLineData>(lua, text, next, char_config)
-                        });
+                    result_object = sol::make_object<TerminalOutputLineData>(lua, text, next);
                 } else {
-                    result.insert({
-                            inserted_name,
-                            sol::make_object<TerminalDescriptionLineData>(lua, text, next, char_config)
-                        });
+                    result_object = sol::make_object<TerminalDescriptionLineData>(lua, text, next);
                 }
             } else if (node["responses"]) {
                 // Construct an empty vector
@@ -148,23 +148,17 @@ struct StoryParser {
                     variants.push_back({resp_text, resp_next});
                 }
 
-                CharacterConfig char_config;
-                auto found_char_config = character_configs.find(node_char);
-                if (found_char_config == character_configs.end()) {
-                    spdlog::warn(
-                        "{} uses the character {}, but it does not exist",
-                        inserted_name,
-                        node_char
-                    );
-                } else {
-                    char_config = found_char_config->second;
-                }
-
-                result.insert({
-                        inserted_name,
-                        sol::make_object<TerminalVariantInputLineData>(lua, variants, char_config)
-                });
+                result_object = sol::make_object<TerminalVariantInputLineData>(lua, variants);
+            } else {
+                spdlog::error("Unknown line type at {}", inserted_name);
+                std::terminate();
             }
+
+            auto &general_line = result_object.as<TerminalLineData>();
+            general_line.character_config = char_config;
+            general_line.script = node_script;
+
+            result.insert({inserted_name, result_object});
         }
 
         return result;

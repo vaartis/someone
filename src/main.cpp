@@ -69,7 +69,8 @@ sf::Shader::Fragment);
 
     auto lines = StoryParser::parse("resources/story/prologue.yml", lua);
 
-    sol::table terminal_module = lua.script("return require('terminal')");
+    // This both defines a global for the module and returns it
+    sol::table terminal_module = lua.require_script("TerminalModule", "return require('terminal')");
     sol::protected_function add_lines = terminal_module["add"];
     {
         auto res = add_lines(lines);

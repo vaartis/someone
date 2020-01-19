@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SFML/Graphics/RenderTarget.hpp>
-#include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/Sprite.hpp>
 #include <SFML/Graphics/Transformable.hpp>
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
@@ -82,7 +82,7 @@ void register_usertypes(sol::state &lua) {
     );
 
     auto tf_type = lua.new_usertype<sf::Transformable>(
-        "Transformable", sol::no_constructor,
+        "Transformable",
         "position", sol::property(
             &sf::Transformable::getPosition,
             sol::resolve<void(const sf::Vector2f&)>(&sf::Transformable::setPosition)
@@ -90,20 +90,20 @@ void register_usertypes(sol::state &lua) {
     );
 
     auto render_target_type = lua.new_usertype<sf::RenderTarget>(
-        "RenderTarget", sol::no_constructor,
+        "RenderTarget",
         "draw", [](sf::RenderTarget &target, const sf::Drawable &drawable) { target.draw(drawable); }
     );
     auto render_states_type = lua.new_usertype<sf::RenderStates>("RenderStates");
 
     auto render_texture_type = lua.new_usertype<sf::RenderTexture>(
-        "RenderTexture", sol::no_constructor,
+        "RenderTexture",
         sol::base_classes, sol::bases<sf::RenderTarget>(),
         "size", sol::property(&sf::RenderTexture::getSize)
     );
 
     auto drawable_type = lua.new_usertype<sf::Drawable>("Drawable");
 
-    auto font_type = lua.new_usertype<sf::Font>("Font", sol::no_constructor);
+    auto font_type = lua.new_usertype<sf::Font>("Font");
 
     auto text_type = lua.new_usertype<sf::Text>(
         "Text", sol::constructors<sf::Text(const std::string&, const sf::Font&, unsigned int)>(),
@@ -139,9 +139,20 @@ void register_usertypes(sol::state &lua) {
         )
     );
 
+    auto texture_type = lua.new_usertype<sf::Texture>(
+        "Texture", sol::constructors<sf::Texture()>(),
+        "load_from_file", [](sf::Texture &texture, const std::string filename) { texture.loadFromFile(filename); },
+        "size", sol::property(&sf::Texture::getSize)
+    );
+
+    auto sprite = lua.new_usertype<sf::Sprite>(
+        "Sprite", sol::constructors<sf::Sprite()>(),
+        sol::base_classes, sol::bases<sf::Drawable, sf::Transformable>(),
+        "texture", sol::property(&sf::Sprite::getTexture, [](sf::Sprite &sprite, const sf::Texture &texture) { sprite.setTexture(texture); })
+    );
 
     auto event_type = lua.new_usertype<sf::Event>(
-        "Event", sol::no_constructor,
+        "Event",
         "type", sol::readonly(&sf::Event::type),
         // Keyboard event
         "key", sol::readonly(&sf::Event::key),
@@ -149,7 +160,7 @@ void register_usertypes(sol::state &lua) {
         "text", sol::readonly(&sf::Event::text)
     );
     auto key_event_type = lua.new_usertype<sf::Event::KeyEvent>(
-        "KeyEvent", sol::no_constructor,
+        "KeyEvent",
         "code", sol::readonly(&sf::Event::KeyEvent::code),
         "alt", sol::readonly(&sf::Event::KeyEvent::alt),
         "control", sol::readonly(&sf::Event::KeyEvent::control),
@@ -157,7 +168,7 @@ void register_usertypes(sol::state &lua) {
         "system", sol::readonly(&sf::Event::KeyEvent::system)
     );
     auto text_event_type = lua.new_usertype<sf::Event::TextEvent>(
-        "TextEvent", sol::no_constructor,
+        "TextEvent",
         "unicode", sol::readonly(&sf::Event::TextEvent::unicode)
     );
     auto key_enum = lua.new_enum(
@@ -174,40 +185,41 @@ void register_usertypes(sol::state &lua) {
     // Helper classes
 
     auto static_fonts_type = lua.new_usertype<StaticFonts>(
-        "StaticFonts", sol::no_constructor,
+        "StaticFonts",
         "main_font", sol::var(std::ref(StaticFonts::main_font)),
         "font_size", sol::var(std::ref(StaticFonts::font_size))
     );
 
     auto string_utils_type = lua.new_usertype<StringUtils>(
-        "StringUtils", sol::no_constructor,
+        "StringUtils",
         "wrap_words_at", &StringUtils::wrap_words_at
     );
 
     // Data
 
     auto char_config_type = lua.new_usertype<CharacterConfig>(
-        "CharacterConfig", sol::no_constructor,
+        "CharacterConfig",
         "color", sol::readonly(&CharacterConfig::color)
     );
 
     auto term_line_type = lua.new_usertype<TerminalLineData>(
-        "TerminalLineData", sol::no_constructor,
-        "character_config", sol::readonly(&TerminalLineData::character_config)
+        "TerminalLineData",
+        "character_config", sol::readonly(&TerminalLineData::character_config),
+        "script", sol::readonly(&TerminalLineData::script)
     );
     auto term_output_line_type = lua.new_usertype<TerminalOutputLineData>(
-        "TerminalOutputLineData", sol::no_constructor,
+        "TerminalOutputLineData",
+        sol::base_classes, sol::bases<TerminalLineData>(),
         "text", sol::readonly(&TerminalOutputLineData::text),
-        "next", sol::readonly(&TerminalOutputLineData::next),
-        sol::base_classes, sol::bases<TerminalLineData>()
+        "next", sol::readonly(&TerminalOutputLineData::next)
     );
     auto term_variant_input_type = lua.new_usertype<TerminalVariantInputLineData>(
-        "TerminalVariantInputLineData", sol::no_constructor,
-        "variants", sol::readonly(&TerminalVariantInputLineData::variants),
-        sol::base_classes, sol::bases<TerminalLineData>()
+        "TerminalVariantInputLineData",
+        sol::base_classes, sol::bases<TerminalLineData>(),
+        "variants", sol::readonly(&TerminalVariantInputLineData::variants)
     );
     auto desc_line_type = lua.new_usertype<TerminalDescriptionLineData>(
-        "TerminalDescriptionLineData", sol::no_constructor,
+        "TerminalDescriptionLineData",
         sol::base_classes, sol::bases<TerminalLineData, TerminalOutputLineData>()
     );
 }

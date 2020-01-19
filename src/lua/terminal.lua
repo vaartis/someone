@@ -16,11 +16,15 @@ end
 local time_per_letter = 0.01
 
 local TerminalLine = class("TerminalLine")
-function TerminalLine:initialize(character_config)
-   self._character = character_config
+function TerminalLine:initialize()
+   self._character = nil
 
    self._letters_output = 0
    self._time_since_last_letter = 0.0
+
+   -- The script to execute on first line evaluation and whether it was executed already or not
+   self._script = nil
+   self._script_executed = false
 end
 
 function TerminalLine:tick_letter_timer(dt)
@@ -28,8 +32,8 @@ function TerminalLine:tick_letter_timer(dt)
 end
 
 local OutputLine = class("OutputLine", TerminalLine)
-function OutputLine:initialize(text, next_line, character_config)
-   TerminalLine.initialize(self, character_config)
+function OutputLine:initialize(text, next_line)
+   TerminalLine.initialize(self)
 
    self._text = text
    self._next_line = next_line
@@ -74,8 +78,8 @@ function OutputLine:next()
 end
 
 local DescriptionLine = class("DescriptionLine", OutputLine)
-function DescriptionLine:initialize(text, next_line, character_config)
-   OutputLine.initialize(self, text, next_line, character_config)
+function DescriptionLine:initialize(text, next_line)
+   OutputLine.initialize(self, text, next_line)
 
    self._space_pressed = false
 end
@@ -116,8 +120,8 @@ function DescriptionLine:handle_interaction(event)
 end
 
 local VariantInputLine = class("VariantInputLine", TerminalLine)
-function VariantInputLine:initialize(variants, character_config)
-   TerminalLine.initialize(self, character_config)
+function VariantInputLine:initialize(variants)
+   TerminalLine.initialize(self)
    
    -- Same as if it was unset. Just to have the name mentioned somewhere beforehand
    self._selected_variant = nil
@@ -209,18 +213,26 @@ local lines = {}
 
 local first_line_on_screen = "prologue/1"
 
+local current_environment_texture, current_environment_sprite
+
 function add(in_lines)
    for name, line in pairs(in_lines) do
       local tp = line.__type.name
+
+      local to_insert      
       if tp == "TerminalOutputLineData" then
-         lines[name] = OutputLine(line.text, line.next, line.character_config)
+         to_insert = OutputLine(line.text, line.next, line.character_config)
       elseif tp == "TerminalDescriptionLineData" then
-         lines[name] = DescriptionLine(line.text, line.next, line.character_config)
+         to_insert = DescriptionLine(line.text, line.next, line.character_config)
       elseif tp == "TerminalVariantInputLineData" then
-         lines[name] = VariantInputLine(line.variants, line.character_config)
+         to_insert = VariantInputLine(line.variants, line.character_config)
       else
          error("Unknown line type " .. tp)
       end
+      to_insert._character = line.character_config
+      to_insert._script = line.script     
+
+      lines[name] = to_insert
    end
 end
 
@@ -307,12 +319,29 @@ function draw(dt)
          end
       end
 
+      -- If there's a script and it wasn't executed yet, do it
+      if line._script and not line._script_executed then         
+         local script_f = load(line._script, current_line_name .. ".script")
+         script_f()
+         
+         line._script_executed = true
+      end
+
       if (should_wait or line:next() == "") then
          break
       end
 
       current_line_name = line:next()
-   end     
+   end
+
+   -- Draw the environment image if there is one
+   if current_environment_sprite then
+      local sprite_height_offset = (height_offset * 2) + rect_height
+      local sprite_width_offset = width_offset + rect_width - current_environment_texture.size.x
+
+      current_environment_sprite.position = Vector2f.new(sprite_width_offset, sprite_height_offset)
+      DRAWING_TARGET:draw(current_environment_sprite)
+   end
 end
 
 function process_event(event)
@@ -338,8 +367,22 @@ function process_event(event)
    end
 end
 
+function set_environment_image(name)
+   -- Create the sprite if it doesn't exist yet
+   if not current_environment_sprite then      
+      current_environment_sprite = Sprite.new()      
+   end
+   
+   local full_name = "resources/sprites/environments/" .. name .. ".png"
+   current_environment_texture = Texture.new()
+   current_environment_texture:load_from_file(full_name)
+   
+   current_environment_sprite.texture = current_environment_texture
+end
+
 return {
    add = add,  
    draw = draw,
-   process_event = process_event
+   process_event = process_event,
+   set_environment_image = set_environment_image
 }
