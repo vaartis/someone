@@ -71,9 +71,19 @@ sf::Shader::Fragment);
 
     // This both defines a global for the module and returns it
     sol::table terminal_module = lua.require_script("TerminalModule", "return require('terminal')");
-    sol::protected_function add_lines = terminal_module["add"];
+
+    // Add the lines from the loaded file
+    sol::protected_function add_lines = terminal_module["add_native_lines"];
     {
         auto res = add_lines(lines);
+        if (!res.valid())
+            throw sol::error(res);
+    }
+
+    // After the lines are added, set up the first line on screen
+    sol::protected_function set_first_line = terminal_module["set_first_line_on_screen"];
+    {
+        auto res = set_first_line("prologue/1");
         if (!res.valid())
             throw sol::error(res);
     }

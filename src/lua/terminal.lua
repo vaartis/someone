@@ -13,6 +13,12 @@ function max_text_width()
    return math.floor((rect_width - (width_offset * 2)) / (StaticFonts.font_size / 2.0))
 end
 
+-- Native lines, data received from C++
+local native_lines = {}
+
+-- First line to be shown on screen every frame
+local first_line_on_screen
+
 local time_per_letter = 0.01
 
 local TerminalLine = class("TerminalLine")
@@ -33,11 +39,14 @@ function TerminalLine:tick_letter_timer(dt)
 end
 
 local OutputLine = class("OutputLine", TerminalLine)
-function OutputLine:initialize(name, text, next_line)
+function OutputLine:initialize(name, text, next_line_name)
    TerminalLine.initialize(self, name)
 
    self._text = text
-   self._next_line = next_line
+   -- The name of the next line to be retreived and instantiated by next()
+   self._next_line_name = next_line_name
+   -- A place to store the next line instance when it's needed
+   self._next_line = nil
 end
 
 function OutputLine:max_line_height()
@@ -67,7 +76,6 @@ function OutputLine:current_text()
       max_text_width()
    )
 
-
    local txt = Text.new(substr, StaticFonts.main_font, StaticFonts.font_size)
    txt.fill_color = self._character.color
 
@@ -75,6 +83,11 @@ function OutputLine:current_text()
 end
 
 function OutputLine:next()
+   -- Create the next line if there is one and only do it if one wasn't created already
+   if self._next_line_name ~= "" and not self._next_line then
+      self._next_line = make_line(next_line, native_lines[self._next_line_name])
+   end
+
    return self._next_line
 end
 
@@ -126,9 +139,15 @@ function VariantInputLine:initialize(name, variants)
 
    -- Same as if it was unset. Just to have the name mentioned somewhere beforehand
    self._selected_variant = nil
+   -- A place to store the next line instance when the variant is selected
+   self._selected_variant_next_instance = nil
 
+   -- All possible variants
    self._variants = {}
+   -- Variants that are currently visible
    self._visible_variants = {}
+
+   -- Process native variants into data
    for _, var in pairs(variants) do
       local inserted_variant = { text = var.text, next = var.next }
 
@@ -141,6 +160,7 @@ function VariantInputLine:initialize(name, variants)
       table.insert(self._variants, inserted_variant)
    end
 
+   -- Find the longest variant to base text printing on
    self._longest_var_length = -1
    for n, var in ipairs(self._variants) do
       local len = #var.text
@@ -153,6 +173,7 @@ end
 function VariantInputLine:max_line_height(variant)
    local term_width = max_text_width()
 
+   -- Get the text of the selected visible variant
    local fit_str = StringUtils.wrap_words_at(self._visible_variants[variant].text, term_width)
 
    local tmp_text = Text.new(fit_str, StaticFonts.main_font, StaticFonts.font_size)
@@ -224,7 +245,14 @@ function VariantInputLine:next()
       return "";
    end
 
-   return self._variants[self._selected_variant].next
+   -- If the next line wasn't instantiated yet, create it
+   if not self._selected_variant_next_instance then
+      local nxt_name = self._visible_variants[self._selected_variant].next
+
+      self._selected_variant_next_instance = make_line(nxt_name, native_lines[nxt_name])
+   end
+
+   return self._selected_variant_next_instance
 end
 
 function VariantInputLine:is_interactive()
@@ -248,37 +276,45 @@ end
 
 local M = {}
 
-local lines = {}
-
-local first_line_on_screen = "prologue/1"
-
 local current_environment_texture, current_environment_sprite
 
-function M.add(in_lines)
-   for name, line in pairs(in_lines) do
-      local tp = line.__type.name
+-- A function to create lines from their name and the native line data
+function make_line(name, line)
+   local tp = line.__type.name
 
-      local to_insert
-      if tp == "TerminalOutputLineData" then
-         to_insert = OutputLine(name, line.text, line.next, line.character_config)
-      elseif tp == "TerminalDescriptionLineData" then
-         to_insert = DescriptionLine(name, line.text, line.next, line.character_config)
-      elseif tp == "TerminalVariantInputLineData" then
-         to_insert = VariantInputLine(name, line.variants, line.character_config)
-      else
-         error("Unknown line type " .. tp)
-      end
-
-      to_insert._character = line.character_config
-
-      if line.script then
-         -- Compile the script (if it exists)
-         to_insert._script, err = load(line.script, name .. ".script")
-         if err then error(err) end
-      end
-
-      lines[name] = to_insert
+   local to_insert
+   if tp == "TerminalOutputLineData" then
+      to_insert = OutputLine(name, line.text, line.next, line.character_config)
+   elseif tp == "TerminalDescriptionLineData" then
+      to_insert = DescriptionLine(name, line.text, line.next, line.character_config)
+   elseif tp == "TerminalVariantInputLineData" then
+      to_insert = VariantInputLine(name, line.variants, line.character_config)
+   else
+      error("Unknown line type " .. tp)
    end
+
+   to_insert._character = line.character_config
+
+   if line.script then
+      -- Compile the script (if it exists)
+      to_insert._script, err = load(line.script, name .. ".script")
+      if err then error(err) end
+   end
+
+   return to_insert
+end
+
+-- Called from C++ to add native lines
+function M.add_native_lines(in_lines)
+   -- Setting them by key allows merging
+   for name, line in pairs(in_lines) do
+      native_lines[name] = line
+   end
+end
+
+-- Called from C++ to set up the first line on screen
+function M.set_first_line_on_screen(name)
+   first_line_on_screen = make_line(name, native_lines[name])
 end
 
 function M.draw(dt)
@@ -306,12 +342,10 @@ function M.draw(dt)
    -- The total height of the text to compare it with the terminal rectangle
    local total_text_height = 0
 
-   local current_line_name = first_line_on_screen
+   local line = first_line_on_screen
    while true do
-      local line = lines[current_line_name]
-
       if not line then
-         error(string.format("Line %s does not exist", current_line_name))
+         error(string.format("Line %s does not exist", line._name))
       end
 
       local should_wait = line:should_wait()
@@ -356,10 +390,10 @@ function M.draw(dt)
          are multiple lines to remove.
       ]]
       if total_text_height > rect_height - (height_offset * 2) then
-         local curr_first_line = lines[first_line_on_screen]
+         local curr_first_line = first_line_on_screen
 
          local maybe_next = curr_first_line:next()
-         if maybe_next ~= "" then
+         if maybe_next ~= nil then
             first_line_on_screen = maybe_next
          end
       end
@@ -371,11 +405,11 @@ function M.draw(dt)
          line._script_executed = true
       end
 
-      if (should_wait or line:next() == "") then
+      if (should_wait or line:next() == nil) then
          break
       end
 
-      current_line_name = line:next()
+      line = line:next()
    end
 
    -- Draw the environment image if there is one
@@ -389,11 +423,8 @@ function M.draw(dt)
 end
 
 function M.process_event(event)
-   local current_line_name = first_line_on_screen
-
+   local line = first_line_on_screen
    while true do
-      local line = lines[current_line_name]
-
       local should_wait = line:should_wait()
 
       -- If line has an is_interactive function, use it
@@ -403,11 +434,11 @@ function M.process_event(event)
          end
       end
 
-      if should_wait or line:next() == "" then
+      if should_wait or line:next() == nil then
          break
       end
 
-      current_line_name = line:next()
+      line = line:next()
    end
 end
 
