@@ -213,11 +213,22 @@ void register_usertypes(sol::state &lua) {
         "text", sol::readonly(&TerminalOutputLineData::text),
         "next", sol::readonly(&TerminalOutputLineData::next)
     );
+
     auto term_variant_input_type = lua.new_usertype<TerminalVariantInputLineData>(
         "TerminalVariantInputLineData",
         sol::base_classes, sol::bases<TerminalLineData>(),
         "variants", sol::readonly(&TerminalVariantInputLineData::variants)
     );
+
+    using Variant = TerminalVariantInputLineData::Variant;
+    auto term_variant_variant_type = lua.new_usertype<Variant>(
+        "TerminalVariantInputLineDataVariant",
+        "text", sol::readonly(&Variant::text),
+        "next", sol::readonly(&Variant::next),
+        "condition", sol::readonly(&Variant::condition)
+    );
+
+
     auto desc_line_type = lua.new_usertype<TerminalDescriptionLineData>(
         "TerminalDescriptionLineData",
         sol::base_classes, sol::bases<TerminalLineData, TerminalOutputLineData>()

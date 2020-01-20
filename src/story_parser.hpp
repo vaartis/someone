@@ -121,8 +121,7 @@ struct StoryParser {
                     result_object = sol::make_object<TerminalDescriptionLineData>(lua, text, next);
                 }
             } else if (node["responses"]) {
-                // Construct an empty vector
-                std::vector<std::tuple<std::string, std::string>> variants;
+                decltype(TerminalVariantInputLineData::variants) variants;
 
                 for (auto resp : node["responses"]) {
                     auto resp_text = resp["text"].as<std::string>();
@@ -145,7 +144,15 @@ struct StoryParser {
 
                     if (resp_next.find('/') == std::string::npos)
                         resp_next = fmt::format("{}/{}", nmspace, resp_next);
-                    variants.push_back({resp_text, resp_next});
+
+                    // Create the variant data with the required parameters
+                    auto variant = TerminalVariantInputLineData::Variant(resp_text, resp_next);
+
+                    // If there's a condition, add it too
+                    if (resp["condition"])
+                        variant.condition = resp["condition"].as<std::string>();
+
+                    variants.push_back(variant);
                 }
 
                 result_object = sol::make_object<TerminalVariantInputLineData>(lua, variants);

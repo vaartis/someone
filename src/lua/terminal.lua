@@ -16,7 +16,8 @@ end
 local time_per_letter = 0.01
 
 local TerminalLine = class("TerminalLine")
-function TerminalLine:initialize()
+function TerminalLine:initialize(name)
+   self._name = name
    self._character = nil
 
    self._letters_output = 0
@@ -32,8 +33,8 @@ function TerminalLine:tick_letter_timer(dt)
 end
 
 local OutputLine = class("OutputLine", TerminalLine)
-function OutputLine:initialize(text, next_line)
-   TerminalLine.initialize(self)
+function OutputLine:initialize(name, text, next_line)
+   TerminalLine.initialize(self, name)
 
    self._text = text
    self._next_line = next_line
@@ -69,7 +70,7 @@ function OutputLine:current_text()
 
    local txt = Text.new(substr, StaticFonts.main_font, StaticFonts.font_size)
    txt.fill_color = self._character.color
-   
+
    return txt
 end
 
@@ -78,8 +79,8 @@ function OutputLine:next()
 end
 
 local DescriptionLine = class("DescriptionLine", OutputLine)
-function DescriptionLine:initialize(text, next_line)
-   OutputLine.initialize(self, text, next_line)
+function DescriptionLine:initialize(name, text, next_line)
+   OutputLine.initialize(self, name, text, next_line)
 
    self._space_pressed = false
 end
@@ -89,7 +90,7 @@ function DescriptionLine:current_text()
    if (self._letters_output == #self._text and not self._space_pressed) then
       final_text = final_text .. "\n[Press Space to continue]"
    end
-   
+
    local substr = StringUtils.wrap_words_at(
       final_text,
       max_text_width()
@@ -97,7 +98,7 @@ function DescriptionLine:current_text()
 
    local txt = Text.new(substr, StaticFonts.main_font, StaticFonts.font_size)
    txt.fill_color = self._character.color
-   
+
    return txt
 end
 
@@ -120,15 +121,24 @@ function DescriptionLine:handle_interaction(event)
 end
 
 local VariantInputLine = class("VariantInputLine", TerminalLine)
-function VariantInputLine:initialize(variants)
-   TerminalLine.initialize(self)
-   
+function VariantInputLine:initialize(name, variants)
+   TerminalLine.initialize(self, name)
+
    -- Same as if it was unset. Just to have the name mentioned somewhere beforehand
    self._selected_variant = nil
 
    self._variants = {}
-   for _, text, nxt in pairs(variants) do
-      table.insert(self._variants, { text = text, next = nxt })
+   self._visible_variants = {}
+   for _, var in pairs(variants) do
+      local inserted_variant = { text = var.text, next = var.next }
+
+      if var.condition then
+         -- Compile the condition if it exists
+         inserted_variant.condition, err = load(var.condition, self._name .. ".condition")
+         if err then error(err) end
+      end
+
+      table.insert(self._variants, inserted_variant)
    end
 
    self._longest_var_length = -1
@@ -143,7 +153,7 @@ end
 function VariantInputLine:max_line_height(variant)
    local term_width = max_text_width()
 
-   local fit_str = StringUtils.wrap_words_at(self._variants[variant].text, term_width)
+   local fit_str = StringUtils.wrap_words_at(self._visible_variants[variant].text, term_width)
 
    local tmp_text = Text.new(fit_str, StaticFonts.main_font, StaticFonts.font_size)
 
@@ -165,8 +175,34 @@ end
 function VariantInputLine:current_text()
    local max_width = max_text_width()
 
+   -- If the line is the current line, allow updating the visible variants for it
+   if self:should_wait() then
+      local visible_vars = {}
+      for _, var in pairs(self._variants) do
+         -- If there's a condition, try checking it
+         if var.condition then
+            local condition_result = var.condition()
+            if type(condition_result) ~= "boolean" then
+               error("A condition in " .. self._name .. " doesn't return a boolean")
+            end
+
+            -- If the condition is successfull, continue with execution and add the line to the result
+            -- Otherwise, skip it and it won't be visible
+            if not condition_result then goto skip end
+         end
+
+         -- Add to visible variants
+         table.insert(visible_vars, var)
+
+         ::skip::
+      end
+
+      self._visible_variants = visible_vars
+   end
+
+   -- Form the result from the visible variants
    local result = {}
-   for n, var in ipairs(self._variants) do
+   for n, var in ipairs(self._visible_variants) do
       local var_str = var.text
 
       local substr = n .. ". " .. StringUtils.wrap_words_at(var_str:sub(0, self._letters_output), max_width)
@@ -201,9 +237,10 @@ function VariantInputLine:handle_interaction(event)
 
       -- Convert the character to it's number equivalent
       local chnum = tonumber(ch)
-      
+
       -- Add 1 because indexes start at 1 in lua
-      if chnum and chnum >= 1 and chnum < #self._variants + 1 then
+      -- Only use visible variants here, not all variants
+      if chnum and chnum >= 1 and chnum < #self._visible_variants + 1 then
          self._selected_variant = chnum
       end
    end
@@ -221,18 +258,24 @@ function M.add(in_lines)
    for name, line in pairs(in_lines) do
       local tp = line.__type.name
 
-      local to_insert      
+      local to_insert
       if tp == "TerminalOutputLineData" then
-         to_insert = OutputLine(line.text, line.next, line.character_config)
+         to_insert = OutputLine(name, line.text, line.next, line.character_config)
       elseif tp == "TerminalDescriptionLineData" then
-         to_insert = DescriptionLine(line.text, line.next, line.character_config)
+         to_insert = DescriptionLine(name, line.text, line.next, line.character_config)
       elseif tp == "TerminalVariantInputLineData" then
-         to_insert = VariantInputLine(line.variants, line.character_config)
+         to_insert = VariantInputLine(name, line.variants, line.character_config)
       else
          error("Unknown line type " .. tp)
       end
+
       to_insert._character = line.character_config
-      to_insert._script = line.script     
+
+      if line.script then
+         -- Compile the script (if it exists)
+         to_insert._script, err = load(line.script, name .. ".script")
+         if err then error(err) end
+      end
 
       lines[name] = to_insert
    end
@@ -268,7 +311,7 @@ function M.draw(dt)
       local line = lines[current_line_name]
 
       if not line then
-         error(current_line_name .. " does not exist")
+         error(string.format("Line %s does not exist", current_line_name))
       end
 
       local should_wait = line:should_wait()
@@ -293,12 +336,12 @@ function M.draw(dt)
          end
          -- Add a bit more after the last line
          total_text_height = total_text_height + StaticFonts.font_size / 2
-         line_height_offset = first_line_height_offset + total_text_height         
+         line_height_offset = first_line_height_offset + total_text_height
       else
          -- It's a single line of text
 
          text.position = Vector2f.new(line_width_offset, line_height_offset)
-         
+
          local line_height = line:max_line_height()
          total_text_height = total_text_height + line_height + (StaticFonts.font_size / 2)
          line_height_offset = first_line_height_offset + total_text_height
@@ -322,10 +365,9 @@ function M.draw(dt)
       end
 
       -- If there's a script and it wasn't executed yet, do it
-      if line._script and not line._script_executed then         
-         local script_f = load(line._script, current_line_name .. ".script")
-         script_f()
-         
+      if line._script and not line._script_executed then
+         line._script()
+
          line._script_executed = true
       end
 
@@ -371,15 +413,18 @@ end
 
 function M.set_environment_image(name)
    -- Create the sprite if it doesn't exist yet
-   if not current_environment_sprite then      
-      current_environment_sprite = Sprite.new()      
+   if not current_environment_sprite then
+      current_environment_sprite = Sprite.new()
    end
-   
+
    local full_name = "resources/sprites/environments/" .. name .. ".png"
    current_environment_texture = Texture.new()
    current_environment_texture:load_from_file(full_name)
-   
+
    current_environment_sprite.texture = current_environment_texture
 end
+
+-- State variables for the story to set/get
+M.state_variables = {}
 
 return M

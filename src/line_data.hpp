@@ -27,7 +27,15 @@ struct TerminalDescriptionLineData : TerminalOutputLineData {
 };
 
 struct TerminalVariantInputLineData : TerminalLineData {
-    std::vector<std::tuple<std::string, std::string>> variants;
+    struct Variant {
+        std::string text;
+        std::string next;
+        std::optional<std::string> condition;
+
+        Variant(std::string text, std::string next) : text(text), next(next) {}
+    };
+
+    std::vector<Variant> variants;
 
     TerminalVariantInputLineData(decltype(variants) variants)
         : variants(variants) { }
