@@ -209,13 +209,15 @@ function VariantInputLine:handle_interaction(event)
    end
 end
 
+local M = {}
+
 local lines = {}
 
 local first_line_on_screen = "prologue/1"
 
 local current_environment_texture, current_environment_sprite
 
-function add(in_lines)
+function M.add(in_lines)
    for name, line in pairs(in_lines) do
       local tp = line.__type.name
 
@@ -236,7 +238,7 @@ function add(in_lines)
    end
 end
 
-function draw(dt)
+function M.draw(dt)
    local win_size = DRAWING_TARGET.size
 
    local width_offset, height_offset = win_size.x / 100, win_size.y / 100 * 2
@@ -344,7 +346,7 @@ function draw(dt)
    end
 end
 
-function process_event(event)
+function M.process_event(event)
    local current_line_name = first_line_on_screen
 
    while true do
@@ -367,7 +369,7 @@ function process_event(event)
    end
 end
 
-function set_environment_image(name)
+function M.set_environment_image(name)
    -- Create the sprite if it doesn't exist yet
    if not current_environment_sprite then      
       current_environment_sprite = Sprite.new()      
@@ -380,9 +382,4 @@ function set_environment_image(name)
    current_environment_sprite.texture = current_environment_texture
 end
 
-return {
-   add = add,  
-   draw = draw,
-   process_event = process_event,
-   set_environment_image = set_environment_image
-}
+return M
