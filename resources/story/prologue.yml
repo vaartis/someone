@@ -16,13 +16,13 @@ config:
   char: player
   responses:
   - text: >-
-      Who are you? And who am I?
+      Who are you?
     next: 3
 
 3:
   char: narrator
   text: >-
-    I'm <narrator>, who you are I do not know, you just appeared here. Can you at least remember your name?
+    I'm <narrator>, and i have the same question for you. You just appeared here. Can you at least remember your name?
 
 4:
   char: player
@@ -46,24 +46,24 @@ config:
 7:
   char: narrator
   text: >-
-    Very well, <P>. Since you're here, i'll show you around.
+    Very well, <P>. Since you're here, i could show you around..
 
 8:
   char: description
+  script: TerminalModule.set_environment_image('gray_room')
   text: >-
     You are standing in an empty room with the <narrator>.
-  script: TerminalModule.set_environment_image('gray_room')
 
 9:
   char: narrator
   text: >-
-    Well, there isn't much much to show now. There was more, but it got cut off. Maybe you could do something about that?
+    However, there isn't anything to show now. There was more, but it's gone now. Maybe you could do something about that?
 
 10:
   char: player
   responses:
   - text: >-
-      And just how would i do that?
+      How would I do that?
     next: 11
 
 11:

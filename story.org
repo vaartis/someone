@@ -14,7 +14,7 @@
 
   I guess <P> would do for for now.
 
-  Very well, <P>. Since you're here, i could show you around.
+  Very well, <P>. Since you're here, i could show you around..
 
   <You are standing in an empty room with the <narrator>>
   <Environment: [[./resources/sprites/environments/gray_room.png]]>
