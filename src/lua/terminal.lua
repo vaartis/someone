@@ -85,7 +85,7 @@ end
 function OutputLine:next()
    -- Create the next line if there is one and only do it if one wasn't created already
    if self._next_line_name ~= "" and not self._next_line then
-      self._next_line = make_line(next_line, native_lines[self._next_line_name])
+      self._next_line = make_line(self._next_line_name, native_lines[self._next_line_name])
    end
 
    return self._next_line
