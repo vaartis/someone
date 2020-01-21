@@ -1,0 +1,14 @@
+config:
+  chars:
+    narrator:
+      color: [211, 0, 0]
+    player:
+      color: [255, 255, 255]
+    description:
+      color: [127, 0, 255]
+
+1:
+  char: description
+  text: >-
+    You're no longer standing in the room, now around you is a midnight forest. You ask <narrator>, who is still standing near, what happened
+  script: TerminalModule.set_environment_image('midnight_forest')

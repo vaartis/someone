@@ -84,3 +84,5 @@ config:
   char: narrator
   text: >-
     Maybe check your surroundings out? I'll still be here, of course. Not like i can go anywhere :)
+  next_file: day1/forest_and_village
+  next: day1/forest_and_village/1
