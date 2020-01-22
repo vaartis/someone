@@ -16,6 +16,10 @@
 #include "mainchar.hpp"
 
 int main() {
+    #ifndef NDEBUG
+    spdlog::set_level(spdlog::level::debug);
+    #endif
+
     sf::RenderWindow window(sf::VideoMode(1280, 1024), "Vacances");
     window.setFramerateLimit(60);
 
@@ -68,7 +72,8 @@ sf::Shader::Fragment);
     */
 
 
-    auto lines = StoryParser::parse("day1/prologue", lua);
+    StoryParser::lines_type lines;
+    StoryParser::parse(lines, "day1/prologue", lua);
 
     // This both defines a global for the module and returns it
     sol::table terminal_module = lua.require_script("TerminalModule", "return require('terminal')");

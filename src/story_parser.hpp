@@ -37,7 +37,9 @@ template <> struct convert<CharacterConfig> {
 }
 
 struct StoryParser {
-    static std::map<std::string, sol::object> parse(std::string file_name, sol::state &lua) {
+    using lines_type = std::map<std::string, sol::object>;
+
+    static void parse(lines_type &result, std::string file_name, sol::state &lua) {
         auto full_file_name = std::filesystem::path("resources/story/") / file_name;
         full_file_name.replace_extension(".yml");
 
@@ -54,7 +56,9 @@ struct StoryParser {
             }
         }
 
-        std::map<std::string, sol::object> result;
+        // A map of reference to the nodes to check after everything has been built
+        std::map<std::string, std::string> next_references_to_check;
+
         for (auto name_and_val : root_node) {
             auto name = name_and_val.first.as<std::string>();
             auto node = name_and_val.second;
@@ -67,10 +71,8 @@ struct StoryParser {
             // If there's a reference to the next file, parse that file now
             if (node["next_file"]) {
                 auto next_file = node["next_file"].as<std::string>();
-                spdlog::info("Encountered a reference to the next file {} in {}, parsing it first", next_file, inserted_name);
-                auto parsed_next = StoryParser::parse(next_file, lua);
-
-                result.insert(parsed_next.begin(), parsed_next.end());
+                spdlog::debug("Encountered a reference to the next file {} in {}, parsing it first", next_file, inserted_name);
+                StoryParser::parse(result, next_file, lua);
             }
 
             if (!node["char"]) {
@@ -104,14 +106,6 @@ struct StoryParser {
                 std::string next;
                 if (node["next"]) {
                     next = node["next"].as<std::string>();
-                    // Namespace the next now, as it might also reference an already namespaced name
-                    if (next != "" && next.find('/') == std::string::npos)
-                        next = fmt::format("{}/{}", nmspace, next);
-
-                    if (!result[next]) {
-                        // If the node doesn't exist, log a warning
-                        spdlog::warn("{} wants {} as next, but it doesn't exist", inserted_name, next);
-                    }
                 } else if (!node["next"] && StringUtils::is_number(name)) {
                     // If there's no next node, but the name of the node is a number,
                     // try using the next number as the next node
@@ -125,15 +119,20 @@ struct StoryParser {
                         next = maybe_next_name;
                     } else {
                         // Otherwise log that there was no more numbers, let "" be there
-                        spdlog::info("Next numbered node not found for {} and there's no 'next'", inserted_name);
+                        spdlog::warn("Next numbered line not found for {} and there's no 'next'", inserted_name);
                     }
                 } else {
                     // If there was no next at all and no patterns matched, let "" be there
                     spdlog::warn("No 'next' on {} and no shortcut patterns matched", inserted_name);
                 }
+
                 // Now add the namespace to it
-                if (next != "" && next.find('/') == std::string::npos)
-                    next = fmt::format("{}/{}", nmspace, next);
+                if (next != "") {
+                    if (next.find('/') == std::string::npos)
+                        next = fmt::format("{}/{}", nmspace, next);
+
+                    next_references_to_check.insert({inserted_name, next});
+                }
 
                 if (node_char != "description") {
                     result_object = sol::make_object<TerminalOutputLineData>(lua, text, next);
@@ -153,17 +152,16 @@ struct StoryParser {
 
                         std::terminate();
                     }
-
                     auto resp_next = resp["next"].as<std::string>();
+
+                    // Add the namespace to next if needed
                     if (resp_next.find('/') == std::string::npos)
                         resp_next = fmt::format("{}/{}", nmspace, resp_next);
 
-                    if (!result[resp_next]) {
-                        spdlog::warn(
-                            "response '{}' of {} wants {} as next, but it doesn't exist",
-                            resp_text, inserted_name, resp_next
-                        );
-                    }
+                    next_references_to_check.insert({
+                            fmt::format("response '{}' of {}", resp_text, inserted_name),
+                            resp_next
+                    });
 
                     // Create the variant data with the required parameters
                     auto variant = TerminalVariantInputLineData::Variant(resp_text, resp_next);
@@ -188,6 +186,10 @@ struct StoryParser {
             result.insert({inserted_name, result_object});
         }
 
-        return result;
+        for (auto &[at, expected_next] : next_references_to_check) {
+            if (!result[expected_next]) {
+                spdlog::warn("{} wants {} as next, but it does not exist", at, expected_next);
+            }
+        }
     }
 };
