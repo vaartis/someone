@@ -41,7 +41,7 @@
 
    <You're no longer standing in the room, now around you is a midnight forest. You ask <narrator>, who is still standing near, what happened>
 
-   <p>: Well, you did something, and now there's the forest. That is what i was talking about when I told you that there was more. This forest is
+   <narrator>: Well, you did something, and now there's the forest. That is what i was talking about when I told you that there was more. This forest is
    a fraction of it. This is where we all woke up.
 
    What do you mean "we all"? There are more people here?

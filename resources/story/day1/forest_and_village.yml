@@ -9,6 +9,55 @@ config:
 
 1:
   char: description
-  text: >-
-    You're no longer standing in the room, now around you is a midnight forest. You ask <narrator>, who is still standing near, what happened
+  text: You're no longer standing in the room, now around you is a midnight forest. You ask <narrator>, who is still standing near, what happened
   script: TerminalModule.set_environment_image('midnight_forest')
+
+2:
+  char: narrator
+  text: >-
+    Well, you did something, and now there's the forest. That is what i was talking about when I told you that there was more. This forest is
+    a fraction of it. This is where we all woke up.
+
+3:
+  char: player
+  responses:
+    - text: What do you mean "we all"? There are more people here?
+      next: 4
+
+4:
+  char: narrator
+  text: >-
+    There were. I don't know if they're still here. It's been some time since there was anything here. But now you're here at least. And the forest is
+    back too.
+
+5:
+  char: player
+  responses:
+    - text: Then what do you mean by "woke up"?
+      next: 6
+
+6:
+  char: narrator
+  text: >-
+    We all found ourselves here just like you did, with no memory of what happened or who we are. When I found myself here, there was nobody else
+    around. It was pretty lonely, the only thing I would do is walk through the forest, looking around for anything to do at all. With time though, more
+    people came, just like me, with no memories about anything before the moment they woke up. They found themselves in this very forest. They went
+    looking for something to do, like i did, and eventually met the others. There were all kinds of creatures appearing, too. Some of them were very
+    much sentient, like me and you, some were more animal-like, just following instincts. What seemed to connect them was that they all were just as
+    confused.
+
+7:
+  char: player
+  responses:
+    - text: So what happened? Where did everyone go?
+      next: 8
+
+8:
+  char: narrator
+  text: >-
+    Something. I'm not sure what exactly happened, but it seemed like the world was being cut off piece by piece. One day, there appeared a wall at the
+    edge of the forest. A wall that looked just like those in the room we were just in. Just a gray wall that seemed to extend in all directions. The
+    next day the wall grew closer. People were scaried. Long story short, eventually the whole world shrank to a single room. I don't know were the
+    other people went, i haven't seen them in a while. I have no idea how much time i've been in that gray room, alone. But now you're here, and that
+    probably means something is happening. Now, let's go for a walk at least, shall we? I've been on this same spot for so long it feels like forever.
+    I'd like to at least take a stroll through the forest while we can.
