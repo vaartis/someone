@@ -39,6 +39,40 @@ template <> struct convert<CharacterConfig> {
 struct StoryParser {
     using lines_type = std::map<std::string, sol::object>;
 
+    static std::string namespace_of(std::string next) {
+        auto last_separator_pos = next.find_last_of("/");
+        if (last_separator_pos != std::string::npos) {
+            return next.substr(0, last_separator_pos);
+        } else {
+            throw std::invalid_argument(fmt::format("{} doesn't not contain a namespace serparator", next));
+        }
+    }
+
+    /** If "next" references a namespace, parse the file that contains
+     *  this namespace if it hasn't already been parsed.
+     */
+    static void maybe_parse_referenced_file(std::string next, lines_type &result, sol::state &lua) {
+        // If it IS namespaced, try parsing a file that it references if it's not parsed yet
+
+        auto next_namespace = namespace_of(next);
+
+        auto any_already = std::find_if(
+            result.begin(),
+            result.end(),
+            [&](auto pair) {
+                auto &[k, v] = pair;
+                return namespace_of(k) == next_namespace;
+            }
+        );
+
+        // If it has not already been parsed, parse the referenced file
+        if (any_already == result.end()) {
+            spdlog::debug("Encountered a reference to a new namespace {}, parsing it", next_namespace);
+
+            StoryParser::parse(result, next_namespace, lua);
+        }
+    }
+
     static void parse(lines_type &result, std::string file_name, sol::state &lua) {
         auto full_file_name = std::filesystem::path("resources/story/") / file_name;
         full_file_name.replace_extension(".yml");
@@ -67,13 +101,6 @@ struct StoryParser {
             if (name == "config") continue;
 
             auto inserted_name = fmt::format("{}/{}", nmspace, name);
-
-            // If there's a reference to the next file, parse that file now
-            if (node["next_file"]) {
-                auto next_file = node["next_file"].as<std::string>();
-                spdlog::debug("Encountered a reference to the next file {} in {}, parsing it first", next_file, inserted_name);
-                StoryParser::parse(result, next_file, lua);
-            }
 
             if (!node["char"]) {
                 spdlog::error("{} doesn't specify a character", inserted_name);
@@ -114,13 +141,12 @@ struct StoryParser {
                     auto maybe_next_name = std::to_string(next_num);
                     auto maybe_next_numbered = root_node[maybe_next_name];
 
-                    if (maybe_next_numbered) {
+                    if (maybe_next_numbered)
                         // If it exists, mark it as next
                         next = maybe_next_name;
-                    } else {
+                    else
                         // Otherwise log that there was no more numbers, let "" be there
                         spdlog::warn("Next numbered line not found for {} and there's no 'next'", inserted_name);
-                    }
                 } else {
                     // If there was no next at all and no patterns matched, let "" be there
                     spdlog::warn("No 'next' on {} and no shortcut patterns matched", inserted_name);
@@ -130,6 +156,10 @@ struct StoryParser {
                 if (next != "") {
                     if (next.find('/') == std::string::npos)
                         next = fmt::format("{}/{}", nmspace, next);
+                    else
+                        // If the name is namespaced, parse the referenced file now
+                        maybe_parse_referenced_file(next, result, lua);
+
 
                     next_references_to_check.insert({inserted_name, next});
                 }
@@ -157,6 +187,8 @@ struct StoryParser {
                     // Add the namespace to next if needed
                     if (resp_next.find('/') == std::string::npos)
                         resp_next = fmt::format("{}/{}", nmspace, resp_next);
+                    else
+                        maybe_parse_referenced_file(resp_next, result, lua);
 
                     next_references_to_check.insert({
                             fmt::format("response '{}' of {}", resp_text, inserted_name),
