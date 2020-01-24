@@ -22,7 +22,6 @@ config:
   char: player
   responses:
     - text: What do you mean "we all"? There are more people here?
-      next: 4
 
 4:
   char: narrator
@@ -34,7 +33,6 @@ config:
   char: player
   responses:
     - text: Then what do you mean by "woke up"?
-      next: 6
 
 6:
   char: narrator
@@ -50,7 +48,6 @@ config:
   char: player
   responses:
     - text: So what happened? Where did everyone go?
-      next: 8
 
 8:
   char: narrator

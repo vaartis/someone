@@ -17,7 +17,6 @@ config:
   responses:
   - text: >-
       Who are you?
-    next: 3
 
 3:
   char: narrator
@@ -29,7 +28,6 @@ config:
   responses:
   - text: >-
       No, i don't think i can actually.
-    next: 5
 
 5:
   char: narrator
@@ -41,7 +39,6 @@ config:
   responses:
   - text: >-
       I guess <P> would do for for now.
-    next: 7
 
 7:
   char: narrator
@@ -64,7 +61,6 @@ config:
   responses:
   - text: >-
       How would I do that?
-    next: 11
 
 11:
   char: narrator
@@ -78,7 +74,6 @@ config:
   responses:
   - text: >-
       Well, now that you mention it. Yeah, i do..
-    next: 13
 
 13:
   char: narrator

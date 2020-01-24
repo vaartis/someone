@@ -174,15 +174,35 @@ struct StoryParser {
 
                 for (auto resp : node["responses"]) {
                     auto resp_text = resp["text"].as<std::string>();
-                    if (!resp["next"]) {
+
+                    std::string resp_next;
+                    if (!resp["next"] && StringUtils::is_number(name)) {
+                        // If there's no next node, but the name of the node is a number,
+                        // try using the next number as the next node
+
+                        auto next_num = std::stoi(name) + 1;
+                        auto maybe_next_name = std::to_string(next_num);
+                        auto maybe_next_numbered = root_node[maybe_next_name];
+
+                        if (maybe_next_numbered) {
+                            // If it exists, mark it as next
+                            resp_next = maybe_next_name;
+                        } else {
+                            spdlog::error(
+                                "Next numbered line not found for variant '{}' of {} and there's no 'next', the response needs to have somewhere to go",
+                                resp_text, inserted_name
+                            );
+                            std::terminate();
+                        }
+                    } else if (resp["next"]) {
+                        resp_next = resp["next"].as<std::string>();
+                    } else {
                         spdlog::error(
-                            "response '{}' of {} has no 'next', it has to have somewhere to go to",
+                            "response '{}' of {} has no 'next' and the name is not a number, it needs to have somewhere to go to",
                             resp_text, inserted_name
                         );
-
                         std::terminate();
                     }
-                    auto resp_next = resp["next"].as<std::string>();
 
                     // Add the namespace to next if needed
                     if (resp_next.find('/') == std::string::npos)
