@@ -54,7 +54,110 @@ config:
   text: >-
     Something. I'm not sure what exactly happened, but it seemed like the world was being cut off piece by piece. One day, there appeared a wall at the
     edge of the forest. A wall that looked just like those in the room we were just in. Just a gray wall that seemed to extend in all directions. The
-    next day the wall grew closer. People were scaried. Long story short, eventually the whole world shrank to a single room. I don't know were the
+    next day the wall grew closer. People were scared. Long story short, eventually the whole world shrank to a single room. I don't know were the
     other people went, i haven't seen them in a while. I have no idea how much time i've been in that gray room, alone. But now you're here, and that
     probably means something is happening. Now, let's go for a walk at least, shall we? I've been on this same spot for so long it feels like forever.
     I'd like to at least take a stroll through the forest while we can.
+
+9:
+  char: player
+  responses:
+    - text: Sure, there's no point in staying here anyway.
+
+10:
+  char: description
+  text: >-
+    You walk through the forest you are now in. It's not very thick, but there is still plenty of plants and trees. Although all of them look somewhat
+    similiar with small variation.
+
+11:
+  char: player
+  responses:
+    - text: So.. what was life like here, anyway? Until everything diasppeared, that is..
+
+12:
+  char: narrator
+  text: >-
+    Oh you know, pretty peaceful. It's not like we had any specific needs to have fights for. I'd say just your usual life, but i can't really judge
+    fairly what usual life is like, because i've only ever known my own life here...
+
+13:
+  char: player
+  responses:
+    - text: True... I still want to know though.
+
+14:
+  char: narrator
+  text: >-
+    Well, after some time spent just going around the forest and finding other people, we decided to settle down somewhere. This is where we're
+    currently heading, or so i hope, since i havn't seen this forest for such a long time. For some reason, there were some people that knew how to make
+    "instruments", while others didn't. They couldn't explain where they obtained this knowledge, it's like it just appread in their heads when the need
+    arose. These people would make these simple instruments from what was in the forest. It looked like they were just smashing things together and then
+    the tools just appeared in their hands. Others tried to do this too, but would not succeed. Then the instruments were used to chop down the trees,
+    uproot stumps, and build from that. Other people knew how to make dyes from flowers and other plants. They did it the same way others made
+    tools. The first houses were pretty simple, but of course, as time went on people would make them more sophisticated and fancy, to stand out
+    more. Eventually we learned how to make other things, too. Some people, who were not able to create anything by hand, would create for the sake of
+    entertainment, some created paintring, others would use paper and black dyes to to write tales and stories. Some volunteered to document the history
+    of what was happening around them, and with those people the libraries appeared. They'd organize their document history in books and store them all
+    in one place. Sounds pretty cool, right?
+
+15:
+  char: player
+  responses:
+    - text: Yeah, that's useful, probably?
+
+16:
+  char: narrator
+  text: >-
+    Maybe for the new people that come like you it would be. People here don't age, they were all around for as long as i can remember, until what
+    happened happened and they were all gone. Anway, after sometime fire was discovered and the first library burnt down with most of the books in
+    it. Some were rewritten from memory after that, but many were gone forever.
+
+17:
+  char: player
+  responses:
+    - text: Oh.
+
+18:
+  char: narrator
+  text: >-
+    Indeed. So the next library was built out of stone. Not long after that concrete was discovered by accident. Same happened with glass. Fast forward
+    some time, and the village wasn't the only place where people lived, a city was built, and it was big, with asphalt roads and tall buildings. People
+    would come up with different work for themselves to spend time. Now they were trying to understand the world itself. Trying to find out how things
+    work. Eventually, a person showed up. They didn't name themselves, but claimed to be the creator of this world. They moved rather unnaturally, as if
+    controlled by strings by strings. They told the researchers about the world about how that person watched them grow and that now they had come to
+    them in person. A bit after that, the "creator" disappeared, and then the thing happened, the world was vanishing. Panic. And then everything ceased
+    to be. Except me. I was still there, for some reason.
+
+19:
+  char: player
+  responses:
+    - text: >-
+        That is one crazy story.. but i have no choice except to belive it. I have no idea what i am doing here exactly, so might as well take some
+        explanation for granted, you really now a lot more about things than I do. Oh and by the way, you so confidently asked me if i'm sitting in front
+        of a computer screen, how come you were so certain?
+
+20:
+  char: narrator
+  text: >-
+    There's something in the way you move that gives it away, it's a bit similiar to how the "creator" was. It might just be my imagination, I really
+    wanted to belive that you had something in common with them, and it turned out you did. Anyway, we're there. This is the place where i used to live.
+
+21:
+  char: description
+  text: >-
+    You see something reminiscent of a village. There are a lot of cottages of all shapes and colors. No living creature seems to be around except the
+    two of you. All the windows are dark, too. There is a central road around which all the houses seem to have been built. Or rather, probably, the
+    road was made to connect the first houses and then the others were built along it.
+
+22:
+  char: narrator
+  text: >-
+    My house is the one on the edge of the road. Since my house was one of the early ones, it was built on the current outskirts of the
+    village and I never really had any reason to move. The road was made a long time after it was built, connecting my house and the house of a friend
+    of mine first, and then extending into the village.
+
+23:
+  char: description
+  text: >-
+    You come to the house <narrator> was talking about. The door is not locked, the <narrator> just opens it.
