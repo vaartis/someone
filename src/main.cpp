@@ -8,6 +8,7 @@
 
 #include "sol/sol.hpp"
 
+#include "terminal.hpp"
 #include "logger.hpp"
 #include "string_utils.hpp"
 #include "fonts.hpp"
@@ -17,7 +18,7 @@
 
 int main() {
     #ifndef NDEBUG
-    spdlog::set_level(spdlog::level::debug);
+    //spdlog::set_level(spdlog::level::debug);
     #endif
 
     sf::RenderWindow window(sf::VideoMode(1280, 1024), "Vacances");
@@ -71,31 +72,9 @@ sf::Shader::Fragment);
     roomDarkerShader.setUniform("currentTexture", targetTexture);
     */
 
+    TerminalEnv terminal_env(lua);
 
-    StoryParser::lines_type lines;
-    StoryParser::parse(lines, "day1/prologue", lua);
-
-    // This both defines a global for the module and returns it
-    sol::table terminal_module = lua.require_script("TerminalModule", "return require('terminal')");
-
-    // Add the lines from the loaded file
-    sol::protected_function add_lines = terminal_module["add_native_lines"];
-    {
-        auto res = add_lines(lines);
-        if (!res.valid())
-            throw sol::error(res);
-    }
-
-    // After the lines are added, set up the first line on screen
-    sol::protected_function set_first_line = terminal_module["set_first_line_on_screen"];
-    {
-        auto res = set_first_line("day1/prologue/1");
-        if (!res.valid())
-            throw sol::error(res);
-    }
-
-    sol::protected_function draw_terminal = terminal_module["draw"];
-    sol::protected_function process_terminal_event = terminal_module["process_event"];
+    auto current_state = CurrentState::Terminal;
 
     sf::Clock clock;
     while (true) {
@@ -124,18 +103,10 @@ sf::Shader::Fragment);
             default: break;
             }
 
-            {
-                auto res = process_terminal_event(event);
-                if (!res.valid())
-                    throw sol::error(res);
-            }
+            terminal_env.process_event(event);
         }
 
-        {
-            auto res = draw_terminal(dt);
-            if (!res.valid())
-                throw sol::error(res);
-        }
+        terminal_env.draw(dt);
 
         //mainChar.update(dt);
 
