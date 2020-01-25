@@ -16,6 +16,11 @@
 #include "usertypes.hpp"
 #include "mainchar.hpp"
 
+enum class CurrentState {
+    Terminal,
+    Walking
+};
+
 int main() {
     #ifndef NDEBUG
     //spdlog::set_level(spdlog::level::debug);
@@ -48,16 +53,19 @@ int main() {
 
     //MainChar mainChar(target, "resources/sprites/mainchar");
 
-
     sol::state lua;
     lua.open_libraries(sol::lib::base, sol::lib::table, sol::lib::string, sol::lib::package, sol::lib::coroutine, sol::lib::math, sol::lib::debug);
 
-    lua["package"]["path"] = std::string("resources/lua/share/lua/" VACANCES_LUA_VERSION "/?.lua;resources/lua/share/lua/" VACANCES_LUA_VERSION "/?/init.lua;") + std::string(lua["package"]["path"]);
-    lua["package"]["cpath"] = std::string("resources/lua/lib/lua/" VACANCES_LUA_VERSION "/?.so;") + std::string(lua["package"]["cpath"]);
+    // Setup the lua path to see luarocks packages
+    lua["package"]["path"] = std::string(
+        "resources/lua/share/lua/" VACANCES_LUA_VERSION "/?.lua;resources/lua/share/lua/" VACANCES_LUA_VERSION "/?/init.lua;"
+    ) + std::string(lua["package"]["path"]);
+    lua["package"]["cpath"] = std::string(
+        "resources/lua/lib/lua/" VACANCES_LUA_VERSION "/?.so;"
+    ) + std::string(lua["package"]["cpath"]);
 
     register_usertypes(lua);
 
-    auto t = sf::Text("test", StaticFonts::main_font, StaticFonts::font_size);
     lua["DRAWING_TARGET"] = &target;
 
     /*
@@ -80,7 +88,15 @@ sf::Shader::Fragment);
     while (true) {
         auto dt = clock.restart().asSeconds();
 
-        target.clear(sf::Color::White);
+        sf::Color clear_color;
+        switch (current_state) {
+        case CurrentState::Terminal:
+            clear_color = sf::Color::White;
+            break;
+        case CurrentState::Walking:
+            clear_color = sf::Color::Black;
+        }
+        target.clear(clear_color);
 
         sf::Event event;
         while (window.pollEvent(event)) {
@@ -93,20 +109,34 @@ sf::Shader::Fragment);
             case sf::Event::Resized: {
                 float width = event.size.width,
                     height = event.size.height;
-                target.setView(sf::View(
-                                   {width / 2, height / 2},
-                                   {width, height}
-                               ));
+                target.setView(
+                    sf::View(
+                        {width / 2, height / 2},
+                        {width, height}
+                    )
+                );
                 break;
             }
 
             default: break;
             }
 
-            terminal_env.process_event(event);
+            switch (current_state) {
+            case CurrentState::Terminal:
+                terminal_env.process_event(event);
+                break;
+            case CurrentState::Walking:
+                break;
+            }
         }
 
-        terminal_env.draw(dt);
+        switch (current_state) {
+        case CurrentState::Terminal:
+            terminal_env.draw(dt);
+            break;
+        case CurrentState::Walking:
+            break;
+        }
 
         //mainChar.update(dt);
 
