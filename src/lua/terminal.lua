@@ -1,6 +1,7 @@
 local tiny = require("tiny")
 local class = require("middleclass")
 local inspect = require("inspect")
+local lume = require("lume")
 
 -- Calculates the maximum text width in the terminal
 function max_text_width()
@@ -52,7 +53,7 @@ end
 function OutputLine:max_line_height()
    local term_width = max_text_width()
 
-   local fit_str = StringUtils.wrap_words_at(self._text, term_width)
+   local fit_str = lume.wordwrap(self._text, term_width)
 
    local tmp_text = Text.new(fit_str, StaticFonts.main_font, StaticFonts.font_size)
 
@@ -71,7 +72,7 @@ function OutputLine:maybe_increment_letter_count()
 end
 
 function OutputLine:current_text()
-   local substr = StringUtils.wrap_words_at(
+   local substr = lume.wordwrap(
       self._text:sub(0, self._letters_output),
       max_text_width()
    )
@@ -104,7 +105,7 @@ function DescriptionLine:current_text()
       final_text = final_text .. "\n[Press Space to continue]"
    end
 
-   local substr = StringUtils.wrap_words_at(
+   local substr = lume.wordwrap(
       final_text,
       max_text_width()
    )
@@ -153,7 +154,7 @@ function VariantInputLine:initialize(name, variants)
 
       if var.condition then
          -- Compile the condition if it exists
-         inserted_variant.condition, err = load(var.condition, self._name .. ".condition")
+         inserted_variant.condition, err = load(var.condition, lume.format("{1}.condition", {self._name}))
          if err then error(err) end
       end
 
@@ -174,7 +175,7 @@ function VariantInputLine:max_line_height(variant)
    local term_width = max_text_width()
 
    -- Get the text of the selected visible variant
-   local fit_str = StringUtils.wrap_words_at(self._visible_variants[variant].text, term_width)
+   local fit_str = lume.wordwrap(self._visible_variants[variant].text, term_width)
 
    local tmp_text = Text.new(fit_str, StaticFonts.main_font, StaticFonts.font_size)
 
@@ -204,7 +205,7 @@ function VariantInputLine:current_text()
          if var.condition then
             local condition_result = var.condition()
             if type(condition_result) ~= "boolean" then
-               error("A condition in " .. self._name .. " doesn't return a boolean")
+               error(lume.format("A condition in {1} doesn't return a boolean", {self._name}))
             end
 
             -- If the condition is successfull, continue with execution and add the line to the result
@@ -226,7 +227,7 @@ function VariantInputLine:current_text()
    for n, var in ipairs(self._visible_variants) do
       local var_str = var.text
 
-      local substr = n .. ". " .. StringUtils.wrap_words_at(var_str:sub(0, self._letters_output), max_width)
+      local substr = lume.format("{num}.  {text}", { num = n, text = lume.wordwrap(var_str:sub(0, self._letters_output), max_width) })
       local txt = Text.new(substr, StaticFonts.main_font, StaticFonts.font_size)
       txt.fill_color = self._character.color
 
@@ -290,14 +291,14 @@ function make_line(name, line)
    elseif tp == "TerminalVariantInputLineData" then
       to_insert = VariantInputLine(name, line.variants, line.character_config)
    else
-      error("Unknown line type " .. tp)
+      error(lume.format("Unknown line type {1}", {tp}))
    end
 
    to_insert._character = line.character_config
 
    if line.script then
       -- Compile the script (if it exists)
-      to_insert._script, err = load(line.script, name .. ".script")
+      to_insert._script, err = load(line.script, lume.format("{1}.script", {name}))
       if err then error(err) end
    end
 
@@ -448,7 +449,7 @@ function M.set_environment_image(name)
       current_environment_sprite = Sprite.new()
    end
 
-   local full_name = "resources/sprites/environments/" .. name .. ".png"
+   local full_name = lume.format("resources/sprites/environments/{1}.png", {name})
    current_environment_texture = Texture.new()
    current_environment_texture:load_from_file(full_name)
 

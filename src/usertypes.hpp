@@ -190,11 +190,6 @@ void register_usertypes(sol::state &lua) {
         "font_size", sol::var(std::ref(StaticFonts::font_size))
     );
 
-    auto string_utils_type = lua.new_usertype<StringUtils>(
-        "StringUtils",
-        "wrap_words_at", &StringUtils::wrap_words_at
-    );
-
     // Data
 
     auto char_config_type = lua.new_usertype<CharacterConfig>(
