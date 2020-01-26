@@ -22,3 +22,6 @@
 [submodule "deps/luarocks"]
 	path = deps/luarocks
 	url = https://github.com/luarocks/luarocks
+[submodule "deps/lovetoys"]
+	path = deps/lovetoys
+	url = https://github.com/lovetoys/lovetoys

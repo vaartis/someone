@@ -42,7 +42,8 @@ add_custom_command(
 add_custom_target(lua DEPENDS "${PROJECT_BINARY_DIR}/deps/lua/liblua.a" "${PROJECT_BINARY_DIR}/deps/lua/lua")
 set(LUA_LIBRARIES "${PROJECT_BINARY_DIR}/deps/lua/liblua.a" dl)
 set(LUA_INCLUDE_DIR "${PROJECT_BINARY_DIR}/deps/lua")
-add_definitions(-DVACANCES_LUA_VERSION="5.3")
+set(VACANCES_LUA_VERSION "5.3")
+add_definitions(-DVACANCES_LUA_VERSION="${VACANCES_LUA_VERSION}")
 
 # ===
 
@@ -66,6 +67,16 @@ add_custom_target(luarocks DEPENDS "${PROJECT_BINARY_DIR}/deps/luarocks/luarocks
 
 # === Copying lua sources
 
+# Temporary (?) fix for lovetoys luarocks package being broken
+
+add_custom_command(
+  OUTPUT "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${VACANCES_LUA_VERSION}/lovetoys"
+  DEPENDS luarocks lua
+  COMMAND ${PROJECT_BINARY_DIR}/deps/luarocks/luarocks --tree=${PROJECT_BINARY_DIR}/resources/lua build
+  WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/deps/lovetoys"
+)
+add_custom_target(lovetoys-build DEPENDS "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${VACANCES_LUA_VERSION}/lovetoys")
+
 add_custom_command(
   OUTPUT "${PROJECT_BINARY_DIR}/resources/lua/"
   DEPENDS luarocks lua "${PROJECT_SOURCE_DIR}/src/lua"
@@ -87,7 +98,7 @@ set(vacances_src
 
 add_executable(vacances ${vacances_src})
 
-add_dependencies(vacances luarocks-build)
+add_dependencies(vacances luarocks-build lovetoys-build)
 target_link_libraries(vacances sfml-graphics sfml-audio fmt yaml-cpp spdlog nlohmann_json::nlohmann_json sol2 ${LUA_LIBRARIES})
 target_include_directories(vacances PRIVATE "src" ${LUA_INCLUDE_DIR})
 

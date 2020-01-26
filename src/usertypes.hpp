@@ -6,6 +6,8 @@
 #include <SFML/Graphics/Drawable.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Window/Event.hpp>
+#include <SFML/Audio/Sound.hpp>
+#include <SFML/Audio/SoundBuffer.hpp>
 
 #include <fmt/format.h>
 
@@ -46,7 +48,11 @@ decltype(auto) register_vector2(sol::state &lua, std::string name) {
     return lua.new_usertype<sf::Vector2<T>>(
         name, sol::constructors<sf::Vector2<T>(T, T)>(),
         "x", &sf::Vector2<T>::x,
-        "y", &sf::Vector2<T>::y
+        "y", &sf::Vector2<T>::y,
+        sol::meta_function::addition,
+        [](const sf::Vector2<T> &left, const sf::Vector2<T> &right) {
+            return sf::Vector2<T>(left.x + right.x, left.y + right.y);
+        }
     );
 }
 
@@ -70,6 +76,7 @@ void register_usertypes(sol::state &lua) {
     auto vec2u_type = register_vector2<unsigned int>(lua, "Vector2u");
 
     auto float_rect_type = register_rect<float>(lua, "FloatRect");
+    auto int_rect_type = register_rect<int>(lua, "IntRect");
 
     auto color_type = lua.new_usertype<sf::Color>(
         "Color", sol::constructors<sf::Color(uint8_t red, uint8_t green, uint8_t blue, uint8_t alpha)>(),
@@ -148,7 +155,16 @@ void register_usertypes(sol::state &lua) {
     auto sprite = lua.new_usertype<sf::Sprite>(
         "Sprite", sol::constructors<sf::Sprite()>(),
         sol::base_classes, sol::bases<sf::Drawable, sf::Transformable>(),
-        "texture", sol::property(&sf::Sprite::getTexture, [](sf::Sprite &sprite, const sf::Texture &texture) { sprite.setTexture(texture); })
+        "texture", sol::property(&sf::Sprite::getTexture, [](sf::Sprite &sprite, const sf::Texture &texture) { sprite.setTexture(texture); }),
+        "origin",  sol::property(
+            &sf::Sprite::getOrigin,
+            sol::resolve<void(const sf::Vector2f&)>(&sf::Sprite::setOrigin)
+        ),
+        "scale",  sol::property(
+            &sf::Sprite::getScale,
+            sol::resolve<void(const sf::Vector2f&)>(&sf::Sprite::setScale)
+        ),
+        "texture_rect", sol::property(&sf::Sprite::getTextureRect, &sf::Sprite::setTextureRect)
     );
 
     auto event_type = lua.new_usertype<sf::Event>(
@@ -171,15 +187,41 @@ void register_usertypes(sol::state &lua) {
         "TextEvent",
         "unicode", sol::readonly(&sf::Event::TextEvent::unicode)
     );
+
+    auto keyboard_type = lua.new_usertype<sf::Keyboard>(
+        "Keyboard",
+        "is_key_pressed", &sf::Keyboard::isKeyPressed
+    );
+
     auto key_enum = lua.new_enum(
         "KeyboardKey",
-        "Space", sf::Keyboard::Space
+        "Space", sf::Keyboard::Space,
+        "D", sf::Keyboard::D,
+        "A", sf::Keyboard::A
     );
     auto event_t_enum = lua.new_enum(
         "EventType",
         "KeyReleased", sf::Event::KeyReleased,
         "KeyPressed", sf::Event::KeyPressed,
         "TextEntered", sf::Event::TextEntered
+    );
+
+    auto sound_buf_type = lua.new_usertype<sf::SoundBuffer>(
+        "SoundBuffer", sol::constructors<sf::SoundBuffer()>(),
+        "load_from_file", &sf::SoundBuffer::loadFromFile
+    );
+    auto sound_type = lua.new_usertype<sf::Sound>(
+        "Sound", sol::constructors<sf::Sound()>(),
+        "buffer", sol::property(
+            &sf::Sound::getBuffer,
+            &sf::Sound::setBuffer
+        ),
+        "status", sol::property(&sf::Sound::getStatus),
+        "play", &sf::Sound::play
+    );
+    auto sound_status_enum = lua.new_enum(
+        "SoundStatus",
+        "Playing", sf::Sound::Status::Playing
     );
 
     // Helper classes

@@ -54,7 +54,8 @@ int main() {
     //MainChar mainChar(target, "resources/sprites/mainchar");
 
     sol::state lua;
-    lua.open_libraries(sol::lib::base, sol::lib::table, sol::lib::string, sol::lib::package, sol::lib::coroutine, sol::lib::math, sol::lib::debug);
+    lua.open_libraries(sol::lib::base, sol::lib::table, sol::lib::string, sol::lib::package,
+                       sol::lib::coroutine, sol::lib::math, sol::lib::debug, sol::lib::os, sol::lib::io);
 
     // Setup the lua path to see luarocks packages
     lua["package"]["path"] = std::string(
@@ -82,7 +83,12 @@ sf::Shader::Fragment);
 
     TerminalEnv terminal_env(lua);
 
-    auto current_state = CurrentState::Terminal;
+    sol::table walking_module = lua.require_script("WalkingModule", "return require('walking')");
+    sol::protected_function walking_update = walking_module["update"];
+    sol::protected_function walking_draw = walking_module["draw"];
+    sol::protected_function walking_add_event = walking_module["add_event"];
+
+    auto current_state = CurrentState::Walking;
 
     sf::Clock clock;
     while (true) {
@@ -126,6 +132,9 @@ sf::Shader::Fragment);
                 terminal_env.process_event(event);
                 break;
             case CurrentState::Walking:
+                auto res = walking_add_event(event);
+                if (!res.valid())
+                    throw sol::error(res);
                 break;
             }
         }
@@ -135,7 +144,19 @@ sf::Shader::Fragment);
             terminal_env.draw(dt);
             break;
         case CurrentState::Walking:
-            break;
+        {
+            auto res = walking_update(dt);
+            if (!res.valid())
+                throw sol::error(res);
+        }
+        {
+            auto res = walking_draw();
+            if (!res.valid())
+                throw sol::error(res);
+
+        }
+
+        break;
         }
 
         //mainChar.update(dt);

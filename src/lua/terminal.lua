@@ -1,4 +1,3 @@
-local tiny = require("tiny")
 local class = require("middleclass")
 local inspect = require("inspect")
 local lume = require("lume")
