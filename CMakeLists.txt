@@ -22,9 +22,6 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/deps/yaml-cpp")
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/deps/spdlog")
 
-set(JSON_BuildTests OFF CACHE INTERNAL "")
-add_subdirectory("${PROJECT_SOURCE_DIR}/deps/nlohmann-json")
-
 # === Building lua ===
 # TODO: might need to be built as C++: https://sol2.readthedocs.io/en/latest/errors.html#destructors-and-safety
 add_custom_command(
@@ -99,7 +96,7 @@ set(vacances_src
 add_executable(vacances ${vacances_src})
 
 add_dependencies(vacances luarocks-build lovetoys-build)
-target_link_libraries(vacances sfml-graphics sfml-audio fmt yaml-cpp spdlog nlohmann_json::nlohmann_json sol2 ${LUA_LIBRARIES})
+target_link_libraries(vacances sfml-graphics sfml-audio fmt yaml-cpp spdlog sol2 ${LUA_LIBRARIES})
 target_include_directories(vacances PRIVATE "src" ${LUA_INCLUDE_DIR})
 
 # Copy all resources
