@@ -174,7 +174,6 @@
              You too.
 
    <The screen goes black>
-
 * Day 2
 ** The first night :walking:
    After the screen goes black, the player is back in the dark room they were in and can explore a little more. There's a new doorway that appeared

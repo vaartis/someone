@@ -17,6 +17,8 @@ source = {
 build = {
     type = "builtin",
     modules = {
+       ["components.shared"] = "components/shared.lua",
+       ["components.player"] = "components/player.lua",
        terminal = "terminal.lua",
        walking = "walking.lua"
     }
