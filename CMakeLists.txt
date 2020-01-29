@@ -76,7 +76,7 @@ add_custom_target(lovetoys-build DEPENDS "${PROJECT_BINARY_DIR}/resources/lua/sh
 
 add_custom_command(
   OUTPUT "${PROJECT_BINARY_DIR}/resources/lua/"
-  DEPENDS luarocks lua "${PROJECT_SOURCE_DIR}/src/lua"
+  DEPENDS luarocks lua "${PROJECT_SOURCE_DIR}/src/lua/**"
   COMMAND ${PROJECT_BINARY_DIR}/deps/luarocks/luarocks --tree=${PROJECT_BINARY_DIR}/resources/lua build
   WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/src/lua"
 )
