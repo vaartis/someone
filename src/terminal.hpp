@@ -1,24 +1,14 @@
 #pragma once
 
 #include "story_parser.hpp"
+#include "lua_module_env.hpp"
 
-class TerminalEnv {
+class TerminalEnv : public LuaModuleEnv {
 private:
-    sol::state &lua;
-
     StoryParser::lines_type lines;
-
-    sol::table module;
 
     sol::protected_function add_lines_f, set_first_line_f, draw_f, process_event_f;
 public:
-    template<typename... T>
-    decltype(auto) call_or_throw(sol::protected_function &fnc, T... args) {
-        auto res = fnc(args...);
-        if (!res.valid())
-            throw sol::error(res);
-    }
-
     void add_lines(StoryParser::lines_type &lines) {
         call_or_throw(add_lines_f, lines);
     }
@@ -35,7 +25,7 @@ public:
         call_or_throw(process_event_f, event);
     }
 
-    TerminalEnv(sol::state &lua) : lua(lua) {
+    TerminalEnv(sol::state &lua) : LuaModuleEnv(lua) {
         // This both defines a global for the module and returns it
         module = lua.require_script("TerminalModule", "return require('terminal')");
 

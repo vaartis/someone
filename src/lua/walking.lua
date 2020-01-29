@@ -221,8 +221,6 @@ engine:addSystem(RenderSystem())
 engine:addSystem(AnimationSystem())
 engine:addSystem(PlayerMovementSystem())
 
--- TODO: load footsteps
-
 local M = {}
 
 function M.add_event(event)

@@ -8,13 +8,15 @@
 
 #include "sol/sol.hpp"
 
-#include "terminal.hpp"
 #include "logger.hpp"
 #include "string_utils.hpp"
 #include "fonts.hpp"
 #include "story_parser.hpp"
 #include "usertypes.hpp"
 #include "mainchar.hpp"
+
+#include "terminal.hpp"
+#include "walking.hpp"
 
 enum class CurrentState {
     Terminal,
@@ -23,7 +25,7 @@ enum class CurrentState {
 
 int main() {
     #ifndef NDEBUG
-    //spdlog::set_level(spdlog::level::debug);
+    spdlog::set_level(spdlog::level::debug);
     #endif
 
     sf::RenderWindow window(sf::VideoMode(1280, 1024), "Vacances");
@@ -39,19 +41,14 @@ int main() {
 
     StaticFonts::initFonts();
 
+    /*
     sf::Texture lightTexture;
     lightTexture.loadFromFile("resources/sprites/room/light.png");
     sf::Sprite lightSprite(lightTexture);
     auto rect = lightSprite.getTextureRect();
     lightSprite.setOrigin(rect.width / 2, rect.height / 2);
     lightSprite.setPosition(387, 600);
-
-    sf::Texture roomTexture;
-    roomTexture.loadFromFile("resources/sprites/room/room.png");
-
-    sf::Sprite roomSprite(roomTexture);
-
-    //MainChar mainChar(target, "resources/sprites/mainchar");
+    */
 
     sol::state lua;
     lua.open_libraries(sol::lib::base, sol::lib::table, sol::lib::string, sol::lib::package,
@@ -69,24 +66,8 @@ int main() {
 
     lua["DRAWING_TARGET"] = &target;
 
-    /*
-    sf::Shader roomDarkerShader;
-    roomDarkerShader.loadFromFile("resources/shaders/room_darker.frag",
-sf::Shader::Fragment);
-
-    roomDarkerShader.setUniform("screenSize", sf::Vector2f(target.getSize()));
-    roomDarkerShader.setUniform("monitorTop", sf::Vector2f(237, 708));
-    roomDarkerShader.setUniform("monitorBottom", sf::Vector2f(237, 765));
-    roomDarkerShader.setUniform("ambientLightLevel", 0.4f);
-    roomDarkerShader.setUniform("currentTexture", targetTexture);
-    */
-
     TerminalEnv terminal_env(lua);
-
-    sol::table walking_module = lua.require_script("WalkingModule", "return require('walking')");
-    sol::protected_function walking_update = walking_module["update"];
-    sol::protected_function walking_draw = walking_module["draw"];
-    sol::protected_function walking_add_event = walking_module["add_event"];
+    WalkingEnv walking_env(lua);
 
     auto current_state = CurrentState::Walking;
 
@@ -132,9 +113,7 @@ sf::Shader::Fragment);
                 terminal_env.process_event(event);
                 break;
             case CurrentState::Walking:
-                auto res = walking_add_event(event);
-                if (!res.valid())
-                    throw sol::error(res);
+                walking_env.add_event(event);
                 break;
             }
         }
@@ -144,32 +123,25 @@ sf::Shader::Fragment);
             terminal_env.draw(dt);
             break;
         case CurrentState::Walking:
-        {
-            auto res = walking_update(dt);
-            if (!res.valid())
-                throw sol::error(res);
+            walking_env.update(dt);
+            walking_env.draw();
+
+            break;
         }
-        {
-            auto res = walking_draw();
-            if (!res.valid())
-                throw sol::error(res);
-
-        }
-
-        break;
-        }
-
-        //mainChar.update(dt);
-
-        //target.draw(roomSprite);
-        //window.draw(lightSprite);
-        //mainChar.display();
 
         target.display();
 
         window.clear();
-        window.draw(targetSprite);
-        //window.draw(targetSprite, &roomDarkerShader);
+
+        switch (current_state) {
+        case CurrentState::Terminal:
+            window.draw(targetSprite);
+            break;
+        case CurrentState::Walking:
+            walking_env.draw_target_to_window(window, targetSprite);
+            break;
+        }
+
         window.display();
     }
 }
