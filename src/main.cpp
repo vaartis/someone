@@ -1,10 +1,6 @@
-#include <SFML/Graphics/Transformable.hpp>
+#include <SFML/Graphics.hpp>
 #include <SFML/Window/Event.hpp>
-#include <SFML/Graphics/RenderWindow.hpp>
-#include <SFML/Graphics/RenderTexture.hpp>
-#include <SFML/Graphics/Shader.hpp>
 #include <SFML/System/Clock.hpp>
-#include <SFML/Graphics/Text.hpp>
 
 #include "sol/sol.hpp"
 
@@ -13,7 +9,6 @@
 #include "fonts.hpp"
 #include "story_parser.hpp"
 #include "usertypes.hpp"
-#include "mainchar.hpp"
 
 #include "terminal.hpp"
 #include "walking.hpp"

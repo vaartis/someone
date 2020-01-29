@@ -90,6 +90,7 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/deps/sol2")
 set(vacances_src
   "src/fonts.cpp"
   "src/string_utils.cpp"
+  "src/usertypes.cpp"
   "src/main.cpp"
 )
 
