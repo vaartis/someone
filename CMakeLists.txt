@@ -91,6 +91,7 @@ set(vacances_src
   "src/fonts.cpp"
   "src/string_utils.cpp"
   "src/usertypes.cpp"
+  "src/story_parser.cpp"
   "src/main.cpp"
 )
 
