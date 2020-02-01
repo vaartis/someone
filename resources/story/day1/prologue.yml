@@ -47,6 +47,7 @@ config:
 
 8:
   char: description
+  wait: true
   script: TerminalModule.set_environment_image('gray_room')
   text: >-
     You are standing in an empty room with the <narrator>.
@@ -77,6 +78,8 @@ config:
 
 13:
   char: narrator
+  wait: true
   text: >-
     Maybe check your surroundings out? I'll still be here, of course. Not like i can go anywhere :)
+  script_after: GLOBAL.set_current_state(CurrentState.Walking)
   next: day1/forest_and_village/1

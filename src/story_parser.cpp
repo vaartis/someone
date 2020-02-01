@@ -118,8 +118,12 @@ void StoryParser::parse(lines_type &result, std::string file_name, sol::state &l
             }
 
             std::optional<std::string> node_script;
-            if (node["script"])
-                node_script = node["script"].as<std::string>();
+            if (node["script"]) node_script = node["script"].as<std::string>();
+
+            std::optional<std::string> node_script_after;
+            if (node["script_after"])
+                node_script_after = node["script_after"].as<std::string>();
+
 
             sol::object result_object;
 
@@ -161,10 +165,10 @@ void StoryParser::parse(lines_type &result, std::string file_name, sol::state &l
                     next_references_to_check.insert({inserted_name, next});
                 }
 
-                if (node_char != "description") {
-                    result_object = sol::make_object<TerminalOutputLineData>(lua, text, next);
+                if (node["wait"] && node["wait"].as<bool>()) {
+                    result_object = sol::make_object<TerminalInputWaitLineData>(lua, text, next);
                 } else {
-                    result_object = sol::make_object<TerminalDescriptionLineData>(lua, text, next);
+                    result_object = sol::make_object<TerminalOutputLineData>(lua, text, next);
                 }
             } else if (node["responses"]) {
                 decltype(TerminalVariantInputLineData::variants) variants;
@@ -231,6 +235,7 @@ void StoryParser::parse(lines_type &result, std::string file_name, sol::state &l
             auto &general_line = result_object.as<TerminalLineData>();
             general_line.character_config = char_config;
             general_line.script = node_script;
+            general_line.script_after = node_script_after;
 
             result.insert({inserted_name, result_object});
         }

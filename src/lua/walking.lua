@@ -7,6 +7,10 @@ local inspect = require("inspect")
 local shared_components = require("components.shared")
 local player_components = require("components.player")
 
+local M = {}
+
+M.state_variables = {}
+
 -- An event manager that stores native events
 local native_event_manager = EventManager()
 
@@ -90,12 +94,15 @@ engine:addEntity(room)
    state_map: a mapping from the state name to the animation frame
    change_state: a function that is provided with the current state and needs to return the new state
 ]]
-local ButtonComponent = Component.create("Button", {"current_state", "change_state", "state_map"})
+local ButtonComponent = Component.create(
+   "Button",
+   {"current_state", "change_state", "state_map"}
+)
 
 local ButtonInteractionSystem = class("ButtonInteractionSystem", System)
 function ButtonInteractionSystem:requires()
    return {
-      buttons = {"Button", "Transformable", "DrawableSprite", "Animation" },
+      buttons = {"Button", "Transformable", "DrawableSprite", "Animation"},
       -- The PlayerMovement component only exists on the player
       player = {"PlayerMovement", "Transformable"}
    }
@@ -117,8 +124,19 @@ function ButtonInteractionSystem:update(dt)
          for _, native_event in pairs(event_store.events) do
             local event = native_event.event
             if event.type == EventType.KeyReleased and event.key.code == KeyboardKey.E then
+               local old_state = button_comp.current_state
                -- Update the state using the function provided by the component
                button_comp.current_state = button_comp.change_state(button_comp.current_state)
+               if button_comp.current_state ~= old_state then
+                  -- If the state changed, play the button press sound
+
+                  local button_press_soundbuf = SoundBuffer.new()
+                  button_press_soundbuf:load_from_file("resources/sounds/button_press.ogg")
+                  local button_press_sound = Sound.new()
+                  button_press_sound.buffer = button_press_soundbuf
+
+                  button_press_sound:play()
+               end
             end
          end
       end
@@ -143,7 +161,11 @@ button_entity:add(
    ButtonComponent(
       "disabled",
       function (curr_state)
-         if curr_state ~= "enabled" then return "enabled" else return curr_state end
+         M.state_variables["first_button_pressed"] = true
+
+         GLOBAL.set_current_state(CurrentState.Terminal)
+
+         return "enabled"
       end,
       { disabled = 1, enabled = 2 }
    )
@@ -161,7 +183,7 @@ engine:addSystem(shared_components.AnimationSystem())
 engine:addSystem(player_components.PlayerMovementSystem())
 engine:addSystem(ButtonInteractionSystem())
 
-local M = {}
+
 
 function M.add_event(event)
    native_event_manager:fireEvent(NativeEvent(event))

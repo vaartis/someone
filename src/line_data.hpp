@@ -9,6 +9,7 @@ struct CharacterConfig {
 struct TerminalLineData {
     CharacterConfig character_config;
     std::optional<std::string> script;
+    std::optional<std::string> script_after;
 
     virtual ~TerminalLineData() { }
 };
@@ -21,8 +22,8 @@ struct TerminalOutputLineData : TerminalLineData {
         : text(text), next(next) { }
 };
 
-struct TerminalDescriptionLineData : TerminalOutputLineData {
-    TerminalDescriptionLineData(std::string text, std::string next)
+struct TerminalInputWaitLineData : TerminalOutputLineData {
+    TerminalInputWaitLineData(std::string text, std::string next)
         : TerminalOutputLineData(text, next) { }
 };
 

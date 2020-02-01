@@ -32,6 +32,9 @@ function TerminalLine:initialize(name)
    -- The script to execute on first line evaluation and whether it was executed already or not
    self._script = nil
    self._script_executed = false
+
+   self._script_after = nil
+   self._script_after_executed = false
 end
 
 function TerminalLine:tick_letter_timer(dt)
@@ -91,14 +94,14 @@ function OutputLine:next()
    return self._next_line
 end
 
-local DescriptionLine = class("DescriptionLine", OutputLine)
-function DescriptionLine:initialize(name, text, next_line)
+local InputWaitLine = class("InputWaitLine", OutputLine)
+function InputWaitLine:initialize(name, text, next_line)
    OutputLine.initialize(self, name, text, next_line)
 
    self._space_pressed = false
 end
 
-function DescriptionLine:current_text()
+function InputWaitLine:current_text()
    local final_text = self._text:sub(0, self._letters_output)
    if (self._letters_output == #self._text and not self._space_pressed) then
       final_text = final_text .. "\n[Press Space to continue]"
@@ -115,15 +118,15 @@ function DescriptionLine:current_text()
    return txt
 end
 
-function DescriptionLine:should_wait()
+function InputWaitLine:should_wait()
    return OutputLine.should_wait(self) or not self._space_pressed
 end
 
-function DescriptionLine:is_interactive()
+function InputWaitLine:is_interactive()
    return self._letters_output == #self._text and not self._space_pressed
 end
 
-function DescriptionLine:handle_interaction(event)
+function InputWaitLine:handle_interaction(event)
    if event.type == EventType.KeyReleased then
       local key = event.key.code
 
@@ -285,8 +288,8 @@ function make_line(name, line)
    local to_insert
    if tp == "TerminalOutputLineData" then
       to_insert = OutputLine(name, line.text, line.next, line.character_config)
-   elseif tp == "TerminalDescriptionLineData" then
-      to_insert = DescriptionLine(name, line.text, line.next, line.character_config)
+   elseif tp == "TerminalInputWaitLineData" then
+      to_insert = InputWaitLine(name, line.text, line.next, line.character_config)
    elseif tp == "TerminalVariantInputLineData" then
       to_insert = VariantInputLine(name, line.variants, line.character_config)
    else
@@ -298,6 +301,11 @@ function make_line(name, line)
    if line.script then
       -- Compile the script (if it exists)
       to_insert._script, err = load(line.script, lume.format("{1}.script", {name}))
+      if err then error(err) end
+   end
+   if line.script_after then
+      -- Compile the script_after (if it exists)
+      to_insert._script_after, err = load(line.script_after, lume.format("{1}.script_after", {name}))
       if err then error(err) end
    end
 
@@ -405,8 +413,14 @@ function M.draw(dt)
          line._script_executed = true
       end
 
-      if (should_wait or line:next() == nil) then
+      if should_wait or line:next() == nil then
          break
+      end
+
+      if line._script_after and not line._script_after_executed then
+         line._script_after()
+
+         line._script_after_executed = true
       end
 
       line = line:next()

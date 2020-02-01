@@ -241,7 +241,8 @@ void register_usertypes(sol::state &lua) {
     auto term_line_type = lua.new_usertype<TerminalLineData>(
         "TerminalLineData",
         "character_config", sol::readonly(&TerminalLineData::character_config),
-        "script", sol::readonly(&TerminalLineData::script)
+        "script", sol::readonly(&TerminalLineData::script),
+        "script_after", sol::readonly(&TerminalLineData::script_after)
     );
     auto term_output_line_type = lua.new_usertype<TerminalOutputLineData>(
         "TerminalOutputLineData",
@@ -265,8 +266,8 @@ void register_usertypes(sol::state &lua) {
     );
 
 
-    auto desc_line_type = lua.new_usertype<TerminalDescriptionLineData>(
-        "TerminalDescriptionLineData",
+    auto input_wait_line_type = lua.new_usertype<TerminalInputWaitLineData>(
+        "TerminalInputWaitLineData",
         sol::base_classes, sol::bases<TerminalLineData, TerminalOutputLineData>()
     );
 }
