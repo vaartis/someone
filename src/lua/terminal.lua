@@ -4,7 +4,7 @@ local lume = require("lume")
 
 -- Calculates the maximum text width in the terminal
 function max_text_width()
-   local win_size = DRAWING_TARGET.size
+   local win_size = GLOBAL.drawing_target.size
 
    local width_offset, height_offset = win_size.x / 100, win_size.y / 100 * 2
 
@@ -318,7 +318,7 @@ function M.set_first_line_on_screen(name)
 end
 
 function M.draw(dt)
-   local win_size = DRAWING_TARGET.size
+   local win_size = GLOBAL.drawing_target.size
 
    local width_offset, height_offset = win_size.x / 100, win_size.y / 100 * 2
    local rect_height, rect_width = win_size.y / 100 * (80 - 10), win_size.x - (width_offset * 2)
@@ -331,7 +331,7 @@ function M.draw(dt)
    rect.outline_color = Color.Black
    rect.fill_color = Color.Black
    rect.position = Vector2f.new(width_offset, height_offset)
-   DRAWING_TARGET:draw(rect)
+   GLOBAL.drawing_target:draw(rect)
 
    -- Offset for the first line to start at
    local first_line_height_offset = height_offset * 2
@@ -366,7 +366,7 @@ function M.draw(dt)
             total_text_height = total_text_height + this_txt_height + (StaticFonts.font_size / 2)
             line_height_offset = first_line_height_offset + total_text_height;
 
-            DRAWING_TARGET:draw(txt);
+            GLOBAL.drawing_target:draw(txt);
          end
          -- Add a bit more after the last line
          total_text_height = total_text_height + StaticFonts.font_size / 2
@@ -380,7 +380,7 @@ function M.draw(dt)
          total_text_height = total_text_height + line_height + (StaticFonts.font_size / 2)
          line_height_offset = first_line_height_offset + total_text_height
 
-         DRAWING_TARGET:draw(text)
+         GLOBAL.drawing_target:draw(text)
       end
 
       --[[
@@ -418,7 +418,7 @@ function M.draw(dt)
       local sprite_width_offset = width_offset + rect_width - current_environment_texture.size.x
 
       current_environment_sprite.position = Vector2f.new(sprite_width_offset, sprite_height_offset)
-      DRAWING_TARGET:draw(current_environment_sprite)
+      GLOBAL.drawing_target:draw(current_environment_sprite)
    end
 end
 

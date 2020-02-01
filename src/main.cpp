@@ -59,12 +59,20 @@ int main() {
 
     register_usertypes(lua);
 
-    lua["DRAWING_TARGET"] = &target;
-
     TerminalEnv terminal_env(lua);
     WalkingEnv walking_env(lua);
 
     auto current_state = CurrentState::Walking;
+
+    auto current_state_type = lua.new_enum(
+        "CurrentState",
+        "Terminal", CurrentState::Terminal,
+        "Walking", CurrentState::Walking
+    );
+    current_state_type["GLOBAL"] = lua.create_table_with(
+        "drawing_target", &target,
+        "set_current_state", [&](CurrentState new_state) { current_state = new_state; }
+    );
 
     sf::Clock clock;
     while (true) {

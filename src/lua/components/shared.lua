@@ -36,7 +36,7 @@ function M.RenderSystem:draw()
    for _, entity in pairs(self.targets) do
       local drawable = entity:get("DrawableSprite")
 
-      DRAWING_TARGET:draw(drawable.sprite)
+      GLOBAL.drawing_target:draw(drawable.sprite)
    end
 end
 
