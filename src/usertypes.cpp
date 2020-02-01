@@ -59,7 +59,8 @@ decltype(auto) register_rect(sol::state &lua, std::string name) {
         "left", &sf::Rect<T>::left,
         "top", &sf::Rect<T>::top,
         "width", &sf::Rect<T>::width,
-        "height", &sf::Rect<T>::height
+        "height", &sf::Rect<T>::height,
+        "intersects", sol::resolve<bool (const sf::Rect<T>&) const>(&sf::Rect<T>::intersects)
     );
 }
 } // namespace
@@ -160,13 +161,14 @@ void register_usertypes(sol::state &lua) {
             &sf::Sprite::getScale,
             sol::resolve<void(const sf::Vector2f&)>(&sf::Sprite::setScale)
         ),
-        "texture_rect", sol::property(&sf::Sprite::getTextureRect, &sf::Sprite::setTextureRect)
+        "texture_rect", sol::property(&sf::Sprite::getTextureRect, &sf::Sprite::setTextureRect),
+        "global_bounds", sol::property(&sf::Sprite::getGlobalBounds)
     );
 
     auto event_type = lua.new_usertype<sf::Event>(
         "Event",
         "type", sol::readonly(&sf::Event::type),
-        // Keyboard event
+        // Keyboard events
         "key", sol::readonly(&sf::Event::key),
         // Text entered event
         "text", sol::readonly(&sf::Event::text)
@@ -193,7 +195,8 @@ void register_usertypes(sol::state &lua) {
         "KeyboardKey",
         "Space", sf::Keyboard::Space,
         "D", sf::Keyboard::D,
-        "A", sf::Keyboard::A
+        "A", sf::Keyboard::A,
+        "E", sf::Keyboard::E
     );
     auto event_t_enum = lua.new_enum(
         "EventType",

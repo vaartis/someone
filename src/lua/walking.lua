@@ -85,18 +85,81 @@ room:add(shared_components.DrawableSpriteComponent(room_sprite, room_texture, 0)
 
 engine:addEntity(room)
 
+--[[
+   A component holding button interaction logic.
+   state_map: a mapping from the state name to the animation frame
+   change_state: a function that is provided with the current state and needs to return the new state
+]]
+local ButtonComponent = Component.create("Button", {"current_state", "change_state", "state_map"})
+
+local ButtonInteractionSystem = class("ButtonInteractionSystem", System)
+function ButtonInteractionSystem:requires()
+   return {
+      buttons = {"Button", "Transformable", "DrawableSprite", "Animation" },
+      -- The PlayerMovement component only exists on the player
+      player = {"PlayerMovement", "Transformable"}
+   }
+end
+
+function ButtonInteractionSystem:update(dt)
+   local player = lume.first(self.targets.player)
+   if not player then error("No player entity found") end
+
+   local player_sprite = player:get("DrawableSprite").sprite
+
+   for _, button in pairs(self.targets.buttons) do
+      local button_pos = button:get("Transformable").position
+      local button_comp = button:get("Button")
+
+      local button_sprite = button:get("DrawableSprite").sprite
+
+      if (player_sprite.global_bounds:intersects(button_sprite.global_bounds)) then
+         for _, native_event in pairs(event_store.events) do
+            local event = native_event.event
+            if event.type == EventType.KeyReleased and event.key.code == KeyboardKey.E then
+               -- Update the state using the function provided by the component
+               button_comp.current_state = button_comp.change_state(button_comp.current_state)
+            end
+         end
+      end
+
+      -- Update the current texture frame
+      local anim = button:get("Animation")
+      anim.current_frame = button_comp.state_map[button_comp.current_state]
+   end
+end
+
+--function
+
 local button_texture = Texture.new();
 button_texture:load_from_file("resources/sprites/room/button/button.png")
 local button_sprite = Sprite.new()
 button_sprite.texture = button_texture
+button_sprite.position = Vector2f.new(1020, 672)
+local button_frames = shared_components.load_sheet_frames("resources/sprites/room/button/")
 
 local button_entity = Entity()
+button_entity:add(
+   ButtonComponent(
+      "disabled",
+      function (curr_state)
+         if curr_state ~= "enabled" then return "enabled" else return curr_state end
+      end,
+      { disabled = 1, enabled = 2 }
+   )
+)
+button_entity:add(shared_components.TransformableComponent(button_sprite))
 button_entity:add(shared_components.DrawableSpriteComponent(button_sprite, button_texture, 1))
+
+local button_anim_comp = shared_components.AnimationComponent(button_frames)
+button_anim_comp.playable = false
+button_entity:add(button_anim_comp)
 engine:addEntity(button_entity)
 
 engine:addSystem(shared_components.RenderSystem())
 engine:addSystem(shared_components.AnimationSystem())
 engine:addSystem(player_components.PlayerMovementSystem())
+engine:addSystem(ButtonInteractionSystem())
 
 local M = {}
 
@@ -106,6 +169,8 @@ end
 
 function M.update(dt)
    engine:update(dt)
+
+   event_store:clear()
 end
 
 function M.draw()

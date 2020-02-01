@@ -63,7 +63,7 @@ function M.create_player_entity()
    local player_sprite = Sprite.new()
    player_sprite.texture = player_texture
    player_sprite.origin = Vector2f.new(first_frame.rect.width / 2, first_frame.rect.height)
-   player_sprite.position = Vector2f.new(180, 880)
+   player_sprite.position = Vector2f.new(420, 820)
 
    local footstep_sound_path = "resources/sounds/footstep.ogg"
    local step_sound_buf = SoundBuffer.new()
@@ -73,7 +73,7 @@ function M.create_player_entity()
    step_sound.buffer = step_sound_buf
 
    local player = Entity()
-   player:add(shared.DrawableSpriteComponent(player_sprite, player_texture, 1))
+   player:add(shared.DrawableSpriteComponent(player_sprite, player_texture, 2))
    player:add(shared.AnimationComponent(animation_frames))
    player:add(shared.TransformableComponent(player_sprite))
    player:add(M.PlayerMovementComponent(step_sound_buf, step_sound))

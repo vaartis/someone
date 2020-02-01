@@ -44,8 +44,8 @@ M.TransformableComponent = Component.create("Transformable", {"transformable"})
 
 M.AnimationComponent = Component.create(
    "Animation",
-   {"frames", "current_frame", "playing", "time_since_frame_change"},
-   { time_since_frame_change = 0, playing = false, current_frame = 1 }
+   {"frames", "current_frame", "playable", "playing", "time_since_frame_change"},
+   { time_since_frame_change = 0, playable = true, playing = false, current_frame = 1 }
 )
 
 M.AnimationSystem = class("AnimationSystem", System)
@@ -60,7 +60,7 @@ function M.AnimationSystem:update(dt)
 
       anim.time_since_frame_change = anim.time_since_frame_change + dt
 
-      if anim.playing then
+      if anim.playable and anim.playing then
          if anim.time_since_frame_change > anim.frames[anim.current_frame].duration then
             anim.time_since_frame_change = 0
 
@@ -70,7 +70,7 @@ function M.AnimationSystem:update(dt)
                anim.current_frame = 1
             end
          end
-      else
+      elseif anim.playable and not anim.playing then
          anim.current_frame = 1
       end
 

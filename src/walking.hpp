@@ -27,8 +27,13 @@ public:
         call_or_throw(draw_f);
     }
 
-    void add_event(sf::Event event) {
-        call_or_throw(add_event_f, event);
+    void add_event(sf::Event &event) {
+        call_or_throw(
+            add_event_f,
+            // For some reason, copying the event makes the values break after a bit in lua, but copying and
+            // allocating a pointer to that works fine
+            std::make_shared<sf::Event>(event)
+        );
     }
 
     void draw_target_to_window(sf::RenderWindow &target_window, sf::Sprite &final_sprite) {
