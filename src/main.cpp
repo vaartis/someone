@@ -12,6 +12,7 @@
 
 #include "terminal.hpp"
 #include "walking.hpp"
+#include "coroutines.hpp"
 
 enum class CurrentState {
     Terminal,
@@ -59,10 +60,11 @@ int main() {
 
     register_usertypes(lua);
 
+    CoroutinesEnv coroutines_env(lua);
     TerminalEnv terminal_env(lua);
     WalkingEnv walking_env(lua);
 
-    auto current_state = CurrentState::Walking;
+    auto current_state = CurrentState::Terminal;
 
     auto current_state_type = lua.new_enum(
         "CurrentState",
@@ -131,6 +133,10 @@ int main() {
 
             break;
         }
+
+        // After everything has been drawn and processed, but before it's actually drawn to the screen,
+        // run the coroutines
+        coroutines_env.run();
 
         target.display();
 

@@ -6,6 +6,8 @@ local inspect = require("inspect")
 
 local shared_components = require("components.shared")
 local player_components = require("components.player")
+local coroutines = require("coroutines")
+local terminal = require("terminal")
 
 local M = {}
 
@@ -163,7 +165,16 @@ button_entity:add(
       function (curr_state)
          M.state_variables["first_button_pressed"] = true
 
-         GLOBAL.set_current_state(CurrentState.Terminal)
+         local player = lume.first(engine:getEntitiesWithComponent("PlayerMovement"))
+         player:get("PlayerMovement").active = false
+
+         coroutines.create_coroutine(
+            coroutines.black_screen_out,
+            function()
+               GLOBAL.set_current_state(CurrentState.Terminal)
+               terminal.active = true
+            end
+         )
 
          return "enabled"
       end,
@@ -182,7 +193,6 @@ engine:addSystem(shared_components.RenderSystem())
 engine:addSystem(shared_components.AnimationSystem())
 engine:addSystem(player_components.PlayerMovementSystem())
 engine:addSystem(ButtonInteractionSystem())
-
 
 
 function M.add_event(event)

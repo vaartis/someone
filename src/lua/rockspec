@@ -20,6 +20,7 @@ build = {
        ["components.shared"] = "components/shared.lua",
        ["components.player"] = "components/player.lua",
        terminal = "terminal.lua",
-       walking = "walking.lua"
+       walking = "walking.lua",
+       coroutines = "coroutines.lua"
     }
 }

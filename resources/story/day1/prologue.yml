@@ -81,5 +81,5 @@ config:
   wait: true
   text: >-
     Maybe check your surroundings out? I'll still be here, of course. Not like i can go anywhere :)
-  script_after: GLOBAL.set_current_state(CurrentState.Walking)
+  script_after: TerminalModule.switch_to_walking()
   next: day1/forest_and_village/1

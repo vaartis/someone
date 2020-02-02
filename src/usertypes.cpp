@@ -95,7 +95,8 @@ void register_usertypes(sol::state &lua) {
 
     auto render_target_type = lua.new_usertype<sf::RenderTarget>(
         "RenderTarget",
-        "draw", [](sf::RenderTarget &target, const sf::Drawable &drawable) { target.draw(drawable); }
+        "draw", [](sf::RenderTarget &target, const sf::Drawable &drawable) { target.draw(drawable); },
+        "size", sol::property(&sf::RenderTarget::getSize)
     );
     auto render_states_type = lua.new_usertype<sf::RenderStates>("RenderStates");
 

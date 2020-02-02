@@ -7,8 +7,8 @@ local M = {}
 
 M.PlayerMovementComponent = Component.create(
    "PlayerMovement",
-   {"step_sound_buffer", "step_sound", "walking", "look_direction"},
-   { walking = false, look_direction = 1}
+   {"step_sound_buffer", "step_sound", "walking", "look_direction", "active"},
+   { walking = false, look_direction = 1, active = true}
 )
 
 M.PlayerMovementSystem = class("PlayerMovementSystem", System)
@@ -19,31 +19,34 @@ end
 
 function M.PlayerMovementSystem:update(dt)
    for _, entity in pairs(self.targets) do
-
-      local tf = entity:get("Transformable")
       local player_movement = entity:get("PlayerMovement")
-      local drawable = entity:get("DrawableSprite")
-      local animation = entity:get("Animation")
 
-      if Keyboard.is_key_pressed(KeyboardKey.D) then
-         tf.transformable.position = tf.transformable.position + Vector2f.new(1.0, 0.0)
-         player_movement.walking = true
-         player_movement.look_direction = 1
-      elseif Keyboard.is_key_pressed(KeyboardKey.A) then
-         tf.transformable.position = tf.transformable.position + Vector2f.new(-1.0, 0.0)
-         player_movement.walking = true
-         player_movement.look_direction = -1
-      else
-         player_movement.walking = false
-      end
+      if player_movement.active then
+         local tf = entity:get("Transformable")
 
-      drawable.sprite.scale = Vector2f.new(player_movement.look_direction, 1.0)
-      animation.playing = player_movement.walking
+         local drawable = entity:get("DrawableSprite")
+         local animation = entity:get("Animation")
 
-      -- Play the step sound every two steps of the animation, which are the moments
-      -- when the feet hit the ground
-      if player_movement.walking and animation.current_frame % 2 == 0 and player_movement.step_sound.status ~= SoundStatus.Playing then
-         player_movement.step_sound:play()
+         if Keyboard.is_key_pressed(KeyboardKey.D) then
+            tf.transformable.position = tf.transformable.position + Vector2f.new(1.0, 0.0)
+            player_movement.walking = true
+            player_movement.look_direction = 1
+         elseif Keyboard.is_key_pressed(KeyboardKey.A) then
+            tf.transformable.position = tf.transformable.position + Vector2f.new(-1.0, 0.0)
+            player_movement.walking = true
+            player_movement.look_direction = -1
+         else
+            player_movement.walking = false
+         end
+
+         drawable.sprite.scale = Vector2f.new(player_movement.look_direction, 1.0)
+         animation.playing = player_movement.walking
+
+         -- Play the step sound every two steps of the animation, which are the moments
+         -- when the feet hit the ground
+         if player_movement.walking and animation.current_frame % 2 == 0 and player_movement.step_sound.status ~= SoundStatus.Playing then
+            player_movement.step_sound:play()
+         end
       end
    end
 end

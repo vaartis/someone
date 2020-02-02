@@ -1,6 +1,7 @@
 local class = require("middleclass")
 local inspect = require("inspect")
 local lume = require("lume")
+local coroutines = require("coroutines")
 
 -- Calculates the maximum text width in the terminal
 function max_text_width()
@@ -325,7 +326,52 @@ function M.set_first_line_on_screen(name)
    first_line_on_screen = make_line(name, native_lines[name])
 end
 
+M.current_lines_to_draw = {}
+
 function M.draw(dt)
+   -- If processing is active, reset and update current lines
+   if M.active then
+      M.current_lines_to_draw = {}
+
+      local line = first_line_on_screen
+
+      -- If some line changes the active status, stop processing the lines after it
+      while true and M.active do
+         if not line then
+            error(string.format("Line %s does not exist", line._name))
+         end
+
+         local should_wait = line:should_wait()
+         if should_wait then
+            line:tick_letter_timer(dt)
+            line:maybe_increment_letter_count()
+         end
+
+         -- If there's a script and it wasn't executed yet, do it
+         if line._script and not line._script_executed then
+            line._script()
+
+            line._script_executed = true
+         end
+
+         -- Insert the line into the drawing queue now
+         table.insert(M.current_lines_to_draw, line)
+
+         if should_wait or line:next() == nil then
+            break
+         end
+
+         -- Execute the script_after after the first time the line was finished
+         if line._script_after and not line._script_after_executed then
+            line._script_after()
+
+            line._script_after_executed = true
+         end
+
+         line = line:next()
+      end
+   end
+
    local win_size = GLOBAL.drawing_target.size
 
    local width_offset, height_offset = win_size.x / 100, win_size.y / 100 * 2
@@ -350,18 +396,8 @@ function M.draw(dt)
    -- The total height of the text to compare it with the terminal rectangle
    local total_text_height = 0
 
-   local line = first_line_on_screen
-   while true do
-      if not line then
-         error(string.format("Line %s does not exist", line._name))
-      end
-
-      local should_wait = line:should_wait()
-      if should_wait then
-         line:tick_letter_timer(dt)
-         line:maybe_increment_letter_count()
-      end
-
+   -- Use the current lines and draw those
+   for _, line in pairs(M.current_lines_to_draw) do
       local text = line:current_text()
       if type(text) == "table" then
          -- It's more than one line
@@ -390,40 +426,21 @@ function M.draw(dt)
 
          GLOBAL.drawing_target:draw(text)
       end
+   end
 
-      --[[
-         If there are too many lines to fit into the screen rectangle,
-         remove the currently first line and put the next one it its place.
-         Since this happens every frame, it should work itself out even if there
-         are multiple lines to remove.
-      ]]
-      if total_text_height > rect_height - (height_offset * 2) then
-         local curr_first_line = first_line_on_screen
+   --[[
+      If there are too many lines to fit into the screen rectangle,
+      remove the currently first line and put the next one it its place.
+      Since this happens every frame, it should work itself out even if there
+      are multiple lines to remove.
+   ]]
+   if total_text_height > rect_height - (height_offset * 2) then
+      local curr_first_line = first_line_on_screen
 
-         local maybe_next = curr_first_line:next()
-         if maybe_next ~= nil then
-            first_line_on_screen = maybe_next
-         end
+      local maybe_next = curr_first_line:next()
+      if maybe_next ~= nil then
+         first_line_on_screen = maybe_next
       end
-
-      -- If there's a script and it wasn't executed yet, do it
-      if line._script and not line._script_executed then
-         line._script()
-
-         line._script_executed = true
-      end
-
-      if should_wait or line:next() == nil then
-         break
-      end
-
-      if line._script_after and not line._script_after_executed then
-         line._script_after()
-
-         line._script_after_executed = true
-      end
-
-      line = line:next()
    end
 
    -- Draw the environment image if there is one
@@ -468,6 +485,22 @@ function M.set_environment_image(name)
 
    current_environment_sprite.texture = current_environment_texture
 end
+
+function M.switch_to_walking()
+   -- Needs to be done as soon as possible to stop processing lines
+   M.active = false
+
+   -- Create a coroutine that blackens the screen with time
+   coroutines.create_coroutine(
+      coroutines.black_screen_out,
+      function()
+         GLOBAL.set_current_state(CurrentState.Walking)
+      end
+   )
+end
+
+-- Should the next line be shown
+M.active = true
 
 -- State variables for the story to set/get
 M.state_variables = {}
