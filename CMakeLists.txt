@@ -11,6 +11,7 @@ set(CMAKE_CXX_STANDARD 17)
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
   set(BUILD_SHARED_LIBS FALSE)
+  set(YAML_BUILD_SHARED_LIBS FALSE)
 endif()
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/deps/sfml")
