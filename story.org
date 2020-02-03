@@ -215,14 +215,14 @@
 
    <The <narrator> seems to have something that looks like cereal with milk in the bowl>
 
-   The liquid in the bowl is a juice of a plant that grows in a region far from here. The region and the plant were discovered in an expedition to a
+   The liquid in the bowl is a product of soaking and grinding a plant that grows in a region far from here. The region and the plant were discovered in an expedition to a
    place outside the known land of that time. When they were there, they discovered a different biome, a colder one. They told that it was a bit more
    chilly out there and that the plants and trees there were different. They took some samples back, then the local people discovered various
    applications for them. One of which was to use them as food, because of their taste. You see, we don't really need food to survive. We don't feel
    hunger. But we do feel the taste, and that is what food is used here for. To satisfy one's curiosity in new tastes and to feel good after an
-   interesting meal. Wanna check this juice out?
+   interesting meal. Wanna check it out?
 
-   <The narrator passes you a carton, presumably full of juice>
+   <The narrator passes you a carton>
 
    Yeah, i'm curious how it tastes now.
 
@@ -373,8 +373,22 @@
 
      Precicely so. The food there is made of things delivered there from different places. Since they don't have much of their own food growing, they
      have to import it from all the places around the world, while the rest of the world gets the "techonolgy" pieces from them, like computers and
-     phones. As a consequence, you can also get food from other parts of the world there for yourself if you go to the city. The juice you saw this
-     morning, for example, i got from my last trip to the city. I try all kinds of food there and those i like i take back with me to enjoy at home.
+     phones. As a consequence, you can also get food from other parts of the world there for yourself if you go to the city. The milk i had for
+     you saw this morning, for example, i got from my last trip to the city. I try all kinds of food there and those i like i take back with
+     me to enjoy at home.
+
+     Wait.. Just to be clear, do you mean the thing you had with dried leaves is called milk?
+
+     Yeah. That's what it's called.
+
+     Huh.. I wonder about the origins of that name.
+
+     No idea, really. I just used the name the people gave it, i weren't the one who made it up or anything.
+
+     I see.. i guess it's the only kind of milk you've ever seen so there's no need to add anything to it's name.
+
+     It's not really the ONLY one. There are kinds made from other things. It's just that since this one was discovered first, it got the name,
+     and only after that did people tried experimenting with other things. Not all of those experiments were that successful..
 
      # Set want to talk about plant based food AND want to talk about the computers UNLESS already talked about them
 *** Are we going to stay in the city for the night?
@@ -510,17 +524,9 @@
 
      Actually.. it kinda is.. huh
 
-     The one i have here is a mix of milk-juice and various syrops. It's not exactly a thing you'd get at the club, more like a coctail.
+     The one i have here is a mix of milk and various syrops. It's not exactly a thing you'd get at the club, more like a coctail. Wanna try it?
 
-     Wait, you're gonna straight up call it milk-juice?
-
-     Yeah. That's what it's called.
-
-     Huh.. I wonder about the origins of that name.
-
-     No idea, really. I just used the name the people gave it, i weren't the one who made it up or anything. Anyway.. wanna try it?
-
-     Alright.. here goes
+     Alright.. here goes.
 
      <You take a sip of the coctail. It is, indeed, a mixture of milk and various sweet syrops, although the which exact ones you can't quite figure
      out>
