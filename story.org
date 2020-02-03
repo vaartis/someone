@@ -352,12 +352,14 @@
 *** What's the city like in general?
      <p>: What's the city we're heading to like in general?
 
-     Uhm.. It's big! And it had a lot of people doing many things. A lot bigger than the village, you know.  The buildings there were also actually
-     placed in places specifically designated for them, unlike in our village, where things were just made up as the time progressed and then were
-     connected with a road. For the city, they've actually made a plan.. And uhm.. the building there are tall and they house many people on many
-     floors.  And since it's that big there are also means of easier transportation between the parts of the city. Although they wouldn't help us
-     since they require someone to operate them and I sure as hell have no idea how to do it. We can probably see some of them though, or at least i
-     hope we can.
+     Uhm.. It's big! And it had a lot of people doing many things. A lot bigger than the village, you know. The buildings there were also actually
+     built in places regions designated for them, unlike in our village, where things were just made up as the time progressed and then were connected
+     with a road. For the city, they actually planned areas for houses and for service and entertainment buildings, which where then built there
+     gradually as the amount of people and idea of what to build raised. In the housing areas, the houses were made with multiple floors and flats, to
+     allow more people to live in those houses; and in the center of the city there is a lot less of housing and a lot more of the fun stuff like
+     clubs, cafes, restaurants. Plus, since the city is so big there are also means of easier transportation between the parts of the city. Although
+     they wouldn't help us since they require someone to operate them and I sure as hell have no idea how to do it. We can probably see some of them
+     though, or at least i hope we can.
 
      Interesting.. so, it's big, that's not really new.. What about nighttime, how's it at night?
 
