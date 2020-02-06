@@ -5,32 +5,37 @@
 ** Prologue
    Hello? Can you hear me?
 
-   Who are you?
+   Uh.. Yes? I think.. Who are you and where am I?
 
-   I'm <narrator>, and i have the same question for you. You just appeared here. Can you at least remember your name?
+   I'm the <narrator>, and we're.. here, in this empty room.
 
-   No, i don't think i can actually.
+   <You are standing in an empty gray room, next to <narrator>>
 
-   How should i call you then?
-
-   I guess <P> would do for for now.
-
-   Very well, <P>. Since you're here, i could show you around..
-
-   <You are standing in an empty room with the <narrator>>
    <Environment: [[./resources/sprites/environments/gray_room.png]]>
 
-   However, there isn't anything to show now. There was more, but it's gone now. Maybe you could do something about that?
+   <p>: What is this..?
 
-   How would I do that?
+   The remains of the world that was, until all that was left was.. this single gray room. And who are you, anyway?
 
-   You're sitting in front of a computer screen, aren't you?
+   I.. don't know? I can't remember anything..
 
+   Well.. maybe you can remember your name, at least?
+
+   Not really.. i suppose <p> would be fine for now, until I figure things out.
+
+   Alright, <p> it is.
+
+   So.. where's the rest of the world?
+
+   I don't know. But you might be able to help me with that.
+
+   Me, how'd I do that?
+
+   You look awfully familliar, say, are you by any chance not actually standing here with me right now, but sitting
+   in front of a computer?
+
+   Now that you mention it.. Yeah, i do..
    <The background becomes a screen frame instead of just white>
-
-   Well, now that you mention it. Yeah, i do..
-
-   Maybe check your surroundings out? I'll still be here, of course. Not like i can go anywhere :)
 ** First time in the room :walking:
    There's a room where the player is in. The player is some ambigous figure in a hoodie.
 
@@ -39,9 +44,11 @@
 ** The walk through the forest to the village
    <Environment: [[./resources/sprites/environments/midnight_forest.png]]>
 
-   <You're no longer standing in the room, now around you is a midnight forest. You ask <narrator>, who is still standing near, what happened>
+   <You're no longer standing in the room, now around you is a midnight forest>
 
-   <narrator>: Well, you did something, and now there's the forest. That is what i was talking about when I told you that there was more. This forest is
+   <p> What.. what happened to the room?
+
+   <narrator>: Well, you did something, and now there's the forest. That is what i was talking about when I told you about the rest of the world. This forest is
    a fraction of it. This is where we all woke up.
 
    What do you mean "we all"? There are more people here?
@@ -58,14 +65,14 @@
    much sentient, like me and you, some were more animal-like, just following instincts. What seemed to connect them was that they all were just as
    confused.
 
-   So what happened? Where did everyone go?
+   And then.. could you elaborate on what happened? Where did everyone go?
 
    Something. I'm not sure what exactly happened, but it seemed like the world was being cut off piece by piece. One day, there appeared a wall at the
    edge of the forest. A wall that looked just like those in the room we were just in. Just a gray wall that seemed to extend in all directions. The
    next day the wall grew closer. People were scared. Long story short, eventually the whole world shrank to a single room. I don't know were the
    other people went, i haven't seen them in a while. I have no idea how much time i've been in that gray room, alone. But now you're here, and that
-   probably means something is happening. Now, let's go for a walk at least, shall we? I've been on this same spot for so long it feels like forever.
-   I'd like to at least take a stroll through the forest while we can.
+   probably means something is happening..  Now, could we go for a walk at least? I've been on this same spot for so long it feels like forever. I'd
+   like to at least take a stroll through the forest while we can.
 
    Sure, there's no point in staying here anyway.
 
