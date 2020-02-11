@@ -13,7 +13,7 @@
 
    <Environment: [[./resources/sprites/environments/gray_room.png]]>
 
-   <p>: What is this..?
+   <p>: What is this place..?
 
    The remnants of the world that was, but all that's left of it now is this single room. And who are you, anyway?
 
@@ -59,7 +59,7 @@
 
    "We all"? So there are more people here?
 
-   There were. But I'm not sure there's anyone else besides us right now. Well, at least I'm not alone anymore :)
+   There were. But I'm not sure there's anyone else besides us right now. Well, at least I'm not alone anymore..
 
    Oh.. and what did you mean by "woke up"?
 
@@ -74,12 +74,12 @@
    Something. I'm not sure what exactly, but it seemed like the world was being cut off piece by piece. One day, walls appeared on the far parts of
    the world, just like you saw before. They seemed to extend in all direcitons. The next day the walls grew closer. People were scared. Long story
    short, eventually the whole world shrank to a single room. Don't know were the other people are now, haven't seen them in a while. I have no idea
-   how much time I've spent alone in that gray room. But now you're here, and that probably means something is happening.. Now, could we go for a
-   walk? I've been on this same spot for so long it feels like forever. I'd like to at least take a stroll through the forest while we can.
+   how much time I've spent alone in that gray room. But now you're here, and that probably means something is happening.. Now, would you mind if we
+   go for a walk? I've been on this same spot for so long it feels like forever. I'd like to at least take a stroll through the forest while we can.
 
    Sure, no point in staying here..
 
-   <You walk through the forest. It's not very thick, but there is still plenty of plants and trees.>
+   <You are now walking through the forest. It's not very thick, but there is still plenty of plants and trees.>
 
    <p>: So.. what was life like here? Until everything diasppeared..
 
@@ -103,14 +103,15 @@
    lost. They built the next library building out of stone.
 
    Oh.. So many books gone.. I guess the people learned their lesson about building from wood, though.. But still it really would have been great if
-   it wasn't the library that burnt down.
+   it wasn't the library that burnt down. At least nobody got hurt I hope.
 
-   Indeed. Fast forward some time, and the village wasn't the only place where people lived now, there also was a city, and it was big, with asphalt
-   roads and tall buildings. People would organize and come up with all kinds of things to work on. Now they were trying to understand and research
-   the world around. Trying to find out how things work. Eventually, a person showed up. They didn't name themselves, but claimed to be the one who
-   gave this world life, the creator. They moved unnaturally, as if controlled by strings. They told the researchers about the world, about how that
-   person watched them grow and that now they had come to interact with them personally. A bit after that, the "creator" disappeared, and then the
-   thing happened, the world was vanishing. Everything ceased to be. Except me. I was still here, for some reason.
+   Indeed a tragedy, but yes, nobody got hurt, so that's something good at least. Fast forward some time, and the village wasn't the only place where
+   people lived now, there also was a city, and it was big, with asphalt roads and tall buildings. People would organize and come up with all kinds of
+   things to work on. Now they were trying to understand and research the world around. Trying to find out how things work. Eventually, a person
+   showed up. They didn't name themselves, but claimed to be the one who gave this world life, the creator. They moved unnaturally, as if controlled
+   by strings. They told the researchers about the world, about how that person watched them grow and that now they had come to interact with them
+   personally. A bit after that, the "creator" disappeared, and then the thing happened, the world was vanishing. Everything ceased to be. Except
+   me. I was still here, for some reason.
 
    That is one crazy story.. but, really, I have no choice except to belive it. I have no idea what I am doing here exactly, so thank you for clearing
    a few things about this world up a bit, you really know a lot about it. Oh and by the way.. when you asked me if i'm sitting in front of a computer
@@ -159,8 +160,6 @@
                  decide to check if the sink works, and sure enough it does. At first the water is very cold, but you figure out turning the knob
                  on the faucet makes it warm or even hot. You wash your hands using the soap bar.
    - Go the bed (=>)
-
-   You go to the bedroom, it's not too big, there are two cupboards on both sides of the bed.
 
    - IF explored at least one room :: The <narrator> is already asleep. You say "good night" to yourself, although you're not sure what will happen
         when you "fall asleep".

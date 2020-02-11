@@ -16,70 +16,87 @@ config:
   char: player
   responses:
   - text: >-
-      Who are you?
+      Uh.. Yes? I think.. Who are you and where am I?
 
 3:
   char: narrator
   text: >-
-    I'm <narrator>, and i have the same question for you. You just appeared here. Can you at least remember your name?
+    I'm the <narrator>, and we're.. here, in this empty room.
 
 4:
-  char: player
-  responses:
-  - text: >-
-      No, i don't think i can actually.
-
-5:
-  char: narrator
-  text: >-
-    How should i call you then?
-
-6:
-  char: player
-  responses:
-  - text: >-
-      I guess <P> would do for for now.
-
-7:
-  char: narrator
-  text: >-
-    Very well, <P>. Since you're here, i could show you around..
-
-8:
   char: description
   wait: true
   script: TerminalModule.set_environment_image('gray_room')
   text: >-
-    You are standing in an empty room with the <narrator>.
+    You are standing in an empty gray room, next to <narrator>.
+
+5:
+  char: player
+  responses:
+  - text: >-
+      What is this place..?
+
+6:
+  char: narrator
+  text: >-
+    The remnants of the world that was, but all that's left of it now is this single room. And who are you, anyway?
+
+7:
+  char: player
+  responses:
+  - text: >-
+      I.. don't know? I can't remember anything..
+
+8:
+  char: narrator
+  text: >-
+    Well.. maybe you can remember your name, at least?
+
 
 9:
-  char: narrator
-  text: >-
-    However, there isn't anything to show now. There was more, but it's gone now. Maybe you could do something about that?
+  char: player
+  responses:
+  - text: >-
+      Not really.. i suppose <p> would be fine for now, until I figure things out.
 
 10:
-  char: player
-  responses:
-  - text: >-
-      How would I do that?
+  char: narrator
+  text: >-
+    Alright, <p>.
 
 11:
-  char: narrator
-  text: >-
-    You're sitting in front of a computer screen, aren't you?
-
-  # <The background becomes a screen frame instead of just white>
-
-12:
   char: player
   responses:
   - text: >-
-      Well, now that you mention it. Yeah, i do..
+      So.. where's the rest of the world?
+
+12:
+  char: narrator
+  text: >-
+    I don't know. But you might be able to help me with that.
 
 13:
+  char: player
+  responses:
+  - text: >-
+      Me? How'd I do that?
+
+14:
+  char: narrator
+  text: >-
+    You look awfully familliar, say, are you by any chance not actually standing here with me right now, but sitting
+    in front of a computer?
+
+15:
+  char: player
+  responses:
+  - text: >-
+      Now that you mention it.. Yeah, i do..
+
+16:
   char: narrator
   wait: true
-  text: >-
-    Maybe check your surroundings out? I'll still be here, of course. Not like i can go anywhere :)
   script_after: TerminalModule.switch_to_walking()
   next: day1/forest_and_village/1
+  text: >-
+    Try checking out your surroundings, maybe there's something obvious you can try?

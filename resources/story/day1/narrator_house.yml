@@ -1,0 +1,149 @@
+config:
+  chars:
+    narrator:
+      color: [211, 0, 0]
+    player:
+      color: [255, 255, 255]
+    description:
+      color: [127, 0, 255]
+
+1:
+  char: description
+  wait: true
+  text: >-
+    The <narrator> finds the light switch on the left and turns the lights on.
+
+2:
+  char: narrator
+  text: >-
+    Surprisingly, the light still works. And don't ask how we got electricity here, I don't quite understand it myself.
+
+3:
+  char: player
+  responses:
+  - text: >-
+      Yeah, alright, Maybe I'll ask someone else, provided there's gonna be someone else.
+
+4:
+  char: narrator
+  text: >-
+    I knew some people who could explain it, but I don't know if we'll ever be able to see them, or anyone, really. Anyway, I'm really tired from
+    all this walking, spending your time in an empty room for so long doesn't motivate to move much. So.. there's only one bed and we'll have to
+    share it, since I never bothered with a second one, nobody stayed for the night here, probably because everyone lived so close together. You can
+    check out the rest of the house if you want, since you'll probably be spending some time here.
+  next: explore-the
+
+explore-the:
+  char: description
+  # Set up the hub variable if they haven't been set up yet
+  script: >-
+    if not TerminalModule.state_variables.narrator_house then
+       TerminalModule.state_variables.narrator_house = {
+         hub = {
+            living_room = false,
+            kitchen = false,
+            bathroom = false
+         }
+        }
+    end
+  text: >-
+    Explore the...
+  next: hub
+
+hub:
+  char: player
+  responses:
+  - text: Living room
+    condition: return not TerminalModule.state_variables.narrator_house.hub.living_room
+    next: living-room
+  - text: Kitchen
+    condition: return not TerminalModule.state_variables.narrator_house.hub.kitchen
+    next: kitchen
+  - text: Bathroom
+    condition: return not TerminalModule.state_variables.narrator_house.hub.bathroom
+    next: bathroom
+  - text: Go to bed
+    condition: >-
+      -- Go to bed when at least one room has been explored
+      local lume = require("lume")
+      return lume.any(TerminalModule.state_variables.narrator_house.hub)
+    next: bed-after-explored
+  - text: Go to bed
+    condition: >-
+      -- Go to bed when when no rooms were explored
+      local lume = require("lume")
+      return not lume.any(TerminalModule.state_variables.narrator_house.hub)
+    next: bed-if-not-explored
+
+living-room:
+  char: description
+  wait: true
+  script: >-
+    TerminalModule.state_variables.narrator_house.hub.living_room = true
+  # TODO: talking topic about computers here
+  text: >-
+    You go to the living room. It's decently sized and has a sofa in it. On the opposite side of the room there are several
+    bookshelves packed with various books, from titles you can guess some of them are probably scientific or philosophical. There's
+    also something what seems to be a computer on the table nearby, but you decide not to touch it for now. The window in the room
+    faces the other house nearby. Not much else in this room.
+  next: explore-the
+
+kitchen:
+  char: description
+  wait: true
+  script: >-
+    TerminalModule.state_variables.narrator_house.hub.kitchen = true
+  # TODO: talking topic about food here
+  text: >-
+    The kitchen is not very big, there are a few cupboards that have dishes in them, others have some of the plants you've seen earlier, but
+    dried. Most of the food on the kitchen seems to be plant-based, except in the fridge there's something that looks like milk, but you
+    decide not to touch it, since it's not your house. Maybe you could inquire the <narrator> about the food here later. Other
+    than all the storage places on the kitchen, there's a table with a few chairs and a window that faces the forest you just came from.
+  next: explore-the
+
+bathroom:
+  char: description
+  wait: true
+  script: >-
+    TerminalModule.state_variables.narrator_house.hub.bathroom = true
+  text: >-
+    On the left, there's a moderately sized bathtub, near which there's a small shelf with some kind of soap and a sponge. On the right,
+    there's a a small sink, with its own bar of soap. There's also a very small window near the ceiling, you can only see the dark sky
+    through it. Unlike in the room you just came from, the bathroom floor and walls are made of stone-looking tiles, not wood. You
+    decide to check if the sink works, and sure enough it does. At first the water is very cold, but you figure out turning the knob
+    on the faucet makes it warm or even hot. You wash your hands using the soap bar.
+  next: explore-the
+
+bed-after-explored:
+  char: description
+  wait: true
+  text: >-
+    The <narrator> is already asleep. You say "good night" to yourself, although you're not sure what will happen
+    when you "fall asleep".
+  next: ""
+
+bed-if-not-explored:
+  char: narrator
+  text: >-
+    Straight to bed, huh?
+  next: bed-if-not-explored-2
+
+bed-if-not-explored-2:
+  char: player
+  responses:
+  - text: >-
+      Yeah. I'm not sure what will happen when I fall asleep, since I'm not exactly here like you are, but we'll see.
+    next: bed-if-not-explored-3
+
+bed-if-not-explored-3:
+  char: narrator
+  text: >-
+    Oh well. Goodnight, then.
+  next: bed-if-not-explored-4
+
+bed-if-not-explored-4:
+  char: player
+  responses:
+  - text: >-
+      You too.
+    next: ""
