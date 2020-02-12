@@ -1,0 +1,22 @@
+# Background
+
+[entities.background.drawable_sprite]
+texture = "resources/sprites/room/room.png"
+z = 0
+
+# Button
+
+[entities.button.drawable_sprite]
+texture = "resources/sprites/room/button/button.png"
+z = 1
+position = [1020, 672]
+
+[entities.button.animation]
+sheet = "resources/sprites/room/button/"
+playing = false
+playable = false
+
+[entities.button.button]
+initial_state = "disabled"
+state_map = { disabled = 1, enabled = 2 }
+callback_name = "switch_to_terminal"

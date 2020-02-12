@@ -3,6 +3,7 @@ local lume = require("lume")
 local path = require("path")
 local json = require("lunajson")
 local inspect = require("inspect")
+local toml = require("toml")
 
 local shared_components = require("components.shared")
 local player_components = require("components.player")
@@ -45,9 +46,6 @@ local engine = Engine()
 native_event_manager:addListener("NativeEvent", event_store, event_store.add_event)
 
 
-local player = Entity()
-
-
 -- Loads the spritesheet frames from the spritesheet directory
 function load_sheet_frames(dir_path)
    local dir_basename = path.basename(path.remove_dir_end(dir_path))
@@ -79,17 +77,6 @@ end
 
 local player = player_components.create_player_entity()
 engine:addEntity(player)
-
-local room_texture = Texture.new()
-room_texture:load_from_file("resources/sprites/room/room.png")
-
-local room_sprite = Sprite.new()
-room_sprite.texture = room_texture
-
-local room = Entity()
-room:add(shared_components.DrawableSpriteComponent(room_sprite, room_texture, 0))
-
-engine:addEntity(room)
 
 --[[
    A component holding button interaction logic.
@@ -149,45 +136,79 @@ function ButtonInteractionSystem:update(dt)
    end
 end
 
---function
+local button_callbacks = {
+   switch_to_terminal = function(curr_state)
+      M.state_variables["first_button_pressed"] = true
 
-local button_texture = Texture.new();
-button_texture:load_from_file("resources/sprites/room/button/button.png")
-local button_sprite = Sprite.new()
-button_sprite.texture = button_texture
-button_sprite.position = Vector2f.new(1020, 672)
-local button_frames = shared_components.load_sheet_frames("resources/sprites/room/button/")
+      local player = lume.first(engine:getEntitiesWithComponent("PlayerMovement"))
+      player:get("PlayerMovement").active = false
 
-local button_entity = Entity()
-button_entity:add(
-   ButtonComponent(
-      "disabled",
-      function (curr_state)
-         M.state_variables["first_button_pressed"] = true
+      coroutines.create_coroutine(
+         coroutines.black_screen_out,
+         function()
+            GLOBAL.set_current_state(CurrentState.Terminal)
+            terminal.active = true
+         end
+      )
 
-         local player = lume.first(engine:getEntitiesWithComponent("PlayerMovement"))
-         player:get("PlayerMovement").active = false
+      return "enabled"
+   end
+}
 
-         coroutines.create_coroutine(
-            coroutines.black_screen_out,
-            function()
-               GLOBAL.set_current_state(CurrentState.Terminal)
-               terminal.active = true
-            end
+local room_toml_file = io.open("resources/rooms/computer_room.toml", "r")
+local room_toml = toml.parse(room_toml_file:read("*all"))
+room_toml_file:close()
+
+for entity_name, entity in pairs(room_toml.entities) do
+   local new_ent = Entity()
+
+   for comp_name, comp in pairs(entity) do
+      if comp_name == "drawable_sprite" then
+         local texture = Texture.new()
+         texture:load_from_file(comp.texture)
+
+         local sprite = Sprite.new()
+         sprite.texture = texture
+
+         if not comp.z then
+            error(lume.format("{1}.{2} requires a {3} value", {entity_name, comp_name, "z"}))
+         end
+
+         if comp.position then
+            sprite.position = Vector2f.new(comp.position[1], comp.position[2])
+         end
+
+         new_ent:add(shared_components.DrawableSpriteComponent(sprite, texture, comp.z))
+         new_ent:add(shared_components.TransformableComponent(sprite))
+      elseif comp_name == "animation" then
+         local sheet_frames = shared_components.load_sheet_frames(comp.sheet)
+
+         local anim = shared_components.AnimationComponent(sheet_frames)
+         if type(comp.playable) == "boolean" then
+            anim.playable = comp.playable
+         end
+         if type(comp.playing) == "boolean" then
+            anim.playing = comp.playing
+         end
+
+         new_ent:add(anim)
+      elseif comp_name == "button" then
+         if not button_callbacks[comp.callback_name] then
+            error(lume.format("{1}.{2} requires a {3} button callback that doesn't exist", {entity_name, comp_name, comp.callback_name}))
+         end
+
+         new_ent:add(
+            ButtonComponent(
+               comp.initial_state,
+               button_callbacks[comp.callback_name],
+               comp.state_map
+            )
          )
+      end
+   end
 
-         return "enabled"
-      end,
-      { disabled = 1, enabled = 2 }
-   )
-)
-button_entity:add(shared_components.TransformableComponent(button_sprite))
-button_entity:add(shared_components.DrawableSpriteComponent(button_sprite, button_texture, 1))
-
-local button_anim_comp = shared_components.AnimationComponent(button_frames)
-button_anim_comp.playable = false
-button_entity:add(button_anim_comp)
-engine:addEntity(button_entity)
+   engine:addEntity(new_ent)
+end
 
 engine:addSystem(shared_components.RenderSystem())
 engine:addSystem(shared_components.AnimationSystem())

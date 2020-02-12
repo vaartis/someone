@@ -7,7 +7,8 @@ dependencies = {
    "inspect==3.1.1",
    "lume==2.3.0",
    "lua-path==0.3.1",
-   "lunajson==1.2.2"
+   "lunajson==1.2.2",
+   "lua-toml==2.0"
 }
 
 source = {
