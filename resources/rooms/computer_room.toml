@@ -1,13 +1,21 @@
+[assets.sprites]
+computer_room = "resources/sprites/room/room.png"
+button = "resources/sprites/room/button/button.png"
+mainchar = "resources/sprites/mainchar/mainchar.png"
+
+[assets.sounds]
+footstep = "resources/sounds/footstep.ogg"
+
 # Background
 
 [entities.background.drawable_sprite]
-texture = "resources/sprites/room/room.png"
+sprite_asset = "computer_room"
 z = 0
 
 # Button
 
 [entities.button.drawable_sprite]
-texture = "resources/sprites/room/button/button.png"
+sprite_asset = "button"
 z = 1
 position = [1020, 672]
 
@@ -20,3 +28,17 @@ playable = false
 initial_state = "disabled"
 state_map = { disabled = 1, enabled = 2 }
 callback_name = "switch_to_terminal"
+
+# Player
+
+[entities.player.drawable_sprite]
+sprite_asset = "mainchar"
+z = 2
+position = [420, 820]
+origin = [44, 176]
+
+[entities.player.animation]
+sheet = "resources/sprites/mainchar/"
+
+[entities.player.player_movement]
+footstep_sound_asset = "footstep"

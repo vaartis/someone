@@ -5,6 +5,7 @@ local json = require("lunajson")
 local inspect = require("inspect")
 local toml = require("toml")
 
+local assets = require("components.assets")
 local shared_components = require("components.shared")
 local player_components = require("components.player")
 local coroutines = require("coroutines")
@@ -74,10 +75,6 @@ function load_sheet_frames(dir_path)
    return animation_frames
 end
 
-
-local player = player_components.create_player_entity()
-engine:addEntity(player)
-
 --[[
    A component holding button interaction logic.
    state_map: a mapping from the state name to the animation frame
@@ -98,8 +95,9 @@ function ButtonInteractionSystem:requires()
 end
 
 function ButtonInteractionSystem:update(dt)
-   local player = lume.first(self.targets.player)
-   if not player then error("No player entity found") end
+   local player_key = lume.first(lume.keys(self.targets.player))
+   if not player_key then error("No player entity found") end
+   local player = self.targets.player[player_key]
 
    local player_sprite = player:get("DrawableSprite").sprite
 
@@ -159,26 +157,46 @@ local room_toml_file = io.open("resources/rooms/computer_room.toml", "r")
 local room_toml = toml.parse(room_toml_file:read("*all"))
 room_toml_file:close()
 
+local r_assets = room_toml.assets
+if r_assets then
+   local r_sprites = r_assets.sprites
+   if r_sprites then
+      for name, path in pairs(r_sprites) do
+         assets.add_sprite(name, path)
+      end
+   end
+
+   local r_sounds = r_assets.sounds
+   if r_sounds then
+      for name, path in pairs(r_sounds) do
+         assets.add_sound(name, path)
+      end
+   end
+end
+
 for entity_name, entity in pairs(room_toml.entities) do
    local new_ent = Entity()
 
    for comp_name, comp in pairs(entity) do
       if comp_name == "drawable_sprite" then
-         local texture = Texture.new()
-         texture:load_from_file(comp.texture)
-
-         local sprite = Sprite.new()
-         sprite.texture = texture
+         local sprite_asset = assets.assets.sprites[comp.sprite_asset]
+         if not sprite_asset then
+            error(lume.format("{1}.{2} requires a sprite named {3}", {entity_name, comp_name, comp.sprite_asset}))
+         end
 
          if not comp.z then
             error(lume.format("{1}.{2} requires a {3} value", {entity_name, comp_name, "z"}))
          end
 
+         local sprite = sprite_asset.sprite
          if comp.position then
             sprite.position = Vector2f.new(comp.position[1], comp.position[2])
          end
+         if comp.origin then
+            sprite.origin = Vector2f.new(comp.origin[1], comp.origin[2])
+         end
 
-         new_ent:add(shared_components.DrawableSpriteComponent(sprite, texture, comp.z))
+         new_ent:add(shared_components.DrawableSpriteComponent(sprite, comp.z))
          new_ent:add(shared_components.TransformableComponent(sprite))
       elseif comp_name == "animation" then
          local sheet_frames = shared_components.load_sheet_frames(comp.sheet)
@@ -204,6 +222,16 @@ for entity_name, entity in pairs(room_toml.entities) do
                comp.state_map
             )
          )
+      else
+         local component_processors = {
+            player_components.process_components
+         }
+
+         for _, processor in pairs(component_processors) do
+            if processor(new_ent, comp_name, comp) then
+               break
+            end
+         end
       end
    end
 

@@ -10,7 +10,7 @@ lovetoys.initialize({
 
 local M = {}
 
-M.DrawableSpriteComponent = Component.create("DrawableSprite", {"sprite", "texture", "z"})
+M.DrawableSpriteComponent = Component.create("DrawableSprite", {"sprite", "z"})
 
 M.RenderSystem = class("RenderSystem", System)
 
