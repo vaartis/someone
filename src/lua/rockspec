@@ -8,7 +8,8 @@ dependencies = {
    "lume==2.3.0",
    "lua-path==0.3.1",
    "lunajson==1.2.2",
-   "lua-toml==2.0"
+   "lua-toml==2.0",
+   "moonscript==0.5.0"
 }
 
 source = {
@@ -16,13 +17,16 @@ source = {
 }
 
 build = {
-    type = "builtin",
-    modules = {
-       ["components.shared"] = "components/shared.lua",
-       ["components.player"] = "components/player.lua",
-       ["components.assets"] = "components/assets.lua",
-       terminal = "terminal.lua",
-       walking = "walking.lua",
-       coroutines = "coroutines.lua"
-    }
+   type = "builtin",
+   modules = {},
+   install = {
+      lua = {
+         ["components.shared"] = "components/shared.moon",
+         ["components.player"] = "components/player.moon",
+         ["components.assets"] = "components/assets.moon",
+         terminal = "terminal.lua",
+         walking = "walking.lua",
+         coroutines = "coroutines.moon"
+      }
+   }
 }

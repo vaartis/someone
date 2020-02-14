@@ -60,6 +60,7 @@ int main() {
 
     register_usertypes(lua);
 
+    lua.script("require('moonscript')");
     CoroutinesEnv coroutines_env(lua);
     TerminalEnv terminal_env(lua);
     WalkingEnv walking_env(lua);

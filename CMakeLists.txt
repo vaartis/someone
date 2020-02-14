@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
-set(CMAKE_CXX_COMPILER clang)
+set(CMAKE_C_COMPILER clang)
 set(CMAKE_CXX_COMPILER clang++)
 
 project(vacances CXX)
@@ -56,7 +56,7 @@ add_custom_target(copy-luarocks-before-build DEPENDS "${PROJECT_BINARY_DIR}/deps
 add_custom_command(
   OUTPUT "${PROJECT_BINARY_DIR}/deps/luarocks/luarocks"
   DEPENDS lua copy-luarocks-before-build
-  COMMAND ./configure --with-lua-bin=${PROJECT_BINARY_DIR}/deps/lua --with-lua-include=${PROJECT_BINARY_DIR}/deps/lua && make
+  COMMAND ./configure --with-lua-bin=${PROJECT_BINARY_DIR}/deps/lua/ --with-lua-include=${PROJECT_BINARY_DIR}/deps/lua/ --with-lua-lib=${PROJECT_BINARY_DIR}/deps/lua/ && PATH=${PROJECT_BINARY_DIR}/deps/lua:$ENV{PATH} make
   WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/deps/luarocks/"
 )
 add_custom_target(luarocks DEPENDS "${PROJECT_BINARY_DIR}/deps/luarocks/luarocks")
@@ -99,6 +99,7 @@ set(vacances_src
 add_executable(vacances ${vacances_src})
 
 add_dependencies(vacances luarocks-build lovetoys-build)
+target_link_options(vacances PRIVATE -Wl,--export-dynamic)
 target_link_libraries(vacances sfml-graphics sfml-audio fmt yaml-cpp spdlog sol2 ${LUA_LIBRARIES})
 target_include_directories(vacances PRIVATE "src" ${LUA_INCLUDE_DIR})
 
