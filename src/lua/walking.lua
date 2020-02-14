@@ -138,7 +138,11 @@ local button_callbacks = {
    switch_to_terminal = function(curr_state)
       M.state_variables["first_button_pressed"] = true
 
-      local player = lume.first(engine:getEntitiesWithComponent("PlayerMovement"))
+      local pents = engine:getEntitiesWithComponent("PlayerMovement")
+      local player_key = lume.first(lume.keys(pents))
+      if not player_key then error("No player entity found") end
+      local player = pents[player_key]
+
       player:get("PlayerMovement").active = false
 
       coroutines.create_coroutine(
