@@ -46,35 +46,6 @@ local engine = Engine()
 
 native_event_manager:addListener("NativeEvent", event_store, event_store.add_event)
 
-
--- Loads the spritesheet frames from the spritesheet directory
-function load_sheet_frames(dir_path)
-   local dir_basename = path.basename(path.remove_dir_end(dir_path))
-   local json_path = path.join(dir_path, dir_basename) .. ".json"
-
-   local sprite_json_file = io.open(json_path, "r")
-   local sprite_json = json.decode(sprite_json_file:read("*all"))
-   sprite_json_file:close()
-
-   local animation_frames = {}
-   for fname, frame in pairs(sprite_json["frames"]) do
-      local frame_f = frame["frame"]
-
-      -- Extract the frame number from the name
-      frame_num = tonumber(fname)
-
-      animation_frames[frame_num] = {
-         -- Translate duration to seconds
-         duration = frame["duration"] / 1000,
-         rect = IntRect.new(
-            frame_f["x"], frame_f["y"], frame_f["w"], frame_f["h"]
-         )
-      }
-   end
-
-   return animation_frames
-end
-
 --[[
    A component holding button interaction logic.
    state_map: a mapping from the state name to the animation frame
