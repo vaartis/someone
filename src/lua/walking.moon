@@ -46,7 +46,7 @@ ButtonComponent = Component.create(
 
 ButtonInteractionSystem = _G.class("ButtonInteractionSystem", System)
 ButtonInteractionSystem.requires = () => {
-  buttons: {"Button", "Transformable", "DrawableSprite", "Animation"},
+  buttons: {"Button", "Transformable", "DrawableSprite"},
   -- The PlayerMovement component only exists on the player
   player: {"PlayerMovement", "Transformable"}
 }
@@ -81,29 +81,40 @@ ButtonInteractionSystem.update = (dt) =>
 
               button_press_sound\play()
 
-    -- Update the current texture frame
-    anim = button\get("Animation")
-    anim.current_frame = button_comp.state_map[button_comp.current_state]
+    if button_comp.state_map
+      -- Update the current texture frame
+      anim = button\get("Animation")
+      anim.current_frame = button_comp.state_map[button_comp.current_state]
 
 button_callbacks = {
-   switch_to_terminal: (curr_state) ->
-      state_variables["first_button_pressed"] = true
+   computer_switch_to_terminal: (curr_state) ->
+    print(state_variables.first_button_pressed)
+    unless state_variables.first_button_pressed
+      return "disabled"
 
-      pents = engine\getEntitiesWithComponent("PlayerMovement")
-      player_key = lume.first(lume.keys(pents))
-      if not player_key then error("No player entity found")
-      player = pents[player_key]
+    pents = engine\getEntitiesWithComponent("PlayerMovement")
+    player_key = lume.first(lume.keys(pents))
+    if not player_key then error("No player entity found")
+    player = pents[player_key]
 
-      player\get("PlayerMovement").active = false
+    player\get("PlayerMovement").active = false
 
-      coroutines.create_coroutine(
-         coroutines.black_screen_out,
-          () ->
-            GLOBAL.set_current_state(CurrentState.Terminal)
-            terminal.active = true
-      )
+    coroutines.create_coroutine(
+      coroutines.black_screen_out,
+        () ->
+          GLOBAL.set_current_state(CurrentState.Terminal)
+          terminal.active = true
+    )
 
-      "enabled"
+    "enabled"
+
+  activate_computer: (curr_state) ->
+    if curr_state == "enabled"
+      return curr_state
+
+    state_variables.first_button_pressed = true
+
+    "enabled"
 }
 
 local room_toml

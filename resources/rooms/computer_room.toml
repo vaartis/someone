@@ -1,5 +1,6 @@
 [assets.sprites]
 computer_room = "resources/sprites/room/room.png"
+table = "resources/sprites/room/table/table.png"
 button = "resources/sprites/room/button/button.png"
 mainchar = "resources/sprites/mainchar/mainchar.png"
 
@@ -11,6 +12,15 @@ footstep = "resources/sounds/footstep.ogg"
 [entities.background.drawable_sprite]
 sprite_asset = "computer_room"
 z = 0
+
+[entities.table.drawable_sprite]
+sprite_asset = "table"
+z = 1
+position = [97, 706]
+
+[entities.table.button]
+initial_state = "disabled"
+callback_name = "computer_switch_to_terminal"
 
 # Button
 
@@ -27,7 +37,7 @@ playable = false
 [entities.button.button]
 initial_state = "disabled"
 state_map = { disabled = 1, enabled = 2 }
-callback_name = "switch_to_terminal"
+callback_name = "activate_computer"
 
 # Player
 
