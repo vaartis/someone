@@ -117,26 +117,52 @@ button_callbacks = {
     "enabled"
 }
 
+load_assets = (l_assets) ->
+    l_sprites = l_assets.sprites
+    if l_sprites
+      for name, path in pairs l_sprites
+        assets.add_sprite(name, path)
+
+    l_sounds = l_assets.sounds
+    if l_sounds then
+      for name, path in pairs l_sounds
+        assets.add_sound(name, path)
+
 local room_toml
 with io.open("resources/rooms/computer_room.toml", "r")
   room_toml = toml.parse(\read("*all"))
   \close()
 
+deep_merge = (t1, t2) ->
+  result = {}
+  for k, v in pairs t1
+    result[k] = v
+
+  for k, _ in pairs t2
+    if type(t1[k]) == "table" and type(t2[k]) == "table"
+      result[k] = deep_merge(t1[k], t2[k])
+    else
+      result[k] = t2[k] or t1[k]
+
+  result
+
 -- Load assets
 r_assets = room_toml.assets
 if r_assets
-  r_sprites = r_assets.sprites
-  if r_sprites
-    for name, path in pairs r_sprites
-      assets.add_sprite(name, path)
-
-  r_sounds = r_assets.sounds
-  if r_sounds then
-    for name, path in pairs r_sounds
-      assets.add_sound(name, path)
+  load_assets(r_assets)
 
 for entity_name, entity in pairs room_toml.entities
   new_ent = Entity()
+
+  if entity.prefab then
+    local prefab_data
+    with io.open("resources/rooms/prefabs/#{entity.prefab}.toml", "r")
+      prefab_data = toml.parse(\read("*all"))
+      \close()
+    -- Load the assets of the prefab and remove them from the data
+    load_assets(prefab_data.assets)
+    prefab_data.assets = nil
+    entity = deep_merge(prefab_data, entity)
 
   for comp_name, comp in pairs entity
     switch comp_name
