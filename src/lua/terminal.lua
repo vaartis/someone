@@ -203,12 +203,12 @@ function VariantInputLine:current_text()
    -- If the line is the current line, allow updating the visible variants for it
    if self:should_wait() then
       local visible_vars = {}
-      for _, var in pairs(self._variants) do
+      for n, var in pairs(self._variants) do
          -- If there's a condition, try checking it
          if var.condition then
             local condition_result = var.condition()
             if type(condition_result) ~= "boolean" then
-               error(lume.format("A condition in {1} doesn't return a boolean", {self._name}))
+               error(lume.format("The condition '{2}' (number {3}) in {1} doesn't return a boolean", {self._name, var.text, n}))
             end
 
             -- If the condition is successfull, continue with execution and add the line to the result
