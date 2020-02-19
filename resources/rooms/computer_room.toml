@@ -3,6 +3,9 @@ computer_room = "resources/sprites/room/room.png"
 table = "resources/sprites/room/table/table.png"
 button = "resources/sprites/room/button/button.png"
 
+[assets.sounds]
+button_press = "resources/sounds/button_press.ogg"
+
 # Background
 
 [entities.background.drawable_sprite]
@@ -34,6 +37,7 @@ playable = false
 initial_state = "disabled"
 state_map = { disabled = 1, enabled = 2 }
 callback_name = "activate_computer"
+interaction_sound_asset = "button_press"
 
 # Player
 

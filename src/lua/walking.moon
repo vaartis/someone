@@ -36,59 +36,52 @@ engine = Engine()
 
 native_event_manager\addListener("NativeEvent", event_store, event_store.add_event)
 
--- A component holding button interaction logic.
--- state_map: a mapping from the state name to the animation frame
--- change_state: a function that is provided with the current state and needs to return the new state
-ButtonComponent = Component.create(
-   "Button",
-   {"current_state", "change_state", "state_map"}
+InteractionComponent = Component.create(
+   "Interaction",
+   {"on_interaction", "current_state", "state_map", "interaction_sound"}
 )
 
-ButtonInteractionSystem = _G.class("ButtonInteractionSystem", System)
-ButtonInteractionSystem.requires = () => {
-  buttons: {"Button", "Transformable", "DrawableSprite"},
+InteractionSystem = _G.class("InteractionSystem", System)
+InteractionSystem.requires = () => {
+  objects: {"Interaction", "Transformable", "DrawableSprite"},
   -- The PlayerMovement component only exists on the player
   player: {"PlayerMovement", "Transformable"}
 }
-ButtonInteractionSystem.update = (dt) =>
+InteractionSystem.update = (dt) =>
   player_key = lume.first(lume.keys(@targets.player))
   if not player_key then error("No player entity found")
   player = @targets.player[player_key]
 
   player_sprite = player\get("DrawableSprite").sprite
 
-  for _, button in pairs @targets.buttons
-    local button_pos, button_comp, button_sprite
-    with button
-      button_pos = \get("Transformable").position
-      button_comp = \get("Button")
-      button_sprite = \get("DrawableSprite").sprite
+  for _, obj in pairs @targets.objects
+    local obj_pos, obj_sprite, interaction_comp
+    with obj
+      obj_pos = \get("Transformable").position
+      obj_sprite = \get("DrawableSprite").sprite
+      interaction_comp = \get("Interaction")
 
-    if player_sprite.global_bounds\intersects(button_sprite.global_bounds) then
+    if player_sprite.global_bounds\intersects(obj_sprite.global_bounds) then
       for _, native_event in pairs event_store.events
         event = native_event.event
         if event.type == EventType.KeyReleased and event.key.code == KeyboardKey.E then
-          old_state = button_comp.current_state
-          -- Update the state using the function provided by the component
-          button_comp.current_state = button_comp.change_state(button_comp.current_state)
-          if button_comp.current_state ~= old_state
-              -- If the state changed, play the button press sound
+          interaction_res = interaction_comp.on_interaction(interaction_comp.current_state)
 
-              button_press_soundbuf = SoundBuffer.new()
-              button_press_soundbuf\load_from_file("resources/sounds/button_press.ogg")
-              button_press_sound = Sound.new()
-              button_press_sound.buffer = button_press_soundbuf
+          -- If some kind of result was returned, use it as the new state
+          if interaction_res ~= nil and interaction_res ~= interaction_comp.current_state
+            interaction_comp.current_state = interaction_res
 
-              button_press_sound\play()
+            -- Play the sound if there is one
+            if interaction_comp.interaction_sound
+              interaction_comp.interaction_sound\play()
 
-    if button_comp.state_map
-      -- Update the current texture frame
-      anim = button\get("Animation")
-      anim.current_frame = button_comp.state_map[button_comp.current_state]
+    -- Update the current texture frame if there's a state map
+    if interaction_comp.state_map
+      anim = obj\get("Animation")
+      anim.current_frame = interaction_comp.state_map[interaction_comp.current_state]
 
-button_callbacks = {
+interaction_callbacks = {
    computer_switch_to_terminal: (curr_state) ->
-    print(state_variables.first_button_pressed)
     unless state_variables.first_button_pressed
       return "disabled"
 
@@ -189,14 +182,19 @@ for entity_name, entity in pairs room_toml.entities
 
         new_ent\add(anim)
       when "button"
-        unless button_callbacks[comp.callback_name]
-          error(lume.format("{1}.{2} requires a {3} button callback that doesn't exist", {entity_name, comp_name, comp.callback_name}))
+        unless interaction_callbacks[comp.callback_name]
+          error(lume.format("{1}.{2} requires a {3} interaction callback that doesn't exist", {entity_name, comp_name, comp.callback_name}))
+
+        local interaction_sound
+        if comp.interaction_sound_asset
+          interaction_sound = assets.assets.sounds[comp.interaction_sound_asset].sound
 
         new_ent\add(
-          ButtonComponent(
+          InteractionComponent(
+            interaction_callbacks[comp.callback_name],
             comp.initial_state,
-            button_callbacks[comp.callback_name],
-            comp.state_map
+            comp.state_map,
+            interaction_sound
           )
         )
       else
