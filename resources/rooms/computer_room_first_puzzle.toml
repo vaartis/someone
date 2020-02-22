@@ -1,0 +1,41 @@
+[assets.sprites]
+computer_room = "resources/sprites/room/room.png"
+table = "resources/sprites/room/table/table.png"
+passage = "resources/sprites/room/passage/passage.png"
+
+# Background
+
+[entities.background.drawable_sprite]
+sprite_asset = "computer_room"
+z = 0
+
+[entities.table.drawable_sprite]
+sprite_asset = "table"
+z = 1
+position = [97, 706]
+
+[entities.table.button]
+initial_state = "disabled"
+callback_name = "computer_switch_to_terminal"
+
+# Passage
+
+[entities.passage.drawable_sprite]
+sprite_asset = "passage"
+z = 1
+origin = [0, 184]
+scale = [-1, 1]
+position = [1000, 750]
+
+
+[entities.passage.interaction]
+callback_name = "switch_room"
+args = [ "computer_room" ]
+
+# Player
+
+[entities.player]
+prefab = "player"
+
+[entities.player.drawable_sprite]
+position = [420, 820]

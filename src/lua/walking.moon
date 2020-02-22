@@ -32,13 +32,13 @@ EventStore.clear = () =>
 
 event_store = EventStore()
 
-engine = Engine()
+local engine
 
 native_event_manager\addListener("NativeEvent", event_store, event_store.add_event)
 
 InteractionComponent = Component.create(
    "Interaction",
-   {"on_interaction", "current_state", "state_map", "interaction_sound"}
+   {"on_interaction", "interaction_args", "current_state", "state_map", "interaction_sound"}
 )
 
 InteractionSystem = _G.class("InteractionSystem", System)
@@ -65,7 +65,10 @@ InteractionSystem.update = (dt) =>
       for _, native_event in pairs event_store.events
         event = native_event.event
         if event.type == EventType.KeyReleased and event.key.code == KeyboardKey.E then
-          interaction_res = interaction_comp.on_interaction(interaction_comp.current_state)
+          interaction_res = interaction_comp.on_interaction(
+            interaction_comp.current_state,
+            if interaction_comp.interaction_args then table.unpack(interaction_comp.interaction_args) else {}
+          )
 
           -- If some kind of result was returned, use it as the new state
           if interaction_res ~= nil and interaction_res ~= interaction_comp.current_state
@@ -79,6 +82,8 @@ InteractionSystem.update = (dt) =>
     if interaction_comp.state_map
       anim = obj\get("Animation")
       anim.current_frame = interaction_comp.state_map[interaction_comp.current_state]
+
+local load_room
 
 interaction_callbacks = {
    computer_switch_to_terminal: (curr_state) ->
@@ -107,7 +112,10 @@ interaction_callbacks = {
 
     state_variables.first_button_pressed = true
 
-    "enabled"
+    "enabled",
+
+  switch_room: (curr_state, room) ->
+    load_room(room)
 }
 
 load_assets = (l_assets) ->
@@ -120,11 +128,6 @@ load_assets = (l_assets) ->
     if l_sounds then
       for name, path in pairs l_sounds
         assets.add_sound(name, path)
-
-local room_toml
-with io.open("resources/rooms/computer_room.toml", "r")
-  room_toml = toml.parse(\read("*all"))
-  \close()
 
 deep_merge = (t1, t2) ->
   result = {}
@@ -139,79 +142,92 @@ deep_merge = (t1, t2) ->
 
   result
 
--- Load assets
-r_assets = room_toml.assets
-if r_assets
-  load_assets(r_assets)
+reset_engine = () ->
+  engine = Engine()
+  with engine
+    \addSystem(shared_components.RenderSystem())
+    \addSystem(shared_components.AnimationSystem())
+    \addSystem(player_components.PlayerMovementSystem())
+    \addSystem(InteractionSystem())
 
-for entity_name, entity in pairs room_toml.entities
-  new_ent = Entity()
+load_room = (name) ->
+  reset_engine!
 
-  if entity.prefab then
-    local prefab_data
-    with io.open("resources/rooms/prefabs/#{entity.prefab}.toml", "r")
-      prefab_data = toml.parse(\read("*all"))
-      \close()
-    -- Load the assets of the prefab and remove them from the data
-    load_assets(prefab_data.assets)
-    prefab_data.assets = nil
-    entity = deep_merge(prefab_data, entity)
+  local room_toml
+  with io.open("resources/rooms/#{name}.toml", "r")
+    room_toml = toml.parse(\read("*all"))
+    \close()
 
-  for comp_name, comp in pairs entity
-    switch comp_name
-      when "drawable_sprite"
-        sprite_asset = assets.assets.sprites[comp.sprite_asset]
-        unless sprite_asset
-          error(lume.format("{1}.{2} requires a sprite named {3}", {entity_name, comp_name, comp.sprite_asset}))
+  -- Load assets
+  load_assets(room_toml.assets) if room_toml.assets
 
-        unless comp.z then
-          error(lume.format("{1}.{2} requires a {3} value", {entity_name, comp_name, "z"}))
+  for entity_name, entity in pairs room_toml.entities
+    new_ent = Entity()
 
-        sprite = with sprite_asset.sprite
-          .position = Vector2f.new(comp.position[1], comp.position[2]) if comp.position
-          .origin = Vector2f.new(comp.origin[1], comp.origin[2]) if comp.origin
+    if entity.prefab then
+      local prefab_data
+      with io.open("resources/rooms/prefabs/#{entity.prefab}.toml", "r")
+        prefab_data = toml.parse(\read("*all"))
+        \close()
+      -- Load the assets of the prefab and remove them from the data
+      load_assets(prefab_data.assets)
+      prefab_data.assets = nil
+      entity = deep_merge(prefab_data, entity)
 
-        new_ent\add(shared_components.DrawableSpriteComponent(sprite, comp.z))
-        new_ent\add(shared_components.TransformableComponent(sprite))
-      when "animation"
-        sheet_frames = shared_components.load_sheet_frames(comp.sheet)
+    for comp_name, comp in pairs entity
+      switch comp_name
+        when "drawable_sprite"
+          sprite_asset = assets.assets.sprites[comp.sprite_asset]
+          unless sprite_asset
+            error(lume.format("{1}.{2} requires a sprite named {3}", {entity_name, comp_name, comp.sprite_asset}))
 
-        anim = with shared_components.AnimationComponent(sheet_frames)
-          .playable = comp.playable if type(comp.playable) == "boolean"
-          .playing = comp.playing if type(comp.playing) == "boolean"
+          unless comp.z then
+            error(lume.format("{1}.{2} requires a {3} value", {entity_name, comp_name, "z"}))
 
-        new_ent\add(anim)
-      when "button"
-        unless interaction_callbacks[comp.callback_name]
-          error(lume.format("{1}.{2} requires a {3} interaction callback that doesn't exist", {entity_name, comp_name, comp.callback_name}))
+          sprite = with sprite_asset.sprite
+            .position = Vector2f.new(comp.position[1], comp.position[2]) if comp.position
+            .origin = Vector2f.new(comp.origin[1], comp.origin[2]) if comp.origin
+            if comp.scale then
+              .scale = Vector2f.new(comp.scale[1], comp.scale[2])
 
-        local interaction_sound
-        if comp.interaction_sound_asset
-          interaction_sound = assets.assets.sounds[comp.interaction_sound_asset].sound
+          new_ent\add(shared_components.DrawableSpriteComponent(sprite, comp.z))
+          new_ent\add(shared_components.TransformableComponent(sprite))
+        when "animation"
+          sheet_frames = shared_components.load_sheet_frames(comp.sheet)
 
-        new_ent\add(
-          InteractionComponent(
-            interaction_callbacks[comp.callback_name],
-            comp.initial_state,
-            comp.state_map,
-            interaction_sound
+          anim = with shared_components.AnimationComponent(sheet_frames)
+            .playable = comp.playable if type(comp.playable) == "boolean"
+            .playing = comp.playing if type(comp.playing) == "boolean"
+
+          new_ent\add(anim)
+        when "interaction"
+          unless interaction_callbacks[comp.callback_name]
+            error(lume.format("{1}.{2} requires a {3} interaction callback that doesn't exist", {entity_name, comp_name, comp.callback_name}))
+
+          local interaction_sound
+          if comp.interaction_sound_asset
+            interaction_sound = assets.assets.sounds[comp.interaction_sound_asset].sound
+
+          new_ent\add(
+            InteractionComponent(
+              interaction_callbacks[comp.callback_name],
+              comp.args,
+              comp.initial_state,
+              comp.state_map,
+              interaction_sound
+            )
           )
-        )
-      else
-        component_processors = {
-          player_components.process_components
-        }
+        else
+          component_processors = {
+            player_components.process_components
+          }
 
-        for _, processor in pairs component_processors
-          break if processor(new_ent, comp_name, comp)
+          for _, processor in pairs component_processors
+            break if processor(new_ent, comp_name, comp)
 
-  engine\addEntity(new_ent)
+    engine\addEntity(new_ent)
 
-with engine
-  \addSystem(shared_components.RenderSystem())
-  \addSystem(shared_components.AnimationSystem())
-  \addSystem(player_components.PlayerMovementSystem())
-  \addSystem(ButtonInteractionSystem())
+load_room "computer_room_first_puzzle"
 
 add_event = (event) ->
   native_event_manager\fireEvent(NativeEvent(event))

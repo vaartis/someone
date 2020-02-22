@@ -1,6 +1,10 @@
-assets =
+lume = require("lume")
+
+empty_namespace =
   sprites: {}
   sounds: {}
+
+assets = lume.clone(empty_namespace)
 
 add_sprite = (name, path) ->
   texture = with Texture.new!
@@ -28,4 +32,7 @@ add_sound = (name, path) ->
 
   sound
 
-{ :assets, :add_sprite, :add_sound }
+clear_assets = () ->
+  assets = lume.clone(empty_namespace)
+
+{ :assets, :add_sprite, :add_sound, :clear_assets }

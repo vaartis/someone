@@ -17,7 +17,7 @@ sprite_asset = "table"
 z = 1
 position = [97, 706]
 
-[entities.table.button]
+[entities.table.interaction]
 initial_state = "disabled"
 callback_name = "computer_switch_to_terminal"
 
@@ -33,7 +33,7 @@ sheet = "resources/sprites/room/button/"
 playing = false
 playable = false
 
-[entities.button.button]
+[entities.button.interaction]
 initial_state = "disabled"
 state_map = { disabled = 1, enabled = 2 }
 callback_name = "activate_computer"
