@@ -15,6 +15,8 @@ z = 0
 [entities.table.drawable_sprite]
 sprite_asset = "table"
 z = 1
+
+[entities.table.transformable]
 position = [97, 706]
 
 [entities.table.interaction]
@@ -26,6 +28,8 @@ callback_name = "computer_switch_to_terminal"
 [entities.button.drawable_sprite]
 sprite_asset = "button"
 z = 1
+
+[entities.button.transformable]
 position = [1020, 672]
 
 [entities.button.animation]
@@ -44,5 +48,5 @@ interaction_sound_asset = "button_press"
 [entities.player]
 prefab = "player"
 
-[entities.player.drawable_sprite]
+[entities.player.transformable]
 position = [420, 820]

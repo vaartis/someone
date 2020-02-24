@@ -8,5 +8,5 @@ z = 0
 [entities.player]
 prefab = "player"
 
-[entities.player.drawable_sprite]
+[entities.player.transformable]
 position = [159, 820]

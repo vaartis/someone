@@ -4,6 +4,7 @@ path = require("path")
 json = require("lunajson")
 inspect = require("inspect")
 toml = require("toml")
+bump = require("bump")
 
 assets = require("components.assets")
 shared_components = require("components.shared")
@@ -35,6 +36,10 @@ event_store = EventStore()
 local engine
 
 native_event_manager\addListener("NativeEvent", event_store, event_store.add_event)
+
+physics_world = bump.newWorld()
+
+ColliderComponent = Component.create("Collider", {"physics_world"})
 
 InteractionComponent = Component.create(
    "Interaction",
@@ -174,6 +179,9 @@ load_room = (name) ->
       prefab_data.assets = nil
       entity = deep_merge(prefab_data, entity)
 
+    add_transformable_actions = {}
+    add_collider_actions = {}
+
     for comp_name, comp in pairs entity
       switch comp_name
         when "drawable_sprite"
@@ -184,14 +192,27 @@ load_room = (name) ->
           unless comp.z then
             error(lume.format("{1}.{2} requires a {3} value", {entity_name, comp_name, "z"}))
 
-          sprite = with sprite_asset.sprite
-            .position = Vector2f.new(comp.position[1], comp.position[2]) if comp.position
-            .origin = Vector2f.new(comp.origin[1], comp.origin[2]) if comp.origin
-            if comp.scale then
-              .scale = Vector2f.new(comp.scale[1], comp.scale[2])
-
+          sprite = sprite_asset.sprite
           new_ent\add(shared_components.DrawableSpriteComponent(sprite, comp.z))
           new_ent\add(shared_components.TransformableComponent(sprite))
+        when "transformable"
+          table.insert(
+            add_transformable_actions,
+            ->
+              local tf_component
+              if new_ent\has("Transformable")
+                -- If there's a transformable component, get it from the entity
+                tf_component = new_ent\get("Transformable")
+              else
+                -- If there's no transformable component, create and add it
+                tf_component = TransformableComponent(Transformable.new())
+                new_ent\add(tf_component)
+
+              with tf_component.transformable
+                .position = Vector2f.new(comp.position[1], comp.position[2]) if comp.position
+                .origin = Vector2f.new(comp.origin[1], comp.origin[2]) if comp.origin
+                .scale = Vector2f.new(comp.scale[1], comp.scale[2]) if comp.scale
+          )
         when "animation"
           sheet_frames = shared_components.load_sheet_frames(comp.sheet)
 
@@ -217,6 +238,36 @@ load_room = (name) ->
               interaction_sound
             )
           )
+        when "collider"
+          table.insert(
+            add_collider_actions,
+            ->
+              unless new_ent\has("Transformable")
+                error("Transformable is required for a collider on #{entity_name}")
+
+              pos = new_ent\get("Transformable").transformable.position
+
+              local ph_width, ph_height
+              switch comp.mode
+                when "sprite"
+                  unless new_ent\has("DrawableSprite")
+                    error("DrawableSprite is required for a collider with sprite mode on #{entity_name}")
+                  sprite_size = new_ent\get("DrawableSprite").sprite.global_bounds
+                  ph_width, ph_height = sprite_size.width, sprite_size.height
+                when "constant"
+                  unless comp.size
+                    error("size is required for a collider with constant mode on #{entity_name}")
+                  ph_width, ph_height = comp.size[1], comp.size[2]
+                else
+                  error("Unknown collider mode #{comp.mode} for #{entity_name}")
+
+
+              physics_world\add(new_ent, pos.x, pos.y, ph_width, ph_height)
+          )
+
+          new_ent\add(
+            ColliderComponent(physics_world)
+          )
         else
           component_processors = {
             player_components.process_components
@@ -224,6 +275,12 @@ load_room = (name) ->
 
           for _, processor in pairs component_processors
             break if processor(new_ent, comp_name, comp)
+
+    -- Call all the "after all inserted" actions
+    lume.each(
+      {add_transformable_actions, add_collider_actions}
+      (col) -> lume.each(col, (f) -> f!)
+    )
 
     engine\addEntity(new_ent)
 

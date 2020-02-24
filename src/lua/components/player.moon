@@ -10,7 +10,7 @@ PlayerMovementComponent = Component.create(
 
 PlayerMovementSystem = _G.class("PlayerMovementSystem", System)
 PlayerMovementSystem.requires = =>
-  {"PlayerMovement", "Transformable", "DrawableSprite", "Animation"}
+  {"PlayerMovement", "Transformable", "DrawableSprite", "Animation", "Collider"}
 
 PlayerMovementSystem.update = (dt) =>
   for _, entity in pairs @targets do
@@ -20,13 +20,20 @@ PlayerMovementSystem.update = (dt) =>
       tf = entity\get("Transformable")
       drawable = entity\get("DrawableSprite")
       animation = entity\get("Animation")
+      physics_world = entity\get("Collider").physics_world
 
       if Keyboard.is_key_pressed KeyboardKey.D
-        tf.transformable.position += Vector2f.new(1.0, 0.0)
+        expected_new_pos = tf.transformable.position + Vector2f.new(1.0, 0.0)
+        actual_new_x, actual_new_y = physics_world\move(entity, expected_new_pos.x, expected_new_pos.y)
+        tf.transformable.position = Vector2f.new(actual_new_x, actual_new_y)
+
         player_movement.walking = true
         player_movement.look_direction = 1
       elseif Keyboard.is_key_pressed KeyboardKey.A
-        tf.transformable.position += Vector2f.new(-1.0, 0.0)
+        expected_new_pos = tf.transformable.position + Vector2f.new(-1.0, 0.0)
+        actual_new_x, actual_new_y = physics_world\move(entity, expected_new_pos.x, expected_new_pos.y)
+        tf.transformable.position = Vector2f.new(actual_new_x, actual_new_y)
+
         player_movement.walking = true
         player_movement.look_direction = -1
       else
