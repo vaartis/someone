@@ -1,0 +1,12 @@
+[assets.sprites]
+first_puzzle_room = "resources/sprites/room/first_puzzle_room.png"
+
+[entities.background.drawable_sprite]
+sprite_asset = "first_puzzle_room"
+z = 0
+
+[entities.player]
+prefab = "player"
+
+[entities.player.drawable_sprite]
+position = [159, 820]

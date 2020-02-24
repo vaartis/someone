@@ -30,7 +30,7 @@ position = [1000, 750]
 
 [entities.passage.interaction]
 callback_name = "switch_room"
-args = [ "computer_room" ]
+args = [ "first_puzzle_room" ]
 
 # Player
 
