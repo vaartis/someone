@@ -13,18 +13,29 @@ DrawableSpriteComponent = Component.create("DrawableSprite", {"sprite", "z"})
 RenderSystem = _G.class("RenderSystem", System)
 RenderSystem.requires = () =>
    {"DrawableSprite"}
-RenderSystem.onAddEntity = (entity) =>
-  -- Sort targets according to the z level
-  @targets = lume.sort(
-      @targets,
-      (a, b) ->
-        drawable_a = a\get("DrawableSprite")
-        drawable_b = b\get("DrawableSprite")
+RenderSystem._sort_targets = () =>
+  -- Sorts targets according to the Z level.
+  -- This has to be done in a roundabout way because sorting DOESN'T WORK
+  -- on sequences with gaps, and pairs ignores sorting, so a separate,
+  -- sorted array of targets needs to be stored for drawing
 
-        drawable_a.z < drawable_b.z
-    )
+  entities = {}
+  for _, v in pairs @targets do table.insert(entities, v)
+
+  table.sort(
+    entities,
+    (a, b) ->
+      drawable_a = a\get("DrawableSprite")
+      drawable_b = b\get("DrawableSprite")
+
+      drawable_a.z < drawable_b.z
+  )
+  @_sorted_targets = entities
+RenderSystem.onAddEntity = () => @_sort_targets!
+RenderSystem.onRemoveEntity = () => @_sort_targets!
+
 RenderSystem.draw = () =>
-  for _, entity in pairs @targets
+  for _, entity in ipairs @_sorted_targets
     drawable = entity\get("DrawableSprite")
 
     GLOBAL.drawing_target\draw(drawable.sprite)
