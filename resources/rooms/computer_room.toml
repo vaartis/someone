@@ -43,6 +43,10 @@ state_map = { disabled = 1, enabled = 2 }
 callback_name = "activate_computer"
 interaction_sound_asset = "button_press"
 
+[entities.button.collider]
+mode = "sprite"
+trigger = true
+
 # Player
 
 [entities.player]
@@ -50,3 +54,10 @@ prefab = "player"
 
 [entities.player.transformable]
 position = [420, 820]
+
+[entities.left_wall.transformable]
+position = [300, 500]
+
+[entities.left_wall.collider]
+mode = "constant"
+size = [10, 400]

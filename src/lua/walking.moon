@@ -39,7 +39,51 @@ native_event_manager\addListener("NativeEvent", event_store, event_store.add_eve
 
 physics_world = bump.newWorld()
 
-ColliderComponent = Component.create("Collider", {"physics_world"})
+ColliderComponent = Component.create("Collider", {"physics_world", "mode", "trigger"}, {trigger: false})
+
+DebugColliderDrawingSystem = _G.class("DebugColliderDrawingSystem", System)
+DebugColliderDrawingSystem.requires = () => {"Collider"}
+DebugColliderDrawingSystem.draw = () =>
+  for _, entity in pairs @targets
+    physics_world = entity\get("Collider").physics_world
+
+    x, y, w, h = physics_world\getRect(entity)
+    shape = RectangleShape.new(Vector2f.new(w, h))
+    shape.outline_thickness = 1.0
+    shape.outline_color = Color.Red
+    shape.fill_color = Color.new(0, 0, 0, 0)
+    shape.position = Vector2f.new(x, y)
+    GLOBAL.drawing_target\draw(shape)
+
+ColliderUpdateSystem = _G.class("ColliderUpdateSystem", System)
+ColliderUpdateSystem.requires = () => {"Collider"}
+ColliderUpdateSystem.update = (dt) =>
+  for _, entity in pairs @targets
+    collider = entity\get("Collider")
+
+    switch collider.mode
+      when "sprite"
+        self.update_from_sprite(entity)
+ColliderUpdateSystem.update_from_sprite = (entity) ->
+  sprite_size = entity\get("DrawableSprite").sprite.global_bounds
+  tf = entity\get("Transformable").transformable
+  physics_world = entity\get("Collider").physics_world
+
+  if physics_world\hasItem(entity)
+    -- If the item is already in the world, sychronize the position from the
+    -- physics world, by getting the position from there and adding the origin change,
+    -- plus putting the current width and height in the world from the sprite
+    tf.position = do
+      x, y = physics_world\getRect(entity)
+
+      physics_world\update(entity, x, y, sprite_size.width, sprite_size.height)
+
+      Vector2f.new(x + tf.origin.x, y + tf.origin.y)
+  else
+    -- If the item isn't in the world yet, add it there, but putting it at the
+    -- transformable position minus the origin change
+    pos = Vector2f.new(tf.position.x - tf.origin.x, tf.position.y - tf.origin.y)
+    physics_world\add(entity, pos.x, pos.y, sprite_size.width, sprite_size.height)
 
 InteractionComponent = Component.create(
    "Interaction",
@@ -154,6 +198,9 @@ reset_engine = () ->
     \addSystem(shared_components.AnimationSystem())
     \addSystem(player_components.PlayerMovementSystem())
     \addSystem(InteractionSystem())
+    \addSystem(ColliderUpdateSystem())
+
+    \addSystem(DebugColliderDrawingSystem())
 
 load_room = (name) ->
   reset_engine!
@@ -199,14 +246,10 @@ load_room = (name) ->
           table.insert(
             add_transformable_actions,
             ->
-              local tf_component
-              if new_ent\has("Transformable")
-                -- If there's a transformable component, get it from the entity
-                tf_component = new_ent\get("Transformable")
-              else
+              unless new_ent\has("Transformable")
                 -- If there's no transformable component, create and add it
-                tf_component = TransformableComponent(Transformable.new())
-                new_ent\add(tf_component)
+                new_ent\add(shared_components.TransformableComponent(Transformable.new()))
+              tf_component = new_ent\get("Transformable")
 
               with tf_component.transformable
                 .position = Vector2f.new(comp.position[1], comp.position[2]) if comp.position
@@ -247,26 +290,23 @@ load_room = (name) ->
 
               pos = new_ent\get("Transformable").transformable.position
 
-              local ph_width, ph_height
               switch comp.mode
                 when "sprite"
                   unless new_ent\has("DrawableSprite")
                     error("DrawableSprite is required for a collider with sprite mode on #{entity_name}")
-                  sprite_size = new_ent\get("DrawableSprite").sprite.global_bounds
-                  ph_width, ph_height = sprite_size.width, sprite_size.height
+
+                  -- Add the collider component and update the collider from the sprite, also adding it to the physics world
+                  new_ent\add(ColliderComponent(physics_world, comp.mode, comp.trigger))
+                  ColliderUpdateSystem.update_from_sprite(new_ent)
                 when "constant"
                   unless comp.size
                     error("size is required for a collider with constant mode on #{entity_name}")
                   ph_width, ph_height = comp.size[1], comp.size[2]
+
+                  physics_world\add(new_ent, pos.x, pos.y, ph_width, ph_height)
+                  new_ent\add(ColliderComponent(physics_world, comp.mode, comp.trigger))
                 else
                   error("Unknown collider mode #{comp.mode} for #{entity_name}")
-
-
-              physics_world\add(new_ent, pos.x, pos.y, ph_width, ph_height)
-          )
-
-          new_ent\add(
-            ColliderComponent(physics_world)
           )
         else
           component_processors = {
@@ -277,14 +317,13 @@ load_room = (name) ->
             break if processor(new_ent, comp_name, comp)
 
     -- Call all the "after all inserted" actions
-    lume.each(
-      {add_transformable_actions, add_collider_actions}
-      (col) -> lume.each(col, (f) -> f!)
-    )
+    for _, actions in pairs {add_transformable_actions, add_collider_actions}
+      for _, action in pairs actions
+        action!
 
     engine\addEntity(new_ent)
 
-load_room "computer_room_first_puzzle"
+load_room "computer_room"
 
 add_event = (event) ->
   native_event_manager\fireEvent(NativeEvent(event))

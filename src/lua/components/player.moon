@@ -1,6 +1,10 @@
+lume = require("lume")
+path = require("path")
+
 assets = require("components.assets")
 shared = require("components.shared")
-path = require("path")
+
+x_movement_speed = 1.0
 
 PlayerMovementComponent = Component.create(
   "PlayerMovement",
@@ -22,20 +26,33 @@ PlayerMovementSystem.update = (dt) =>
       animation = entity\get("Animation")
       physics_world = entity\get("Collider").physics_world
 
-      if Keyboard.is_key_pressed KeyboardKey.D
-        expected_new_pos = tf.transformable.position + Vector2f.new(1.0, 0.0)
-        actual_new_x, actual_new_y = physics_world\move(entity, expected_new_pos.x, expected_new_pos.y)
-        tf.transformable.position = Vector2f.new(actual_new_x, actual_new_y)
+      if Keyboard.is_key_pressed(KeyboardKey.D) or Keyboard.is_key_pressed(KeyboardKey.A)
+        local expected_new_pos, look_direction
 
-        player_movement.walking = true
-        player_movement.look_direction = 1
-      elseif Keyboard.is_key_pressed KeyboardKey.A
-        expected_new_pos = tf.transformable.position + Vector2f.new(-1.0, 0.0)
-        actual_new_x, actual_new_y = physics_world\move(entity, expected_new_pos.x, expected_new_pos.y)
-        tf.transformable.position = Vector2f.new(actual_new_x, actual_new_y)
+        local pos_diff
+        if Keyboard.is_key_pressed KeyboardKey.D
+          pos_diff = Vector2f.new(x_movement_speed, 0.0)
+          look_direction = 1
+        elseif Keyboard.is_key_pressed KeyboardKey.A
+          pos_diff = Vector2f.new(-x_movement_speed, 0.0)
+          look_direction = -1
+        expected_new_pos = do
+          x, y = physics_world\getRect(entity)
+          Vector2f.new(x, y) + pos_diff
 
-        player_movement.walking = true
-        player_movement.look_direction = -1
+        _, _, cols, col_count = physics_world\check(
+          entity,
+          expected_new_pos.x,
+          expected_new_pos.y,
+          (item, other) -> if other\get("Collider").trigger then "cross" else "slide"
+        )
+        if col_count == 0 or not lume.any(cols, (c) -> c.type == "slide")
+          -- Don't check for collisions here, since the've already been checked,
+          -- just update the position
+          physics_world\update(entity, expected_new_pos.x, expected_new_pos.y)
+          player_movement.walking = true
+
+        player_movement.look_direction = look_direction
       else
         player_movement.walking = false
 

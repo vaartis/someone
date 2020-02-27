@@ -87,7 +87,8 @@ void register_usertypes(sol::state &lua) {
         "b", &sf::Color::b,
         "a", &sf::Color::a,
 
-        "Black", sol::var(sf::Color::Black)
+        "Black", sol::var(sf::Color::Black),
+        "Red", sol::var(sf::Color::Red)
     );
 
     auto tf_type = lua.new_usertype<sf::Transformable>(
