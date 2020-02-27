@@ -104,13 +104,19 @@ InteractionSystem.update = (dt) =>
   player_sprite = player\get("DrawableSprite").sprite
 
   for _, obj in pairs @targets.objects
-    local obj_pos, obj_sprite, interaction_comp
+    local obj_pos, obj_sprite, interaction_comp, physics_world
     with obj
       obj_pos = \get("Transformable").position
       obj_sprite = \get("DrawableSprite").sprite
       interaction_comp = \get("Interaction")
+      physics_world = \get("Collider").physics_world
 
-    if player_sprite.global_bounds\intersects(obj_sprite.global_bounds) then
+    cols = do
+      x, y, w, h = physics_world\getRect(obj)
+      physics_world\queryRect(x, y, w, h)
+
+    -- If the player is in the rectangle of the sprite, then check if the interaction button is pressed
+    if lume.any(cols, (e) -> e\has("PlayerMovement")) then
       for _, native_event in pairs event_store.events
         event = native_event.event
         if event.type == EventType.KeyReleased and event.key.code == KeyboardKey.E then

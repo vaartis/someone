@@ -23,6 +23,10 @@ position = [97, 706]
 initial_state = "disabled"
 callback_name = "computer_switch_to_terminal"
 
+[entities.table.collider]
+mode = "sprite"
+trigger = true
+
 # Button
 
 [entities.button.drawable_sprite]
