@@ -56,8 +56,15 @@ prefab = "player"
 position = [420, 820]
 
 [entities.left_wall.transformable]
-position = [300, 500]
+position = [350, 500]
 
 [entities.left_wall.collider]
+mode = "constant"
+size = [10, 400]
+
+[entities.right_wall.transformable]
+position = [1130, 500]
+
+[entities.right_wall.collider]
 mode = "constant"
 size = [10, 400]
