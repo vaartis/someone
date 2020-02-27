@@ -41,14 +41,19 @@ namespace {
 
 template<typename T>
 decltype(auto) register_vector2(sol::state &lua, std::string name) {
-    return lua.new_usertype<sf::Vector2<T>>(
-        name, sol::constructors<sf::Vector2<T>(T, T)>(),
-        "x", &sf::Vector2<T>::x,
-        "y", &sf::Vector2<T>::y,
-        sol::meta_function::addition,
-        [](const sf::Vector2<T> &left, const sf::Vector2<T> &right) {
-            return sf::Vector2<T>(left.x + right.x, left.y + right.y);
-        }
+    using VecT = sf::Vector2<T>;
+    using ConstVecRefT = std::add_lvalue_reference_t<std::add_const_t<VecT>>;
+
+    return lua.new_usertype<VecT>(
+        name, sol::constructors<VecT(T, T)>(),
+        "x", &VecT::x,
+        "y", &VecT::y,
+        sol::meta_function::addition, sol::resolve<VecT(ConstVecRefT, ConstVecRefT)>(&sf::operator+),
+        sol::meta_function::subtraction, sol::resolve<VecT(ConstVecRefT, ConstVecRefT)>(&sf::operator-),
+        sol::meta_function::multiplication, sol::overload(
+            sol::resolve<VecT(ConstVecRefT, T)>(&sf::operator*),
+            sol::resolve<VecT(T, ConstVecRefT)>(&sf::operator*)
+        )
     );
 }
 
