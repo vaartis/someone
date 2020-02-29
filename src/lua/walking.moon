@@ -106,22 +106,18 @@ InteractionComponent = Component.create(
 
 InteractionSystem = _G.class("InteractionSystem", System)
 InteractionSystem.requires = () => {
-  objects: {"Interaction", "Transformable", "DrawableSprite", "Collider"},
+  objects: {"Interaction", "Collider"},
   -- The PlayerMovement component only exists on the player
-  player: {"PlayerMovement", "Transformable"}
+  player: {"PlayerMovement"}
 }
 InteractionSystem.update = (dt) =>
   player_key = lume.first(lume.keys(@targets.player))
   if not player_key then error("No player entity found")
   player = @targets.player[player_key]
 
-  player_sprite = player\get("DrawableSprite").sprite
-
   for _, obj in pairs @targets.objects
-    local obj_pos, obj_sprite, interaction_comp, physics_world
+    local interaction_comp, physics_world
     with obj
-      obj_pos = \get("Transformable").position
-      obj_sprite = \get("DrawableSprite").sprite
       interaction_comp = \get("Interaction")
       physics_world = \get("Collider").physics_world
 
