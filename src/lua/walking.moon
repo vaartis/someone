@@ -76,14 +76,28 @@ ColliderUpdateSystem.update_from_sprite = (entity) ->
     tf.position = do
       x, y = physics_world\getRect(entity)
 
+      -- Update the physics world with the new size
       physics_world\update(entity, x, y, sprite_size.width, sprite_size.height)
 
-      Vector2f.new(x + tf.origin.x, y + tf.origin.y)
+      x, y = x + (tf.origin.x * tf.scale.x), y + (tf.origin.y * tf.scale.y)
+      -- Adjust the position for scale (doing the opposite of the thing done when
+      -- first putting the entity into the world)
+      scale_modifier = if tf.scale.x > 0 then 1 - tf.scale.x else tf.scale.x * -1
+      x += sprite_size.width * scale_modifier
+
+      -- Return the data for the transforamble position
+      Vector2f.new(x, y)
   else
     -- If the item isn't in the world yet, add it there, but putting it at the
     -- transformable position minus the origin change
-    pos = Vector2f.new(tf.position.x - tf.origin.x, tf.position.y - tf.origin.y)
-    physics_world\add(entity, pos.x, pos.y, sprite_size.width, sprite_size.height)
+
+    x, y = tf.position.x - (tf.origin.x * tf.scale.x), tf.position.y - (tf.origin.y * tf.scale.y)
+
+    -- Adjust the position for scale
+    scale_modifier = if tf.scale.x > 0 then 1 - tf.scale.x else tf.scale.x * -1
+    x -= sprite_size.width * scale_modifier
+
+    physics_world\add(entity, x, y, sprite_size.width, sprite_size.height)
 
 InteractionComponent = Component.create(
    "Interaction",
