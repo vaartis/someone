@@ -92,7 +92,7 @@ InteractionComponent = Component.create(
 
 InteractionSystem = _G.class("InteractionSystem", System)
 InteractionSystem.requires = () => {
-  objects: {"Interaction", "Transformable", "DrawableSprite"},
+  objects: {"Interaction", "Transformable", "DrawableSprite", "Collider"},
   -- The PlayerMovement component only exists on the player
   player: {"PlayerMovement", "Transformable"}
 }
@@ -208,13 +208,44 @@ reset_engine = () ->
 
     \addSystem(DebugColliderDrawingSystem())
 
-load_room = (name) ->
-  reset_engine!
-
+-- Loads the room's toml file, processing parent relationships
+load_room_toml = (name) ->
   local room_toml
   with io.open("resources/rooms/#{name}.toml", "r")
     room_toml = toml.parse(\read("*all"))
     \close()
+
+  -- If there's a prefab/base room, load it
+  if room_toml.prefab
+    with room_toml.prefab
+        prefab_room = load_room_toml(.name)
+
+        if .removed_entities
+          for k, v in pairs(prefab_room.entities)
+            if lume.find(.removed_entities, k)
+              -- Remove the entity
+              prefab_room.entities[k] = nil
+        if .removed_assets
+          with .removed_assets
+            if .sprites and prefab_room.assets.sprites
+              for k, v in pairs(prefab_room.assets.sprites)
+                if lume.find(.sprites, k)
+                  prefab_room.assets.sprites[k] = nil
+            if .sounds and prefab_room.assets.sounds
+              for k, v in pairs(prefab_room.assets.sounds)
+                if lume.find(.sounds, k)
+                  prefab_room.assets.sounds[k] = nil
+
+        room_toml = deep_merge(prefab_room, room_toml)
+    -- Remove the mention of the prefab
+    room_toml.prefab = nil
+
+  room_toml
+
+load_room = (name) ->
+  reset_engine!
+
+  room_toml = load_room_toml(name)
 
   -- Load assets
   load_assets(room_toml.assets) if room_toml.assets
@@ -223,14 +254,20 @@ load_room = (name) ->
     new_ent = Entity()
 
     if entity.prefab then
-      local prefab_data
-      with io.open("resources/rooms/prefabs/#{entity.prefab}.toml", "r")
-        prefab_data = toml.parse(\read("*all"))
-        \close()
+      prefab_data = do
+        local data
+        with io.open("resources/rooms/prefabs/#{entity.prefab}.toml", "r")
+          data = toml.parse(\read("*all"))
+          \close()
+        data
+
       -- Load the assets of the prefab and remove them from the data
       load_assets(prefab_data.assets)
       prefab_data.assets = nil
       entity = deep_merge(prefab_data, entity)
+
+      -- Remove the mention of the prefab from the entity
+      entity.prefab = nil
 
     add_transformable_actions = {}
     add_collider_actions = {}
@@ -319,8 +356,13 @@ load_room = (name) ->
             player_components.process_components
           }
 
+          processed = false
           for _, processor in pairs component_processors
-            break if processor(new_ent, comp_name, comp)
+            if processor(new_ent, comp_name, comp)
+              processed = true
+              break
+          if not processed
+            error("Unknown component: #{comp_name} on #{entity_name}")
 
     -- Call all the "after all inserted" actions
     for _, actions in pairs {add_transformable_actions, add_collider_actions}

@@ -1,23 +1,12 @@
+[prefab]
+name = "computer_room"
+removed_entities = [ "button" ]
+removed_assets = { sprites = ["button"], sounds = ["button_press"] }
+
 [assets.sprites]
-computer_room = "resources/sprites/room/room.png"
-table = "resources/sprites/room/table/table.png"
 passage = "resources/sprites/room/passage/passage.png"
 
-# Background
-
-[entities.background.drawable_sprite]
-sprite_asset = "computer_room"
-z = 0
-
-[entities.table.drawable_sprite]
-sprite_asset = "table"
-z = 1
-
-[entities.table.transformable]
-position = [97, 706]
-
-[entities.table.button]
-initial_state = "disabled"
+[entities.table.interaction]
 callback_name = "computer_switch_to_terminal"
 
 # Passage
@@ -35,10 +24,6 @@ position = [1000, 750]
 callback_name = "switch_room"
 args = [ "first_puzzle_room" ]
 
-# Player
-
-[entities.player]
-prefab = "player"
-
-[entities.player.transformable]
-position = [420, 820]
+[entities.passage.collider]
+mode = "sprite"
+trigger = true
