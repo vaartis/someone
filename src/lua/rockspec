@@ -27,7 +27,9 @@ build = {
          ["components.assets"] = "components/assets.moon",
          terminal = "terminal.lua",
          walking = "walking.moon",
-         coroutines = "coroutines.moon"
+         coroutines = "coroutines.moon",
+
+         ["components.first_puzzle"] = "components/first_puzzle.moon"
       }
    }
 }

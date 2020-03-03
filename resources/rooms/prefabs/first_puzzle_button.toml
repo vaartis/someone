@@ -1,0 +1,18 @@
+[drawable_sprite]
+texture_asset = "button"
+z = 1
+
+[animation]
+sheet = "resources/sprites/room/button/"
+playing = false
+playable = false
+
+[interaction]
+initial_state = "wrong"
+state_map = { right = 2, wrong = 1 }
+interaction_sound_asset = "button_press"
+callback_name = "first_puzzle_button"
+
+[collider]
+mode = "sprite"
+trigger = true

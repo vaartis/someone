@@ -12,6 +12,8 @@ player_components = require("components.player")
 coroutines = require("coroutines")
 terminal = require("terminal")
 
+first_puzzle = require("components.first_puzzle")
+
 state_variables = {}
 
 native_event_manager = EventManager()
@@ -181,6 +183,8 @@ interaction_callbacks = {
 
   switch_room: (curr_state, room) ->
     load_room(room)
+
+  first_puzzle_button: first_puzzle.button_callback
 }
 
 load_assets = () ->
@@ -218,6 +222,8 @@ reset_engine = () ->
     \addSystem(player_components.PlayerMovementSystem())
     \addSystem(InteractionSystem())
     \addSystem(ColliderUpdateSystem())
+
+    \addSystem(first_puzzle.FirstPuzzleButtonSystem())
 
     \addSystem(DebugColliderDrawingSystem())
 
@@ -353,7 +359,8 @@ load_room = (name) ->
           )
         else
           component_processors = {
-            player_components.process_components
+            player_components.process_components,
+            first_puzzle.process_components
           }
 
           processed = false
