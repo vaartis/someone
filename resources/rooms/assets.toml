@@ -1,0 +1,15 @@
+[textures]
+
+# Backgrounds
+computer_room = "resources/sprites/room/room.png"
+first_puzzle_room = "resources/sprites/room/first_puzzle_room.png"
+
+table = "resources/sprites/room/table/table.png"
+button = "resources/sprites/room/button/button.png"
+passage = "resources/sprites/room/passage/passage.png"
+
+mainchar = "resources/sprites/mainchar/mainchar.png"
+
+[sounds]
+button_press = "resources/sounds/button_press.ogg"
+footstep = "resources/sounds/footstep.ogg"

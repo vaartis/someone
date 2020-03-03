@@ -1,11 +1,5 @@
-[assets.sprites]
-mainchar = "resources/sprites/mainchar/mainchar.png"
-
-[assets.sounds]
-footstep = "resources/sounds/footstep.ogg"
-
 [drawable_sprite]
-sprite_asset = "mainchar"
+texture_asset = "mainchar"
 z = 2
 
 [transformable]

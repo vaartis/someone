@@ -67,11 +67,14 @@ PlayerMovementSystem.update = (dt) =>
 process_components = (new_ent, comp_name, comp) ->
   switch comp_name
     when "player_movement"
-      sound_asset = assets.assets.sounds[comp.footstep_sound_asset]
-      if not sound_asset then
+      sound_buf_asset = assets.assets.sounds[comp.footstep_sound_asset]
+      if not sound_buf_asset then
         error(lume.format("{1}.{2} requires a sound named {3}", {entity_name, comp_name, comp.footstep_sound_asset}))
 
-      new_ent\add(PlayerMovementComponent(sound_asset.sound))
+      sound = with Sound.new!
+        .buffer = assets.assets.sounds[comp.footstep_sound_asset]
+
+      new_ent\add(PlayerMovementComponent(sound))
 
       true
 

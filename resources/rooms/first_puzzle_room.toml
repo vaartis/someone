@@ -1,8 +1,5 @@
-[assets.sprites]
-first_puzzle_room = "resources/sprites/room/first_puzzle_room.png"
-
 [entities.background.drawable_sprite]
-sprite_asset = "first_puzzle_room"
+texture_asset = "first_puzzle_room"
 z = 0
 
 [entities.player]
@@ -10,3 +7,29 @@ prefab = "player"
 
 [entities.player.transformable]
 position = [159, 820]
+
+[entities.left_wall]
+transformable = { position = [70, 500] }
+collider = { mode = "constant", size = [10, 400] }
+
+[entities.right_wall]
+transformable = { position = [650, 500] }
+collider = { mode = "constant", size = [10, 400] }
+
+[entities.first_button]
+prefab = "first_puzzle_button"
+transformable = { position = [ 300, 650 ] }
+interaction = { args = [ "first" ] }
+first_puzzle_button = { n = "first" }
+
+[entities.second_button]
+prefab = "first_puzzle_button"
+transformable = { position = [ 400, 650 ] }
+interaction = { args = [ "second" ] }
+first_puzzle_button = { n = "second" }
+
+[entities.third_button]
+prefab = "first_puzzle_button"
+transformable = { position = [ 500, 650 ] }
+interaction = { args = [ "third" ] }
+first_puzzle_button = { n = "third" }

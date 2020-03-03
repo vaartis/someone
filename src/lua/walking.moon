@@ -183,16 +183,19 @@ interaction_callbacks = {
     load_room(room)
 }
 
-load_assets = (l_assets) ->
-    l_sprites = l_assets.sprites
-    if l_sprites
-      for name, path in pairs l_sprites
-        assets.add_sprite(name, path)
+load_assets = () ->
+  local l_assets
+  with io.open("resources/rooms/assets.toml", "r")
+    l_assets = toml.parse(\read("*all"))
+    \close()
 
-    l_sounds = l_assets.sounds
-    if l_sounds then
-      for name, path in pairs l_sounds
-        assets.add_sound(name, path)
+  if l_textures = l_assets.textures
+    for name, path in pairs l_textures
+      assets.add_to_known_assets("textures", name, path)
+
+  if l_sounds = l_assets.sounds
+    for name, path in pairs l_sounds
+      assets.add_to_known_assets("sounds", name, path)
 
 deep_merge = (t1, t2) ->
   result = {}
@@ -235,16 +238,6 @@ load_room_toml = (name) ->
             if lume.find(.removed_entities, k)
               -- Remove the entity
               prefab_room.entities[k] = nil
-        if .removed_assets
-          with .removed_assets
-            if .sprites and prefab_room.assets.sprites
-              for k, v in pairs(prefab_room.assets.sprites)
-                if lume.find(.sprites, k)
-                  prefab_room.assets.sprites[k] = nil
-            if .sounds and prefab_room.assets.sounds
-              for k, v in pairs(prefab_room.assets.sounds)
-                if lume.find(.sounds, k)
-                  prefab_room.assets.sounds[k] = nil
 
         room_toml = deep_merge(prefab_room, room_toml)
     -- Remove the mention of the prefab
@@ -257,9 +250,6 @@ load_room = (name) ->
 
   room_toml = load_room_toml(name)
 
-  -- Load assets
-  load_assets(room_toml.assets) if room_toml.assets
-
   for entity_name, entity in pairs room_toml.entities
     new_ent = Entity()
 
@@ -271,9 +261,6 @@ load_room = (name) ->
           \close()
         data
 
-      -- Load the assets of the prefab and remove them from the data
-      load_assets(prefab_data.assets)
-      prefab_data.assets = nil
       entity = deep_merge(prefab_data, entity)
 
       -- Remove the mention of the prefab from the entity
@@ -285,14 +272,16 @@ load_room = (name) ->
     for comp_name, comp in pairs entity
       switch comp_name
         when "drawable_sprite"
-          sprite_asset = assets.assets.sprites[comp.sprite_asset]
-          unless sprite_asset
-            error(lume.format("{1}.{2} requires a sprite named {3}", {entity_name, comp_name, comp.sprite_asset}))
+          texture_asset = assets.assets.textures[comp.texture_asset]
+          unless texture_asset
+            error(lume.format("{1}.{2} requires a texture named {3}", {entity_name, comp_name, comp.texture_asset}))
 
           unless comp.z then
             error(lume.format("{1}.{2} requires a {3} value", {entity_name, comp_name, "z"}))
 
-          sprite = sprite_asset.sprite
+          sprite = with Sprite.new!
+            .texture = texture_asset
+
           new_ent\add(shared_components.DrawableSpriteComponent(sprite, comp.z))
           new_ent\add(shared_components.TransformableComponent(sprite))
         when "transformable"
@@ -323,7 +312,8 @@ load_room = (name) ->
 
           local interaction_sound
           if comp.interaction_sound_asset
-            interaction_sound = assets.assets.sounds[comp.interaction_sound_asset].sound
+            interaction_sound = with Sound.new!
+              .buffer = assets.assets.sounds[comp.interaction_sound_asset]
 
           new_ent\add(
             InteractionComponent(
@@ -381,7 +371,10 @@ load_room = (name) ->
 
     engine\addEntity(new_ent)
 
-load_room "computer_room"
+-- Load the assets.toml file
+load_assets!
+-- Load the room
+load_room "first_puzzle_room"
 
 add_event = (event) ->
   native_event_manager\fireEvent(NativeEvent(event))

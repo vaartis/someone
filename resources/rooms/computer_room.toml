@@ -1,19 +1,11 @@
-[assets.sprites]
-computer_room = "resources/sprites/room/room.png"
-table = "resources/sprites/room/table/table.png"
-button = "resources/sprites/room/button/button.png"
-
-[assets.sounds]
-button_press = "resources/sounds/button_press.ogg"
-
 # Background
 
 [entities.background.drawable_sprite]
-sprite_asset = "computer_room"
+texture_asset = "computer_room"
 z = 0
 
 [entities.table.drawable_sprite]
-sprite_asset = "table"
+texture_asset = "table"
 z = 1
 
 [entities.table.transformable]
@@ -30,7 +22,7 @@ trigger = true
 # Button
 
 [entities.button.drawable_sprite]
-sprite_asset = "button"
+texture_asset = "button"
 z = 1
 
 [entities.button.transformable]

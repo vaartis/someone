@@ -1,10 +1,6 @@
 [prefab]
 name = "computer_room"
 removed_entities = [ "button" ]
-removed_assets = { sprites = ["button"], sounds = ["button_press"] }
-
-[assets.sprites]
-passage = "resources/sprites/room/passage/passage.png"
 
 [entities.table.interaction]
 callback_name = "computer_switch_to_terminal"
@@ -12,7 +8,7 @@ callback_name = "computer_switch_to_terminal"
 # Passage
 
 [entities.passage.drawable_sprite]
-sprite_asset = "passage"
+texture_asset = "passage"
 z = 1
 
 [entities.passage.transformable]

@@ -1,38 +1,45 @@
 lume = require("lume")
 
-empty_namespace =
-  sprites: {}
+known_assets =
+  textures: {}
+  sounds: {}
+assets =
+  textures: {}
   sounds: {}
 
-assets = lume.clone(empty_namespace)
+load_from_known_assets = (asset_type, key) ->
+  maybe_known_asset_path = known_assets[asset_type][key]
+  if not maybe_known_asset_path
+    error("Trying to load an unknown asset: #{key}")
 
-add_sprite = (name, path) ->
-  texture = with Texture.new!
-    \load_from_file(path)
+  switch asset_type
+    when "textures"
+      texture = with Texture.new!
+        \load_from_file(maybe_known_asset_path)
 
-  sprite = with Sprite.new!
-    .texture = texture
+      assets.textures[key] = texture
 
-  if assets.sprites[name]
-    print("Overriding sprite asset #{name}")
-  assets.sprites[name] = { :texture, :sprite }
+      texture
+    when "sounds"
+      buffer = with SoundBuffer.new!
+        \load_from_file(maybe_known_asset_path)
 
-  sprite
+      assets.sounds[key] = buffer
 
-add_sound = (name, path) ->
-  buffer = with SoundBuffer.new!
-    \load_from_file(path)
+      buffer
+    else
+      error("Unknown asset type: #{asset_type}")
 
-  sound = with Sound.new!
-    .buffer = buffer
+add_to_known_assets = (asset_type, key, path) ->
+  known_assets[asset_type][key] = path
 
-  if assets.sprites[name]
-    print("Overriding audio asset #{name}")
-  assets.sounds[name] = { :buffer, :sound }
+setmetatable(
+  assets.textures,
+  { __index: (_, key) -> load_from_known_assets("textures", key) }
+)
+setmetatable(
+  assets.sounds,
+  { __index: (_, key) -> load_from_known_assets("sounds", key) }
+)
 
-  sound
-
-clear_assets = () ->
-  assets = lume.clone(empty_namespace)
-
-{ :assets, :add_sprite, :add_sound, :clear_assets }
+{ :assets, :add_to_known_assets }
