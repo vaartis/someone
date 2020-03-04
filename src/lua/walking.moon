@@ -253,6 +253,7 @@ load_room_toml = (name) ->
 
 load_room = (name) ->
   reset_engine!
+  physics_world = bump.newWorld()
 
   room_toml = load_room_toml(name)
 
