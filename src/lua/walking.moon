@@ -103,7 +103,7 @@ ColliderUpdateSystem.update_from_sprite = (entity) ->
 
 InteractionComponent = Component.create(
    "Interaction",
-   {"on_interaction", "interaction_args", "current_state", "state_map", "interaction_sound"}
+   {"on_interaction", "is_activatable" , "interaction_args", "current_state", "state_map", "interaction_sound"}
 )
 
 InteractionSystem = _G.class("InteractionSystem", System)
@@ -129,6 +129,10 @@ InteractionSystem.update = (dt) =>
 
     -- If the player is in the rectangle of the sprite, then check if the interaction button is pressed
     if lume.any(cols, (e) -> e\has("PlayerMovement")) then
+      if interaction_comp.is_activatable
+        unless interaction_comp.is_activatable(interaction_comp.current_state)
+          continue
+
       for _, native_event in pairs event_store.events
         event = native_event.event
         if event.type == EventType.KeyReleased and event.key.code == KeyboardKey.E then
@@ -152,11 +156,15 @@ InteractionSystem.update = (dt) =>
 
 local load_room
 
+activatable_callbacks = {
+  first_button_pressed: () -> state_variables.first_button_pressed == true
+  state_is_disabled: (curr_state) -> curr_state == "disabled",
+  first_puzzle_solved: first_puzzle.first_puzzle_solved,
+  first_puzzle_not_solved: first_puzzle.first_puzzle_not_solved
+}
+
 interaction_callbacks = {
    computer_switch_to_terminal: (curr_state) ->
-    unless state_variables.first_button_pressed
-      return "disabled"
-
     pents = engine\getEntitiesWithComponent("PlayerMovement")
     player_key = lume.first(lume.keys(pents))
     if not player_key then error("No player entity found")
@@ -174,9 +182,6 @@ interaction_callbacks = {
     "enabled"
 
   activate_computer: (curr_state) ->
-    if curr_state == "enabled"
-      return curr_state
-
     state_variables.first_button_pressed = true
 
     "enabled",
@@ -316,6 +321,9 @@ load_room = (name) ->
         when "interaction"
           unless interaction_callbacks[comp.callback_name]
             error(lume.format("{1}.{2} requires a {3} interaction callback that doesn't exist", {entity_name, comp_name, comp.callback_name}))
+          if comp.activatable_callback_name
+            unless activatable_callbacks[comp.activatable_callback_name]
+              error(lume.format("{1}.{2} requires a {3} activatable callback that doesn't exist", {entity_name, comp_name, comp.activatable_callback_name}))
 
           local interaction_sound
           if comp.interaction_sound_asset
@@ -325,6 +333,7 @@ load_room = (name) ->
           new_ent\add(
             InteractionComponent(
               interaction_callbacks[comp.callback_name],
+              if comp.activatable_callback_name then activatable_callbacks[comp.activatable_callback_name] else nil,
               comp.args,
               comp.initial_state,
               comp.state_map,

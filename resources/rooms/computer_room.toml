@@ -13,6 +13,7 @@ position = [97, 706]
 
 [entities.table.interaction]
 initial_state = "disabled"
+activatable_callback_name = "first_button_pressed"
 callback_name = "computer_switch_to_terminal"
 
 [entities.table.collider]
@@ -36,6 +37,7 @@ playable = false
 [entities.button.interaction]
 initial_state = "disabled"
 state_map = { disabled = 1, enabled = 2 }
+activatable_callback_name = "state_is_disabled"
 callback_name = "activate_computer"
 interaction_sound_asset = "button_press"
 

@@ -12,6 +12,7 @@ initial_state = "wrong"
 state_map = { right = 2, wrong = 1 }
 interaction_sound_asset = "button_press"
 callback_name = "first_puzzle_button"
+activatable_callback_name = "first_puzzle_not_solved"
 
 [collider]
 mode = "sprite"

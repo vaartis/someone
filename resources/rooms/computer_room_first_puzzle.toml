@@ -3,6 +3,7 @@ name = "computer_room"
 removed_entities = [ "button" ]
 
 [entities.table.interaction]
+activatable_callback_name = "first_puzzle_solved"
 callback_name = "computer_switch_to_terminal"
 
 # Passage
