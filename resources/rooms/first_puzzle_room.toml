@@ -33,3 +33,8 @@ prefab = "first_puzzle_button"
 transformable = { position = [ 500, 650 ] }
 interaction = { args = [ "third" ] }
 first_puzzle_button = { n = "third" }
+
+[entities.passage]
+prefab = "passage"
+transformable = { position = [120, 750], scale = [1, 1] }
+interaction = { args = [ "computer_room_first_puzzle" ] }

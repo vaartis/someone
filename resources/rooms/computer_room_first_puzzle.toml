@@ -8,19 +8,7 @@ callback_name = "computer_switch_to_terminal"
 
 # Passage
 
-[entities.passage.drawable_sprite]
-texture_asset = "passage"
-z = 1
-
-[entities.passage.transformable]
-origin = [0, 184]
-scale = [-1, 1]
-position = [1000, 750]
-
-[entities.passage.interaction]
-callback_name = "switch_room"
-args = [ "first_puzzle_room" ]
-
-[entities.passage.collider]
-mode = "sprite"
-trigger = true
+[entities.passage]
+prefab = "passage"
+transformable = { position = [1000, 750] }
+interaction = { args = [ "first_puzzle_room" ] }

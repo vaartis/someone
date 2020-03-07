@@ -154,6 +154,13 @@ InteractionSystem.update = (dt) =>
       anim = obj\get("Animation")
       anim.current_frame = interaction_comp.state_map[interaction_comp.current_state]
 
+find_player = () ->
+  pents = engine\getEntitiesWithComponent("PlayerMovement")
+  player_key = lume.first(lume.keys(pents))
+  if not player_key then error("No player entity found")
+
+  pents[player_key]
+
 local load_room
 
 activatable_callbacks = {
@@ -165,10 +172,7 @@ activatable_callbacks = {
 
 interaction_callbacks = {
    computer_switch_to_terminal: (curr_state) ->
-    pents = engine\getEntitiesWithComponent("PlayerMovement")
-    player_key = lume.first(lume.keys(pents))
-    if not player_key then error("No player entity found")
-    player = pents[player_key]
+    player = find_player!
 
     player\get("PlayerMovement").active = false
 

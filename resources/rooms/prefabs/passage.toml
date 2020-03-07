@@ -1,0 +1,14 @@
+[drawable_sprite]
+texture_asset = "passage"
+z = 1
+
+[transformable]
+origin = [0, 184]
+scale = [-1, 1]
+
+[interaction]
+callback_name = "switch_room"
+
+[collider]
+mode = "sprite"
+trigger = true
