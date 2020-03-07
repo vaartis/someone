@@ -11,4 +11,4 @@ callback_name = "computer_switch_to_terminal"
 [entities.passage]
 prefab = "passage"
 transformable = { position = [1000, 750] }
-interaction = { args = [ "first_puzzle_room" ] }
+interaction = { args = { room = "first_puzzle_room" } }

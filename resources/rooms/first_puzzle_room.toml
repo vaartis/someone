@@ -37,4 +37,4 @@ first_puzzle_button = { n = "third" }
 [entities.passage]
 prefab = "passage"
 transformable = { position = [120, 750], scale = [1, 1] }
-interaction = { args = [ "computer_room_first_puzzle" ] }
+interaction = { args = { room = "computer_room_first_puzzle", player_pos = [900, 644] } }

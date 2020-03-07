@@ -136,10 +136,15 @@ InteractionSystem.update = (dt) =>
       for _, native_event in pairs event_store.events
         event = native_event.event
         if event.type == EventType.KeyReleased and event.key.code == KeyboardKey.E then
-          interaction_res = interaction_comp.on_interaction(
-            interaction_comp.current_state,
-            if interaction_comp.interaction_args then table.unpack(interaction_comp.interaction_args) else {}
-          )
+          args = if interaction_comp.interaction_args
+            if lume.isarray(interaction_comp.interaction_args)
+                table.unpack(interaction_comp.interaction_args)
+            else
+                interaction_comp.interaction_args
+          else
+            {}
+
+          interaction_res = interaction_comp.on_interaction(interaction_comp.current_state, args)
 
           -- If some kind of result was returned, use it as the new state
           if interaction_res ~= nil and interaction_res ~= interaction_comp.current_state
@@ -190,8 +195,16 @@ interaction_callbacks = {
 
     "enabled",
 
-  switch_room: (curr_state, room) ->
+  switch_room: (curr_state, args) ->
+    { :room, :player_pos } = args
+
     load_room(room)
+
+    if player_pos then
+      player = find_player!
+
+      physics_world = player\get("Collider").physics_world
+      physics_world\update(player, player_pos[1], player_pos[2])
 
   first_puzzle_button: first_puzzle.button_callback
 }
