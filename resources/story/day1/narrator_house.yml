@@ -36,7 +36,7 @@ config:
 explore-the:
   char: description
   # Set up the hub variable if they haven't been set up yet
-  script: >-
+  script: |-
     if not TerminalModule.state_variables.narrator_house then
        TerminalModule.state_variables.narrator_house = {
          hub = {
@@ -63,13 +63,13 @@ hub:
     condition: return not TerminalModule.state_variables.narrator_house.hub.bathroom
     next: bathroom
   - text: Go to bed
-    condition: >-
+    condition: |-
       -- Go to bed when at least one room has been explored
       local lume = require("lume")
       return lume.any(TerminalModule.state_variables.narrator_house.hub)
     next: bed-after-explored
   - text: Go to bed
-    condition: >-
+    condition: |-
       -- Go to bed when when no rooms were explored
       local lume = require("lume")
       return not lume.any(TerminalModule.state_variables.narrator_house.hub)
@@ -78,7 +78,7 @@ hub:
 living-room:
   char: description
   wait: true
-  script: >-
+  script: |-
     TerminalModule.state_variables.narrator_house.hub.living_room = true
   # TODO: talking topic about computers here
   text: >-
@@ -91,7 +91,7 @@ living-room:
 kitchen:
   char: description
   wait: true
-  script: >-
+  script: |-
     TerminalModule.state_variables.narrator_house.hub.kitchen = true
   # TODO: talking topic about food here
   text: >-
@@ -104,7 +104,7 @@ kitchen:
 bathroom:
   char: description
   wait: true
-  script: >-
+  script: |-
     TerminalModule.state_variables.narrator_house.hub.bathroom = true
   text: >-
     On the left, there's a moderately sized bathtub, near which there's a small shelf with some kind of soap and a sponge. On the right,
