@@ -107,6 +107,8 @@ InteractionComponent = Component.create(
 )
 
 InteractionSystem = _G.class("InteractionSystem", System)
+InteractionSystem._seconds_since_last_interaction = 0 -- Time tracked by dt, since last interaction
+InteractionSystem._seconds_before_next_interaction = 0.3 -- A constant that represents how long to wait between interactions
 InteractionSystem.requires = () => {
   objects: {"Interaction", "Collider"},
   -- The PlayerMovement component only exists on the player
@@ -116,6 +118,8 @@ InteractionSystem.update = (dt) =>
   player_key = lume.first(lume.keys(@targets.player))
   if not player_key then error("No player entity found")
   player = @targets.player[player_key]
+
+  @_seconds_since_last_interaction += dt
 
   for _, obj in pairs @targets.objects
     local interaction_comp, physics_world
@@ -135,7 +139,9 @@ InteractionSystem.update = (dt) =>
 
       for _, native_event in pairs event_store.events
         event = native_event.event
-        if event.type == EventType.KeyReleased and event.key.code == KeyboardKey.E then
+        if @_seconds_since_last_interaction > @_seconds_before_next_interaction and
+           event.type == EventType.KeyReleased and event.key.code == KeyboardKey.E then
+          @_seconds_since_last_interaction = 0
           args = if interaction_comp.interaction_args
             if lume.isarray(interaction_comp.interaction_args)
                 table.unpack(interaction_comp.interaction_args)
