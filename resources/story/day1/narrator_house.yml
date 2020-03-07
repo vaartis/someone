@@ -120,7 +120,7 @@ bed-after-explored:
   text: >-
     The <narrator> is already asleep. You say "good night" to yourself, although you're not sure what will happen
     when you "fall asleep".
-  next: ""
+  next: "narrator-house-end"
 
 bed-if-not-explored:
   char: narrator
@@ -143,7 +143,13 @@ bed-if-not-explored-3:
 
 bed-if-not-explored-4:
   char: player
+  wait: true
   responses:
   - text: >-
       You too.
-    next: ""
+    next: "narrator-house-end"
+
+narrator-house-end:
+  char: description
+  text: ""
+  script: TerminalModule.switch_to_walking("computer_room_first_puzzle")

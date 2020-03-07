@@ -408,7 +408,7 @@ load_room = (name) ->
 -- Load the assets.toml file
 load_assets!
 -- Load the room
-load_room "first_puzzle_room"
+-- load_room "first_puzzle_room"
 
 add_event = (event) ->
   native_event_manager\fireEvent(NativeEvent(event))
@@ -423,5 +423,5 @@ draw = () ->
 
 {
   :add_event, :update, :draw
-  :state_variables
+  :state_variables, :load_room
 }

@@ -486,7 +486,7 @@ function M.set_environment_image(name)
    current_environment_sprite.texture = current_environment_texture
 end
 
-function M.switch_to_walking()
+function M.switch_to_walking(room)
    -- Needs to be done as soon as possible to stop processing lines
    M.active = false
 
@@ -494,6 +494,7 @@ function M.switch_to_walking()
    coroutines.create_coroutine(
       coroutines.black_screen_out,
       function()
+         WalkingModule.load_room(room)
          GLOBAL.set_current_state(CurrentState.Walking)
       end
    )
