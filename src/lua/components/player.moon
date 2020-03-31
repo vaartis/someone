@@ -26,16 +26,15 @@ PlayerMovementSystem.update = (dt) =>
       animation = entity\get("Animation")
       physics_world = entity\get("Collider").physics_world
 
-      if Keyboard.is_key_pressed(KeyboardKey.D) or Keyboard.is_key_pressed(KeyboardKey.A)
-        local expected_new_pos, look_direction
+      local pos_diff, look_direction
+      if Keyboard.is_key_pressed KeyboardKey.D
+        pos_diff = Vector2f.new(x_movement_speed, 0.0)
+        look_direction = 1
+      elseif Keyboard.is_key_pressed KeyboardKey.A
+        pos_diff = Vector2f.new(-x_movement_speed, 0.0)
+        look_direction = -1
 
-        local pos_diff
-        if Keyboard.is_key_pressed KeyboardKey.D
-          pos_diff = Vector2f.new(x_movement_speed, 0.0)
-          look_direction = 1
-        elseif Keyboard.is_key_pressed KeyboardKey.A
-          pos_diff = Vector2f.new(-x_movement_speed, 0.0)
-          look_direction = -1
+      if pos_diff ~= nil
         expected_new_pos = do
           x, y = physics_world\getRect(entity)
           Vector2f.new(x, y) + pos_diff
