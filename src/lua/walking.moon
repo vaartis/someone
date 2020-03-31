@@ -165,6 +165,17 @@ InteractionSystem.update = (dt) =>
       anim = obj\get("Animation")
       anim.current_frame = interaction_comp.state_map[interaction_comp.current_state]
 
+SoundPlayerComponent = Component.create("SoundPlayer", {"sound", "activate_callback", "played"}, { played: false })
+SoundPlayerSystem = _G.class("SoundPlayerSystem", System)
+SoundPlayerSystem.requires = () => {"SoundPlayer"}
+SoundPlayerSystem.update = () =>
+  for _, entity in pairs @targets
+    sound_comp = entity\get("SoundPlayer")
+    unless sound_comp.played
+      if sound_comp.activate_callback()
+        sound_comp.sound\play()
+        sound_comp.played = true
+
 find_player = () ->
   pents = engine\getEntitiesWithComponent("PlayerMovement")
   player_key = lume.first(lume.keys(pents))
@@ -250,6 +261,7 @@ reset_engine = () ->
     \addSystem(player_components.PlayerMovementSystem())
     \addSystem(InteractionSystem())
     \addSystem(ColliderUpdateSystem())
+    \addSystem(SoundPlayerSystem())
 
     \addSystem(first_puzzle.FirstPuzzleButtonSystem())
 
@@ -390,6 +402,15 @@ load_room = (name) ->
                 else
                   error("Unknown collider mode #{comp.mode} for #{entity_name}")
           )
+        when "sound_player"
+          callback = activatable_callbacks[comp.activate_callback_name]
+          unless callback
+            error(lume.format("{1}.{2} requires a {3} interaction callback that doesn't exist", {entity_name, comp_name, comp.activate_callback_name}))
+
+          sound = with Sound.new!
+            .buffer = assets.assets.sounds[comp.sound_asset]
+
+          new_ent\add(SoundPlayerComponent(sound, callback))
         else
           component_processors = {
             player_components.process_components,

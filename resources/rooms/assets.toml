@@ -13,3 +13,4 @@ mainchar = "resources/sprites/mainchar/mainchar.png"
 [sounds]
 button_press = "resources/sounds/button_press.ogg"
 footstep = "resources/sounds/footstep.ogg"
+puzzle_jingle = "resources/sounds/puzzle_jingle/puzzle_jingle.ogg"

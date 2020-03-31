@@ -34,6 +34,9 @@ transformable = { position = [ 500, 650 ] }
 interaction = { args = [ "third" ] }
 first_puzzle_button = { n = "third" }
 
+[entities.puzzle_jingle_player]
+sound_player = { sound_asset = "puzzle_jingle", activate_callback_name = "first_puzzle_solved" }
+
 [entities.passage]
 prefab = "passage"
 transformable = { position = [120, 750], scale = [1, 1] }
