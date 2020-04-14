@@ -17,6 +17,7 @@ position = [97, 706]
 initial_state = "disabled"
 activatable_callback_name = "first_button_pressed"
 callback_name = "computer_switch_to_terminal"
+action_text = "use the computer"
 
 [entities.table.collider]
 mode = "sprite"
@@ -43,6 +44,7 @@ state_map = { disabled = 1, enabled = 2 }
 activatable_callback_name = "state_is_disabled"
 callback_name = "activate_computer"
 interaction_sound_asset = "button_press"
+action_text = "press the button"
 
 [entities.button.collider]
 mode = "sprite"
@@ -56,6 +58,8 @@ prefab = "player"
 [entities.player.transformable]
 position = [420, 820]
 
+# Walls
+
 [entities.left_wall]
 transformable = { position = [350, 500] }
 collider = { mode = "constant", size = [10, 400] }
@@ -63,3 +67,6 @@ collider = { mode = "constant", size = [10, 400] }
 [entities.right_wall]
 transformable = { position = [1130, 500] }
 collider = { mode = "constant", size = [10, 400] }
+
+[entities.interaction_text]
+prefab = "interaction_text"

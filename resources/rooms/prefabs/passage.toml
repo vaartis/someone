@@ -9,6 +9,7 @@ scale = [-1, 1]
 
 [interaction]
 callback_name = "switch_room"
+action_text = "go through"
 
 [collider]
 mode = "sprite"

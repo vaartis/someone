@@ -1,0 +1,10 @@
+tags = [ "interaction_text" ]
+
+[drawable]
+kind = "text"
+text = { text = "[E] to", font_size = 40 }
+z = 2
+enabled = false
+
+[transformable]
+position = [50, 950]

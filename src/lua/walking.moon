@@ -41,6 +41,8 @@ native_event_manager\addListener("NativeEvent", event_store, event_store.add_eve
 
 physics_world = bump.newWorld()
 
+InteractionTextTag = Component.create("InteractionTextTag")
+
 ColliderComponent = Component.create("Collider", {"physics_world", "mode", "trigger"}, {trigger: false})
 
 DebugColliderDrawingSystem = _G.class("DebugColliderDrawingSystem", System)
@@ -103,7 +105,7 @@ ColliderUpdateSystem.update_from_sprite = (entity) ->
 
 InteractionComponent = Component.create(
    "Interaction",
-   {"on_interaction", "is_activatable" , "interaction_args", "current_state", "state_map", "interaction_sound"}
+   {"on_interaction", "is_activatable" , "interaction_args", "current_state", "state_map", "interaction_sound", "action_text"}
 )
 
 InteractionSystem = _G.class("InteractionSystem", System)
@@ -111,16 +113,16 @@ InteractionSystem._seconds_since_last_interaction = 0 -- Time tracked by dt, sin
 InteractionSystem._seconds_before_next_interaction = 0.3 -- A constant that represents how long to wait between interactions
 InteractionSystem.requires = () => {
   objects: {"Interaction", "Collider"},
-  -- The PlayerMovement component only exists on the player
-  player: {"PlayerMovement"}
+  interaction_text: {"InteractionTextTag"}
 }
 InteractionSystem.update = (dt) =>
-  player_key = lume.first(lume.keys(@targets.player))
-  if not player_key then error("No player entity found")
-  player = @targets.player[player_key]
+  interaction_text_key = lume.first(lume.keys(@targets.interaction_text))
+  if not interaction_text_key then error("No interaction text entity found")
+  interaction_text_drawable = @targets.interaction_text[interaction_text_key]\get("Drawable")
 
   @_seconds_since_last_interaction += dt
 
+  any_interactables_touched = false
   for _, obj in pairs @targets.objects
     local interaction_comp, physics_world
     with obj
@@ -136,6 +138,10 @@ InteractionSystem.update = (dt) =>
       if interaction_comp.is_activatable
         unless interaction_comp.is_activatable(interaction_comp.current_state)
           continue
+      any_interactables_touched = true
+
+      with interaction_comp
+        interaction_text_drawable.drawable.string =  "[E] to " .. (if .action_text then .action_text else "interact")
 
       for _, native_event in pairs event_store.events
         event = native_event.event
@@ -159,6 +165,8 @@ InteractionSystem.update = (dt) =>
             -- Play the sound if there is one
             if interaction_comp.interaction_sound
               interaction_comp.interaction_sound\play()
+
+    interaction_text_drawable.enabled = any_interactables_touched
 
     -- Update the current texture frame if there's a state map
     if interaction_comp.state_map
@@ -379,7 +387,8 @@ load_room = (name) ->
               comp.args,
               comp.initial_state,
               comp.state_map,
-              interaction_sound
+              interaction_sound,
+              comp.action_text
             )
           )
         when "collider"
@@ -418,6 +427,16 @@ load_room = (name) ->
             .buffer = assets.assets.sounds[comp.sound_asset]
 
           new_ent\add(SoundPlayerComponent(sound, callback))
+        when "tags"
+          -- TODO: this tag system doesn't seem like a very good solution, maybe
+          -- it should be changed somehow to allow selecting entities by tags directly,
+          -- though it is likely that this change has to be done in the ECS itself
+          for _, tag in pairs comp
+            switch tag
+              when "interaction_text"
+                new_ent\add(InteractionTextTag())
+              else
+                error("Unknown tag in #{entity_name}.#{comp_name}: #{tag}")
         else
           component_processors = {
             player_components.process_components,

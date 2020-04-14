@@ -119,6 +119,10 @@ void register_usertypes(sol::state &lua) {
     auto text_type = lua.new_usertype<sf::Text>(
         "Text", sol::constructors<sf::Text(const std::string&, const sf::Font&, unsigned int)>(),
         sol::base_classes, sol::bases<sf::Drawable, sf::Transformable>(),
+        "string", sol::property(
+            [](sf::Text &self) { return self.getString().toAnsiString(); },
+            [](sf::Text &self, std::string str) { return self.setString(str); }
+        ),
         "global_bounds", sol::property(&sf::Text::getGlobalBounds),
         "fill_color", sol::property(&sf::Text::getFillColor, &sf::Text::setFillColor),
         "style", sol::property(&sf::Text::getStyle, &sf::Text::setStyle)
