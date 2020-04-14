@@ -1,4 +1,5 @@
-[entities.background.drawable_sprite]
+[entities.background.drawable]
+kind = "sprite"
 texture_asset = "first_puzzle_room"
 z = 0
 

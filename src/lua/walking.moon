@@ -67,7 +67,7 @@ ColliderUpdateSystem.update = (dt) =>
       when "sprite"
         self.update_from_sprite(entity)
 ColliderUpdateSystem.update_from_sprite = (entity) ->
-  sprite_size = entity\get("DrawableSprite").sprite.global_bounds
+  sprite_size = entity\get("Drawable").drawable.global_bounds
   tf = entity\get("Transformable").transformable
   physics_world = entity\get("Collider").physics_world
 
@@ -318,19 +318,26 @@ load_room = (name) ->
 
     for comp_name, comp in pairs entity
       switch comp_name
-        when "drawable_sprite"
-          texture_asset = assets.assets.textures[comp.texture_asset]
-          unless texture_asset
-            error(lume.format("{1}.{2} requires a texture named {3}", {entity_name, comp_name, comp.texture_asset}))
-
+        when "drawable"
           unless comp.z then
             error(lume.format("{1}.{2} requires a {3} value", {entity_name, comp_name, "z"}))
 
-          sprite = with Sprite.new!
-            .texture = texture_asset
+          local drawable
+          switch comp.kind
+            when "sprite"
+              texture_asset = assets.assets.textures[comp.texture_asset]
+              unless texture_asset
+                error(lume.format("{1}.{2} requires a texture named {3}", {entity_name, comp_name, comp.texture_asset}))
 
-          new_ent\add(shared_components.DrawableSpriteComponent(sprite, comp.z))
-          new_ent\add(shared_components.TransformableComponent(sprite))
+              drawable = with Sprite.new!
+                .texture = texture_asset
+            when "text"
+              drawable = Text.new(comp.text.text, StaticFonts.main_font, comp.text.font_size or StaticFonts.font_size)
+            else
+              error("Unknown kind of drawable kind in #{entity_name}.#{comp_name}")
+
+          new_ent\add(shared_components.DrawableComponent(drawable, comp.z, comp.kind, if comp.enabled ~= nil then comp.enabled else true))
+          new_ent\add(shared_components.TransformableComponent(drawable))
         when "transformable"
           table.insert(
             add_transformable_actions,
@@ -386,8 +393,8 @@ load_room = (name) ->
 
               switch comp.mode
                 when "sprite"
-                  unless new_ent\has("DrawableSprite")
-                    error("DrawableSprite is required for a collider with sprite mode on #{entity_name}")
+                  unless new_ent\has("Drawable") and new_ent\get("Drawable").kind == "sprite"
+                    error("Drawable sprite is required for a collider with sprite mode on #{entity_name}")
 
                   -- Add the collider component and update the collider from the sprite, also adding it to the physics world
                   new_ent\add(ColliderComponent(physics_world, comp.mode, comp.trigger))

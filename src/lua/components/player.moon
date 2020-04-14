@@ -14,7 +14,7 @@ PlayerMovementComponent = Component.create(
 
 PlayerMovementSystem = _G.class("PlayerMovementSystem", System)
 PlayerMovementSystem.requires = =>
-  {"PlayerMovement", "Transformable", "DrawableSprite", "Animation", "Collider"}
+  {"PlayerMovement", "Transformable", "Drawable", "Animation", "Collider"}
 
 PlayerMovementSystem.update = (dt) =>
   for _, entity in pairs @targets do
@@ -22,7 +22,7 @@ PlayerMovementSystem.update = (dt) =>
 
     if player_movement.active
       tf = entity\get("Transformable")
-      drawable = entity\get("DrawableSprite")
+      drawable = entity\get("Drawable")
       animation = entity\get("Animation")
       physics_world = entity\get("Collider").physics_world
 
@@ -55,7 +55,7 @@ PlayerMovementSystem.update = (dt) =>
       else
         player_movement.walking = false
 
-      drawable.sprite.scale = Vector2f.new(player_movement.look_direction, 1.0)
+      drawable.drawable.scale = Vector2f.new(player_movement.look_direction, 1.0)
       animation.playing = player_movement.walking
 
       -- Play the step sound every two steps of the animation, which are the moments

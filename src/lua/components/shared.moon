@@ -8,11 +8,11 @@ lovetoys.initialize({
       globals: true
 })
 
-DrawableSpriteComponent = Component.create("DrawableSprite", {"sprite", "z"})
+DrawableComponent = Component.create("Drawable", {"drawable", "z", "kind", "enabled"})
 
 RenderSystem = _G.class("RenderSystem", System)
 RenderSystem.requires = () =>
-   {"DrawableSprite"}
+   {"Drawable"}
 RenderSystem._sort_targets = () =>
   -- Sorts targets according to the Z level.
   -- This has to be done in a roundabout way because sorting DOESN'T WORK
@@ -25,8 +25,8 @@ RenderSystem._sort_targets = () =>
   table.sort(
     entities,
     (a, b) ->
-      drawable_a = a\get("DrawableSprite")
-      drawable_b = b\get("DrawableSprite")
+      drawable_a = a\get("Drawable")
+      drawable_b = b\get("Drawable")
 
       drawable_a.z < drawable_b.z
   )
@@ -36,9 +36,10 @@ RenderSystem.onRemoveEntity = () => @_sort_targets!
 
 RenderSystem.draw = () =>
   for _, entity in ipairs @_sorted_targets
-    drawable = entity\get("DrawableSprite")
+    drawable = entity\get("Drawable")
 
-    GLOBAL.drawing_target\draw(drawable.sprite)
+    if drawable.enabled
+      GLOBAL.drawing_target\draw(drawable.drawable)
 
 TransformableComponent = Component.create("Transformable", {"transformable"})
 
@@ -50,7 +51,7 @@ AnimationComponent = Component.create(
 
 AnimationSystem = _G.class("AnimationSystem", System)
 AnimationSystem.requires = () =>
-  {"DrawableSprite", "Animation"}
+  {"Drawable", "Animation"}
 AnimationSystem.update = (dt) =>
   for _, entity in pairs @targets
     with entity\get("Animation")
@@ -68,7 +69,7 @@ AnimationSystem.update = (dt) =>
         .current_frame = 1
 
 
-      entity\get("DrawableSprite").sprite.texture_rect = .frames[.current_frame].rect
+      entity\get("Drawable").drawable.texture_rect = .frames[.current_frame].rect
 
 load_sheet_frames = (dir_path) ->
   dir_basename = path.basename(path.remove_dir_end(dir_path))
@@ -97,7 +98,7 @@ load_sheet_frames = (dir_path) ->
   animation_frames
 
 {
-  :DrawableSpriteComponent, :RenderSystem,
+  :DrawableComponent, :RenderSystem,
   :AnimationComponent, :AnimationSystem,
   :TransformableComponent,
   :load_sheet_frames

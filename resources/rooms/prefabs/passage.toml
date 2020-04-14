@@ -1,4 +1,5 @@
-[drawable_sprite]
+[drawable]
+kind = "sprite"
 texture_asset = "passage"
 z = 1
 

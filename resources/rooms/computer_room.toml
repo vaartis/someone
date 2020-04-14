@@ -1,10 +1,12 @@
 # Background
 
-[entities.background.drawable_sprite]
+[entities.background.drawable]
+kind = "sprite"
 texture_asset = "computer_room"
 z = 0
 
-[entities.table.drawable_sprite]
+[entities.table.drawable]
+kind = "sprite"
 texture_asset = "table"
 z = 1
 
@@ -22,7 +24,8 @@ trigger = true
 
 # Button
 
-[entities.button.drawable_sprite]
+[entities.button.drawable]
+kind = "sprite"
 texture_asset = "button"
 z = 1
 
