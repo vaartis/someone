@@ -1,5 +1,5 @@
-package = "vacances"
-version = "vacances-1"
+package = "someone"
+version = "someone-1"
 
 dependencies = {
    --"lovetoys==0.4.0",

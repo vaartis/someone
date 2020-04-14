@@ -24,7 +24,7 @@ int main() {
     spdlog::set_level(spdlog::level::debug);
     #endif
 
-    sf::RenderWindow window(sf::VideoMode(1280, 1024), "Vacances");
+    sf::RenderWindow window(sf::VideoMode(1280, 1024), "Someone");
     window.setFramerateLimit(60);
 
     sf::RenderTexture target;
@@ -52,10 +52,10 @@ int main() {
 
     // Setup the lua path to see luarocks packages
     lua["package"]["path"] = std::string(
-        "resources/lua/share/lua/" VACANCES_LUA_VERSION "/?.lua;resources/lua/share/lua/" VACANCES_LUA_VERSION "/?/init.lua;"
+        "resources/lua/share/lua/" SOMEONE_LUA_VERSION "/?.lua;resources/lua/share/lua/" SOMEONE_LUA_VERSION "/?/init.lua;"
     ) + std::string(lua["package"]["path"]);
     lua["package"]["cpath"] = std::string(
-        "resources/lua/lib/lua/" VACANCES_LUA_VERSION "/?.so;"
+        "resources/lua/lib/lua/" SOMEONE_LUA_VERSION "/?.so;"
     ) + std::string(lua["package"]["cpath"]);
 
     register_usertypes(lua);

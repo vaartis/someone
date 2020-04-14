@@ -5,7 +5,7 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 set(CMAKE_C_COMPILER clang)
 set(CMAKE_CXX_COMPILER clang++)
 
-project(vacances CXX)
+project(someone CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
@@ -40,8 +40,8 @@ add_custom_command(
 add_custom_target(lua DEPENDS "${PROJECT_BINARY_DIR}/deps/lua/liblua.a" "${PROJECT_BINARY_DIR}/deps/lua/lua")
 set(LUA_LIBRARIES "${PROJECT_BINARY_DIR}/deps/lua/liblua.a" dl)
 set(LUA_INCLUDE_DIR "${PROJECT_BINARY_DIR}/deps/lua")
-set(VACANCES_LUA_VERSION "5.3")
-add_definitions(-DVACANCES_LUA_VERSION="${VACANCES_LUA_VERSION}")
+set(SOMEONE_LUA_VERSION "5.3")
+add_definitions(-DSOMEONE_LUA_VERSION="${SOMEONE_LUA_VERSION}")
 
 # ===
 
@@ -68,12 +68,12 @@ add_custom_target(luarocks DEPENDS "${PROJECT_BINARY_DIR}/deps/luarocks/luarocks
 # Temporary (?) fix for lovetoys luarocks package being broken
 
 add_custom_command(
-  OUTPUT "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${VACANCES_LUA_VERSION}/lovetoys"
+  OUTPUT "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/lovetoys"
   DEPENDS luarocks lua
   COMMAND ${PROJECT_BINARY_DIR}/deps/luarocks/luarocks --tree=${PROJECT_BINARY_DIR}/resources/lua build
   WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/deps/lovetoys"
 )
-add_custom_target(lovetoys-build DEPENDS "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${VACANCES_LUA_VERSION}/lovetoys")
+add_custom_target(lovetoys-build DEPENDS "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/lovetoys")
 
 add_custom_command(
   OUTPUT "${PROJECT_BINARY_DIR}/resources/lua/"
@@ -88,7 +88,7 @@ add_custom_target(luarocks-build DEPENDS "${PROJECT_BINARY_DIR}/resources/lua/")
 add_definitions("-DSOL_ALL_SAFETIES_ON=1")
 add_subdirectory("${PROJECT_SOURCE_DIR}/deps/sol2")
 
-set(vacances_src
+set(someone_src
   "src/fonts.cpp"
   "src/string_utils.cpp"
   "src/usertypes.cpp"
@@ -96,12 +96,12 @@ set(vacances_src
   "src/main.cpp"
 )
 
-add_executable(vacances ${vacances_src})
+add_executable(someone ${someone_src})
 
-add_dependencies(vacances luarocks-build lovetoys-build)
-target_link_options(vacances PRIVATE -Wl,--export-dynamic)
-target_link_libraries(vacances sfml-graphics sfml-audio fmt yaml-cpp spdlog sol2 ${LUA_LIBRARIES})
-target_include_directories(vacances PRIVATE "src" ${LUA_INCLUDE_DIR})
+add_dependencies(someone luarocks-build lovetoys-build)
+target_link_options(someone PRIVATE -Wl,--export-dynamic)
+target_link_libraries(someone sfml-graphics sfml-audio fmt yaml-cpp spdlog sol2 ${LUA_LIBRARIES})
+target_include_directories(someone PRIVATE "src" ${LUA_INCLUDE_DIR})
 
 # Copy all resources
 add_custom_target(copy-resources ALL
