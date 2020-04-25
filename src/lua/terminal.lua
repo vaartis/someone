@@ -99,13 +99,13 @@ local InputWaitLine = class("InputWaitLine", OutputLine)
 function InputWaitLine:initialize(name, text, next_line)
    OutputLine.initialize(self, name, text, next_line)
 
-   self._space_pressed = false
+   self._1_pressed = false
 end
 
 function InputWaitLine:current_text()
    local final_text = self._text:sub(0, self._letters_output)
-   if (self._letters_output == #self._text and not self._space_pressed) then
-      final_text = final_text .. "\n[Press Space to continue]"
+   if (self._letters_output == #self._text and not self._1_pressed) then
+      final_text = final_text .. "\n[Press 1 to continue]"
    end
 
    local substr = lume.wordwrap(
@@ -120,19 +120,19 @@ function InputWaitLine:current_text()
 end
 
 function InputWaitLine:should_wait()
-   return OutputLine.should_wait(self) or not self._space_pressed
+   return OutputLine.should_wait(self) or not self._1_pressed
 end
 
 function InputWaitLine:is_interactive()
-   return self._letters_output == #self._text and not self._space_pressed
+   return self._letters_output == #self._text and not self._1_pressed
 end
 
 function InputWaitLine:handle_interaction(event)
    if event.type == EventType.KeyReleased then
       local key = event.key.code
 
-      if key == KeyboardKey.Space then
-         self._space_pressed = true
+      if key == KeyboardKey.Num1 then
+         self._1_pressed = true
       end
    end
 end

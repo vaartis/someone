@@ -205,6 +205,7 @@ void register_usertypes(sol::state &lua) {
     auto key_enum = lua.new_enum(
         "KeyboardKey",
         "Space", sf::Keyboard::Space,
+        "Num1", sf::Keyboard::Num1,
         "D", sf::Keyboard::D,
         "A", sf::Keyboard::A,
         "E", sf::Keyboard::E
