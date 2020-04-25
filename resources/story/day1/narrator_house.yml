@@ -16,21 +16,21 @@ config:
 2:
   char: narrator
   text: >-
-    Surprisingly, the light still works. And don't ask how we got electricity here, I don't quite understand it myself.
+    Surprisingly, the light still works. And don't ask how, I don't quite understand it myself.
 
 3:
   char: player
   responses:
   - text: >-
-      Yeah, alright, Maybe I'll ask someone else, provided there's gonna be someone else.
+      Yeah, alright.
 
 4:
   char: narrator
   text: >-
-    I knew some people who could explain it, but I don't know if we'll ever be able to see them, or anyone, really. Anyway, I'm really tired from
-    all this walking, spending your time in an empty room for so long doesn't motivate to move much. So.. there's only one bed and we'll have to
-    share it, since I never bothered with a second one, nobody stayed for the night here, probably because everyone lived so close together. You can
-    check out the rest of the house if you want, since you'll probably be spending some time here.
+    I knew some people who could explain it, but I'm unsure we'll be able to meet them any time soon. Now, I'm really tired from all this walking,
+    spending your time in an empty room for so long doesn't motivate to move much. So.. there's only one bed and we'll have to share it, I hope you're
+    fine with that, thought it's not like you have a choice. You can check out the rest of the house if you want, you'll probably be spending some time
+    here.
   next: explore-the
 
 explore-the:
@@ -82,10 +82,9 @@ living-room:
     TerminalModule.state_variables.narrator_house.hub.living_room = true
   # TODO: talking topic about computers here
   text: >-
-    You go to the living room. It's decently sized and has a sofa in it. On the opposite side of the room there are several
-    bookshelves packed with various books, from titles you can guess some of them are probably scientific or philosophical. There's
-    also something what seems to be a computer on the table nearby, but you decide not to touch it for now. The window in the room
-    faces the other house nearby. Not much else in this room.
+    Decently sized, has a sofa in it. On the opposite side of the room there are several bookshelves packed with various books, from
+    titles you can guess some of them are probably scientific or philosophical. There's also something what seems to be a computer on
+    the table nearby, but you decide not to touch it for now. The window in the room faces the other house nearby.
   next: explore-the
 
 kitchen:
@@ -95,10 +94,10 @@ kitchen:
     TerminalModule.state_variables.narrator_house.hub.kitchen = true
   # TODO: talking topic about food here
   text: >-
-    The kitchen is not very big, there are a few cupboards that have dishes in them, others have some of the plants you've seen earlier, but
-    dried. Most of the food on the kitchen seems to be plant-based, except in the fridge there's something that looks like milk, but you
-    decide not to touch it, since it's not your house. Maybe you could inquire the <narrator> about the food here later. Other
-    than all the storage places on the kitchen, there's a table with a few chairs and a window that faces the forest you just came from.
+    Not very big, there are a few cupboards that have dishes in them, others have some of the plants you've seen earlier, but dried. Most
+    of the food on the kitchen seems to be plant-based, except in the fridge there's something that looks like milk, but you decide not to
+    touch it, since it's not your house. Maybe you could inquire the <narrator> about the food here later. Other than all the storage
+    places on the kitchen, there's a table with a few chairs and a window that faces the forest you just came from.
   next: explore-the
 
 bathroom:
@@ -109,17 +108,15 @@ bathroom:
   text: >-
     On the left, there's a moderately sized bathtub, near which there's a small shelf with some kind of soap and a sponge. On the right,
     there's a a small sink, with its own bar of soap. There's also a very small window near the ceiling, you can only see the dark sky
-    through it. Unlike in the room you just came from, the bathroom floor and walls are made of stone-looking tiles, not wood. You
-    decide to check if the sink works, and sure enough it does. At first the water is very cold, but you figure out turning the knob
-    on the faucet makes it warm or even hot. You wash your hands using the soap bar.
+    through it. The bathroom floor and walls are made of stone-looking tiles, not wood, like the rest of the rooms. You check if the sink
+    works, and sure enough it does. At first the water is very cold, but turning the knob on the faucet makes it warm or even hot.
   next: explore-the
 
 bed-after-explored:
   char: description
   wait: true
   text: >-
-    The <narrator> is already asleep. You say "good night" to yourself, although you're not sure what will happen
-    when you "fall asleep".
+    The <narrator> is already asleep.
   next: "narrator-house-end"
 
 bed-if-not-explored:
@@ -132,7 +129,7 @@ bed-if-not-explored-2:
   char: player
   responses:
   - text: >-
-      Yeah. I'm not sure what will happen when I fall asleep, since I'm not exactly here like you are, but we'll see.
+      Yeah.
     next: bed-if-not-explored-3
 
 bed-if-not-explored-3:
@@ -151,5 +148,6 @@ bed-if-not-explored-4:
 
 narrator-house-end:
   char: description
-  text: ""
-  script: TerminalModule.switch_to_walking("computer_room_first_puzzle")
+  text: "You lie bed fow a while, before the screen goes black."
+  wait: true
+  script_after: TerminalModule.switch_to_walking("computer_room_first_puzzle")
