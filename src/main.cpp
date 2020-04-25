@@ -126,6 +126,7 @@ int main() {
 
         switch (current_state) {
         case CurrentState::Terminal:
+            terminal_env.update_event_timer(dt);
             terminal_env.draw(dt);
             break;
         case CurrentState::Walking:

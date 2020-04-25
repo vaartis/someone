@@ -95,6 +95,23 @@ function OutputLine:next()
    return self._next_line
 end
 
+function OutputLine:is_interactive()
+   return self._letters_output < #self._text
+end
+
+function OutputLine:handle_interaction(event)
+   if event.type == EventType.KeyPressed then
+      -- Skip by pressing 1
+      local key = event.key.code
+
+      if key == KeyboardKey.Num1 then
+         self._letters_output = #self._text
+
+         return true
+      end
+   end
+end
+
 local InputWaitLine = class("InputWaitLine", OutputLine)
 function InputWaitLine:initialize(name, text, next_line)
    OutputLine.initialize(self, name, text, next_line)
@@ -124,7 +141,7 @@ function InputWaitLine:should_wait()
 end
 
 function InputWaitLine:is_interactive()
-   return self._letters_output == #self._text and not self._1_pressed
+   return not self._1_pressed
 end
 
 function InputWaitLine:handle_interaction(event)
@@ -133,6 +150,17 @@ function InputWaitLine:handle_interaction(event)
 
       if key == KeyboardKey.Num1 then
          self._1_pressed = true
+
+         return true
+      end
+   elseif self._letters_output < #self._text and event.type == EventType.KeyPressed then
+      -- Allow skipping by pressing 1
+      local key = event.key.code
+
+      if key == KeyboardKey.Num1 then
+         self._letters_output = #self._text
+
+         return true
       end
    end
 end
@@ -274,6 +302,8 @@ function VariantInputLine:handle_interaction(event)
       -- Only use visible variants here, not all variants
       if chnum and chnum >= 1 and chnum < #self._visible_variants + 1 then
          self._selected_variant = chnum
+
+         return true
       end
    end
 end
@@ -457,15 +487,27 @@ function M.draw(dt)
    end
 end
 
-function M.process_event(event)
+local time_since_last_interaction = 0
+local time_between_interactions = 0.2
+
+-- A function to track time between events
+function M.update_event_timer(dt)
+   time_since_last_interaction = time_since_last_interaction + dt
+end
+
+function M.process_event(event, dt)
    local line = first_line_on_screen
    while true do
       local should_wait = line:should_wait()
 
       -- If line has an is_interactive function, use it
       if line.is_interactive then
-         if line:should_wait() and line:is_interactive() then
-            line:handle_interaction(event)
+         if line:should_wait() and line:is_interactive() and time_since_last_interaction > time_between_interactions then
+
+
+            if line:handle_interaction(event) then
+               time_since_last_interaction = 0
+            end
          end
       end
 
