@@ -357,7 +357,7 @@ function M.draw(dt)
          -- Insert the line into the drawing queue now
          table.insert(M.current_lines_to_draw, line)
 
-         if should_wait or line:next() == nil then
+         if should_wait then
             break
          end
 
@@ -366,6 +366,10 @@ function M.draw(dt)
             line._script_after()
 
             line._script_after_executed = true
+         end
+
+         if line:next() == nil then
+            break
          end
 
          line = line:next()
