@@ -1,6 +1,6 @@
 config:
   chars:
-    narrator:
+    narra:
       color: [211, 0, 0]
     player:
       color: [255, 255, 255]
@@ -11,10 +11,10 @@ config:
   char: description
   wait: true
   text: >-
-    The <narrator> finds the light switch on the left and turns the lights on.
+    She finds the light switch on the left and turns the lights on.
 
 2:
-  char: narrator
+  char: narra
   text: >-
     Surprisingly, the light still works. And don't ask how, I don't quite understand it myself.
 
@@ -25,7 +25,7 @@ config:
       Yeah, alright.
 
 4:
-  char: narrator
+  char: narra
   text: >-
     I knew some people who could explain it, but I'm unsure we'll be able to meet them any time soon. Now, I'm really tired from all this walking,
     spending your time in an empty room for so long doesn't motivate to move much. So.. there's only one bed and we'll have to share it, I hope you're
@@ -37,8 +37,8 @@ explore-the:
   char: description
   # Set up the hub variable if they haven't been set up yet
   script: |-
-    if not TerminalModule.state_variables.narrator_house then
-       TerminalModule.state_variables.narrator_house = {
+    if not TerminalModule.state_variables.narra_house then
+       TerminalModule.state_variables.narra_house = {
          hub = {
             living_room = false,
             kitchen = false,
@@ -54,32 +54,32 @@ hub:
   char: player
   responses:
   - text: Living room
-    condition: return not TerminalModule.state_variables.narrator_house.hub.living_room
+    condition: return not TerminalModule.state_variables.narra_house.hub.living_room
     next: living-room
   - text: Kitchen
-    condition: return not TerminalModule.state_variables.narrator_house.hub.kitchen
+    condition: return not TerminalModule.state_variables.narra_house.hub.kitchen
     next: kitchen
   - text: Bathroom
-    condition: return not TerminalModule.state_variables.narrator_house.hub.bathroom
+    condition: return not TerminalModule.state_variables.narra_house.hub.bathroom
     next: bathroom
   - text: Go to bed
     condition: |-
       -- Go to bed when at least one room has been explored
       local lume = require("lume")
-      return lume.any(TerminalModule.state_variables.narrator_house.hub)
+      return lume.any(TerminalModule.state_variables.narra_house.hub)
     next: bed-after-explored
   - text: Go to bed
     condition: |-
       -- Go to bed when when no rooms were explored
       local lume = require("lume")
-      return not lume.any(TerminalModule.state_variables.narrator_house.hub)
+      return not lume.any(TerminalModule.state_variables.narra_house.hub)
     next: bed-if-not-explored
 
 living-room:
   char: description
   wait: true
   script: |-
-    TerminalModule.state_variables.narrator_house.hub.living_room = true
+    TerminalModule.state_variables.narra_house.hub.living_room = true
   # TODO: talking topic about computers here
   text: >-
     Decently sized, has a sofa in it. On the opposite side of the room there are several bookshelves packed with various books, from
@@ -91,12 +91,12 @@ kitchen:
   char: description
   wait: true
   script: |-
-    TerminalModule.state_variables.narrator_house.hub.kitchen = true
+    TerminalModule.state_variables.narra_house.hub.kitchen = true
   # TODO: talking topic about food here
   text: >-
     Not very big, there are a few cupboards that have dishes in them, others have some of the plants you've seen earlier, but dried. Most
     of the food on the kitchen seems to be plant-based, except in the fridge there's something that looks like milk, but you decide not to
-    touch it, since it's not your house. Maybe you could inquire the <narrator> about the food here later. Other than all the storage
+    touch it, since it's not your house. Maybe you could inquire Narra about the food here later. Other than all the storage
     places on the kitchen, there's a table with a few chairs and a window that faces the forest you just came from.
   next: explore-the
 
@@ -104,7 +104,7 @@ bathroom:
   char: description
   wait: true
   script: |-
-    TerminalModule.state_variables.narrator_house.hub.bathroom = true
+    TerminalModule.state_variables.narra_house.hub.bathroom = true
   text: >-
     On the left, there's a moderately sized bathtub, near which there's a small shelf with some kind of soap and a sponge. On the right,
     there's a a small sink, with its own bar of soap. There's also a very small window near the ceiling, you can only see the dark sky
@@ -116,11 +116,11 @@ bed-after-explored:
   char: description
   wait: true
   text: >-
-    The <narrator> is already asleep.
-  next: "narrator-house-end"
+    Narra is already asleep.
+  next: "narra-house-end"
 
 bed-if-not-explored:
-  char: narrator
+  char: narra
   text: >-
     Straight to bed, huh?
   next: bed-if-not-explored-2
@@ -133,7 +133,7 @@ bed-if-not-explored-2:
     next: bed-if-not-explored-3
 
 bed-if-not-explored-3:
-  char: narrator
+  char: narra
   text: >-
     Oh well. Goodnight, then.
   next: bed-if-not-explored-4
@@ -144,9 +144,9 @@ bed-if-not-explored-4:
   responses:
   - text: >-
       You too.
-    next: "narrator-house-end"
+    next: "narra-house-end"
 
-narrator-house-end:
+narra-house-end:
   char: description
   text: "You lie in bed fow a while, before the screen goes black."
   wait: true

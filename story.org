@@ -7,9 +7,9 @@
 
    Uh.. Yes? I think.. Who are you and where am I?
 
-   I'm the <narrator>, and we're.. here, in this empty room.
+   I'm Narra, and we're.. here, in this empty room.
 
-   <You are standing in an empty gray room, next to <narrator>>
+   <You are standing in an empty gray room, next to her>
 
    <Environment: [[./resources/sprites/environments/gray_room.png]]>
 
@@ -38,7 +38,7 @@
    
    <The background becomes a screen frame instead of just white>
 
-   <narrator>: Try checking out your surroundings, maybe there's something obvious you can try?
+   <narra>: Try checking out your surroundings, maybe there's something obvious you can try?
 ** First time in the room :walking:
    There's a room where the player is in. The player is some ambigous figure in a hoodie.
 
@@ -51,7 +51,7 @@
 
    <p> What.. what happened to the room?
 
-   <narrator>: Well, you did something, right?
+   <narra>: Well, you did something, right?
    
    Yeah. I did the most obvious thing: pressed the button that was the only other thing in the room except me and the computer.
 
@@ -118,15 +118,15 @@
    <You see a village. There are a lot of houses of all shapes and colors. No living creature seems to be around except the two of you. All the
    windows are dark, too. There is a central road around which all the houses seem to have been built.>
 
-   <narrator>: My house is the one on the edge of the road. It was one of the early ones, built on what later became the outskirts of the village. The
+   <narra>: My house is the one on the edge of the road. It was one of the early ones, built on what later became the outskirts of the village. The
    road was made a long time after it was built, connecting my house and the house of a friend of mine first, and then extending into the rest of the
    village.
 
-   <You come to the house. The door is not locked, the <narrator> just opens it>
-** Narrator's house
-   <The <narrator> finds the light switch on the left and turns the lights on.>
+   <You come to the house. The door is not locked, she just opens it.>
+** Narra's house
+   <She finds the light switch on the left and turns the lights on.>
 
-   <narrator>: Surprisingly, the light still works. And don't ask how, I don't quite understand it myself.
+   <narra>: Surprisingly, the light still works. And don't ask how, I don't quite understand it myself.
 
    Yeah, alright.
 
@@ -142,7 +142,7 @@
                     # Set want to talk about the computers
    - Kitchen :: Not very big, there are a few cupboards that have dishes in them, others have some of the plants you've seen earlier, but dried. Most
                 of the food on the kitchen seems to be plant-based, except in the fridge there's something that looks like milk, but you decide not to
-                touch it, since it's not your house. Maybe you could inquire the <narrator> about the food here later. Other than all the storage
+                touch it, since it's not your house. Maybe you could inquire Narra about the food here later. Other than all the storage
                 places on the kitchen, there's a table with a few chairs and a window that faces the forest you just came from.
                 # Set want to talk about plant based food
    - Bathroom :: On the left, there's a moderately sized bathtub, near which there's a small shelf with some kind of soap and a sponge. On the right,
@@ -151,8 +151,8 @@
                  works, and sure enough it does. At first the water is very cold, but turning the knob on the faucet makes it warm or even hot.
    - Go the bed (=>)
 
-   - IF explored at least one room :: The <narrator> is already asleep.
-   - ELSE :: <narrator>: Straight to bed, huh?
+   - IF explored at least one room :: Narra is already asleep.
+   - ELSE :: <narra>: Straight to bed, huh?
              
              Yeah.
 
@@ -169,10 +169,9 @@
    and that the player can go through. It is as badly lit as the room and has a simple puzzle with three buttons that need to be pressed in a certain
    order. After that a sound is heard and the player goes back to the computer. It's now the next day.
 ** Morning, setting out for the road
-   <It seems like it's already morning and the <narrator> is already out somewhere. After a bit of searching you find them in the kitchen having
-   breakfast.>
+   <It seems like it's already morning and Narra is already out somewhere. After a bit of searching you find her in the kitchen having breakfast.>
 
-   <narrator>: Hey. Mornin'
+   <narra>: Hey. Mornin'
 
    Yeah..
 
@@ -216,7 +215,7 @@
 
    Yeah.. Now, what is this you're having for breakfast?
 
-   <The <narrator> seems to have something that looks like cereal with milk in the bowl>
+   <She seems to have something that looks like cereal with milk in the bowl>
 
    The liquid in the bowl is a product of soaking and grinding a plant that grows in another region, far from here. It was discovered in an expedition
    to a place outside the known land of that time. When they were there, they found a different biome, a colder one. The reports said that it was a
@@ -224,7 +223,7 @@
    applications for them. One of which was to use them as food, because of their taste. You see, we don't really need food to survive. We don't feel
    hunger. But we do feel the taste, and that is what food is used here for. Want to taste it?
 
-   <The narrator passes you a carton>
+   <She passes you a carton>
 
    Yeah, I'm feeling curious.
 
@@ -258,13 +257,13 @@
 
    Sure, take you time.
 
-   <You spend a few minutes in the kitchen while the <narrator> finishes their breakfast>
+   <You spend a few minutes in the kitchen while she finishes her breakfast>
 
-   <narrator>: Well, I'm done.. Let's go.
+   <narra>: Well, I'm done.. Let's go.
 
-   <You go outside. The <narrator> turns the lights off as they close the door. They then look somewhere behind you with a confused look>.
+   <You go outside. She turns the lights off as they close the door. They then look somewhere behind you with a confused look>.
 
-   <narrator>: Ah. This wasn't here yesterday. Might be the result of you solving that "puzzle" you talked about.
+   <narra>: Ah. This wasn't here yesterday. Might be the result of you solving that "puzzle" you talked about.
 
    <You turn around and see that in the distance, there are now tall buildings>
 
@@ -284,7 +283,7 @@
 
    <After a short walk, you are on the stone road.>
 
-   <narrator>: Here it is. 
+   <narra>: Here it is. 
 
    Let's go, then. And if you don't mind, can I ask a few more questions about your world?
 ** The long walk questions
@@ -403,7 +402,7 @@
    <Finally, after the long walk, you arrive. Judging by the position of the sun, it's somewhere around noon. The stone road you've been walking
    gradually changes to asphalt>
 
-   <narrator>: We're here, finally! That was hell of a walk. I guess we could just keep going on the road and not the sidewalk, since, presumably,
+   <narra>: We're here, finally! That was hell of a walk. I guess we could just keep going on the road and not the sidewalk, since, presumably,
    there's no transport on the roads right now.. We're in the suburbs currenly, so the buildings here are mostly houses.
 
    Yeah.. These look smaller compared to those in the distance. Are we heading deeper into the city?
@@ -418,17 +417,17 @@
 
    <Both of you go off the road, to the first house on the right, going up a stairway to the first floor>
 
-   <narrator>: Let's check the doors on this floor..
+   <narra>: Let's check the doors on this floor..
 
-   <The <narrator> comes to the first door and carefully turns the knob. The door is not locked. The <narrator> looks at you somewhat worryingly>
+   <She comes to the first door and carefully turns the knob. The door is not locked. She looks at you somewhat worryingly.>
 
-   <narrator>: So.. should we go in?
+   <narra>: So.. should we go in?
 
    That's what we're here for, right?
 
    Yeah.. right..
 *** Flat on the first floor
-    <The <narrator> goes through the door and you go after. You're now in the first flat on the first floor. It's not very big: there's what seems to
+    <She goes through the door and you go after. You're now in the first flat on the first floor. It's not very big: there's what seems to
     be a bathroom, and the living room and the kitchen are made into a single room, with a kitchen counter inbetween. The living room part has a sofa
     and a small coffee table. There's a laptop on the table.>
 **** Check the laptop
@@ -455,10 +454,10 @@
 **** Check the kitchen part of the room
      <You walk up to the fridge and open it. There's a bunch of different foods in there, some in bags, most unopened at all>
 
-     <narrator>: So many interesting kinds of meals could be made from this.. Maybe we could get some from the city center too, when we're there.
+     <narra>: So many interesting kinds of meals could be made from this.. Maybe we could get some from the city center too, when we're there.
 **** Check the bathroom
      <You open the bathroom door and turn on the light. It blinks a few times at first, and then stays on as it should. The bathroom is mostly the
-     same as the <narrator>'s, maybe even a little smaller.>
+     same as Narra's, maybe even a little smaller.>
 
      <p>: Not much to see here.. Good thing we checked, anyway.
 *** Leaving the first flat & go into the city
@@ -466,13 +465,13 @@
 
     Yea. Nothing more catches the eye here.
 
-    <You leave the flat. The <narrator> closes the door, leaving it as it was when you arrived>
+    <You leave the flat. Narra closes the door, leaving it as it was when you arrived>
 
-    <narrator>: Let's check the other flats.
+    <narra>: Let's check the other flats.
 
-    <You nod. The <narrator> come to the opposite side of the corridor and turns the knob. The door is locked>
+    <You nod. She goes to the opposite side of the corridor and turns the knob. The door is locked>
 
-    <narrator>: Interesting.. So, the person who lived in that flat just forgot to lock their door? And their computer didn't have any password,
+    <narra>: Interesting.. So, the person who lived in that flat just forgot to lock their door? And their computer didn't have any password,
     too..
 
     Means they had nothing to hide, right?
@@ -481,7 +480,7 @@
 
     <You check the other floors, all the doors are locked. Same happens in the adjacent house>
 
-    <narrator>: Seems like we just got lucky with that one.. All the others are probably locked, too. Let's head into the city and see what's up
+    <narra>: Seems like we just got lucky with that one.. All the others are probably locked, too. Let's head into the city and see what's up
     there.
 
     Agreed. This door checking getting boring anyway. You come up to the door and you just know it's locked, but you still try, with no luck. That
@@ -490,12 +489,12 @@
     <You head into the city, going along the road, past all the same-looking houses. After some time, you reach the center part of the city, where all
     the night and day life happened.>
 
-    <narrator>: Never seen these streets so empty, it was bright and full of people even at night. Not anymore. Didn't think they'd ever end up like
+    <narra>: Never seen these streets so empty, it was bright and full of people even at night. Not anymore. Didn't think they'd ever end up like
     this. Hope they'll be the way they were before someday, even though I didn't like it at the time, it's sad to see them so devoid of life.
 
-    <The <narrator> stops for a few seconds, looking at the building to the right.>
+    <She stops for a few seconds, looking at the building to the right.>
 
-    <narrator>: Let's go see this one. This club was a hugely popular place to hang out at night, I got invited to go there at night a few times, but
+    <narra>: Let's go see this one. This club was a hugely popular place to hang out at night, I got invited to go there at night a few times, but
     after the first one I didn't want to go there any more at all, too crowded.
 
     Shouldn't it be closed though? It's day after all.
@@ -550,7 +549,7 @@
      Yep. It's very basic. If you want to just chew on something, maybe, or have no time to brush your teeth at all, although.. I'm not sure it helps
      with that?
 *** Mall and the way back
-    <narrator>: That was a whole bunch of nothing, huh? I'm getting really desperate for something to change already! Come on..  Did we go all the
+    <narra>: That was a whole bunch of nothing, huh? I'm getting really desperate for something to change already! Come on..  Did we go all the
     way for nothing?
 
     Yeah.. Jeez. So boring! Maybe we should head back already?
@@ -568,7 +567,7 @@
     <You walk for bit more deeper into the city, until you see the big mall building. You know it's a mall because it has "City Mall" written on
     it. Who could've thought.>
 
-    <narrator>: I'll try to remember where exactly the bike place is, while you look around and see if there's anything interesting while we're on
+    <narra>: I'll try to remember where exactly the bike place is, while you look around and see if there's anything interesting while we're on
     the way. This place is pretty big after all.
 
     <While you go, you notice a few clothing places, cosmetics stuff, lingerie, a huge food section, general applience stuff, and then, finlly,
@@ -576,11 +575,11 @@
 
     Well, just take the first one that fits you and let's go already.
 
-    <The <narrator> tries out a few bikes, stopping on a sporty looking green one. You grab the first one you see, the seat feels alright and the
+    <She tries out a few bikes, stopping on a sporty looking green one. You grab the first one you see, the seat feels alright and the
     pedals are at the comfortable height, so you don't hesitate too much. Your bike is red, the best color. You set out on your way back
     immediately. The sun seems to already be setting. Just how much have you been walking here?>
 
-    <narrator>: What a disappointment. Not like it really matters, since the time is not a constraint, but still, it's disappointing. Now we know
+    <narra>: What a disappointment. Not like it really matters, since the time is not a constraint, but still, it's disappointing. Now we know
     there's probably nothing there, at least.
 
     I guess that's true.. That wasn't very exciting, except when we actually did find something, you know?
@@ -588,53 +587,53 @@
     Not a lot of that, but yes..
 ** Back in the village
    <On the way back, you spend most of the time focusing on the road. The bikes make the journey quite a bit shorter. When you arrive, the sun has
-   almost set and it's pretty dark. On your way to <narrator>'s house you suddenly notice that the house on opposite side of the street has its lights
-   turned on. You look at the <narrator>. The <narrator> looks at you.>
+   almost set and it's pretty dark. On your way to Narra's house you suddenly notice that the house on opposite side of the street has its lights
+   turned on. You look at her. She looks at you.>
 
-   <narrator>: What the hell?! Is he.. actually in here?
+   <narra>: What the hell?! Is he.. actually in there?
 
    Is this your friend's house?
 
    Yes! Oh wow, can it be that he's there? That we aren't alone here? We have to check RIGHT NOW.
 
-   <You both abandon the bikes in the middle of the road and run up to the house. The <narrator> knocks on the door a few times and carefully opens
+   <You both abandon the bikes in the middle of the road and run up to the house. She knocks on the door a few times and carefully opens
    it.>
 
-   <narrator>: Hey?
+   <narra>: Hey?
 
    <Behind the door, you see a guy, not too tall, shoulder length black hair, wearing glasses. He jumps back, producing a high-pitched yell>
 
    <maj>: aaHHH!!
 
-   <You see <narrator> giggle a little.>
+   <You see Narra giggle a little.>
 
-   <narrator>: Maj! Long time no see!!
+   <narra>: Maj! Long time no see!!
 
    <maj>: Ah.. ha.. hi! I'm really lost.. since everything went down I can't remember much.. The panic, then darkness, and then I wake up in the
    forest this morning. I couldn't wrap my head around what happened, so I thought I'd just head back home, what else could I do? So I there I was,
    alone.. Which was scary.. so I just spent the whole day at home..
 
-   <narrator>: Oh wow.. That's a bit different.. but.. uh.. let's come in and not just stand here, eh?
+   <narra>: Oh wow.. That's a bit different.. but.. uh.. let's come in and not just stand here, eh?
 
    <maj>: Ohh.. yeah! Sure.. and who's the person behind you might be..? if you don't mind me asking..
 
-   <narratoro>: Ah, that's <p>. They're.. uh.. new here. Apparently they're from the "outside", like the "creator" was.
+   <narra>: Ah, that's <p>. They're.. uh.. new here. Apparently they're from the "outside", like the "creator" was.
 
    <maj>: Wow! Never thought I'd meet someone like that ever again..
 
    <p>: Hello! While I it's true i'm from the "outside", I don't know anything about that "creator" person, nor do I know anything about myself.. or
    anything outside the room I'm in, really..
 
-   <maj>: Oh.. shame.. but still, welcome! Let's head into the kitchen and have some tea at least, like the <narrator> suggested, we shouldn't
+   <maj>: Oh.. shame.. but still, welcome! Let's head into the kitchen and have some tea at least, like Narra suggested, we shouldn't
    just stand in the doors.
 
-   <You all head to a room on the left, it's a medium-sized kitchen. You and <narrator> sit at the table, while Maj puts some water into the electric
+   <You all head to a room on the left, it's a medium-sized kitchen. You and Narra sit at the table, while Maj puts some water into the electric
    kettle, the water boils rather fast, and after a minute you all sit at the table with some tea, which is still too hot to drink, but already smells
    minty.>
 
    <maj>: So, how have you been?
 
-   <narrator>: You said that you only remember darkness and then you woke up back in the forest, but it was very different for me. It has actually
+   <narra>: You said that you only remember darkness and then you woke up back in the forest, but it was very different for me. It has actually
    been a very long wait for me. All that was left of the world was a single room with gray walls, and nothing else, and that's where I was all that
    time. I'm a bit envious of you not having to experience that. I never want to stay alone with nothing and nobody else but myself. I'm glad you're
    back too now, it's been about a day since the world has returned back to normal.. well.. except all the people. <p> helped me get out of that room
@@ -643,26 +642,26 @@
    <p>: Yeah.. There was some kind of a corridor, with a stupid puzzle. So I pressed a few buttons, a melody played, and that somehow brought back the
    city. And you, too, it seems. Looking forward to more changes like that in the future.
 
-   <maj>: Wow.. that is a lot to process.. First off, it's very sad you had to experience this, <narrator>.. But that's behind you now, and we can
+   <maj>: Wow.. that is a lot to process.. First off, it's very sad Narra had to experience this. But that's behind you now, and we can
    start living again, right?
 
-   <narrator>: I.. sure hope so. There are still so many people missing.. But we'll try to get them back! We've been to the city with <p> today, it's
+   <narra>: I.. sure hope so. There are still so many people missing.. But we'll try to get them back! We've been to the city with <p> today, it's
    as empty as everything else, so we really just wasted a lot of time.
 
    <maj>: Such a big city and nobody there too.. So we're the only people here..
 
-   <narrator>: We haven't found anyone else.. But seeing you now makes me excited! More people might be coming back soon..
+   <narra>: We haven't found anyone else.. But seeing you now makes me excited! More people might be coming back soon..
 
    <maj>: Oh I can't wait for that..! I already miss all the life around here..
 
-   <narrator>: We'll be progressing with that soon, I hope. In the meantime, <p>, Maj was one of the people who designed the first computers around
+   <narra>: We'll be progressing with that soon, I hope. In the meantime, <p>, Maj was one of the people who designed the first computers around
    here! So you can ask something about them..
 
    <p>: Oh!
 
    <maj>: Well.. I only participated in the initial design and development of the first models, they were quite clumsy and big.. Nowadays computers
    are a lot smaller, all of that happened after they moved to the city, and I mostly resigned from duty and stayed here. We made the network, mail
-   and blogging platforms to communicate with each other, I'm sure <narrator> told you about that. So, i still got the news about new inventions and
+   and blogging platforms to communicate with each other, I'm sure Narra told you about that. So, I still got the news about new inventions and
    research and even got to participate in a few, but it mostly still still required being there in person, so it happened rarely.
 
    <p> Why didn't you want to go to the city with them and continue working on the cool stuff?
@@ -670,7 +669,7 @@
    <maj>: You see.. I really don't like big crowds of people and the city is ALL about that.. I get all anxious.. So I'd rather stay.. besides, the
    scientific community has grown a lot since the beginning and I'm sure they can go on without me.
 
-   <narrator>: Don't you belittle your part in that, you dummy! They wouldn't be able to make it like it is without your work, and you know it. You
+   <narra>: Don't you belittle your part in that, you dummy! They wouldn't be able to make it like it is without your work, and you know it. You
    didn't really leave them for good with no news or anything, you still kept up with people from there, didn't you?
 
    <maj>: Yes.. ok, ok, you got me. I don't really like to admit it, because it'd sound like I'm bragging. But enough about that, there's another
@@ -683,7 +682,7 @@
    <Since you all are already done with the tea, you all stand up, and wait for Maj to lead the way. However, he just moves his chair and you notice
    that there's a trapdoor underneath. He lifts it, then reaches inside to find the light switch and turns it on. He then steps on the ledder there
    and starts going down. You look as he goes down, it's not that deep down there, just a few meters. He waves at you, telling you can go down
-   now. You climb down the ladder first, then the <narrator> climbs after you.>
+   now. You climb down the ladder first, then Narra climbs after you.>
 
    <p>: You know.. this really looks like the room I am in. I mean, on the outside. Except yours is way better lit.
 
@@ -704,7 +703,7 @@
 
    <p>: So it's not just me, it really is colder in here?
 
-   <narrator>: I've noticed, too.
+   <narra>: I've noticed, too.
 
    <maj>: Yes! Besides being underground, this place is also additionally cooled down artificially. Otherwise it'd get pretty hot in here, this thing
    produces a lot of heat. There's not much to see other than the server, but I am proud of it and will take any opportunity to show this setup to
@@ -715,7 +714,7 @@
 
    <maj>: Now, it's getting really late, I'd love to talk some more, but maybe we should continue tomorrow?
 
-   <narrator>: I'm actually suddenly very tired, probably because the trip, I just realized it. Didn't notice at first because I was so excited to see
+   <narra>: I'm actually suddenly very tired, probably because the trip, I just realized it. Didn't notice at first because I was so excited to see
    you! We'll probably head back to my place then, <p> is staying at my house for now, until we maybe figure out else.
 
    <maj>: See you tomorrow, then!
@@ -728,10 +727,10 @@
 
    <maj>: You too!
 
-   <You and the <narrator> leave the house and get back to the <narrator>'s place, <narrator> takes a shower, and you both head to bed.>
+   <You and Narra leave the house and get back to her place, she takes a shower, and you both head to bed.>
 
-   <narrator>: I'm exhausted.. Goodnight, I guess, even though it doesn't mean much for you apparently.
+   <narra>: I'm exhausted.. Goodnight, I guess, even though it doesn't mean much for you apparently.
 
    <p>: Still, I appriciate it. Let's see what tomorrow brings.
 
-   <The <narrator> falls asleep fast, after some time the screen goes black again.>
+   <She falls asleep fast, after some time the screen goes black again.>

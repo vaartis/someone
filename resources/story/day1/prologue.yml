@@ -1,6 +1,6 @@
 config:
   chars:
-    narrator:
+    narra:
       color: [211, 0, 0]
     player:
       color: [255, 255, 255]
@@ -8,7 +8,7 @@ config:
       color: [127, 0, 255]
 
 1:
-  char: narrator
+  char: narra
   text: >-
     Hello? Can you hear me?
 
@@ -19,16 +19,16 @@ config:
       Uh.. Yes? I think.. Who are you and where am I?
 
 3:
-  char: narrator
+  char: narra
   text: >-
-    I'm the <narrator>, and we're.. here, in this empty room.
+    I'm Narra, and we're.. here, in this empty room.
 
 4:
   char: description
   wait: true
   script: TerminalModule.set_environment_image('gray_room')
   text: >-
-    You are standing in an empty gray room, next to <narrator>.
+    You are standing in an empty gray room, next to her.
 
 5:
   char: player
@@ -37,7 +37,7 @@ config:
       What is this place..?
 
 6:
-  char: narrator
+  char: narra
   text: >-
     The remnants of the world that was, but all that's left of it now is this single room. And who are you, anyway?
 
@@ -48,7 +48,7 @@ config:
       I.. don't know? I can't remember anything..
 
 8:
-  char: narrator
+  char: narra
   text: >-
     Well.. maybe you can remember your name, at least?
 
@@ -60,7 +60,7 @@ config:
       Not really.. i suppose <p> would be fine for now, until I figure things out.
 
 10:
-  char: narrator
+  char: narra
   text: >-
     Alright, <p>.
 
@@ -71,7 +71,7 @@ config:
       So.. where's the rest of the world?
 
 12:
-  char: narrator
+  char: narra
   text: >-
     I don't know. But you might be able to help me with that.
 
@@ -82,7 +82,7 @@ config:
       Me? How'd I do that?
 
 14:
-  char: narrator
+  char: narra
   text: >-
     You look awfully familliar, say, are you by any chance not actually standing here with me right now, but sitting
     in front of a computer?
@@ -94,7 +94,7 @@ config:
       Now that you mention it.. Yeah, i do..
 
 16:
-  char: narrator
+  char: narra
   wait: true
   script_after: TerminalModule.switch_to_walking("computer_room")
   next: day1/forest_and_village/1
