@@ -1,1 +1,5 @@
 /_build
+
+# Autocompletion/clangd data
+/.clangd
+/compile_commands.json
