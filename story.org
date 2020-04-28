@@ -166,63 +166,76 @@
 * Day 2
 ** The first night :walking:
    After the screen goes black, the player is back in the dark room they were in and can explore a little more. There's a new doorway that appeared
-   and that the player can go through. It is as badly lit as the room and has a simple puzzle with three switches that need to be pressed in a certain
-   order or something similiar (TBD). After that a sound is heard and the player goes back to the computer. It's now the next day.
+   and that the player can go through. It is as badly lit as the room and has a simple puzzle with three buttons that need to be pressed in a certain
+   order. After that a sound is heard and the player goes back to the computer. It's now the next day.
 ** Morning, setting out for the road
    <It seems like it's already morning and the <narrator> is already out somewhere. After a bit of searching you find them in the kitchen having
-   breakfast>.
+   breakfast.>
 
    <narrator>: Hey. Mornin'
 
-   Yeah.. Morning
+   Yeah..
 
    Slept well?
 
-   Not really. When i "went to sleep" the screen went black and i was unable to do anything. So i figured i'll go look around again. Unsurprisingly,
-   there was a new place to look at. Nothing too interesting though, a very basic puzzle, if you can even call it that. I wonder why it was
-   there. But when i activated it, something happened, i guess?  There was some kind of sound. And then i went back to the computer and it was
-   already morning.
+   Not really. When I "went to sleep" the screen went black and I was unable to do anything. So I figured I'll go look around again. Unsurprisingly,
+   there was a new place to look at. Nothing too interesting though, three buttons that, when pressed so that they all become green, play a
+   melody. And then I went back to the computer and it was already morning.
 
-   Interesting.. As for me, i slept in an actual bed this time, haven't done that in a while.
+   Looks like someone's playing with you.
 
-   No bed here in the room i'm in. It's quite empty actually.
+   These buttons make no sense at all.. Why would someone engineer such a mechanism to just play a simple melody?
 
-   Could you elaborate?
+   No idea. Though it might have done something more than just playing a melody, something less obvious.
 
-   Not much to say. It's just me and a table with the computer. Well, there's this new hallway, but it's pretty empty too. There really isn't
-   anything of interest here besides the computer. Which is also the only source of light here, it seems. Otherwise it's dark as hell.
+   Did you notice anything change here, maybe?
 
-   Scary.
+   Nope. Not yet, at least. I've been here in the house just as you were, though I did get up a bit earlier. Finally slept on a bed, too, haven't had
+   that priveledge in a while.
 
-   I dunno.. Didn't really think about that until now. Well, at least I'm pretty sure there's nobody else here, there's simply no place to hide in
-   the two empty rooms, and the screen of this computer is taking care of darkness around too. It's not that bright, but it's something. Let's see if
-   I can find something to brighten this place up in the future.
+   No bed here in the room I'm in. It's quite empty actually, just me and a table with the computer. Well, there's this new hallway, but it's empty
+   too, besides the buttons near the end of it. There really isn't anything of interest here besides the computer, which is also the only source of
+   light here, otherwise it's dark as hell. Well, maybe also me, but that's only if someone is looking for company. And I don't think
+   there's anyone else here.
 
-   Yeah, even if you aren't afraid, sitting in the darkness doesn't do you any good.
+   Scary. You sure there's noone else there?
 
-   Anyway, what is this you're having for breakfast?
+   I dunno.. There's simply no place to hide in the two empty rooms. Maybe I'm missing the full picture, maybe this is all just a big joke, and you're
+   in on it too.
+
+   I'm not. Or at least I'm not aware of it.
+
+   Hope I can trust ya.
+
+   Hope I can trust myself.
+
+   Fair. Now, about the room again, the screen of this computer is taking care of darkness around, but it's not that bright, hope I can find something
+   to brighten this place up in the future.
+
+   Yeah, even if you're actually alone and not afraid, sitting in the darkness doesn't do you any good.
+
+   Yeah.. Now, what is this you're having for breakfast?
 
    <The <narrator> seems to have something that looks like cereal with milk in the bowl>
 
-   The liquid in the bowl is a product of soaking and grinding a plant that grows in a region far from here. The region and the plant were discovered in an expedition to a
-   place outside the known land of that time. When they were there, they discovered a different biome, a colder one. They told that it was a bit more
+   The liquid in the bowl is a product of soaking and grinding a plant that grows in another region, far from here. It was discovered in an expedition
+   to a place outside the known land of that time. When they were there, they found a different biome, a colder one. The reports said that it was a
    chilly out there and that the plants and trees there were different. They took some samples back, then the local people discovered various
    applications for them. One of which was to use them as food, because of their taste. You see, we don't really need food to survive. We don't feel
-   hunger. But we do feel the taste, and that is what food is used here for. To satisfy one's curiosity in new tastes and to feel good after an
-   interesting meal. Wanna check it out?
+   hunger. But we do feel the taste, and that is what food is used here for. Want to taste it?
 
    <The narrator passes you a carton>
 
-   Yeah, i'm curious how it tastes now.
+   Yeah, I'm feeling curious.
 
-   <You take a sip. It tastes like milk with a slight bit of grass>
+   <You take a sip. It tastes like milk with a slight bit of grass.>
 
    <p>: This taste reminds me of a certain drink i know about for some reason. This seems to be a reoccuring pattern, too..  I know about something,
-   but i can't remember where i got that knowledge from.
+   but can't remember where I got that knowledge.
 
-   That's.. unusual. I felt like this too, but when the "creator" came and told us how this world came to be, it became ovious.
+   Usual for this place, if you ask me.
 
-   Well, that doesn't really work in my case, since i'm here and you're there, does it?
+   Well, that logic might apply to you, but I'm here and you're there, it's a bit different.
 
    Indeed. You'll have to figure it out in some other way.
 
@@ -235,7 +248,7 @@
 
    <You take a few from the box and taste them. It's really just dried leaves>
 
-   Uh i dunno about this one. Really, it tastes like leaves.
+   Uh I dunno about this one. Really, it tastes like leaves.
 
    That's because they are leaves?
 
@@ -247,166 +260,161 @@
 
    <You spend a few minutes in the kitchen while the <narrator> finishes their breakfast>
 
-   <narrator>: Well, i'm done.. Let's go.
+   <narrator>: Well, I'm done.. Let's go.
 
    <You go outside. The <narrator> turns the lights off as they close the door. They then look somewhere behind you with a confused look>.
 
-   <narrator>: Ah. This wasn't here yesterday. Might be the result of you solving that "puzzle" you talked about yesterday.
+   <narrator>: Ah. This wasn't here yesterday. Might be the result of you solving that "puzzle" you talked about.
 
    <You turn around and see that in the distance, there are now tall buildings>
 
-   <p> So this is the city you talked about yesterday?
+   <p> So this is the city?
 
-   It seems like that's the one. Indeed.
+   Yep, that's the one.
 
-   So, now we'll go check it out, right?
+   So, we'll go check it out, right?
 
-   If you insist. It's going to be a long walk though.
+   Sure, if you don't mind the long walk.
 
    It's not like we're short on time.. If I were to describe how much time we have, I'd say we've got all of it. Besides, not like there's anything
    else to do. Boredom really is a big problem around here..
 
-   Oh yes, it very much is. So, there was a stone pathway that leads from here to the city. It was layed a bit after the city was started, before the
-   tall buildings were there to help people find where the city was. Let's see if we can find it..
+   Oh yes, it very much is. So, there was a stone road that leads from here to the city. It was layed a bit after the city was started, to make
+   the path through the woods easier. It starts out there, on the other side of the village.
 
-   <After a short walk you find the stone road on the other side of the village>
+   <After a short walk, you are on the stone road.>
 
-   <narrator>: Here it is. Let's go here, then. It's far more comfortable to walk on the road instead of going through the bushes and grass.
+   <narrator>: Here it is. 
 
-   Yeah. Getting through that forest yesterday was no fun. Well, the getting throught the forest part was no fun, but listening you talk about the
-   world was alright. So i guess i'll get to have more of that but without the no fun part.
+   Let's go, then. And if you don't mind, can I ask a few more questions about your world?
 ** The long walk questions
    Sure. What do you want to talk about?
 
+   Ask about..
 *** IF (want to talk about the computers) THEN the computers here, what are they like and how do they work?
-     So.. You have computers here? How do they actually work?
+    So.. You have computers here? How do they actually work?
 
-     Yes! I actually have one, too. You might've seen it in my living room. I got it recenly, if you don't count all the time i've spent alone in that
-     empty room alone.  I used to have a big one, until it eventually broke down, just refused to boot.. So i got a new one. Couldn't really get the
-     same one, since they didn't make them like that anymore.  So i got a new shiny slick one. It was faster, but i really don't use it much. I'm not
-     very good with computers, you see. Checking mail, reading people's blogs and writing in my own blog was good enough for me. We had a network that
-     connected all computers together, but once again, i have no idea how it works, so you'll have to ask someone else about that, provided we ever
-     find anyone else..
+    Yes! I actually have one, too. You might've seen it in my living room. I got it recenly before everything disappeared, though now it feels like
+    it's been forever. I used to have a bigger one, until it eventually broke down, probably from being so ancient, just refused to boot.. So I got a
+    new one. Couldn't get the same one, they didn't make them like that anymore, I really got used to it, you know.x So I got a new one. It was
+    faster, but really, I didn't care much. I'm not very good with computers anyway, and I don't do anything complicated. Checking mail and blogging
+    was good enough for me. We had a network that connected all computers together, making remote communication really easy.
 
-     You have a blog? What is it about?
+    You have a blog? What is it about?
 
-     Oh all the things. It's more like a micro-blog, you know? Where you put all the things that are happening to you right now. And check what other
-     people are doing. It's pretty fun. That way it's easier to keep up with your friends even when they move. I was really happy when i was told
-     about it, and that people i wanted to keep talking with were on there. So i started using it a lot. Of course, now that everyone's gone, there is
-     probably nobody on there..  We could still check it later when we get back. Or maybe we could find some kind of computer cafe in the city.
+    Oh all the things, daily happenings, just sharing your status with friends, you know? So you don't loose touch. I was happy when I was told about
+    it, there were people I knew that moved to the city on there. So i started using it a lot. Of course, now that everyone's gone, there is probably
+    nobody on there..  We could still check it later when we get back. Or maybe we could find some kind of public computer in the city.
 
-     Yeah, for sure. I wanna see it.
+    Yeah, maybe. I wanna see it.
 *** IF (want to talk about plant based food) THEN What's with the food here, it's all made from plants?
-     <p>: It seems like all the food is made out of various plants. Do all people here only eat that?
+    <p>: It seems like all the food is made out of various plants. Do all people here only eat that?
 
-     Yes? Well, we wouldn't eat each other, would we?
+    Yes? Well, we wouldn't eat each other, would we?
 
-     Fair.. Here we have other foods, which are made of various creatures that are deemed not self-aware. People would raise them specifically to cook
-     them later. I can't remember why i do, but i know that it exists and how it happens..
+    Fair.. Here we have other foods, which are made of various creatures that are deemed not self-aware enough. People would raise them specifically
+    to cook them later. I can't remember why, but I know that it exists and how it happens..
 
-     That sounds pretty awful.
+    That sounds pretty awful.
 
-     It does, kind of. But these creatures live their best lives before they are made into food. They're well fed and cleaned. I can't say I'm too
-     much against that, especially if they really don't even recognize themselves, just follow the instincts.
+    It does, kind of. But these creatures live their best lives before they are made into food. They're well fed and cleaned. I can't say I'm too much
+    against that, especially if they really don't even recognize themselves, just follow the instincts.
 
-     While i can understand that, we never really sank that low as to abuse the less aware creatures.
+    While I can understand that, we never really sank that low as to abuse the less aware creatures.
 
-     Yeah, I guess some of the reasoning for that would be that people in your world don't actually need to eat to survive. Eating other creatures
-     gives way more nutrients. Maybe that was the main reason people eat them: to survive the tougher times. I'm sure there are people out there that
-     still only eat plant-based foods like you here do.
+    Yeah, I guess some of the reasoning for that would be that people in your world don't actually need to eat to survive. Eating other creatures
+    gives way more nutrients. Maybe that was the main reason people eat them: to survive the tougher times. I'm sure there are people out there that
+    are against that.
 
-     Requiring food to survive indeed makes it a lot more difficult, it does make sense that people would use any means necessary to survive of
-     course. Still, I'm glad that for us this problem never existed and we could circumvent it entirely and don't have a dire need to abuse creatures
-     to survive and it makes me feel unwell that this had to happen in your case.
+    In that case, it does make sense that people would use any means necessary to survive of course. Still, I'm glad that for us this problem never
+    existed and we could circumvent it entirely and don't have a dire need to abuse creatures to survive and it makes me feel unwell that this had to
+    happen in your case.
 
-     Again, surely there must be other people that feel like you out there. Although i bet the opposite is also true, there might be people that enjoy
-     it.
+    Again, surely there must be other people that feel like you out there. Although I bet the opposite is also true, there might be people that enjoy
+    it.
 
-     What an awful world that must be. Still, surely, not all hope is lost if someone understand that it's bad.
+    What an awful world that must be. Still, surely, not all hope is lost if someone understand that it's bad.
 
-     I suppose that's just how it is. The world is cruel like that sometimes.
+    I suppose that's just how it is. The world is cruel like that sometimes.
 *** Do people always look the same since they don't age?
-     <p>: So.. if people here don't age, does that mean their appearance doesn't change since when they first find themselves here?
+    <p>: So.. if people here don't age, does that mean their appearance doesn't change since when they first find themselves here?
 
-     Pretty much. Since i woke up here my appearance didn't change at all. The hair and the nails still grow, but that's practically it.  So i still
-     have to look after them, but except that.. not much changes. You can get new clothes to change your looks a bit, certainly, but other than that
-     the looks don't change too much. Some people actually wondered if anything could be done about that, but the research was started relatively late
-     and didn't go that far.
+    Pretty much. Since I woke up here my appearance didn't change at all. The hair and the nails grow, but that's practically it. So Ib still have to
+    look after them, but except that.. not much changes. You can get new clothes to change your looks a bit, certainly, but other than that the looks
+    don't change too much. Some people actually wondered if anything could be done about that, but the research was started just recently and didn't
+    go that far.
 
-     I see.. So after people wake up here, they are all already aged and that never changes. Were all people here grown-ups?
-
-     Not all of them, no. The "age" ranged considerably, there were all kinds of people. You couldn't really judge anyone by their appearance, because
-     someone could look like a child, but have lived a long life already. Perhaps, we could talk to the people who did research on the topic, provided
-     we'd find someone like that. Maybe in the city, since most of them lived there, it was the place for researchers to gather.
+    I see.. So after people wake up here, they are all already aged and that never changes. Were all people here grown-ups?
+    
+    Not all of them, no. The "age" ranged considerably, there were all kinds of people. You couldn't really judge anyone by their appearance, because
+    someone could look like a child, but have lived a long life already. Perhaps, we could talk to the people who did research on the topic, provided
+    we'd find someone like that. Maybe in the city, since most of them lived there, it was the place for researchers to gather.
 *** What's the city like in general?
-     <p>: What's the city we're heading to like in general?
+    <p>: What's the city we're heading to like in general?
 
-     Uhm.. It's big! And it had a lot of people doing many things. A lot bigger than the village, you know. The buildings there were also actually
-     built in places regions designated for them, unlike in our village, where things were just made up as the time progressed and then were connected
-     with a road. For the city, they actually planned areas for houses and for service and entertainment buildings, which where then built there
-     gradually as the amount of people and idea of what to build raised. In the housing areas, the houses were made with multiple floors and flats, to
-     allow more people to live in those houses; and in the center of the city there is a lot less of housing and a lot more of the fun stuff like
-     clubs, cafes, restaurants. Plus, since the city is so big there are also means of easier transportation between the parts of the city. Although
-     they wouldn't help us since they require someone to operate them and I sure as hell have no idea how to do it. We can probably see some of them
-     though, or at least i hope we can.
+    Uhm.. It's big! And it had a lot of people doing many things. A lot bigger than the village, you know. The buildings there were also actually
+    built in regions designated for them, unlike in our village, where things were just made up as the time progressed and then were connected with a
+    road. For the city, they actually planned areas for houses and for service and entertainment buildings, which where then built there gradually as
+    the amount of people and ideas of what to build raised. In the housing areas, the houses were made with multiple floors and flats, to allow more
+    people to live in those houses; and in the center of the city there is a lot less of housing and a lot more of the fun stuff like clubs, cafes,
+    restaurants. Plus, since the city is so big there are also means of easier transportation between the parts of the city. Although they wouldn't
+    help us since they require someone to operate them and I sure as hell have no idea how to do it. We can probably see some of them standing
+    motionless though.
 
-     Interesting.. so, it's big, that's not really new.. What about nighttime, how's it at night?
+    Interesting.. so, it's big, that's not really new.. What about nighttime, how's it at night?
 
-     It'd be all lit up if there were people, night life there is a normal thing there, unlike in the village where we mostly go to bed and get up
-     early; in the city, many people are more active at night, just because of the way they made their schedule; there are entertainment places where
-     they go to meet their friends and make new ones, have a drink, dance. I tried that lifestyle for some time when i was in the city but i really
-     just couldn't handle it, I think it takes a lot of time to get used to it; getting up so late just feels wrong.. and staying up after midnight is
-     just too tiring for me..
+    It'd be all lit up if there were people, night life there is a normal thing there, unlike in the village where we mostly go to bed and get up
+    early; in the city, many people are more active at night, just because of the way they made their schedule; there are entertainment places where
+    they go to meet their friends and make new ones, have a drink, dance. I tried that lifestyle for some time when I was in the city but I really
+    just couldn't handle it, I think it takes a lot of time to get used to it; getting up so late just feels wrong.. and staying up after midnight is
+    just too tiring for me..
 *** Is the food in the city any different?
-     <p>: Since the city is so big, they probably have some interesting different cuisine, right?
+    <p>: Since the city is so big, they probably have some interesting different cuisine, right?
 
-     Precicely so. The food there is made of things delivered there from different places. Since they don't have much of their own food growing, they
-     have to import it from all the places around the world, while the rest of the world gets the "techonolgy" pieces from them, like computers and
-     phones. As a consequence, you can also get food from other parts of the world there for yourself if you go to the city. The milk i had for
-     you saw this morning, for example, i got from my last trip to the city. I try all kinds of food there and those i like i take back with
-     me to enjoy at home.
+    Precicely so. The food there is made of things gathered there from different places. Since they don't have much of their own food production, they
+    have to get it from all the places around the world, while the rest of the world gets the "techonolgy" pieces from them, like computers and
+    phones. As a consequence, you can also get food from other parts of the world there for yourself if you go to the city. The milk I had for
+    breakfast, for example, I got from my last trip to the city.
 
-     Wait.. Just to be clear, do you mean the thing you had with dried leaves is called milk?
+    Wait.. Just to be clear, do you call that liquid you had "milk"?
 
-     Yeah. That's what it's called.
+    Yeah. That's what it's called.
 
-     Huh.. I wonder about the origins of that name.
+    Huh.. I wonder about the origins of that name.
 
-     No idea, really. I just used the name the people gave it, i weren't the one who made it up or anything.
+    No idea, really. I just used the name the people gave it, I weren't the one who made it up or anything.
 
-     I see.. i guess it's the only kind of milk you've ever seen so there's no need to add anything to it's name.
+    I see.. I guess it's the only kind of milk you've ever seen so there's no need to add anything to it's name.
 
-     It's not really the ONLY one. There are kinds made from other things. It's just that since this one was discovered first, it got the name,
-     and only after that did people tried experimenting with other things. Not all of those experiments were that successful..
+    It's not really the ONLY one. There are kinds made from other things. It's just that since this one was discovered first, it got the name, and
+    only after that did people tried experimenting with other things. Not all of those experiments were that successful..
 
-     # Set want to talk about plant based food AND want to talk about the computers UNLESS already talked about them
+    # Set want to talk about plant based food AND want to talk about the computers UNLESS already talked about them
 *** Are we going to stay in the city for the night?
-     Are we gonna stay in the city this night? Do you know anywhere to stay in case we have to?
+    Are we gonna stay in the city this night? Do you know anywhere to stay in case we have to?
 
-     I hope we won't have to.. We got up pretty early and the day is still young, so there's a good chance we won't.  Still, if we have to, we'll
-     probably be able to stay at some kind of hotel, especially if there's nobody else there besides us. There are a few of those in the city, so
-     finding one wouldn't be a problem. They were made especially for people like us, who come to the city for a short time and don't have any other
-     place to stay at.
+    I hope we won't have to.. We got up pretty early and the day is still young, so there's a good chance we won't. Still, if we have to, we'll
+    probably be able to stay at some kind of hotel, especially if there's nobody else there besides us. There are a few of those in the city, so
+    finding one wouldn't be a problem. They were made especially for people like us, who come to the city for a short time and don't have any other
+    place to stay at.
 
-     Pretty convinient.. So finding where to stay for the night, if we need to, shouldn't be a problem. Got it.
+    Convinient..
 ** The city
-   <Finally, after the long walk, you arrive at the city. Judging by the position of the sun, it's somewhere around noon. The stone road you've been
-   walking gradually changes to asphalt>
+   <Finally, after the long walk, you arrive. Judging by the position of the sun, it's somewhere around noon. The stone road you've been walking
+   gradually changes to asphalt>
 
    <narrator>: We're here, finally! That was hell of a walk. I guess we could just keep going on the road and not the sidewalk, since, presumably,
-   there's no transport on the roads right now.. We're in the suburbs currenly, so the buildings here aren't as big and are mostly houses, not some
-   services or entertainment ones.
+   there's no transport on the roads right now.. We're in the suburbs currenly, so the buildings here are mostly houses.
 
    Yeah.. These look smaller compared to those in the distance. Are we heading deeper into the city?
 
-   I'd say we should check a few houses first, to see if anyone's there. The chance is small but that's the main point why we're here: to try to find
-   someone else besides us..
+   I'd say we should check a few houses first, to see if anyone's there. The chance is small but that's the main point why we're here.
 
-   OK, gotcha. So, are we gonna split and just go check a few houses here and there?
+   OK. So, are we gonna split and just go check a few houses here and there?
 
-   I'd really rather not split. I'm afraid that something might go wrong, like you'd get lost, and i'll be left alone again.
+   I'd really rather not split. I'm afraid that something might go wrong, like you'd get lost, and I'll be left alone again.
 
-   Understandable. We'll check some houses together then.
+   I see. We'll check some houses together then.
 
    <Both of you go off the road, to the first house on the right, going up a stairway to the first floor>
 
@@ -420,85 +428,83 @@
 
    Yeah.. right..
 *** Flat on the first floor
-   <The <narrator> goes through the door and you go after. You're now in the first flat on the first floor. It's not very big: there's what seems to
-   be a bathroom, and the living room and the kitchen are made into a single room, with a kitchen counter inbetween them. The living room part has a
-   sofa and a small coffee table. There's a laptop on the table.>
-*** Check the laptop
+    <The <narrator> goes through the door and you go after. You're now in the first flat on the first floor. It's not very big: there's what seems to
+    be a bathroom, and the living room and the kitchen are made into a single room, with a kitchen counter inbetween. The living room part has a sofa
+    and a small coffee table. There's a laptop on the table.>
+**** Check the laptop
      <player> Should we.. check the laptop?
 
-     I'm.. not sure. It's somebode else's! That'd be kinda rude..
+     I'm.. not sure. It's somebode else's, that'd be kinda rude..
 
      Well it's not like we're gonna go snooping around too much in there. Let's just see if there's anything that can help us "on the surface",
      alright?
 
-     OK.. I guess that's fine..
+     Okay.. I guess that's fine..
 
-     <You come up to the laptop and press the spacebar key. The laptop wakes up. The screen is locked, but there's no password, you just click the log
-     in button and it does so. The only window on the computer seems to be a blog, you assume, on the same platform the <narrator> talked about
-     before. The top post says "Just got some new flavored noodles, gonna check em out soon", underneath the text it says "posted undefined ago">
+     <You come up to the laptop and press a random key. The laptop wakes up. The screen is locked, but there's no password, you just click the log in
+     button and it does so. The only window on the is the blogging sofware. The top post says "Just got some new noodles, haven't seen those around
+     here before, gonna check em out soon", underneath the text it says "posted undefined ago">
 
      <p>: Is that the blogging thing you told me about?
 
-     Yes.. Well, the interface looks like it, at least.. The date of the post says "undefined" ago, but what does that mean? And, looking at it, other
-     posts' dates are like that too.
+     Yes, that seems like it. The date of the post makes no sense though. And, looking at it, other posts' dates are like that
+     too.
 
-     No idea! It wasn't able to determine the date, obviously, but what that actually means I don't know. Probably not much else to see here, since
-     this is the only window on the computer, it was probably only used for writing on the blog.
-*** Check the kitchen part of the room
+     It wasn't able to determine the date, obviously, but what that actually means I do not know. Probably not much else to see here, since this is
+     the only window on the computer, it was probably only used for writing on the blog.
+**** Check the kitchen part of the room
      <You walk up to the fridge and open it. There's a bunch of different foods in there, some in bags, most unopened at all>
 
-     <narrator>: So many interesting kinds of meals could be made from this.. But I wouldn't dare to touch someone else's supplies. Maybe we could
-     take some from the city center when we're there. That's where i'd usually get all the cooking stuff.
-*** Check the bathroom
+     <narrator>: So many interesting kinds of meals could be made from this.. Maybe we could get some from the city center too, when we're there.
+**** Check the bathroom
      <You open the bathroom door and turn on the light. It blinks a few times at first, and then stays on as it should. The bathroom is mostly the
      same as the <narrator>'s, maybe even a little smaller.>
 
      <p>: Not much to see here.. Good thing we checked, anyway.
-*** Leave the first flat
-   <p>: Not much else to look at here. Should we go check out the other flats?
+*** Leaving the first flat & go into the city
+    <p>: Not much else to look at here. Should we go check out the other flats?
 
-   Yea. Nothing more catches the eye here.
+    Yea. Nothing more catches the eye here.
 
-   <You leave the flat. The <narrator> closes the door, leaving it as it was when you arrived>
+    <You leave the flat. The <narrator> closes the door, leaving it as it was when you arrived>
 
-   <narrator>: Let's check the other flats, then.
+    <narrator>: Let's check the other flats.
 
-   <You nod. The <narrator> come to the opposite side of the corridor and turns the knob. The door is locked>
+    <You nod. The <narrator> come to the opposite side of the corridor and turns the knob. The door is locked>
 
-   <narrator>: Interesting.. So, the person who lived in that flat just forgot to lock their door? And their computer didn't have any password,
-   too. Guess someone didn't really care about invaders at all.
+    <narrator>: Interesting.. So, the person who lived in that flat just forgot to lock their door? And their computer didn't have any password,
+    too..
 
-   Means they had nothing to hide, right?
+    Means they had nothing to hide, right?
 
-   Not sure about that. But we can assume that for now.
+    Maybe. Or they were careless.
 
-   <You check the other floors, all the doors are locked. Same happens in the adjacent house>
+    <You check the other floors, all the doors are locked. Same happens in the adjacent house>
 
-   <narrator>: Seems like we just got lucky with that one.. All the others are probably locked, too. Let's head into the city and see what's up
-   there.
+    <narrator>: Seems like we just got lucky with that one.. All the others are probably locked, too. Let's head into the city and see what's up
+    there.
 
-   Agreed. This was getting boring anyway. You come up to the door and you just know it's locked, but you still try, with no luck. That first one was
-   a big surprise.
+    Agreed. This door checking getting boring anyway. You come up to the door and you just know it's locked, but you still try, with no luck. That
+    first one was a big surprise.
 
-   <You head into the city, going along the road, past all the same-looking houses. After some time, you reach the center part of the city, where all
-   the night and day life happened>
+    <You head into the city, going along the road, past all the same-looking houses. After some time, you reach the center part of the city, where all
+    the night and day life happened.>
 
-   <narrator>: Never seen these streets so empty, it was bright and full of people even at night. Not anymore. Didn't think they'd ever end up like
-   this. I hope they'll be the way they were before someday, even though i didn't like it at the time, it's sad to see them so devoid of life.
+    <narrator>: Never seen these streets so empty, it was bright and full of people even at night. Not anymore. Didn't think they'd ever end up like
+    this. Hope they'll be the way they were before someday, even though I didn't like it at the time, it's sad to see them so devoid of life.
 
-   <The <narrator> stops for a few second, looking at the building to the right>
+    <The <narrator> stops for a few seconds, looking at the building to the right.>
 
-   <narrator>: Let's go see this one. This club was a hugely popular place to hang out at night, i got invited to go there at night a few times, but
-   after the first one i didn't want to go there any more at all, too crowded.
+    <narrator>: Let's go see this one. This club was a hugely popular place to hang out at night, I got invited to go there at night a few times, but
+    after the first one I didn't want to go there any more at all, too crowded.
 
-   Shouldn't it be closed though? It's day after all.
+    Shouldn't it be closed though? It's day after all.
 
-   They didn't close it for the day, it's just that there weren't a lot of people there. That was the sweet time for me to go enjoy a few drinks.
+    They didn't close it for the day, it's just that there weren't a lot of people there. That was the sweet time for me to go enjoy a few drinks.
 *** Club
-   <You go throuth the glass doors of the parade entrance, then through the long hallway, and to the actual dancefloor and the bar.
-   As expected, there's nobody there.>
-
-*** The bar
+    <You go throuth the glass doors of the parade entrance, then through the long hallway, and to the actual dancefloor and the bar.
+    As expected, there's nobody there.>
+**** The bar
      <You come over to the bar. There are a few drinks on the bar.>
 
      <p> Well, if nobody else is there, we might as well have them, right?
@@ -511,21 +517,21 @@
 
      Yes! This one was called "strawberry boom", because it's so sweet. But the aftertaste is nice.
 
-     Actually.. it kinda is.. huh
+     Actually.. maybe is is.. huh.
 
-     The one i have here is a mix of milk and various syrops. It's not exactly a thing you'd get at the club, more like a coctail. Wanna try it?
+     The one I have here is a mix of milk and various syrops. It's not exactly a thing you'd get at the club, more like a coctail. Wanna try it?
 
-     Alright.. here goes.
+     Alright..
 
      <You take a sip of the coctail. It is, indeed, a mixture of milk and various sweet syrops, although the which exact ones you can't quite figure
      out>
 
-     Eh.. It is as you described, i don't know if i like it.
+     Uh.. don't know if I like it.
 
-     Well. To each their own. Let's finish those and continue our "investigation"
+     Well. To each their own. Let's finish those and continue our investigation.
 
-     Yeah. Investigatin'
-*** The dance floor
+     Yeah. Investigatin'.
+**** The dance floor
      <The tiles of the dance floor don't change colors. It seems like the program that controls them doesn't run during the day.  There are a few
      tables around it, one of which has a small white pack of someting, with "6" written on it.>
 
@@ -535,7 +541,7 @@
 
      <You come up to the table and peek into the pack. There are 5 strips of gum in there.
 
-     <p>: Five. They left an almost full pack here. How unthoughtful.
+     <p>: Five. They left an almost full pack here. What a waste.
 
      Maybe someone didn't like 'em. They don't exactly taste like.. anything. Just dull.
 
@@ -544,143 +550,140 @@
      Yep. It's very basic. If you want to just chew on something, maybe, or have no time to brush your teeth at all, although.. I'm not sure it helps
      with that?
 *** Mall and the way back
-   <narrator>: That was a whole bunch of nothing, huh? I'm getting really desperate for something to change already! Come on..  Did we go all the
-   way for nothing?
+    <narrator>: That was a whole bunch of nothing, huh? I'm getting really desperate for something to change already! Come on..  Did we go all the
+    way for nothing?
 
-   Yeah.. Jeez. So boring! Maybe we should head back already?
+    Yeah.. Jeez. So boring! Maybe we should head back already?
 
-   Come on, let's check a few more places, OK? And on our way, let's try to find a few bicycles to go back on, that should ease our way a bit.
+    Come on, let's check a few more places, OK? And on our way, let's try to find a few bicycles to go back on, that should ease our way a bit.
 
-   Oh, sure.. If you know where to get them.
+    Oh, sure.. If you know where to get them.
 
-   Yeah. We'll head for the big mall for now, there's a bike place there, i hope nobody is going to mind if we take them?
+    Yeah. We'll head for the big mall for now, there's a bike place there, I hope nobody is going to mind if we take them.
 
-   There's probably nobody to do so..
+    There's probably nobody to do so..
 
-   Yes. That's what i'm talking about. Let's go.
+    Yes. That's what I'm talking about.
 
-   <You walk for bit more deeper into the city, until you see the big mall building. You know it's a mall because it has "City Mall" written on
-   it. Who could've thought>
+    <You walk for bit more deeper into the city, until you see the big mall building. You know it's a mall because it has "City Mall" written on
+    it. Who could've thought.>
 
-   <narrator>: I'll try to remember where exactly the bike place is, while you look around and see if there's anything interesting while we're on
-   the way. This place is pretty big after all.
+    <narrator>: I'll try to remember where exactly the bike place is, while you look around and see if there's anything interesting while we're on
+    the way. This place is pretty big after all.
 
-   <While you go, you notice a few clothing places, cosmetics stuff, lingerie, a huge food section, general applience stuff, and then, finlly,
-   you're at the bike place>
+    <While you go, you notice a few clothing places, cosmetics stuff, lingerie, a huge food section, general applience stuff, and then, finlly,
+    you're at the bike place>
 
-   Well, just take the first one that fits you and let's go already.
+    Well, just take the first one that fits you and let's go already.
 
-   <The <narrator> tries out a few bikes, stopping on a sporty looking green one. You grab the first one you see, the seat feels alright and the
-   pedals are at the comfortable height, so you don't hesitate too much. Your bike is red, the fastest color. You set out on your way back
-   immediately. The sun seems to already be setting.  Just how much have you been walking here?>
+    <The <narrator> tries out a few bikes, stopping on a sporty looking green one. You grab the first one you see, the seat feels alright and the
+    pedals are at the comfortable height, so you don't hesitate too much. Your bike is red, the best color. You set out on your way back
+    immediately. The sun seems to already be setting. Just how much have you been walking here?>
 
-   <narrator>: What a disappointment. Not like it really matters, since the time is not a constraint, but still, having no results is
-   disappointing. Now we know there's probably nothing there, at least, so we wouldn't need to go all the way back again for a while.
+    <narrator>: What a disappointment. Not like it really matters, since the time is not a constraint, but still, it's disappointing. Now we know
+    there's probably nothing there, at least.
 
-   I guess that's true.. That wasn't very exciting, except when we actually did find something, you know?
+    I guess that's true.. That wasn't very exciting, except when we actually did find something, you know?
 
-   Not a lot of that, but yes..
+    Not a lot of that, but yes..
 ** Back in the village
-   <After the back, you spend most of the time focusing on the road. The bikes make the journey quite a bit shorter. When you arrive, almost set and
-   it's pretty dark. On your way to <narrator>'s house you suddenly notice that the house on opposite side of the street has its lights turned
-   on. You look at the <narrator>. The <narrator> looks at you>
+   <On the way back, you spend most of the time focusing on the road. The bikes make the journey quite a bit shorter. When you arrive, the sun has
+   almost set and it's pretty dark. On your way to <narrator>'s house you suddenly notice that the house on opposite side of the street has its lights
+   turned on. You look at the <narrator>. The <narrator> looks at you.>
 
    <narrator>: What the hell?! Is he.. actually in here?
 
    Is this your friend's house?
 
-   Yes! Oh wow, can it be that he's somehow back? That we aren't alone here? We have to check RIGHT NOW.
+   Yes! Oh wow, can it be that he's there? That we aren't alone here? We have to check RIGHT NOW.
 
    <You both abandon the bikes in the middle of the road and run up to the house. The <narrator> knocks on the door a few times and carefully opens
-   it>
+   it.>
 
    <narrator>: Hey?
 
-   <Behind the door, you see a guy, not too tall, with shoulder length black hair and wearing glasses. He jumps back, producing a high-pitched yell>
+   <Behind the door, you see a guy, not too tall, shoulder length black hair, wearing glasses. He jumps back, producing a high-pitched yell>
 
    <maj>: aaHHH!!
 
-   <You see <narrator> giggle a little>
+   <You see <narrator> giggle a little.>
 
    <narrator>: Maj! Long time no see!!
 
-   # Possible names: Rüd, Maj, Jörg?
-
-   <maj>: Ah.. ha.. Not sure about the time, but hi! I'm really lost.. since everything went down i can't remember much.. The panic, then darkness,
-   and then i wake up in the forest this morning, in the same place i was the first time. I didn't understand anything, so i thought i'd just head
-   back home, what else could i do? So I there i was, alone.. Which was scary.. so i just spent the whole day at home..
+   <maj>: Ah.. ha.. hi! I'm really lost.. since everything went down I can't remember much.. The panic, then darkness, and then I wake up in the
+   forest this morning. I couldn't wrap my head around what happened, so I thought I'd just head back home, what else could I do? So I there I was,
+   alone.. Which was scary.. so I just spent the whole day at home..
 
    <narrator>: Oh wow.. That's a bit different.. but.. uh.. let's come in and not just stand here, eh?
 
-   <maj>: Ohh.. yeah! sure.. and who's the person behind you might be..? if you don't mind me asking..
+   <maj>: Ohh.. yeah! Sure.. and who's the person behind you might be..? if you don't mind me asking..
 
-   <narratoro>: Ah, that's <p>. They're.. uh.. new here. Apparently they're from the "outside", like the "creator" was..
+   <narratoro>: Ah, that's <p>. They're.. uh.. new here. Apparently they're from the "outside", like the "creator" was.
 
-   <maj>: Wow! i never thought i'd meet someone like that ever again..
+   <maj>: Wow! Never thought I'd meet someone like that ever again..
 
-   <p>: Hello! While i suppose it's true i'm from the "outside" I don't really know anything about that person you refer to as the "creator", nor do
-   I know anything about myself.. or anything outside the room i'm in, really..
+   <p>: Hello! While I it's true i'm from the "outside", I don't know anything about that "creator" person, nor do I know anything about myself.. or
+   anything outside the room I'm in, really..
 
-   <maj>: Oh wow.. shame.. but still, welcome! let's head into the kitchen and have some tea at least, like the <narrator> suggested, we shouldn't
+   <maj>: Oh.. shame.. but still, welcome! Let's head into the kitchen and have some tea at least, like the <narrator> suggested, we shouldn't
    just stand in the doors.
 
-   <You all head to a room on the left, it's a medium-sized kitchen. You and <narrator> sit at the table, while Maj puts some water into the
-   electric kettle, the water boils rather fast, and after a minute you all sit at the table with some tea, which is still too hot to taste, but
-   already smells minty>
+   <You all head to a room on the left, it's a medium-sized kitchen. You and <narrator> sit at the table, while Maj puts some water into the electric
+   kettle, the water boils rather fast, and after a minute you all sit at the table with some tea, which is still too hot to drink, but already smells
+   minty.>
 
-   <maj>: So, <narrator>, what about time that you wanted to say, what was so different?
+   <maj>: So, how have you been?
 
    <narrator>: You said that you only remember darkness and then you woke up back in the forest, but it was very different for me. It has actually
-   been a very long wait for me.  All that was left of the world was a single room with gray walls, and nothing else, and that's where i was all
-   that time. I'm a bit envious of you not having to experience that.  I never want to stay alone with nothing and nobody else but myself. I'm glad
-   you're back too now, it's been about a day since the world has returned back to normal.. well.. except all the people. <p> helped me get out of
-   that room by doing somethig on the outside. Something also changed this night, while I was asleep, isn't that right, <p>?
+   been a very long wait for me. All that was left of the world was a single room with gray walls, and nothing else, and that's where I was all that
+   time. I'm a bit envious of you not having to experience that. I never want to stay alone with nothing and nobody else but myself. I'm glad you're
+   back too now, it's been about a day since the world has returned back to normal.. well.. except all the people. <p> helped me get out of that room
+   by doing somethig on the outside. Something also changed this night, while I was asleep.
 
-   <p>: Yeah.. There was some kind of a corridor, with a stupid puzzle. So i solved it, there was some kind of sound, and that somehow brought back
-   the city. And you, too, it seems. I'm looking forward to more changes like that in the future.
+   <p>: Yeah.. There was some kind of a corridor, with a stupid puzzle. So I pressed a few buttons, a melody played, and that somehow brought back the
+   city. And you, too, it seems. Looking forward to more changes like that in the future.
 
    <maj>: Wow.. that is a lot to process.. First off, it's very sad you had to experience this, <narrator>.. But that's behind you now, and we can
    start living again, right?
 
-   <narrator>: I.. sure hope so. There are still so many people missing.. But we'll try to get them back. We've been to the city with <p> today,
-   it's as empty as everything else, so we really just wasted a lot of time.
+   <narrator>: I.. sure hope so. There are still so many people missing.. But we'll try to get them back! We've been to the city with <p> today, it's
+   as empty as everything else, so we really just wasted a lot of time.
 
    <maj>: Such a big city and nobody there too.. So we're the only people here..
 
    <narrator>: We haven't found anyone else.. But seeing you now makes me excited! More people might be coming back soon..
 
-   <maj>: Oh i can't wait for that..! I really really want everyone to be back.. I already miss all the life around here..
+   <maj>: Oh I can't wait for that..! I already miss all the life around here..
 
-   <narrator>: We'll be progressing with that soon, i hope. In the meantime, <p>, Maj was one of the people who designed the first computers around
-   here!  So you can ask something about them..
+   <narrator>: We'll be progressing with that soon, I hope. In the meantime, <p>, Maj was one of the people who designed the first computers around
+   here! So you can ask something about them..
 
    <p>: Oh!
 
-   <maj>: Well.. i only participated in the initial design and development of the first ones, they were quite clumsy and big.. Nowadays computers
-   are a lot more slim, all of that happened after they moved to the city, and i mostly resigned from duty and stayed here. We made the
-   micro-blogging thing, i'm sure <narrator> told you about it, so we could keep each other up to date on things, so i still got the news about new
-   inventions and research and even got to participate sometimes, but a lot of the time that still required being there in person, so it rarely
-   happened.
+   <maj>: Well.. I only participated in the initial design and development of the first models, they were quite clumsy and big.. Nowadays computers
+   are a lot smaller, all of that happened after they moved to the city, and I mostly resigned from duty and stayed here. We made the network, mail
+   and blogging platforms to communicate with each other, I'm sure <narrator> told you about that. So, i still got the news about new inventions and
+   research and even got to participate in a few, but it mostly still still required being there in person, so it happened rarely.
 
    <p> Why didn't you want to go to the city with them and continue working on the cool stuff?
 
-   <maj>: You see.. I really don't like big crowds of people and the city is ALL about that.. I get all anxious and trembly.. So I'd rather
-   stay.. besides, the scientific community has grown a lot since the beginning and i'm sure they can go on without me.
+   <maj>: You see.. I really don't like big crowds of people and the city is ALL about that.. I get all anxious.. So I'd rather stay.. besides, the
+   scientific community has grown a lot since the beginning and I'm sure they can go on without me.
 
-   <narrator>: Don't you belittle your part in that community, you dummy! They wouldn't be able to make it like it is without your work, and you
-   know it. You didn't really leave or anything, you still kept up with people from there, didn't you?
+   <narrator>: Don't you belittle your part in that, you dummy! They wouldn't be able to make it like it is without your work, and you know it. You
+   didn't really leave them for good with no news or anything, you still kept up with people from there, didn't you?
 
-   <maj>: Yes.. ok, ok, you got me. I don't really like to admit it, because i'd sound like a hypocrit, though. But enough about that, there's
-   another interesting thing: we designed the computers with long range networking in mind, and put some big servers in places where they'd be
-   needed and where we could connect computers to them and then connect the server together. One of them is actually right here, in the basement of
-   my house, I rarely go down there so it might be a bit dusty, but we can go see it if you want.
+   <maj>: Yes.. ok, ok, you got me. I don't really like to admit it, because it'd sound like I'm bragging. But enough about that, there's another
+   interesting thing: we designed the computers with long range networking in mind, and put some big servers in places where they'd be needed and
+   where we could connect computers to them and then connect the servers together. One of them is actually right here, in the basement of my house, I
+   rarely go down there so it might be a bit dusty, but we can go see it.. if you're interested.
 
    <p>: Sure, i wanna see it.
 
    <Since you all are already done with the tea, you all stand up, and wait for Maj to lead the way. However, he just moves his chair and you notice
    that there's a trapdoor underneath. He lifts it, then reaches inside to find the light switch and turns it on. He then steps on the ledder there
    and starts going down. You look as he goes down, it's not that deep down there, just a few meters. He waves at you, telling you can go down
-   now. You climb down the ladder first, then the <narrator> climbs in afterwards>
+   now. You climb down the ladder first, then the <narrator> climbs after you.>
 
    <p>: You know.. this really looks like the room I am in. I mean, on the outside. Except yours is way better lit.
 
@@ -688,31 +691,32 @@
 
    <p>: Not like i have any choice..
 
-   <maj>: Anyway. Here it is, this big boy handles all the communication between the village and the city
+   <maj>: Anyway. Here it is, this big boy handles all the communication between the village and the city.
 
    <You look at the server. It's a rack filled with all kinds of boxes and wires, all blinking with different colors>
 
    <maj>: In the city, there are a few of servers like this once, since it's a lot bigger. The city is like a hub for communication.
 
-   <p>: I think I'm noticing a pattern here, same happens with the foods you guys have.
+   <p>: I think I'm noticing a pattern here.
 
-   <maj>: Precicely. I wasn't sure about how to use the basement for a while, but this thingy here fit in quite well, and now it doesn't take space
-   in the house, plus it gets all the underground coolness.
+   <maj>: It only makes sense that the city would be the center of all things, doesn't it? So.. I wasn't sure about how to use the basement for a
+   while, but this thingy here fit in quite well, and it doesn't take space in the house, plus it gets all the underground coolness.
 
    <p>: So it's not just me, it really is colder in here?
 
    <narrator>: I've noticed, too.
 
-   <maj>: Yes! Besides being underground, this place is also additionally cooled down artificially. Otherwise it'd get pretty hot in here, this baby
-   produces a lot of heat. There's not much to see other than the server, but i am proud of it and will take any opportunity to show this setup to
-   someone, albeit it might sound like braggning, it did took some planning to set up. Now, let's get out of here, I'm feeling cold myself.
+   <maj>: Yes! Besides being underground, this place is also additionally cooled down artificially. Otherwise it'd get pretty hot in here, this thing
+   produces a lot of heat. There's not much to see other than the server, but I am proud of it and will take any opportunity to show this setup to
+   someone if they ask, albeit it might sound like braggning, it did take some planning to set up. Now, let's get out of here, I'm feeling cold
+   myself.
 
    <You all get out of the basement in the reverse order. Maj closes the trapdoor and moves his chair back>
 
-   <maj>: Now, it's getting really late, i'd love to talk some more, but maybe we should continue tomorrow?
+   <maj>: Now, it's getting really late, I'd love to talk some more, but maybe we should continue tomorrow?
 
-   <narrator>: I'm actually suddenly very tired, probably because the trip, I just realized it. Didn't notice at first because I was so excited to
-   see you! We'll probably head back to my place then, <p> is staying at my house for now, until we figure out something better.
+   <narrator>: I'm actually suddenly very tired, probably because the trip, I just realized it. Didn't notice at first because I was so excited to see
+   you! We'll probably head back to my place then, <p> is staying at my house for now, until we maybe figure out else.
 
    <maj>: See you tomorrow, then!
 
@@ -722,10 +726,12 @@
 
    <p>: Yeah, good night!
 
-   <You and the <narrator> leave the house and get back to the <narrator>'s place, <narrator> takes a shower, and you both head to bed>
+   <maj>: You too!
 
-   <narrator>: I'm exhausted.. Goodnight, i guess, even though it doesn't mean much for you apparently.
+   <You and the <narrator> leave the house and get back to the <narrator>'s place, <narrator> takes a shower, and you both head to bed.>
 
-   <p>: I still appreciate the kind words. Let's see what tomorrow brings.
+   <narrator>: I'm exhausted.. Goodnight, I guess, even though it doesn't mean much for you apparently.
 
-   <The <narrator> falls asleep very fast and your screen goes black again>
+   <p>: Still, I appriciate it. Let's see what tomorrow brings.
+
+   <The <narrator> falls asleep fast, after some time the screen goes black again.>
