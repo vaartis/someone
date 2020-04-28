@@ -79,11 +79,21 @@ void StoryParser::parse(lines_type &result, std::string file_name, sol::state &l
     YAML::Node root_node = YAML::LoadFile(full_file_name);
 
     std::map<std::string, CharacterConfig> character_configs;
+
+    std::vector<std::string> dialogue_between_chars;
+    std::optional<uint32_t> dialogue_between_chars_current;
+
     if (root_node["config"]) {
         auto config = root_node["config"];
 
         if (config["chars"]) {
             character_configs = config["chars"].as<decltype(character_configs)>();
+        }
+
+        if (config["dialogue_between"]) {
+            auto dialogue_chars = config["dialogue_between"].as<std::vector<std::string>>();
+            dialogue_between_chars.insert(dialogue_between_chars.end(), dialogue_chars.begin(), dialogue_chars.end());
+            dialogue_between_chars_current = 0;
         }
     }
 
@@ -99,11 +109,30 @@ void StoryParser::parse(lines_type &result, std::string file_name, sol::state &l
 
         auto inserted_name = fmt::format("{}/{}", nmspace, name);
 
-        if (!node["char"]) {
-            spdlog::error("{} doesn't specify a character", inserted_name);
-        }
+        std::string node_char;
+        if (node["char"]) {
+            node_char = node["char"].as<std::string>();
+            if (!dialogue_between_chars.empty()) {
+                // If the character specified is a dialogue character, then the dialogue switches to them and continues with the next character
+                auto maybe_found_char_iter = std::find(dialogue_between_chars.begin(), dialogue_between_chars.end(), node_char);
+                if (maybe_found_char_iter != dialogue_between_chars.end()) {
+                    dialogue_between_chars_current = std::distance(dialogue_between_chars.begin(), maybe_found_char_iter);
+                }
+            }
+        } else {
+            if (!dialogue_between_chars.empty()) {
+                dialogue_between_chars_current =
+                    // If the next number would go out of bounds, wrap around
+                    *dialogue_between_chars_current + 1 >= dialogue_between_chars.size()
+                    ? 0
+                    // Otherwise, switch to the next character
+                    : *dialogue_between_chars_current + 1;
 
-        auto node_char = node["char"].as<std::string>();
+                node_char = dialogue_between_chars[*dialogue_between_chars_current];
+            } else {
+                spdlog::error("{} doesn't specify a character and there's no dialogue going on", inserted_name);
+            }
+        }
 
         CharacterConfig char_config;
         auto found_char_config = character_configs.find(node_char);
