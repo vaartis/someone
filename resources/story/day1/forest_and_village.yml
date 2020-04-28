@@ -6,6 +6,7 @@ config:
       color: [255, 255, 255]
     description:
       color: [127, 0, 255]
+  dialogue_between: [player, narra]
 
 1:
   char: description
@@ -20,40 +21,33 @@ config:
       What.. what happened to the room?
 
 3:
-  char: narra
   text: >-
     Well, you did something, right?
 
 4:
-  char: player
   responses:
   - text: >-
       Yeah. I did the most obvious thing: pressed the button that was the only other thing in the room except me and the computer.
 
 5:
-  char: narra
   text: >-
     That was.. indeed a very obvious thing to do. Anyway, what lies before you is "the rest of the world". This is where we all woke up.
 
 6:
-  char: player
   responses:
   - text: >-
       So there are more people here?
 
 7:
-  char: narra
   text: >-
     There were. But I'm not sure there's anyone else besides us right now. Well, at least I'm not alone anymore..
 
 8:
-  char: player
   responses:
   - text: >-
       Oh.. and what did you mean by "woke up"?
 
 9:
-  char: narra
   text: >-
     We all found ourselves here just like you did, with no memory of what happened or who we are. When I found myself here, there was nobody
     else.  The only thing I would do is walk through this forest, looking around for anything to do. Somehow, with time, more people
@@ -62,13 +56,11 @@ config:
     connect everyone was that they all confused as to how they came here.
 
 10:
-  char: player
   responses:
   - text: >-
       And then.. Where did everyone go?
 
 11:
-  char: narra
   text: >-
     Something happened. It seemed like the world was being cut off piece by piece. One day, walls appeared on the far parts of the world,
     just like you saw before. They seemed to extend in all direcitons. The next day the walls grew closer. People were scared. Long story
@@ -78,7 +70,6 @@ config:
     forest while we can.
 
 12:
-  char: player
   responses:
   - text: >-
       Sure, no point in staying here..
@@ -87,7 +78,7 @@ config:
   char: description
   wait: true
   text: >-
-    You walk through the forest. It's not very thick, but there is still plenty of plants and trees.
+    You walk through the forest. It's not very thick, but there are still plenty of plants and trees.
 
 14:
   char: player
@@ -96,19 +87,16 @@ config:
       So.. what was life like here? Until everything diasppeared..
 
 15:
-  char: narra
   text: >-
     Pretty simple. It's not like we had any specific needs to have fights for. I want to say just usual life, but I can't really judge
     fairly what usual life is like to anyone else, because I've only ever known my own life here...
 
 16:
-  char: player
   responses:
   - text: >-
       I don't think I have any idea how usual life is at all, so I'd like to hear how it was for you.
 
 17:
-  char: narra
   text: >-
     Well, after some time spent just going around the forest and finding other people, we decided to settle down somewhere. For some reason,
     there were people that knew how to make "instruments", while others didn't. They couldn't explain why they knew it. These people would
@@ -123,13 +111,11 @@ config:
     hours of work were lost. They built the next library building out of stone.
 
 18:
-  char: player
   responses:
   - text: >-
        So many books gone.. I guess the people learned their lesson about building from wood, though.. At least nobody got hurt?
 
 19:
-  char: narra
   text: >-
     A tragedy, but yes, nobody got hurt. After some time, the village wasn't the only place where people lived, there was a city, with
     asphalt roads and tall buildings. People would come up with all kinds of things to work on to spend time, fight the bordeom, understand
@@ -139,14 +125,12 @@ config:
     vanished. Everything ceased to be. Except me. I was still here.
 
 20:
-  char: player
   responses:
   - text: >-
       I have no idea what I am doing here exactly, so thank you for clearing a few things about this world up a bit. Oh and by the
       way.. when you asked me if i'm sitting in front of a computer screen, how did you come up with that, what gave you the clue?
 
 21:
-  char: narra
   text: >-
     There's something in the way you look and move that gives it away, it's a similiar to how the "creator" was. It might just be my
     imagination, I really wanted to belive that you had something in common with them, and it turned out you did. Anyway, we've
@@ -160,7 +144,6 @@ config:
     the windows are dark, too. There is a central road around which all the houses seem to have been built.
 
 23:
-  char: narra
   text: >-
     My house is the one on the edge of the road. It was one of the early ones, built on what later became the outskirts of the village. The
     road was made a long time after it was built, connecting my house and the house of a friend of mine first, and then extending into the

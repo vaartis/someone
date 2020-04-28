@@ -6,6 +6,7 @@ config:
       color: [255, 255, 255]
     description:
       color: [127, 0, 255]
+  dialogue_between: [narra, player]
 
 1:
   char: description
@@ -19,13 +20,11 @@ config:
     Surprisingly, the light still works. And don't ask how, I don't quite understand it myself.
 
 3:
-  char: player
   responses:
   - text: >-
       Yeah, alright.
 
 4:
-  char: narra
   text: >-
     I knew some people who could explain it, but I'm unsure we'll be able to meet them any time soon. Now, I'm really tired from all this walking,
     spending your time in an empty room for so long doesn't motivate to move much. So.. there's only one bed and we'll have to share it, I hope you're
@@ -126,20 +125,17 @@ bed-if-not-explored:
   next: bed-if-not-explored-2
 
 bed-if-not-explored-2:
-  char: player
   responses:
   - text: >-
       Yeah.
     next: bed-if-not-explored-3
 
 bed-if-not-explored-3:
-  char: narra
   text: >-
     Oh well. Goodnight, then.
   next: bed-if-not-explored-4
 
 bed-if-not-explored-4:
-  char: player
   wait: true
   responses:
   - text: >-

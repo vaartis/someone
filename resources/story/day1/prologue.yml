@@ -6,6 +6,7 @@ config:
       color: [255, 255, 255]
     description:
       color: [127, 0, 255]
+  dialogue_between: [narra, player]
 
 1:
   char: narra
@@ -13,13 +14,11 @@ config:
     Hello? Can you hear me?
 
 2:
-  char: player
   responses:
   - text: >-
       Uh.. Yes? I think.. Who are you and where am I?
 
 3:
-  char: narra
   text: >-
     I'm Narra, and we're.. here, in this empty room.
 
@@ -31,70 +30,58 @@ config:
     You are standing in an empty gray room, next to her.
 
 5:
-  char: player
   responses:
   - text: >-
       What is this place..?
 
 6:
-  char: narra
   text: >-
     The remnants of the world that was, but all that's left of it now is this single room. And who are you, anyway?
 
 7:
-  char: player
   responses:
   - text: >-
       I.. don't know? I can't remember anything..
 
 8:
-  char: narra
   text: >-
     Well.. maybe you can remember your name, at least?
 
 
 9:
-  char: player
   responses:
   - text: >-
       Not really.. i suppose <p> would be fine for now, until I figure things out.
 
 10:
-  char: narra
   text: >-
     Alright, <p>.
 
 11:
-  char: player
   responses:
   - text: >-
       So.. where's the rest of the world?
 
 12:
-  char: narra
   text: >-
     I don't know. But you might be able to help me with that.
 
 13:
-  char: player
   responses:
   - text: >-
       Me? How'd I do that?
 
 14:
-  char: narra
   text: >-
     You look awfully familliar, say, are you by any chance not actually standing here with me right now, but sitting
     in front of a computer?
 
 15:
-  char: player
   responses:
   - text: >-
       Now that you mention it.. Yeah, i do..
 
 16:
-  char: narra
   wait: true
   script_after: TerminalModule.switch_to_walking("computer_room")
   next: day1/forest_and_village/1

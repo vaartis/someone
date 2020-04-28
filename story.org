@@ -79,7 +79,7 @@
 
    Sure, no point in staying here..
 
-   <You walk through the forest. It's not very thick, but there is still plenty of plants and trees.>
+   <You walk through the forest. It's not very thick, but there are still plenty of plants and trees.>
 
    <p>: So.. what was life like here? Until everything diasppeared..
    
@@ -170,7 +170,7 @@
 ** Morning, setting out for the road
    <It seems like it's already morning and Narra is already out somewhere. After a bit of searching you find her in the kitchen having breakfast.>
 
-   <narra>: Hey. Mornin'
+   <narra>: Hey. Morning.
 
    Yeah..
 
@@ -180,7 +180,7 @@
    there was a new place to look at. Nothing too interesting though, three buttons that, when pressed so that they all become green, play a
    melody. And then I went back to the computer and it was already morning.
 
-   Looks like someone's playing with you.
+   Sounds like someone's playing with you.
 
    These buttons make no sense at all.. Why would someone engineer such a mechanism to just play a simple melody?
 
