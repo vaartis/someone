@@ -71,8 +71,8 @@
 
    And then.. Where did everyone go?
 
-   Something. It seemed like the world was being cut off piece by piece. One day, walls appeared on the far parts of the world, just like you saw
-   before. They seemed to extend in all direcitons. The next day the walls grew closer. People were scared. Long story short, eventually the whole
+   Something happened. It seemed like the world was being cut off piece by piece. One day, walls appeared on the far parts of the world, just like you
+   saw before. They seemed to extend in all direcitons. The next day the walls grew closer. People were scared. Long story short, eventually the whole
    world shrank to a single room. Don't know were the other people are now, haven't seen them in a while. I have no idea how much time I've spent
    alone in that room. But now you're here, and that probably means something is happening.. Now, would you mind if we go for a walk? I've been on
    this same spot for so long, it would be nice to at least take a stroll through the forest while we can.
@@ -122,7 +122,7 @@
    road was made a long time after it was built, connecting my house and the house of a friend of mine first, and then extending into the rest of the
    village.
 
-   <You come to the house. The door is not locked, she just opens it.>
+   <You come to the house. The door is not locked, Narra just opens it.>
 ** Narra's house
    <She finds the light switch on the left and turns the lights on.>
 
