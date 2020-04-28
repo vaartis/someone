@@ -160,8 +160,7 @@
 
              You too.
 
-   You lie in bed fow a while, before the screen goes black.
-
+   <You lie in bed fow a while, until eventually you fall asleep.>
    <The screen goes black>
 * Day 2
 ** The first night :walking:
@@ -733,4 +732,4 @@
 
    <p>: Still, I appriciate it. Let's see what tomorrow brings.
 
-   <She falls asleep fast, after some time the screen goes black again.>
+   <She falls asleep fast, you soon follow.>

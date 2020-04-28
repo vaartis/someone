@@ -148,6 +148,7 @@ bed-if-not-explored-4:
 
 narra-house-end:
   char: description
-  text: "You lie in bed fow a while, before the screen goes black."
+  text: "You lie in bed fow a while, until eventually you fall asleep."
   wait: true
   script_after: TerminalModule.switch_to_walking("computer_room_first_puzzle")
+  next: day2/morning/1
