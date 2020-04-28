@@ -90,6 +90,11 @@ void StoryParser::parse(lines_type &result, std::string file_name, sol::state &l
             character_configs = config["chars"].as<decltype(character_configs)>();
         }
 
+        // dialogue_between works as follows: there's a list of characters in the dialogue, and, provided
+        // that the characters are alternating every phrase, it will automatically switch to the next character
+        // in that list every time, unless the character is explicitly specified. If the character is specified,
+        // then, if it's one of those participating in the dialogue, the dialogue tracking switches to that character,
+        // and if not, then it does nothing and the dialogue continues as usual on the next phrase
         if (config["dialogue_between"]) {
             auto dialogue_chars = config["dialogue_between"].as<std::vector<std::string>>();
             dialogue_between_chars.insert(dialogue_between_chars.end(), dialogue_chars.begin(), dialogue_chars.end());
