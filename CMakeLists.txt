@@ -76,12 +76,12 @@ add_custom_command(
 add_custom_target(lovetoys-build DEPENDS "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/lovetoys")
 
 add_custom_command(
-  OUTPUT "${PROJECT_BINARY_DIR}/resources/lua/"
-  DEPENDS luarocks lua "${PROJECT_SOURCE_DIR}/src/lua/**"
+  OUTPUT "${PROJECT_BINARY_DIR}/resources/lua/share/lua/walking.moon"
+  DEPENDS lovetoys-build "${PROJECT_SOURCE_DIR}/src/lua/**"
   COMMAND ${PROJECT_BINARY_DIR}/deps/luarocks/luarocks --tree=${PROJECT_BINARY_DIR}/resources/lua build
   WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/src/lua"
 )
-add_custom_target(luarocks-build DEPENDS "${PROJECT_BINARY_DIR}/resources/lua/")
+add_custom_target(luarocks-build DEPENDS "${PROJECT_BINARY_DIR}/resources/lua/share/lua/walking.moon")
 
 # ===
 

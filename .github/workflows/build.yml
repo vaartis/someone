@@ -1,0 +1,57 @@
+name: Build
+
+on:
+  push:
+    branches: [ master ]
+
+jobs:
+  build-linux:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Install deps
+      run: |-
+        sudo apt-get update && sudo apt-get install -y build-essential clang cmake xorg-dev libgl-dev\
+             libudev-dev libopenal-dev libvorbis-dev libflac-dev libreadline-dev libncurses-dev
+
+    - name: Build
+      run: |-
+        mkdir $GITHUB_WORKSPACE/_build && cd $GITHUB_WORKSPACE/_build
+        cmake .. -DCMAKE_BUILD_TYPE=Release
+        make -j $(nproc)
+
+    - name: Copy the release to /someone/someone-${{github.sha}}/
+      run: |-
+        sudo mkdir -p /someone/someone-${{github.sha}}/
+        cd $GITHUB_WORKSPACE/_build/
+        sudo cp -r someone resources/ /someone/someone-${{github.sha}}/
+
+    - name: Upload the release artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: "someone-${{github.sha}}-linux"
+        path: "/someone/"
+
+  build-windows:
+    runs-on: windows-2019
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Install MSYS2
+      uses: numworks/setup-msys2@v1
+
+    - name: Install deps
+      run: |-
+        msys2do pacman -S --noconfirm base-devel clang cmake
+
+    - name: Build
+      run: |-
+        msys2do mkdir $GITHUB_WORKSPACE/_build
+        cd $GITHUB_WORKSPACE/_build
+        msys2do cmake .. -DCMAKE_BUILD_TYPE=Release
+        msys2do make -j $(nproc)
