@@ -1,0 +1,289 @@
+config:
+  chars:
+    narra:
+      color: [211, 0, 0]
+    player:
+      color: [255, 255, 255]
+    description:
+      color: [127, 0, 255]
+  dialogue_between: [player, narra]
+
+1:
+  char: description
+  text: >-
+    It seems like it's already morning and Narra is already out
+    somewhere. After a bit of searching you find her in the kitchen
+    having breakfast.
+
+2:
+  char: narra
+  text: >-
+    Hey. Morning.
+
+3:
+  responses:
+  - text: >-
+      Yeah..
+
+4:
+  text: >-
+    Slept well?
+
+5:
+  responses:
+  - text: >-
+      Not really. When I "went to sleep" the screen went black and I was unable to do anything. So I figured I'll go
+      look around again. Unsurprisingly, there was a new place to look at. Nothing too interesting though, three buttons
+      that, when pressed so that they all become green, play a melody. And then I went back to the computer and it was
+      already morning.
+
+6:
+  text: >-
+    Sounds like someone's playing with you.
+
+7:
+  responses:
+  - text: >-
+      These buttons make no sense at all.. Why would someone engineer such a mechanism to just play a simple melody?
+
+8:
+  text: >-
+    No idea. Though it might have done something more than just playing a melody, something less obvious.
+
+9:
+  responses:
+  - text: >-
+      Did you notice anything change here, maybe?
+
+10:
+  text: >-
+    Nope. Not yet, at least. I've been here in the house just as you were, though I did get up a bit earlier. Finally
+    slept on a bed, too, haven't had that priveledge in a while.
+
+11:
+  responses:
+  - text: >-
+      No bed here in the room I'm in. It's quite empty actually, just me and a table with the computer. Well, there's this new hallway, but it's empty
+      too, besides the buttons near the end of it. There really isn't anything of interest here besides the computer, which is also the only source of
+      light here, otherwise it's dark as hell. Well, maybe also me, but that's only if someone is looking for company. And I don't think
+      there's anyone else here.
+
+12:
+  text: >-
+   Scary. You sure there's noone else there?
+
+13:
+  responses:
+  - text: >-
+      I dunno.. There's simply no place to hide in the two empty rooms. Maybe I'm missing the full picture, maybe this is all just a big joke, and you're
+      in on it too.
+
+14:
+  text: >-
+   I'm not. Or at least I'm not aware of it.
+
+15:
+  responses:
+  - text: >-
+      Hope I can trust ya.
+
+16:
+  text: >-
+    Hope I can trust myself.
+
+17:
+  responses:
+  - text: >-
+      Fair. Now, about this room.. The screen of this computer is taking care of darkness around, but it's not that
+      bright, hope I can find something to brighten this place up in the future.
+
+18:
+  text: >-
+    Yeah, even if you're actually alone and not afraid, sitting in the darkness doesn't do you any good.
+
+19:
+  responses:
+  - text: >-
+      Yep.. Now, what is this you're having for breakfast?
+
+20:
+  char: description
+  wait: true
+  text: >-
+    She seems to have something that looks like cereal with milk in the bowl.
+
+21:
+  text: >-
+    The liquid in the bowl is a product of soaking and grinding a plant that grows in another region, far from here. It was discovered in an expedition
+    to a place outside the known land of that time. When they were there, they found a different biome, a colder one. The reports said that it was a
+    chilly out there and that the plants and trees there were different. They took some samples back, then the local people discovered various
+    applications for them. One of which was to use them as food, because of their taste. You see, we don't really need food to survive. We don't feel
+    hunger. But we do feel the taste, and that is what food is used here for. Want to taste it?
+
+22:
+  char: description
+  wait: true
+  text: >-
+    She passes you the carton.
+
+
+23:
+  responses:
+  - text: >-
+      Yeah, I'm feeling curious.
+
+24:
+  char: description
+  wait: true
+  text: >-
+    You take a sip. It tastes like milk with a slight bit of grass.
+
+25:
+  char: player
+  responses:
+  - text: >-
+      This taste reminds me of a certain drink I know about for some reason. This seems to be a reoccuring pattern,
+      too.. I know about something, but can't remember where I got that knowledge.
+
+26:
+  text: >-
+    Usual for this place, if you ask me.
+
+27:
+  responses:
+  - text: >-
+      Well, that logic might apply to you, but I'm here and you're there, it's a bit different.
+
+28:
+  text: >-
+    Indeed. You'll have to figure it out in some other way.
+
+29:
+  responses:
+  - text: >-
+      So.. What about the other part of your meal?
+
+30:
+  text: >-
+    Oh, it's the leaves of a bush growing around, people have been using it as food for a long time. When dried, it
+    changes its taste, and some people like it more in that state. I do, for example. Do you wish to taste this too?
+
+31:
+  responses:
+  - text: >-
+      Since we're on it, yeah i'll take a bite.
+
+32:
+  char: description
+  wait: true
+  text: >-
+    You take a few from the box and taste them. It's really just dried leaves.
+
+33:
+  char: player
+  responses:
+  - text: >-
+      Uh I dunno about this one. Really, it tastes like leaves.
+
+34:
+  text: >-
+    That's because they are leaves?
+
+35:
+  responses:
+  - text: >-
+      Yeah. I just thought it'd be something more surprising.
+
+36:
+  text: >-
+    Sorry to disappoint! I like it, though. Now, let me finish my breakfast and we'll go take a stroll outside.
+
+37:
+  responses:
+  - text: >-
+      Sure, take you time.
+
+38:
+  char: description
+  wait: true
+  text: >-
+    You spend a few minutes in the kitchen while she finishes her breakfast.
+
+39:
+  text: >-
+    Well, I'm done.. Let's go.
+
+40:
+  char: description
+  wait: true
+  text: >-
+    You go outside. She turns the lights off as she closes the door. She then look somewhere behind you with a confused
+    look.
+
+41:
+  char: narra
+  text: >-
+    Ah. This wasn't here yesterday. Might be the result of you solving that "puzzle" you talked about.
+
+42:
+  char: description
+  text: >-
+    You turn around and see that in the distance, there are now tall buildings.
+
+43:
+  responses:
+  - text: >-
+      So this is the city?
+
+44:
+  text: >-
+    Yep, that's the one.
+
+45:
+  responses:
+  - text: >-
+      So, we'll go check it out, right?
+
+46:
+  text: >-
+    Sure, if you don't mind the long walk.
+
+47:
+  responses:
+  - text: >-
+      It's not like we're short on time.. If I were to describe how much time we have, I'd say we've got all of
+      it. Besides, not like there's anything else to do. Boredom really is a big problem around here.
+
+48:
+  text: >-
+    Oh yes, it very much is. So, there was a stone road that leads from here to the city. It was layed a bit after the city was started, to make
+    the path through the woods easier. It starts out there, on the other side of the village.
+
+49:
+  char: description
+  text: >-
+    After a short walk, you are on the stone road.
+
+50:
+  char: narra
+  text: >-
+    Here it is.
+
+51:
+  responses:
+  - text: >-
+      Let's go, then. And if you don't mind, may I ask a few more questions?
+
+52:
+  text: >-
+    Sure. What do you want to talk about?
+  next: ask-about
+
+ask-about:
+  char: player
+  text: Ask about...
+#  next: road-questions-hub
+
+#road-question-hub:
+#  char: player
+#  responses:

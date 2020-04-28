@@ -207,14 +207,14 @@
 
    Hope I can trust myself.
 
-   Fair. Now, about the room again, the screen of this computer is taking care of darkness around, but it's not that bright, hope I can find something
-   to brighten this place up in the future.
+   Fair. Now, about this room.. The screen of this computer is taking care of darkness around, but it's not that bright, hope I can find something to
+   brighten this place up in the future.
 
    Yeah, even if you're actually alone and not afraid, sitting in the darkness doesn't do you any good.
 
-   Yeah.. Now, what is this you're having for breakfast?
+   Yep.. Now, what is this you're having for breakfast?
 
-   <She seems to have something that looks like cereal with milk in the bowl>
+   <She seems to have something that looks like cereal with milk in the bowl.>
 
    The liquid in the bowl is a product of soaking and grinding a plant that grows in another region, far from here. It was discovered in an expedition
    to a place outside the known land of that time. When they were there, they found a different biome, a colder one. The reports said that it was a
@@ -222,13 +222,13 @@
    applications for them. One of which was to use them as food, because of their taste. You see, we don't really need food to survive. We don't feel
    hunger. But we do feel the taste, and that is what food is used here for. Want to taste it?
 
-   <She passes you a carton>
+   <She passes you the carton.>
 
    Yeah, I'm feeling curious.
 
    <You take a sip. It tastes like milk with a slight bit of grass.>
 
-   <p>: This taste reminds me of a certain drink i know about for some reason. This seems to be a reoccuring pattern, too..  I know about something,
+   <p>: This taste reminds me of a certain drink I know about for some reason. This seems to be a reoccuring pattern, too.. I know about something,
    but can't remember where I got that knowledge.
 
    Usual for this place, if you ask me.
@@ -256,15 +256,15 @@
 
    Sure, take you time.
 
-   <You spend a few minutes in the kitchen while she finishes her breakfast>
+   <You spend a few minutes in the kitchen while she finishes her breakfast.>
 
    <narra>: Well, I'm done.. Let's go.
 
-   <You go outside. She turns the lights off as they close the door. They then look somewhere behind you with a confused look>.
+   <You go outside. She turns the lights off as she closes the door. She then look somewhere behind you with a confused look.>
 
    <narra>: Ah. This wasn't here yesterday. Might be the result of you solving that "puzzle" you talked about.
 
-   <You turn around and see that in the distance, there are now tall buildings>
+   <You turn around and see that in the distance, there are now tall buildings.>
 
    <p> So this is the city?
 
@@ -275,7 +275,7 @@
    Sure, if you don't mind the long walk.
 
    It's not like we're short on time.. If I were to describe how much time we have, I'd say we've got all of it. Besides, not like there's anything
-   else to do. Boredom really is a big problem around here..
+   else to do. Boredom really is a big problem around here.
 
    Oh yes, it very much is. So, there was a stone road that leads from here to the city. It was layed a bit after the city was started, to make
    the path through the woods easier. It starts out there, on the other side of the village.
@@ -284,7 +284,7 @@
 
    <narra>: Here it is. 
 
-   Let's go, then. And if you don't mind, can I ask a few more questions about your world?
+   Let's go, then. And if you don't mind, may I ask a few more questions?
 ** The long walk questions
    Sure. What do you want to talk about?
 
