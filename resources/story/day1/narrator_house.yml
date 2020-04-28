@@ -148,6 +148,6 @@ bed-if-not-explored-4:
 
 narrator-house-end:
   char: description
-  text: "You lie bed fow a while, before the screen goes black."
+  text: "You lie in bed fow a while, before the screen goes black."
   wait: true
   script_after: TerminalModule.switch_to_walking("computer_room_first_puzzle")
