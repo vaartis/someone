@@ -85,7 +85,7 @@ if(WIN32)
   add_custom_command(
     OUTPUT ${LUAROCKS_BIN}
     DEPENDS lua copy-luarocks-before-build
-    COMMAND cmd //c "install.bat /lua ${PROJECT_BINARY_DIR}/deps/lua/ /inc ${PROJECT_BINARY_DIR}/deps/lua/ /lib ${PROJECT_BINARY_DIR}/deps/lua/ /mw /selfcontained /p ${PROJECT_BINARY_DIR}/deps/luarocks/install /q /f"
+    COMMAND cmd //c "install.bat /lua ${PROJECT_BINARY_DIR}/deps/lua/ /inc ${PROJECT_BINARY_DIR}/deps/lua/ /lib ${PROJECT_BINARY_DIR}/deps/lua/ /mw /selfcontained /p ${PROJECT_BINARY_DIR}/deps/luarocks/install /q /f /noadmin"
     WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/deps/luarocks/"
   )
 else()
