@@ -1,3 +1,5 @@
+#include <filesystem>
+
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Event.hpp>
 #include <SFML/System/Clock.hpp>
@@ -18,6 +20,13 @@ enum class CurrentState {
     Terminal,
     Walking
 };
+
+
+#if defined(SOMEONE_WINDOWS)
+  #define LIB_EXT "dll"
+#elif defined(SOMEONE_LINUX)
+  #define LIB_EXT "so"
+#endif
 
 int main() {
     #ifndef NDEBUG
@@ -51,12 +60,12 @@ int main() {
                        sol::lib::coroutine, sol::lib::math, sol::lib::debug, sol::lib::os, sol::lib::io);
 
     // Setup the lua path to see luarocks packages
-    lua["package"]["path"] = std::string(
-        "resources/lua/share/lua/" SOMEONE_LUA_VERSION "/?.lua;resources/lua/share/lua/" SOMEONE_LUA_VERSION "/?/init.lua;"
-    ) + std::string(lua["package"]["path"]);
-    lua["package"]["cpath"] = std::string(
-        "resources/lua/lib/lua/" SOMEONE_LUA_VERSION "/?.so;"
-    ) + std::string(lua["package"]["cpath"]);
+    auto package_path = std::filesystem::path("resources") / "lua" / "share" / "lua" / SOMEONE_LUA_VERSION / "?.lua;";
+    package_path += std::filesystem::path("resources") / "lua" / "share" / "lua" / SOMEONE_LUA_VERSION / "?" / "init.lua;";
+    lua["package"]["path"] = std::string(package_path.u8string()) + std::string(lua["package"]["path"]);
+
+    auto package_cpath = std::filesystem::path("resources") / "lua" / "lib" / "lua" / SOMEONE_LUA_VERSION / "?." LIB_EXT ";";
+    lua["package"]["cpath"] = std::string(package_cpath.u8string()) + std::string(lua["package"]["cpath"]);
 
     register_usertypes(lua);
 

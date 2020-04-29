@@ -76,7 +76,7 @@ void StoryParser::parse(lines_type &result, std::string file_name, sol::state &l
 
     std::string nmspace = file_name;
 
-    YAML::Node root_node = YAML::LoadFile(full_file_name);
+    YAML::Node root_node = YAML::LoadFile(full_file_name.u8string());
 
     std::map<std::string, CharacterConfig> character_configs;
 
