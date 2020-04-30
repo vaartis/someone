@@ -20,6 +20,7 @@ local native_lines = {}
 -- First line to be shown on screen every frame
 local first_line_on_screen
 
+local time_before_output = 0.5
 local time_per_letter = 0.01
 
 local TerminalLine = class("TerminalLine")
@@ -29,6 +30,7 @@ function TerminalLine:initialize(name)
 
    self._letters_output = 0
    self._time_since_last_letter = 0.0
+   self._time_since_started_output = 0.0
 
    -- The script to execute on first line evaluation and whether it was executed already or not
    self._script = nil
@@ -40,6 +42,10 @@ end
 
 function TerminalLine:tick_letter_timer(dt)
    self._time_since_last_letter = self._time_since_last_letter + dt
+end
+
+function TerminalLine:tick_before_output_timer(dt)
+   self._time_since_started_output = self._time_since_started_output + dt
 end
 
 local OutputLine = class("OutputLine", TerminalLine)
@@ -373,6 +379,12 @@ function M.draw(dt)
 
          local should_wait = line:should_wait()
          if should_wait then
+            if line._time_since_started_output < time_before_output then
+               line:tick_before_output_timer(dt)
+
+               break
+            end
+
             line:tick_letter_timer(dt)
             line:maybe_increment_letter_count()
          end
