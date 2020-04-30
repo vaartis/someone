@@ -4,7 +4,7 @@ path = require("path")
 assets = require("components.assets")
 shared = require("components.shared")
 
-x_movement_speed = 1.0
+x_movement_speed = 4.0
 
 PlayerMovementComponent = Component.create(
   "PlayerMovement",
