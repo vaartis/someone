@@ -11,27 +11,75 @@ project(someone CXX)
 
 set(CMAKE_CXX_STANDARD 17)
 
+set(someone_src
+  "src/fonts.cpp"
+  "src/string_utils.cpp"
+  "src/usertypes.cpp"
+  "src/story_parser.cpp"
+  "src/main.cpp"
+)
+
 if(WIN32)
-  add_definitions(-DSOMEONE_WINDOWS)
-elseif(UNIX AND NOT APPLE)
-  add_definitions(-DSOMEONE_LINUX)
+  add_executable(someone WIN32 ${someone_src})
+
+  target_compile_definitions(someone PRIVATE -DSOMEONE_LIB_EXT="dll")
+  target_link_options(someone PRIVATE -Wl,--export-all-symbols)
+else()
+  add_executable(someone ${someone_src})
+  target_link_options(someone PRIVATE -Wl,--export-dynamic)
+  target_link_libraries(someone dl)
 endif()
+
+if(UNIX AND NOT APPLE)
+  target_compile_definitions(someone PRIVATE -DSOMEONE_LIB_EXT="so")
+endif()
+
+target_include_directories(someone PRIVATE "src")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release")
   set(BUILD_SHARED_LIBS FALSE)
   set(YAML_BUILD_SHARED_LIBS FALSE)
 endif()
 
+# === SFML
+
 add_subdirectory("${PROJECT_SOURCE_DIR}/deps/sfml")
+target_link_libraries(someone sfml-graphics sfml-audio)
+
+# ===
+
+# === fmt
+
 add_subdirectory("${PROJECT_SOURCE_DIR}/deps/fmt")
+target_link_libraries(someone fmt)
+
+# ===
+
+# === yaml-cpp
 
 set(YAML_CPP_BUILD_CONTRIB FALSE)
 set(YAML_CPP_BUILD_TOOLS FALSE)
 add_subdirectory("${PROJECT_SOURCE_DIR}/deps/yaml-cpp")
+target_link_libraries(someone yaml-cpp)
+
+# === yaml-cpp
+
+# === spdlog
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/deps/spdlog")
+target_link_libraries(someone spdlog)
 
-# === Building lua ===
+# ===
+
+# === sol2
+
+target_compile_definitions(someone PRIVATE SOL_ALL_SAFETIES_ON=1)
+add_subdirectory("${PROJECT_SOURCE_DIR}/deps/sol2")
+target_link_libraries(someone sol2)
+
+# ===
+
+# === Building lua
 # TODO: might need to be built as C++: https://sol2.readthedocs.io/en/latest/errors.html#destructors-and-safety
 add_custom_command(
   OUTPUT "${PROJECT_BINARY_DIR}/deps/lua/"
@@ -68,7 +116,10 @@ add_custom_target(lua DEPENDS "${LUA_LIBRARY}" "${LUA_EXECUTABLE}")
 
 set(LUA_INCLUDE_DIR "${PROJECT_BINARY_DIR}/deps/lua")
 set(SOMEONE_LUA_VERSION "5.3")
-add_definitions(-DSOMEONE_LUA_VERSION="${SOMEONE_LUA_VERSION}")
+
+target_compile_definitions(someone PRIVATE SOMEONE_LUA_VERSION="${SOMEONE_LUA_VERSION}")
+target_link_libraries(someone ${LUA_LIBRARY})
+target_include_directories(someone PRIVATE ${LUA_INCLUDE_DIR})
 
 # ===
 
@@ -123,34 +174,7 @@ add_custom_target(luarocks-build DEPENDS "${PROJECT_BINARY_DIR}/resources/lua/sh
 
 # ===
 
-add_definitions("-DSOL_ALL_SAFETIES_ON=1")
-add_subdirectory("${PROJECT_SOURCE_DIR}/deps/sol2")
-
-set(someone_src
-  "src/fonts.cpp"
-  "src/string_utils.cpp"
-  "src/usertypes.cpp"
-  "src/story_parser.cpp"
-  "src/main.cpp"
-)
-
-if(WIN32)
-  add_executable(someone WIN32 ${someone_src})
-else()
-  add_executable(someone ${someone_src})
-endif()
-
 add_dependencies(someone luarocks-build lovetoys-build)
-
-if(WIN32)
-  target_link_options(someone PRIVATE -Wl,--export-all-symbols)
-else()
-  target_link_options(someone PRIVATE -Wl,--export-dynamic)
-  target_link_libraries(someone dl)
-endif()
-
-target_link_libraries(someone sfml-graphics sfml-audio fmt yaml-cpp spdlog sol2 ${LUA_LIBRARY})
-target_include_directories(someone PRIVATE "src" ${LUA_INCLUDE_DIR})
 
 # Copy all resources
 add_custom_target(copy-resources ALL

@@ -21,13 +21,6 @@ enum class CurrentState {
     Walking
 };
 
-
-#if defined(SOMEONE_WINDOWS)
-  #define LIB_EXT "dll"
-#elif defined(SOMEONE_LINUX)
-  #define LIB_EXT "so"
-#endif
-
 int main() {
     #ifndef NDEBUG
     spdlog::set_level(spdlog::level::debug);
@@ -64,7 +57,7 @@ int main() {
     package_path += std::filesystem::path("resources") / "lua" / "share" / "lua" / SOMEONE_LUA_VERSION / "?" / "init.lua;";
     lua["package"]["path"] = std::string(package_path.u8string()) + std::string(lua["package"]["path"]);
 
-    auto package_cpath = std::filesystem::path("resources") / "lua" / "lib" / "lua" / SOMEONE_LUA_VERSION / "?." LIB_EXT ";";
+    auto package_cpath = std::filesystem::path("resources") / "lua" / "lib" / "lua" / SOMEONE_LUA_VERSION / "?." SOMEONE_LIB_EXT ";";
     lua["package"]["cpath"] = std::string(package_cpath.u8string()) + std::string(lua["package"]["cpath"]);
 
     register_usertypes(lua);
