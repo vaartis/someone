@@ -294,7 +294,7 @@ function VariantInputLine:next()
 end
 
 function VariantInputLine:is_interactive()
-   return self._letters_output == self._longest_var_length and not self._selected_variant
+   return not self._selected_variant
 end
 
 function VariantInputLine:handle_interaction(event)
@@ -307,7 +307,13 @@ function VariantInputLine:handle_interaction(event)
       -- Add 1 because indexes start at 1 in lua
       -- Only use visible variants here, not all variants
       if chnum and chnum >= 1 and chnum < #self._visible_variants + 1 then
-         self._selected_variant = chnum
+         -- If the text has already bean output, set the answer,
+         -- if not, then skip all the printing and show the whole thing
+         if self._letters_output == self._longest_var_length then
+            self._selected_variant = chnum
+         else
+            self._letters_output = self._longest_var_length
+         end
 
          return true
       end
