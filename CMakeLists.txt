@@ -24,13 +24,19 @@ if(WIN32)
 
   target_compile_definitions(someone PRIVATE -DSOMEONE_LIB_EXT="dll")
   target_link_options(someone PRIVATE -Wl,--export-all-symbols)
+elseif(APPLE)
+  add_executable(someone ${someone_src})
+  target_link_options(someone PRIVATE -Wl,-export_dynamic)
+  target_link_libraries(someone dl)
 else()
   add_executable(someone ${someone_src})
-  target_link_options(someone PRIVATE -Wl,--export-dynamic)
+  target_link_options(someone PRIVATE -Wl,-E)
   target_link_libraries(someone dl)
 endif()
 
-if(UNIX AND NOT APPLE)
+if(APPLE)
+  target_compile_definitions(someone PRIVATE -DSOMEONE_LIB_EXT="dylib")
+else()
   target_compile_definitions(someone PRIVATE -DSOMEONE_LIB_EXT="so")
 endif()
 
@@ -45,6 +51,7 @@ endif()
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/deps/sfml")
 target_link_libraries(someone sfml-graphics sfml-audio)
+set_target_properties(sfml-graphics sfml-audio PROPERTIES CXX_STANDARD 14)
 
 # ===
 
@@ -81,45 +88,41 @@ target_link_libraries(someone sol2)
 
 # === Building lua
 # TODO: might need to be built as C++: https://sol2.readthedocs.io/en/latest/errors.html#destructors-and-safety
-add_custom_command(
-  OUTPUT "${PROJECT_BINARY_DIR}/deps/lua/"
-  COMMAND cmake -E copy_directory "${PROJECT_SOURCE_DIR}/deps/lua/" "${PROJECT_BINARY_DIR}/deps/lua/"
+include(ExternalProject)
+
+if(WIN32)
+  set(LUA_PLATFORM mingw)
+elseif(APPLE)
+  set(LUA_PLATFORM macosx)
+else()
+  set(LUA_PLATFORM linux)
+endif()
+
+ExternalProject_Add(lua
+   URL "https://www.lua.org/ftp/lua-5.3.5.tar.gz"
+   CONFIGURE_COMMAND ""
+   BUILD_COMMAND make ${LUA_PLATFORM}
+   BUILD_ALWAYS true
+   BUILD_IN_SOURCE true
+   INSTALL_COMMAND ""
 )
-add_custom_target(copy-lua-before-build DEPENDS "${PROJECT_BINARY_DIR}/deps/lua/")
+add_library(liblua STATIC IMPORTED)
+ExternalProject_Get_property(lua SOURCE_DIR)
+
+set(LUA_SRC "${PROJECT_BINARY_DIR}/lua-prefix/src/lua/src/")
 
 if(WIN32)
-  set(LUA_EXECUTABLE "${PROJECT_BINARY_DIR}/deps/lua/lua.exe")
-  set(LUA_LIBRARY "${PROJECT_BINARY_DIR}/deps/lua/lua53.dll")
+  set(LUA_EXECUTABLE "${LUA_SRC}/lua.exe")
+  set(LUA_LIBRARY "${LUA_SRC}/lua53.dll")
 else()
-  set(LUA_EXECUTABLE "${PROJECT_BINARY_DIR}/deps/lua/lua")
-  set(LUA_LIBRARY "${PROJECT_BINARY_DIR}/deps/lua/liblua.a")
+  set(LUA_EXECUTABLE "${LUA_SRC}/lua")
+  set(LUA_LIBRARY "${LUA_SRC}/liblua.a")
 endif()
 
-if(WIN32)
-  add_custom_command(
-    OUTPUT ${LUA_LIBRARY} ${LUA_EXECUTABLE}
-    DEPENDS copy-lua-before-build
-    COMMAND gcc -O2 -DLUA_BUILD_AS_DLL=1 *.c -c && mv lua.o lua.e && gcc -shared -o lua53.dll *.o
-    COMMAND gcc -L. -llua53 lua.e -o lua.exe
-    WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/deps/lua/"
-  )
-else()
-  add_custom_command(
-    OUTPUT ${LUA_LIBRARY} ${LUA_EXECUTABLE}
-    DEPENDS copy-lua-before-build
-    COMMAND make CC=${CMAKE_C_COMPILER} lua liblua.a
-    WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/deps/lua/"
-  )
-endif()
-
-add_custom_target(lua DEPENDS "${LUA_LIBRARY}" "${LUA_EXECUTABLE}")
-
-set(LUA_INCLUDE_DIR "${PROJECT_BINARY_DIR}/deps/lua")
-set(SOMEONE_LUA_VERSION "5.3")
-
+set(SOMEONE_LUA_VERSION="5.3")
 target_compile_definitions(someone PRIVATE SOMEONE_LUA_VERSION="${SOMEONE_LUA_VERSION}")
 target_link_libraries(someone ${LUA_LIBRARY})
-target_include_directories(someone PRIVATE ${LUA_INCLUDE_DIR})
+target_include_directories(someone PRIVATE ${LUA_SRC})
 
 # ===
 
@@ -136,7 +139,7 @@ if(WIN32)
   add_custom_command(
     OUTPUT ${LUAROCKS_BIN}
     DEPENDS lua copy-luarocks-before-build
-    COMMAND cmd //c "install.bat /lua ${PROJECT_BINARY_DIR}/deps/lua/ /inc ${PROJECT_BINARY_DIR}/deps/lua/ /lib ${PROJECT_BINARY_DIR}/deps/lua/ /mw /selfcontained /p ${PROJECT_BINARY_DIR}/deps/luarocks/install /q /f /noadmin"
+    COMMAND cmd //c "install.bat /lua ${LUA_SRC} /inc ${LUA_SRC} /lib ${LUA_SRC} /mw /selfcontained /p ${PROJECT_BINARY_DIR}/deps/luarocks/install /q /f /noadmin"
     WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/deps/luarocks/"
   )
 else()
@@ -144,7 +147,7 @@ else()
   add_custom_command(
     OUTPUT ${LUAROCKS_BIN}
     DEPENDS lua copy-luarocks-before-build
-    COMMAND ./configure --with-lua-bin=${PROJECT_BINARY_DIR}/deps/lua/ --with-lua-include=${PROJECT_BINARY_DIR}/deps/lua/ --with-lua-lib=${PROJECT_BINARY_DIR}/deps/lua/ && PATH=${PROJECT_BINARY_DIR}/deps/lua:$ENV{PATH} make
+    COMMAND ./configure --with-lua-bin=${LUA_SRC} --with-lua-include=${LUA_SRC} --with-lua-lib=${LUA_SRC} && PATH=${PROJECT_BINARY_DIR}/deps/lua:$ENV{PATH} make
     WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/deps/luarocks/"
   )
 endif()
