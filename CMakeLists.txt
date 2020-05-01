@@ -10,6 +10,7 @@ endif()
 project(someone CXX)
 
 set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_EXTENSIONS FALSE)
 
 set(someone_src
   "src/fonts.cpp"
@@ -24,20 +25,16 @@ if(WIN32)
 
   target_compile_definitions(someone PRIVATE -DSOMEONE_LIB_EXT="dll")
   target_link_options(someone PRIVATE -Wl,--export-all-symbols)
-elseif(APPLE)
-  add_executable(someone ${someone_src})
-  target_link_options(someone PRIVATE -Wl,-export_dynamic)
-  target_link_libraries(someone dl)
 else()
   add_executable(someone ${someone_src})
-  target_link_options(someone PRIVATE -Wl,-E)
   target_link_libraries(someone dl)
-endif()
-
-if(APPLE)
-  target_compile_definitions(someone PRIVATE -DSOMEONE_LIB_EXT="dylib")
-else()
   target_compile_definitions(someone PRIVATE -DSOMEONE_LIB_EXT="so")
+
+  if(APPLE)
+    target_link_options(someone PRIVATE -Wl,-export_dynamic)
+  else()
+    target_link_options(someone PRIVATE -Wl,-E)
+  endif()
 endif()
 
 target_include_directories(someone PRIVATE "src")
@@ -106,7 +103,6 @@ ExternalProject_Add(lua
    BUILD_IN_SOURCE true
    INSTALL_COMMAND ""
 )
-add_library(liblua STATIC IMPORTED)
 ExternalProject_Get_property(lua SOURCE_DIR)
 
 set(LUA_SRC "${PROJECT_BINARY_DIR}/lua-prefix/src/lua/src/")
@@ -119,7 +115,7 @@ else()
   set(LUA_LIBRARY "${LUA_SRC}/liblua.a")
 endif()
 
-set(SOMEONE_LUA_VERSION="5.3")
+set(SOMEONE_LUA_VERSION "5.3")
 target_compile_definitions(someone PRIVATE SOMEONE_LUA_VERSION="${SOMEONE_LUA_VERSION}")
 target_link_libraries(someone ${LUA_LIBRARY})
 target_include_directories(someone PRIVATE ${LUA_SRC})
