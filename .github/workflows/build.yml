@@ -65,7 +65,7 @@ jobs:
         cd ${GITHUB_WORKSPACE}/_build
         mkdir -p /d/someone-x86_64/someone-${{github.sha}}-x86_64/
         cp -r someone.exe resources\
-              deps/lua/lua53.dll /mingw64/bin/{libstdc++-6.dll,libgcc_s_seh-1.dll,libwinpthread-1.dll}\
+              deps/lua/src/lua/src/lua53.dll /mingw64/bin/{libstdc++-6.dll,libgcc_s_seh-1.dll,libwinpthread-1.dll}\
               ../deps/sfml/extlibs/bin/x64/openal32.dll /d/someone-x86_64/someone-${{github.sha}}-x86_64
 
     - name: Upload the x86_64 release artifact
@@ -90,7 +90,7 @@ jobs:
         cd ${GITHUB_WORKSPACE}/_build
         mkdir -p /d/someone-i686/someone-${{github.sha}}-i686/
         cp -r someone.exe resources\
-              deps/lua/lua53.dll /mingw32/bin/{libstdc++-6.dll,libgcc_s_dw2-1.dll,libwinpthread-1.dll}\
+              deps/lua/src/lua/src/lua53.dll /mingw32/bin/{libstdc++-6.dll,libgcc_s_dw2-1.dll,libwinpthread-1.dll}\
               ../deps/sfml/extlibs/bin/x86/openal32.dll /d/someone-i686/someone-${{github.sha}}-i686
 
     - name: Upload the i686 release artifact

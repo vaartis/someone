@@ -102,10 +102,11 @@ ExternalProject_Add(lua
    BUILD_ALWAYS true
    BUILD_IN_SOURCE true
    INSTALL_COMMAND ""
+   PREFIX "${PROJECT_BINARY_DIR}/deps/lua/"
 )
 ExternalProject_Get_property(lua SOURCE_DIR)
 
-set(LUA_SRC "${PROJECT_BINARY_DIR}/lua-prefix/src/lua/src/")
+set(LUA_SRC "${PROJECT_BINARY_DIR}/deps/lua/src/lua/src/")
 
 if(WIN32)
   set(LUA_EXECUTABLE "${LUA_SRC}/lua.exe")
@@ -143,7 +144,7 @@ else()
   add_custom_command(
     OUTPUT ${LUAROCKS_BIN}
     DEPENDS lua copy-luarocks-before-build
-    COMMAND ./configure --with-lua-bin=${LUA_SRC} --with-lua-include=${LUA_SRC} --with-lua-lib=${LUA_SRC} && PATH=${PROJECT_BINARY_DIR}/deps/lua:$ENV{PATH} make
+    COMMAND ./configure --with-lua-bin=${LUA_SRC} --with-lua-include=${LUA_SRC} --with-lua-lib=${LUA_SRC} && PATH=${LUA_SRC}:$ENV{PATH} make
     WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/deps/luarocks/"
   )
 endif()
