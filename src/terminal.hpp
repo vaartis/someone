@@ -7,7 +7,8 @@ class TerminalEnv : public LuaModuleEnv {
 private:
     StoryParser::lines_type lines;
 
-    sol::protected_function add_lines_f, set_first_line_f, draw_f, process_event_f, update_event_timer_f;
+    sol::protected_function add_lines_f, set_first_line_f, draw_f, process_event_f, update_event_timer_f,
+        debug_menu_f;
 public:
     void add_lines(StoryParser::lines_type &lines) {
         call_or_throw(add_lines_f, lines);
@@ -29,6 +30,10 @@ public:
         call_or_throw(update_event_timer_f, dt);
     }
 
+    void debug_menu() {
+        call_or_throw(debug_menu_f);
+    }
+
     TerminalEnv(sol::state &lua) : LuaModuleEnv(lua) {
         // This both defines a global for the module and returns it
         module = lua.require_script("TerminalModule", "return require('terminal')");
@@ -38,6 +43,7 @@ public:
         draw_f = module["draw"];
         process_event_f = module["process_event"];
         update_event_timer_f = module["update_event_timer"];
+        debug_menu_f = module["debug_menu"];
 
         // Parse the lines from the prologue file and going forward from it
         StoryParser::parse(lines, "day1/prologue", lua);

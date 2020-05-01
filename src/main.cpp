@@ -4,6 +4,9 @@
 #include <SFML/Window/Event.hpp>
 #include <SFML/System/Clock.hpp>
 
+#include "imgui.h"
+#include "imgui-SFML.h"
+
 #include "sol/sol.hpp"
 
 #include "logger.hpp"
@@ -28,6 +31,7 @@ int main() {
 
     sf::RenderWindow window(sf::VideoMode(1280, 1024), "Someone");
     window.setFramerateLimit(60);
+    ImGui::SFML::Init(window);
 
     sf::RenderTexture target;
     {
@@ -79,9 +83,12 @@ int main() {
         "set_current_state", [&](CurrentState new_state) { current_state = new_state; }
     );
 
+    bool debug_menu = false;
+
     sf::Clock clock;
     while (true) {
-        auto dt = clock.restart().asSeconds();
+        auto dt_time = clock.restart();
+        auto dt = dt_time.asSeconds();
 
         sf::Color clear_color;
         switch (current_state) {
@@ -112,17 +119,27 @@ int main() {
                 );
                 break;
             }
+            case sf::Event::KeyReleased: {
+                // Activate debug menu on ~+1
+                if (event.key.code == sf::Keyboard::Tilde)
+                    debug_menu = !debug_menu;
+                break;
+            }
 
             default: break;
             }
 
-            switch (current_state) {
-            case CurrentState::Terminal:
-                terminal_env.process_event(event);
-                break;
-            case CurrentState::Walking:
-                walking_env.add_event(event);
-                break;
+            if (!debug_menu) {
+                switch (current_state) {
+                case CurrentState::Terminal:
+                    terminal_env.process_event(event);
+                    break;
+                case CurrentState::Walking:
+                    walking_env.add_event(event);
+                    break;
+                }
+            } else {
+                ImGui::SFML::ProcessEvent(event);
             }
         }
 
@@ -155,6 +172,23 @@ int main() {
             break;
         }
 
+        if (debug_menu) {
+            ImGui::SFML::Update(window, dt_time);
+
+            ImGui::Begin("Debug menu", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+
+            switch (current_state) {
+            case CurrentState::Terminal:
+                terminal_env.debug_menu();
+                break;
+            case CurrentState::Walking:
+                break;
+            }
+
+            ImGui::End();
+
+            ImGui::SFML::Render(window);
+        }
         window.display();
     }
 }

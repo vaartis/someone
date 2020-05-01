@@ -52,6 +52,16 @@ set_target_properties(sfml-graphics sfml-audio PROPERTIES CXX_STANDARD 14)
 
 # ===
 
+# === IMGUI SFML
+
+set(IMGUI_SFML_FIND_SFML FALSE)
+set(IMGUI_DIR "${PROJECT_SOURCE_DIR}/deps/imgui")
+set(SFML_DIR "${PROJECT_SOURCE_DIR}/deps/sfml")
+add_subdirectory("${PROJECT_SOURCE_DIR}/deps/imgui-sfml")
+target_link_libraries(someone ImGui-SFML::ImGui-SFML)
+
+# ===
+
 # === fmt
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/deps/fmt")
