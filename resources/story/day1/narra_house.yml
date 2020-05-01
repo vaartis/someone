@@ -34,17 +34,6 @@ config:
 
 explore-the:
   char: description
-  # Set up the hub variable if they haven't been set up yet
-  script: |-
-    if not TerminalModule.state_variables.narra_house then
-       TerminalModule.state_variables.narra_house = {
-         hub = {
-            living_room = false,
-            kitchen = false,
-            bathroom = false
-         }
-        }
-    end
   text: >-
     Explore the...
   next: hub
@@ -53,33 +42,33 @@ hub:
   char: player
   responses:
   - text: Living room
-    condition: return not TerminalModule.state_variables.narra_house.hub.living_room
+    condition: return not TerminalModule.state_variables.day1.narra_house_hub.living_room
     next: living-room
   - text: Kitchen
-    condition: return not TerminalModule.state_variables.narra_house.hub.kitchen
+    condition: return not TerminalModule.state_variables.day1.narra_house_hub.kitchen
     next: kitchen
   - text: Bathroom
-    condition: return not TerminalModule.state_variables.narra_house.hub.bathroom
+    condition: return not TerminalModule.state_variables.day1.narra_house_hub.bathroom
     next: bathroom
   - text: Go to bed
     condition: |-
       -- Go to bed when at least one room has been explored
       local lume = require("lume")
-      return lume.any(TerminalModule.state_variables.narra_house.hub)
+      return lume.any(TerminalModule.state_variables.day1.narra_house_hub)
     next: bed-after-explored
   - text: Go to bed
     condition: |-
       -- Go to bed when when no rooms were explored
       local lume = require("lume")
-      return not lume.any(TerminalModule.state_variables.narra_house.hub)
+      return not lume.any(TerminalModule.state_variables.day1.narra_house_hub)
     next: bed-if-not-explored
 
 living-room:
   char: description
   wait: true
   script: |-
-    TerminalModule.state_variables.narra_house.hub.living_room = true
-  # TODO: talking topic about computers here
+    TerminalModule.state_variables.day1.narra_house_hub.living_room = true
+    TerminalModule.add_talking_topic("computers")
   text: >-
     Decently sized, has a sofa in it. On the opposite side of the room there are several bookshelves packed with various books, from
     titles you can guess some of them are probably scientific or philosophical. There's also something what seems to be a computer on
@@ -90,8 +79,8 @@ kitchen:
   char: description
   wait: true
   script: |-
-    TerminalModule.state_variables.narra_house.hub.kitchen = true
-  # TODO: talking topic about food here
+    TerminalModule.state_variables.day1.narra_house_hub.kitchen = true
+    TerminalModule.add_talking_topic("food")
   text: >-
     Not very big, there are a few cupboards that have dishes in them, others have some of the plants you've seen earlier, but dried. Most
     of the food on the kitchen seems to be plant-based, except in the fridge there's something that looks like milk, but you decide not to
@@ -103,7 +92,7 @@ bathroom:
   char: description
   wait: true
   script: |-
-    TerminalModule.state_variables.narra_house.hub.bathroom = true
+    TerminalModule.state_variables.day1.narra_house_hub.bathroom = true
   text: >-
     On the left, there's a moderately sized bathtub, near which there's a small shelf with some kind of soap and a sponge. On the right,
     there's a a small sink, with its own bar of soap. There's also a very small window near the ceiling, you can only see the dark sky

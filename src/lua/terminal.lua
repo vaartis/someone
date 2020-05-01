@@ -224,11 +224,11 @@ function VariantInputLine:should_wait()
 end
 
 function VariantInputLine:maybe_increment_letter_count()
-    if self._letters_output < self._longest_var_length and self._time_since_last_letter >= time_per_letter then
-       self._time_since_last_letter = 0.0;
+   if self._letters_output < self._longest_var_length and self._time_since_last_letter >= time_per_letter then
+      self._time_since_last_letter = 0.0;
 
-       self._letters_output = self._letters_output + 1
-    end
+      self._letters_output = self._letters_output + 1
+   end
 end
 
 function VariantInputLine:current_text()
@@ -568,6 +568,29 @@ end
 M.active = true
 
 -- State variables for the story to set/get
-M.state_variables = {}
+M.state_variables = {
+   day1 = {
+      narra_house_hub = {
+         living_room = false,
+         kitchen = false,
+         bathroom = false
+      }
+   },
+   day2 = {
+      road_questions = {
+      }
+   },
+   talking_topics = {}
+}
+
+function M.talking_topic_known(topic)
+   return lume.find(M.state_variables.talking_topics, topic) ~= nil
+end
+
+function M.add_talking_topic(topic)
+   if not lume.find(M.state_variables.talking_topics, topic) then
+      table.insert(M.state_variables.talking_topics, topic)
+   end
+end
 
 return M
