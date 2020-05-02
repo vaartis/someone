@@ -273,7 +273,7 @@ reset_engine = () ->
 
     \addSystem(first_puzzle.FirstPuzzleButtonSystem())
 
-    \addSystem(DebugColliderDrawingSystem())
+    --\addSystem(DebugColliderDrawingSystem())
 
 -- Loads the room's toml file, processing parent relationships
 load_room_toml = (name) ->
