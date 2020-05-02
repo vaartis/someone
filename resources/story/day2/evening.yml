@@ -1,0 +1,338 @@
+config:
+  chars:
+    narra:
+      color: [211, 0, 0]
+    player:
+      color: [255, 255, 255]
+    maj:
+      color: [135,206,235]
+    description:
+      color: [127, 0, 255]
+  dialogue_between: [narra, maj]
+
+1:
+  char: description
+  wait: true
+  text: >-
+    On the way back, you spend most of the time focusing on the road. The bikes make the journey quite a bit shorter. When you arrive, the
+    sun has almost set and it's pretty dark. On your way to Narra's house you suddenly notice that the house on opposite side of the street
+    has its lights turned on. You look at her. She looks at you.
+
+2:
+  char: narra
+  text: >-
+    What the hell?! Is he.. actually in there?
+
+3:
+  char: player
+  responses:
+  - text: >-
+      Is this your friend's house?
+
+4:
+  char: narra
+  text: >-
+    Yes! Oh wow, can it be that he's there? That we aren't alone here? We have to check RIGHT NOW.
+
+5:
+  char: description
+  wait: true
+  text: >-
+    You both abandon the bikes in the middle of the road and run up to the house. She knocks on the door a few times and carefully opens it.
+
+6:
+  char: narra
+  text: >-
+    Hey?
+
+7:
+  char: description
+  text: >-
+    Behind the door, you see a guy, not too tall, shoulder length hair, wearing glasses. He jumps back, producing a high-pitched yell
+
+8:
+  text: >-
+    aaHHH!!
+
+9:
+  char: description
+  wait: true
+  text: >-
+    You see Narra giggle a little.
+
+10:
+  wait: true
+  text: >-
+    Maj! Long time no see!!
+
+11:
+  wait: true
+  text: >-
+    Ah.. ha.. hi! I'm really lost.. since everything went down I can't remember much.. The panic, then darkness, and then I wake up in the
+    forest this morning. I couldn't wrap my head around what happened, so I thought I'd just head back home, what else could I do? So I there I was,
+    alone.. Which was scary.. so I just spent the whole day at home..
+
+12:
+  wait: true
+  text: >-
+    Oh wow.. That's a bit different.. but.. uh.. let's come in and not just stand here, eh?
+
+13:
+  wait: true
+  text: >-
+    Ohh.. yeah! Sure.. and who's the person behind you might be..? If you don't mind me asking..
+
+14:
+  wait: true
+  text: >-
+    Ah, that's <p>. They're.. uh.. new here. Apparently they're from the "outside", like the "creator" was.
+
+15:
+  text: >-
+    Wow! Never thought I'd meet someone like that ever again..
+
+16:
+  char: player
+  responses:
+  - text: >-
+      Hello! While it's true i'm from the "outside", I don't know anything about that "creator" person, nor do I know anything about
+      myself.. or anything outside the room I'm in, really..
+17:
+  char: maj
+  wait: true
+  text: >-
+    Oh.. shame.. but still, welcome! Let's head into the kitchen and have some tea at least, like Narra suggested, we shouldn't
+    just stand in the doors.
+
+18:
+  char: description
+  wait: true
+  text: >-
+    You all head to a room on the left, it's a medium-sized kitchen. You and Narra sit at the table, while Maj puts some water into the electric
+    kettle, the water boils rather fast, and after a minute you all sit at the table with some tea, which is still too hot to drink, but already smells
+    minty.
+
+19:
+  char: maj
+  wait: true
+  text: >-
+    So, how have you been?
+
+20:
+  text: >-
+    You said that you only remember darkness and then you woke up back in the forest, but it was very different for me. It has actually been
+    a very long wait for me. All that was left of the world was a single room with gray walls, and nothing else, and that's where I was all
+    that time. I'm a bit envious of you not having to experience that. I never want to stay alone with nothing and nobody else but
+    myself. I'm glad you're back too now, it's been about a day since the world has returned back to normal.. well.. except all the
+    people. <p> helped me get out of that room by doing somethig on the outside. Something also changed this night, while I was asleep.
+
+21:
+  char: player
+  responses:
+  - text: >-
+      Yeah.. There was some kind of a corridor, with a stupid puzzle. So I pressed a few buttons, a melody played, and that somehow brought back the
+      city. And you, too, it seems. Looking forward to more changes like that in the future.
+
+22:
+  char: maj
+  wait: true
+  text: >-
+    Wow.. that is a lot to process.. First off, it's very sad Narra had to experience this. But that's behind you now, and everything's
+    gonan be fine, right?
+
+23:
+  wait: true
+  text: >-
+    I.. sure hope so. There are still so many people missing.. But we'll try to get them back! We've been to the city with <p> today, it's
+    as empty as everything else, so we really just wasted a lot of time.
+
+24:
+  wait: true
+  text: >-
+    Such a big city and nobody there too.. So we're the only people here..
+
+25:
+  wait: true
+  text: >-
+    We haven't found anyone else.. But seeing you now makes me excited! More people might be coming back soon..
+
+26:
+  wait: true
+  text: >-
+    Oh I can't wait for that..! I already miss all the life around here..
+
+27:
+  text: >-
+    We'll be progressing with that soon, I hope. In the meantime, <p>, Maj was one of the people who designed the first computers around
+    here! So you can ask something about them..
+
+28:
+  char: player
+  responses:
+  - text: >-
+      Why didn't you want to go to the city with them and continue working on the cool stuff?
+
+29:
+  char: maj
+  wait: true
+  text: >-
+    You see.. I really don't like big crowds of people and the city is ALL about that.. I get all anxious.. So I'd rather stay.. besides,
+    the scientific community has grown a lot since the beginning and I'm sure they can go on without me.
+
+30:
+  wait: true
+  text: >-
+    Don't you belittle your part in that, you dummy! They wouldn't be able to make it like it is without your work, and you know it. You
+    didn't really leave them for good with no news or anything, you still kept up with people from there, didn't you?
+
+31:
+  text: >-
+    Yes.. ok, ok, you got me. I don't really like to admit it, because it'd sound like I'm bragging. But enough about that, there's another
+    interesting thing: we designed the computers with long range networking in mind, and put some big servers in places where they'd be
+    needed and where we could connect computers to them and then connect the servers together. One of them is actually right here, in the
+    basement of my house, I rarely go down there so it might be a bit dusty, but we can go see it.. if you're interested.
+
+32:
+  char: player
+  responses:
+  - text: >-
+      Sure, I wanna see it.
+
+33:
+  char: description
+  wait: true
+  text: >-
+    Since you all are already done with the tea, you all stand up, and wait for Maj to lead the way. However, he just moves his chair and you notice
+    that there's a trapdoor underneath. He lifts it, then reaches inside to find the light switch and turns it on. He then steps on the ledder there
+    and starts going down. You look as he goes down, it's not that deep down there, just a few meters. He waves at you, telling you can go down
+    now. You climb down the ladder first, then Narra climbs after you.
+
+34:
+  char: player
+  responses:
+  - text: >-
+      You know.. this really looks like the room I am in. I mean, on the "outside". Except yours is way better lit.
+
+35:
+  char: maj
+  text: >-
+    Do you really spend all your time in an almost empty concrete box?
+
+36:
+  char: player
+  responses:
+  - text: >-
+      It's not like I have a choice..
+
+37:
+  char: maj
+  text: >-
+    Anyway. Here it is, this big boy handles all the communication between the village and the city.
+
+38:
+  char: description
+  wait: true
+  text: >-
+    You look at the server. It's a rack filled with all kinds of boxes and wires, all blinking with different colors.
+
+39:
+  char: maj
+  text: >-
+    In the city, there are a few of servers like this once, since it's a lot bigger. The city is like a hub for communication.
+
+40:
+  char: player
+  responses:
+  - text: >-
+      I think I'm noticing a pattern here.
+
+41:
+  char: maj
+  text: >-
+    It only makes sense that the city would be the center of all things, doesn't it? So.. I wasn't sure about how to use the basement for a
+    while, but this thingy here fit in quite well, and it doesn't take space in the house, plus it gets all the underground coolness.
+
+42:
+  char: player
+  responses:
+    - text: >-
+        So it's not just me, it really is colder in here?
+
+43:
+  char: narra
+  wait: true
+  text: >-
+    I've noticed, too.
+
+44:
+  text: >-
+    Yes! Besides being underground, this place is also additionally cooled down artificially. Otherwise it'd get pretty hot in here, this thing
+    produces a lot of heat. There's not much to see other than the server, but I am proud of it and will take any opportunity to show this setup to
+    someone if they ask, albeit it might sound like braggning, it did take some planning to set up. Now, let's get out of here, I'm feeling cold
+    myself.
+
+45:
+  char: description
+  wait: true
+  text: >-
+    You all get out of the basement in the reverse order. Maj closes the trapdoor and moves his chair back.
+
+46:
+  char: maj
+  wait: true
+  text: >-
+    Now, it's getting really late, I'd love to talk some more, but maybe we should continue tomorrow?
+
+47:
+  wait: true
+  text: >-
+    I'm actually suddenly very tired, probably because the trip, I just realized it. Didn't notice at first because I was so excited to see
+    you! We'll probably head back to my place then, <p> is staying at my house for now, until we maybe figure out else.
+
+48:
+  text: >-
+    See you tomorrow, then!
+
+49:
+  char: player
+  responses:
+  - text: >-
+      I wonder what'll happen tomorrow.. and how today's night will go. On my side, the the computer screen just goes black for a while.
+
+50:
+  char: maj
+  text: >-
+    We'll know sooner if we go to sleep sonner, haha.
+
+51:
+  char: player
+  responses:
+  - text: >-
+      Yeah, good night!
+
+52:
+  char: maj
+  text: >-
+    You too!
+
+53:
+  char: description
+  wait: true
+  text: >-
+    You and Narra leave the house and get back to her place, she takes a shower, and you both head to bed.
+
+54:
+  char: narra
+  text: >-
+    I'm exhausted.. Goodnight, I guess, even though it doesn't mean much for you apparently.
+
+55:
+  char: player
+  responses:
+  - text: >-
+      Still, I appriciate it. Let's see what tomorrow brings.
+
+56:
+  char: description
+  text: >-
+    She falls asleep fast, you soon follow.

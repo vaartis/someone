@@ -1,0 +1,259 @@
+config:
+  chars:
+    narra:
+      color: [211, 0, 0]
+    player:
+      color: [255, 255, 255]
+    description:
+      color: [127, 0, 255]
+  dialogue_between: [player, narra]
+
+1:
+  text: >-
+    Never seen these streets so empty, it was bright and full of people even at night. Not anymore. Didn't think they'd ever end up like
+    this. Hope they'll be the way they were before someday, even though I didn't like it at the time, it's sad to see them so devoid of
+    life.
+
+2:
+  char: description
+  wait: true
+  text: >-
+    She stops for a few seconds, looking at the building to the right.
+
+3:
+  char: narra
+  text: >-
+    Let's go see this one. This club was a hugely popular place to hang out at night, I got invited to go there at night a few times, but
+    after the first one I didn't want to go there any more at all, too crowded.
+
+4:
+  responses:
+  - text: >-
+      Shouldn't it be closed during the day?
+
+5:
+  text: >-
+    They didn't close it for the day, it's just that there weren't a lot of people there. That was the sweet time for me to go enjoy a few
+    drinks.
+
+6:
+  char: description
+  wait: true
+  text: >-
+    You go throuth the glass doors of the parade entrance, then through the long hallway, and to the actual dancefloor and the bar.
+    As expected, there's nobody there.
+  next: club-hub
+
+club-hub:
+  char: player
+  responses:
+  - text: >-
+      Check the bar
+    condition: return not TerminalModule.state_variables.day2.club.bar
+    next: bar-1
+  - text: >-
+      Check the dance floor
+    condition: return not TerminalModule.state_variables.day2.club.dance_floor
+    next: dance-floor-1
+  - text: >-
+      Leave
+    condition: |
+      local lume = require("lume")
+      return lume.all(TerminalModule.state_variables.day2.club)
+    next: 7
+
+bar-1:
+  char: description
+  script: TerminalModule.state_variables.day2.club.bar = true
+  text: >-
+    You come over to the bar. There are a few drinks on the bar.
+
+bar-2:
+  char: player
+  responses:
+  - text: >-
+      Uhm.. if nobody else is here, we might as well have them, right?
+
+bar-3:
+  text: >-
+    Uh.. sure. The drinks here were nice. I missed them.
+
+bar-4:
+  char: description
+  wait: true
+  text: >-
+    You sit on the stool and take one the glasses, then have a sip. It's very, very sweet and has a slight strawberry flavor
+
+bar-5:
+  responses:
+  - text: >-
+      Yuck.. it's so sweet!
+
+bar-6:
+  text: >-
+    Yes! This one's called "strawberry boom", because it's so sweet. But the aftertaste is nice.
+
+bar-7:
+  responses:
+  - text: >-
+      Actually.. maybe is is.. huh.
+
+bar-8:
+  text: >-
+    The one I have here is a mix of milk and various syrops. It's not exactly a thing you'd get at the club, more like a coctail. Wanna try
+    it?
+
+bar-9:
+  responses:
+  - text: >-
+      Alright..
+
+bar-10:
+  char: description
+  wait: true
+  text: >-
+    You take a sip of the coctail. It is, indeed, a mixture of milk and various sweet syrops, although the which exact ones you can't quite
+    figure out.
+
+bar-11:
+  char: player
+  responses:
+  - text: >-
+      Uh.. don't know if I like it.
+
+bar-12:
+  text: >-
+    Well. To each their own. Let's finish those and continue our investigation.
+
+bar-13:
+  responses:
+  - text: >-
+      Yeah. Investigation.
+    next: club-hub
+
+dance-floor-1:
+  char: description
+  wait: true
+  script: TerminalModule.state_variables.day2.club.dance_floor = true
+  text: >-
+    The tiles of the dance floor don't change colors. It seems like the program that controls them doesn't run during the day.  There are a
+    few tables around it, one of which has a small white pack of someting, with "6" written on it.
+
+dance-floor-2:
+  char: player
+  responses:
+  - text: >-
+      Any idea what this pack is?
+
+dance-floor-3:
+  text: >-
+    Oh that one.. It's probably the popular bubble-gum. Yeah it's called "6". Because there are 6 of them in the pack.
+
+dance-floor-4:
+  char: description
+  wait: true
+  text: >-
+    You come up to the table and peek into the pack. There are 5 strips of gum in there.
+
+dance-floor-5:
+  responses:
+  - text: >-
+      Five. They left an almost full pack here. What a waste.
+
+dance-floor-6:
+  text: >-
+    Maybe someone didn't like 'em. They don't exactly taste like.. anything. Just dull.
+
+dance-floor-7:
+  responses:
+  - text: >-
+      Not too fancy of a gum, eh?
+
+dance-floor-8:
+  text: >-
+    Yep. It's very basic. If you want to just chew on something, maybe, or have no time to brush your teeth at all, although.. I'm not sure
+    it helps with that?
+  next: club-hub
+
+7:
+  char: narra
+  text: >-
+    That was a whole bunch of nothing, huh? I'm getting really desperate for something to change already! Come on.. Did we go all the way
+    for nothing?
+
+8:
+  responses:
+  - text: >-
+      Yeah.. Jeez. So boring! Maybe we should head back already?
+
+9:
+  text: >-
+    Come on, let's check a few more places, OK? And on our way, let's try to find a few bicycles to go back on, that should ease our way a
+    bit.
+
+10:
+  responses:
+  - text: >-
+      Oh, sure.. If you know where to get them.
+
+11:
+  text: >-
+    Yeah. We'll head for the big mall for now, there's a bike place there, I hope nobody is going to mind if we take them.
+
+12:
+  responses:
+  - text: >-
+      There's probably nobody to do so..
+
+13:
+  text: >-
+    Yes. That's what I'm talking about.
+
+14:
+  char: description
+  wait: true
+  text: >-
+    You walk for bit more deeper into the city, until you see the big mall building. You know it's a mall because it has "City Mall" written
+    on it. Who could've thought.
+
+15:
+  char: narra
+  text: >-
+    I'll try to remember where exactly the bike place is, while you look around and see if there's anything interesting while we're on the
+    way. This place is pretty big.
+
+16:
+  char: description
+  wait: true
+  text: >-
+    While you go, you notice a few clothing places, cosmetics stuff, lingerie, a huge food section, general applience stuff, and then,
+    finally, you're at the bike place.
+
+17:
+  char: narra
+  text: >-
+    Well, just take the first one that fits you and let's go already.
+
+18:
+  char: description
+  wait: true
+  text: >-
+    She tries out a few bikes, stopping on a sporty looking green one. You grab the first one you see, the seat feels alright and the pedals
+    are at the comfortable height, so you don't hesitate too much. Your bike is red, the best color. You set out on your way back
+    immediately. The sun seems to already be setting. Just how much have you been walking here?
+
+19:
+  char: narra
+  text: >-
+    What a disappointment. Not like it really matters, since the time is not a constraint, but still, it's disappointing. Now we know
+    there's probably nothing there, at least.
+
+20:
+  responses:
+  - text: >-
+      I guess that's true.. That wasn't very exciting, except when we actually did find something, you know?
+
+21:
+  text: >-
+    Not a lot of that, but yes..
+  next: day2/evening/1

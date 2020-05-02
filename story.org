@@ -398,7 +398,7 @@
 
    OK. So, are we gonna split and just go check a few houses here and there?
 
-   I'd really rather not split. I'm afraid that something might go wrong, like you'd get lost, and I'll be left alone again.
+   I'd really rather not. I'm afraid that something might go wrong, like you'd get lost, and I'll be left alone again.
 
    I see. We'll check some houses together then.
 
@@ -414,7 +414,7 @@
 
    Yeah.. right..
 *** Flat on the first floor
-    <She goes through the door and you go after. You're now in the first flat on the first floor. It's not very big: there's what seems to
+    <Narra goes through the door and you go after. You're now in the first flat on the first floor. It's not very big: there's what seems to
     be a bathroom, and the living room and the kitchen are made into a single room, with a kitchen counter inbetween. The living room part has a sofa
     and a small coffee table. There's a laptop on the table.>
 **** Check the laptop
@@ -429,17 +429,16 @@
 
      <You come up to the laptop and press a random key. The laptop wakes up. The screen is locked, but there's no password, you just click the log in
      button and it does so. The only window on the is the blogging sofware. The top post says "Just got some new noodles, haven't seen those around
-     here before, gonna check em out soon", underneath the text it says "posted undefined ago">
+     here before, gonna check em out soon", underneath the text it says "posted undefined ago".>
 
      <p>: Is that the blogging thing you told me about?
 
-     Yes, that seems like it. The date of the post makes no sense though. And, looking at it, other posts' dates are like that
-     too.
+     Yes, that seems like it. The date of the post makes no sense though. And, looking at it, other posts' dates are like that too.
 
      It wasn't able to determine the date, obviously, but what that actually means I do not know. Probably not much else to see here, since this is
      the only window on the computer, it was probably only used for writing on the blog.
 **** Check the kitchen part of the room
-     <You walk up to the fridge and open it. There's a bunch of different foods in there, some in bags, most unopened at all>
+     <You walk up to the fridge and open it. There's a bunch of different foods in there, some in bags, most unopened at all.>
 
      <narra>: So many interesting kinds of meals could be made from this.. Maybe we could get some from the city center too, when we're there.
 **** Check the bathroom
@@ -452,11 +451,11 @@
 
     Yea. Nothing more catches the eye here.
 
-    <You leave the flat. Narra closes the door, leaving it as it was when you arrived>
+    <You leave the flat. Narra closes the door, leaving it as it was when you arrived.>
 
     <narra>: Let's check the other flats.
 
-    <You nod. She goes to the opposite side of the corridor and turns the knob. The door is locked>
+    <You nod. She goes to the opposite side of the corridor and turns the knob. The door is locked.>
 
     <narra>: Interesting.. So, the person who lived in that flat just forgot to lock their door? And their computer didn't have any password,
     too..
@@ -465,7 +464,7 @@
 
     Maybe. Or they were careless.
 
-    <You check the other floors, all the doors are locked. Same happens in the adjacent house>
+    <You check the other floors, all the doors are locked. Same happens in the adjacent house.>
 
     <narra>: Seems like we just got lucky with that one.. All the others are probably locked, too. Let's head into the city and see what's up
     there.
@@ -484,7 +483,7 @@
     <narra>: Let's go see this one. This club was a hugely popular place to hang out at night, I got invited to go there at night a few times, but
     after the first one I didn't want to go there any more at all, too crowded.
 
-    Shouldn't it be closed though? It's day after all.
+    Shouldn't it be closed during the day?
 
     They didn't close it for the day, it's just that there weren't a lot of people there. That was the sweet time for me to go enjoy a few drinks.
 *** Club
@@ -493,15 +492,15 @@
 **** The bar
      <You come over to the bar. There are a few drinks on the bar.>
 
-     <p> Well, if nobody else is there, we might as well have them, right?
+     <p> Well, if nobody else is here, we might as well have them, right?
 
-     Uh.. sure. The drinks here were nice after all. I missed them.
+     Uh.. sure. The drinks here were nice. I missed them.
 
-     <You sit on the stool and take one the glasses, then have a sip. It's very, very sweet and has a slight strawberry flavor>
+     <You sit on the stool and take one the glasses, then have a sip. It's very, very sweet and has a slight strawberry flavor.>
 
      <p>: Yuck.. it's so sweet!
 
-     Yes! This one was called "strawberry boom", because it's so sweet. But the aftertaste is nice.
+     Yes! This one's called "strawberry boom", because it's so sweet. But the aftertaste is nice.
 
      Actually.. maybe is is.. huh.
 
@@ -510,13 +509,13 @@
      Alright..
 
      <You take a sip of the coctail. It is, indeed, a mixture of milk and various sweet syrops, although the which exact ones you can't quite figure
-     out>
+     out.>
 
      Uh.. don't know if I like it.
 
      Well. To each their own. Let's finish those and continue our investigation.
 
-     Yeah. Investigatin'.
+     Yeah. Investigation.
 **** The dance floor
      <The tiles of the dance floor don't change colors. It seems like the program that controls them doesn't run during the day.  There are a few
      tables around it, one of which has a small white pack of someting, with "6" written on it.>
@@ -554,11 +553,11 @@
     <You walk for bit more deeper into the city, until you see the big mall building. You know it's a mall because it has "City Mall" written on
     it. Who could've thought.>
 
-    <narra>: I'll try to remember where exactly the bike place is, while you look around and see if there's anything interesting while we're on
-    the way. This place is pretty big after all.
+    <narra>: I'll try to remember where exactly the bike place is, while you look around and see if there's anything interesting while we're on the
+    way. This place is pretty big.
 
-    <While you go, you notice a few clothing places, cosmetics stuff, lingerie, a huge food section, general applience stuff, and then, finlly,
-    you're at the bike place>
+    <While you go, you notice a few clothing places, cosmetics stuff, lingerie, a huge food section, general applience stuff, and then, finally,
+    you're at the bike place.>
 
     Well, just take the first one that fits you and let's go already.
 
@@ -588,7 +587,7 @@
 
    <narra>: Hey?
 
-   <Behind the door, you see a guy, not too tall, shoulder length black hair, wearing glasses. He jumps back, producing a high-pitched yell>
+   <Behind the door, you see a guy, not too tall, shoulder length hair, wearing glasses. He jumps back, producing a high-pitched yell>
 
    <maj>: aaHHH!!
 
@@ -608,7 +607,7 @@
 
    <maj>: Wow! Never thought I'd meet someone like that ever again..
 
-   <p>: Hello! While I it's true i'm from the "outside", I don't know anything about that "creator" person, nor do I know anything about myself.. or
+   <p>: Hello! While it's true i'm from the "outside", I don't know anything about that "creator" person, nor do I know anything about myself.. or
    anything outside the room I'm in, really..
 
    <maj>: Oh.. shame.. but still, welcome! Let's head into the kitchen and have some tea at least, like Narra suggested, we shouldn't
@@ -629,8 +628,8 @@
    <p>: Yeah.. There was some kind of a corridor, with a stupid puzzle. So I pressed a few buttons, a melody played, and that somehow brought back the
    city. And you, too, it seems. Looking forward to more changes like that in the future.
 
-   <maj>: Wow.. that is a lot to process.. First off, it's very sad Narra had to experience this. But that's behind you now, and we can
-   start living again, right?
+   <maj>: Wow.. that is a lot to process.. First off, it's very sad Narra had to experience this. But that's behind you now, and everything's gonan be
+   fine, right?
 
    <narra>: I.. sure hope so. There are still so many people missing.. But we'll try to get them back! We've been to the city with <p> today, it's
    as empty as everything else, so we really just wasted a lot of time.
@@ -664,22 +663,22 @@
    where we could connect computers to them and then connect the servers together. One of them is actually right here, in the basement of my house, I
    rarely go down there so it might be a bit dusty, but we can go see it.. if you're interested.
 
-   <p>: Sure, i wanna see it.
+   <p>: Sure, I wanna see it.
 
    <Since you all are already done with the tea, you all stand up, and wait for Maj to lead the way. However, he just moves his chair and you notice
    that there's a trapdoor underneath. He lifts it, then reaches inside to find the light switch and turns it on. He then steps on the ledder there
    and starts going down. You look as he goes down, it's not that deep down there, just a few meters. He waves at you, telling you can go down
    now. You climb down the ladder first, then Narra climbs after you.>
 
-   <p>: You know.. this really looks like the room I am in. I mean, on the outside. Except yours is way better lit.
+   <p>: You know.. this really looks like the room I am in. I mean, on the "outside". Except yours is way better lit.
 
-   <maj>: Do you really spend all your time in an almost empty concrete box? That's just sad.
+   <maj>: Do you really spend all your time in an almost empty concrete box?
 
-   <p>: Not like i have any choice..
+   <p>: It's not like I have a choice..
 
    <maj>: Anyway. Here it is, this big boy handles all the communication between the village and the city.
 
-   <You look at the server. It's a rack filled with all kinds of boxes and wires, all blinking with different colors>
+   <You look at the server. It's a rack filled with all kinds of boxes and wires, all blinking with different colors.>
 
    <maj>: In the city, there are a few of servers like this once, since it's a lot bigger. The city is like a hub for communication.
 
@@ -697,7 +696,7 @@
    someone if they ask, albeit it might sound like braggning, it did take some planning to set up. Now, let's get out of here, I'm feeling cold
    myself.
 
-   <You all get out of the basement in the reverse order. Maj closes the trapdoor and moves his chair back>
+   <You all get out of the basement in the reverse order. Maj closes the trapdoor and moves his chair back.>
 
    <maj>: Now, it's getting really late, I'd love to talk some more, but maybe we should continue tomorrow?
 

@@ -20,3 +20,223 @@ config:
   text: >-
     We're here, finally! That was hell of a walk. I guess we could just keep going on the road and not the sidewalk, since, presumably,
     there's no transport on the roads right now.. We're in the suburbs currenly, so the buildings here are mostly houses.
+
+3:
+  responses:
+  - text: >-
+      Yeah.. These look smaller compared to those in the distance. Are we heading deeper into the city?
+
+4:
+  text: >-
+    I'd say we should check a few houses first, to see if anyone's there. The chance is small but that's the main point why we're here.
+
+5:
+  responses:
+  - text: >-
+      OK. So, are we gonna split and just go check a few houses here and there?
+
+6:
+  text: >-
+    I'd really rather not. I'm afraid that something might go wrong, like you'd get lost, and I'll be left alone again.
+
+7:
+  responses:
+  - text: >-
+      I see. We'll check some houses together then.
+
+8:
+  char: description
+  wait: true
+  text: >-
+    Both of you go off the road, to the first house on the right, going up a stairway to the first floor.
+
+9:
+  text: >-
+    Let's check the doors on this floor..
+
+10:
+  char: description
+  text: >-
+    She comes to the first door and carefully turns the knob. The door is not locked. She looks at you somewhat worryingly.
+
+11:
+  char: narra
+  text: >-
+    So.. should we go in?
+
+12:
+  responses:
+  - text: >-
+      That's what we're here for, right?
+
+13:
+  text: >-
+    Yeah.. right..
+
+14:
+  char: description
+  wait: true
+  text: >-
+    Narra goes through the door and you go after. You're now in the first flat on the first floor. It's not very big: there's what seems to be
+    a bathroom, and the living room and the kitchen are made into a single room, with a kitchen counter inbetween. The living room part has
+    a sofa and a small coffee table. There's a laptop on the table.
+  next: flat-hub
+
+flat-hub:
+  char: player
+  responses:
+  - text: >-
+      Check the laptop
+    condition: return not TerminalModule.state_variables.day2.flat.laptop
+    next: laptop-1
+  - text: >-
+      Check the kitchen part of the room
+    condition: return not TerminalModule.state_variables.day2.flat.kitchen
+    next: kitchen-1
+  - text: >-
+      Check the bathroom
+    condition: return not TerminalModule.state_variables.day2.flat.bathroom
+    next: bathroom-1
+  - text: >-
+      Leave the flat
+    condition: |
+      local lume = require("lume")
+      return lume.all(TerminalModule.state_variables.day2.flat)
+    next: 15
+
+laptop-1:
+  char: player
+  script: TerminalModule.state_variables.day2.flat.laptop = true
+  text: >-
+    Should we.. check the laptop?
+
+laptop-2:
+  text: >-
+    I'm.. not sure. It's somebode else's, that'd be kinda rude..
+
+laptop-3:
+  responses:
+  - text: >-
+      Well it's not like we're gonna go snooping around too much in there. Let's just see if there's anything that can help us "on the
+      surface", alright?
+
+laptop-4:
+  text: >-
+    Okay.. I guess that's fine..
+
+laptop-5:
+  char: description
+  wait: true
+  text: >-
+    You come up to the laptop and press a random key. The laptop wakes up. The screen is locked, but there's no password, you just click the
+    log in button and it does so. The only window on the is the blogging sofware. The top post says "Just got some new noodles, haven't seen
+    those around here before, gonna check em out soon", underneath the text it says "posted undefined ago".
+
+laptop-6:
+  responses:
+  - text: >-
+      Is that the blogging thing you told me about?
+
+laptop-7:
+  text: >-
+    Yes, that seems like it. The date of the post makes no sense though. And, looking at it, other posts' dates are like that too.
+
+laptop-8:
+  responses:
+  - text: >-
+      It wasn't able to determine the date, obviously, but what that actually means I do not know. Probably not much else to see here, since
+      this is the only window on the computer, it was probably only used for writing on the blog.
+    next: flat-hub
+
+kitchen-1:
+  char: description
+  wait: true
+  script: TerminalModule.state_variables.day2.flat.kitchen = true
+  text: >-
+    You walk up to the fridge and open it. There's a bunch of different foods in there, some in bags, most unopened at all
+
+kitchen-2:
+  char: narra
+  text: >-
+    So many interesting kinds of meals could be made from this.. Maybe we could get some from the city center too, when we're there.
+  next: flat-hub
+
+bathroom-1:
+  char: description
+  wait: true
+  script: TerminalModule.state_variables.day2.flat.bathroom = true
+  text: >-
+    You open the bathroom door and turn on the light. It blinks a few times at first, and then stays on as it should. The bathroom is mostly
+    the same as Narra's, maybe even a little smaller.
+
+bathroom-2:
+  char: player
+  responses:
+  - text: >-
+      Not much to see here.. Good thing we checked, anyway.
+    next: flat-hub
+
+15:
+  char: player
+  text: >-
+    Not much else to look at here. Should we go check out the other flats?
+
+16:
+  text: >-
+    Yea. Nothing more catches the eye here.
+
+17:
+  char: description
+  wait: true
+  text: >-
+    You leave the flat. Narra closes the door, leaving it as it was when you arrived.
+
+18:
+  char: narra
+  text: >-
+    Let's check the other flats.
+
+19:
+  char: description
+  wait: true
+  text: >-
+    You nod. She goes to the opposite side of the corridor and turns the knob. The door is locked.
+
+20:
+  char: narra
+  text: >-
+    Interesting.. So, the person who lived in that flat just forgot to lock their door? And their computer didn't have any password, too..
+
+21:
+  responses:
+  - text: >-
+      Means they had nothing to hide, right?
+
+22:
+  text: >-
+    Maybe. Or they were careless.
+
+23:
+  char: description
+  wait: true
+  text: >-
+    You check the other floors, all the doors are locked. Same happens in the adjacent house.
+
+24:
+  char: narra
+  text: >-
+    Seems like we just got lucky with that one.. All the others are probably locked, too. Let's head into the city and see what's up there.
+
+25:
+  responses:
+  - text: >-
+      Agreed. This door checking getting boring anyway. You come up to the door and you just know it's locked, but you still try, with no
+      luck. That first one was a big surprise.
+
+26:
+  char: description
+  wait: true
+  text: >-
+    You head into the city, going along the road, past all the same-looking houses. After some time, you reach the center part of the city, where all
+    the night and day life happened.
+  next: day2/city_center/1

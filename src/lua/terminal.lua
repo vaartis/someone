@@ -586,6 +586,15 @@ M.state_variables = {
          city = false,
          city_food = false,
          stay = false
+      },
+      flat = {
+         laptop = false,
+         kitchen = false,
+         bathroom = false
+      },
+      club = {
+         bar = false,
+         dance_floor = false
       }
    },
    talking_topics = {}
