@@ -31,7 +31,11 @@ int main() {
 
     sf::RenderWindow window(sf::VideoMode(1280, 1024), "Someone");
     window.setFramerateLimit(60);
+
     ImGui::SFML::Init(window);
+    ImGuiIO& io = ImGui::GetIO();
+    // Disable the ini file
+    io.IniFilename = nullptr;
 
     sf::RenderTexture target;
     {
