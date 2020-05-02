@@ -115,7 +115,11 @@ void StoryParser::parse(lines_type &result, std::string file_name, sol::state &l
         // that the characters are alternating every phrase, it will automatically switch to the next character
         // in that list every time, unless the character is explicitly specified. If the character is specified,
         // then, if it's one of those participating in the dialogue, the dialogue tracking switches to that character,
-        // and if not, then it does nothing and the dialogue continues as usual on the next phrase
+        // and if not, then it does nothing and the dialogue continues as usual on the next phrase.
+        //
+        // However, it only correctly works if the dialogue is going linearly and there are no hubs or anything of sort,
+        // then it might behave strangely. A good practice would be to put characters on every hub answer beginning.
+        // Since the parser does not consider branching, there's no easy way to allow skipping names for hubs.
         if (config["dialogue_between"]) {
             auto dialogue_chars = config["dialogue_between"].as<std::vector<std::string>>();
             dialogue_between_chars.insert(dialogue_between_chars.end(), dialogue_chars.begin(), dialogue_chars.end());
@@ -231,6 +235,11 @@ void StoryParser::parse(lines_type &result, std::string file_name, sol::state &l
             }
         } else if (node["responses"]) {
             decltype(TerminalVariantInputLineData::variants) variants;
+
+            if (!node["responses"].IsSequence()) {
+                spdlog::error("'responses' needs to be a sequence, but it's not a sequence in {}", name);
+                std::terminate();
+            }
 
             for (auto resp : node["responses"]) {
                 auto resp_text = resp["text"].as<std::string>();
