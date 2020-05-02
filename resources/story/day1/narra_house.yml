@@ -61,7 +61,7 @@ hub:
       -- Go to bed when when no rooms were explored
       local lume = require("lume")
       return not lume.any(TerminalModule.state_variables.day1.narra_house_hub)
-    next: bed-if-not-explored
+    next: bed-if-not-explored-1
 
 living-room:
   char: description
@@ -105,31 +105,28 @@ bed-after-explored:
   wait: true
   text: >-
     Narra is already asleep.
-  next: "narra-house-end"
+  next: narra-house-end
 
-bed-if-not-explored:
+bed-if-not-explored-1:
   char: narra
   text: >-
     Straight to bed, huh?
-  next: bed-if-not-explored-2
 
 bed-if-not-explored-2:
   responses:
   - text: >-
       Yeah.
-    next: bed-if-not-explored-3
 
 bed-if-not-explored-3:
   text: >-
     Oh well. Goodnight, then.
-  next: bed-if-not-explored-4
 
 bed-if-not-explored-4:
   wait: true
   responses:
   - text: >-
       You too.
-    next: "narra-house-end"
+    next: narra-house-end
 
 narra-house-end:
   char: description

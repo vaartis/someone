@@ -70,6 +70,27 @@ void StoryParser::maybe_parse_referenced_file(std::string next, lines_type &resu
     }
 }
 
+std::optional<std::tuple<std::string, uint32_t>> split_as_numbered(const std::string &name) {
+    auto maybe_last_dash = name.rfind('-');
+
+    // number_string is something that might be a number, from which
+    // the next line can be derived by incrementing that number
+    std::string before_number_string;
+    std::string maybe_number_string;
+    if (maybe_last_dash == name.npos) {
+        maybe_number_string = name;
+    } else {
+        before_number_string = name.substr(0, maybe_last_dash + 1);
+        maybe_number_string = name.substr(maybe_last_dash + 1);
+    }
+
+    if (StringUtils::is_number(maybe_number_string)) {
+        return std::make_tuple(before_number_string, std::stoi(maybe_number_string));
+    } else {
+        return std::nullopt;
+    }
+}
+
 void StoryParser::parse(lines_type &result, std::string file_name, sol::state &lua) {
     auto full_file_name = std::filesystem::path("resources/story/") / file_name;
     full_file_name.replace_extension(".yml");
@@ -168,23 +189,27 @@ void StoryParser::parse(lines_type &result, std::string file_name, sol::state &l
             std::string next;
             if (node["next"]) {
                 next = node["next"].as<std::string>();
-            } else if (!node["next"] && StringUtils::is_number(name)) {
-                // If there's no next node, but the name of the node is a number,
-                // try using the next number as the next node
-
-                auto next_num = std::stoi(name) + 1;
-                auto maybe_next_name = std::to_string(next_num);
-                auto maybe_next_numbered = root_node[maybe_next_name];
-
-                if (maybe_next_numbered)
-                    // If it exists, mark it as next
-                    next = maybe_next_name;
-                else
-                    // Otherwise log that there was no more numbers, let "" be there
-                    spdlog::warn("Next numbered line not found for {} and there's no 'next'", inserted_name);
             } else {
-                // If there was no next at all and no patterns matched, let "" be there
-                spdlog::warn("No 'next' on {} and no shortcut patterns matched", inserted_name);
+                if (auto splitted = split_as_numbered(name); splitted) {
+                    auto [before_number_string, number] = *splitted;
+
+                    auto next_num = number + 1;
+                    // Next name is anything that was before + an incremented number,
+                    // or just an incremented number if the while name is a number
+                    std::string next_name = before_number_string + std::to_string(next_num);
+                    auto maybe_next_numbered = root_node[next_name];
+
+                    if (maybe_next_numbered) {
+                        // If it exists, mark it as next
+                        next = next_name;
+                    } else {
+                        // Otherwise log that there was no more numbers, let "" be there
+                        spdlog::warn("Next numbered line not found for {} and there's no 'next'", inserted_name);
+                    }
+                } else {
+                    // If there was no next at all and no patterns matched, let "" be there
+                    spdlog::warn("No 'next' on {} and no shortcut patterns matched", inserted_name);
+                }
             }
 
             // Now add the namespace to it
@@ -211,32 +236,32 @@ void StoryParser::parse(lines_type &result, std::string file_name, sol::state &l
                 auto resp_text = resp["text"].as<std::string>();
 
                 std::string resp_next;
-                if (!resp["next"] && StringUtils::is_number(name)) {
-                    // If there's no next node, but the name of the node is a number,
-                    // try using the next number as the next node
+                if (resp["next"]) {
+                    resp_next = resp["next"].as<std::string>();
+                } else {
+                    if (auto splitted = split_as_numbered(name); splitted) {
+                        auto [before_number_string, number] = *splitted;
 
-                    auto next_num = std::stoi(name) + 1;
-                    auto maybe_next_name = std::to_string(next_num);
-                    auto maybe_next_numbered = root_node[maybe_next_name];
+                        auto next_num = number + 1;
+                        // Next name is anything that was before + an incremented number,
+                        // or just an incremented number if the while name is a number
+                        std::string next_name = before_number_string + std::to_string(next_num);
+                        auto maybe_next_numbered = root_node[next_name];
 
-                    if (maybe_next_numbered) {
-                        // If it exists, mark it as next
-                        resp_next = maybe_next_name;
+                        if (maybe_next_numbered) {
+                            // If it exists, mark it as next
+                            resp_next = next_name;
+                        } else {
+                            // Otherwise log that there was no more numbers, let "" be there
+                            spdlog::warn("Next numbered line not found for {} and there's no 'next'", inserted_name);
+                        }
                     } else {
                         spdlog::error(
-                            "Next numbered line not found for variant '{}' of {} and there's no 'next', the response needs to have somewhere to go",
+                            "response '{}' of {} has no 'next' and the name is not a number, it needs to have somewhere to go to",
                             resp_text, inserted_name
                         );
                         std::terminate();
                     }
-                } else if (resp["next"]) {
-                    resp_next = resp["next"].as<std::string>();
-                } else {
-                    spdlog::error(
-                        "response '{}' of {} has no 'next' and the name is not a number, it needs to have somewhere to go to",
-                        resp_text, inserted_name
-                    );
-                    std::terminate();
                 }
 
                 // Add the namespace to next if needed
