@@ -125,19 +125,25 @@ function InputWaitLine:initialize(name, text, next_line)
    self._1_pressed = false
 end
 
+local press_1_text
+
 function InputWaitLine:current_text()
-   local final_text = self._text:sub(0, self._letters_output)
+   local txt = OutputLine.current_text(self)
+
    if (self._letters_output == #self._text and not self._1_pressed) then
-      final_text = final_text .. "\n[Press 1 to continue]"
+      if not press_1_text then
+         press_1_text = Text.new("[Press 1 to continue]", StaticFonts.main_font, 24)
+         press_1_text.fill_color = Color.Black
+      end
+
+      local win_size = GLOBAL.drawing_target.size
+      local width_offset, height_offset = win_size.x / 100, win_size.y / 100 * 2
+      local rect_height, rect_width = win_size.y / 100 * (80 - 10), win_size.x - (width_offset * 2)
+      local text_pos = Vector2f.new(width_offset, height_offset + rect_height + 30)
+      press_1_text.position = text_pos
+
+      GLOBAL.drawing_target:draw(press_1_text)
    end
-
-   local substr = lume.wordwrap(
-      final_text,
-      max_text_width()
-   )
-
-   local txt = Text.new(substr, StaticFonts.main_font, StaticFonts.font_size)
-   txt.fill_color = self._character.color
 
    return txt
 end
