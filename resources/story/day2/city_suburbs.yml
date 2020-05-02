@@ -1,0 +1,22 @@
+config:
+  chars:
+    narra:
+      color: [211, 0, 0]
+    player:
+      color: [255, 255, 255]
+    description:
+      color: [127, 0, 255]
+  dialogue_between: [player, narra]
+
+1:
+  char: description
+  wait: true
+  text: >-
+    Finally, after the long walk, you arrive. Judging by the position of the sun, it's somewhere around noon. The stone road you've been
+    walking gradually changes to asphalt.
+
+2:
+  char: narra
+  text: >-
+    We're here, finally! That was hell of a walk. I guess we could just keep going on the road and not the sidewalk, since, presumably,
+    there's no transport on the roads right now.. We're in the suburbs currenly, so the buildings here are mostly houses.

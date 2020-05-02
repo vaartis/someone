@@ -277,13 +277,4 @@ config:
 52:
   text: >-
     Sure. What do you want to talk about?
-  next: ask-about
-
-ask-about:
-  char: player
-  text: Ask about...
-#  next: road-questions-hub
-
-#road-question-hub:
-#  char: player
-#  responses:
+  next: day2/road_questions/hub

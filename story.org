@@ -289,12 +289,10 @@
    Sure. What do you want to talk about?
 
    Ask about..
-*** IF (want to talk about the computers) THEN the computers here, what are they like and how do they work?
-    So.. You have computers here? How do they actually work?
-
-    Yes! I actually have one, too. You might've seen it in my living room. I got it recenly before everything disappeared, though now it feels like
-    it's been forever. I used to have a bigger one, until it eventually broke down, probably from being so ancient, just refused to boot.. So I got a
-    new one. Couldn't get the same one, they didn't make them like that anymore, I really got used to it, you know.x So I got a new one. It was
+*** IF (want to talk about the computers) THEN So.. You have computers here? How do they actually work?
+    Yes, we do! I actually have one, too. You might've seen it in my living room. I got it recenly before everything disappeared, though now it feels
+    like it's been forever. I used to have a bigger one, until it eventually broke down, probably from being so ancient, just refused to boot.. So I
+    got a new one. Couldn't get the same one, they didn't make them like that anymore, I really got used to it, you know. So I got a new one. It was
     faster, but really, I didn't care much. I'm not very good with computers anyway, and I don't do anything complicated. Checking mail and blogging
     was good enough for me. We had a network that connected all computers together, making remote communication really easy.
 
@@ -304,10 +302,8 @@
     it, there were people I knew that moved to the city on there. So i started using it a lot. Of course, now that everyone's gone, there is probably
     nobody on there..  We could still check it later when we get back. Or maybe we could find some kind of public computer in the city.
 
-    Yeah, maybe. I wanna see it.
-*** IF (want to talk about plant based food) THEN What's with the food here, it's all made from plants?
-    <p>: It seems like all the food is made out of various plants. Do all people here only eat that?
-
+    Yeah, maybe.
+*** IF (want to talk about plant based food) THEN It seems like all the food is made out of various plants. Do all people here only eat that?
     Yes? Well, we wouldn't eat each other, would we?
 
     Fair.. Here we have other foods, which are made of various creatures that are deemed not self-aware enough. People would raise them specifically
@@ -334,22 +330,18 @@
     What an awful world that must be. Still, surely, not all hope is lost if someone understand that it's bad.
 
     I suppose that's just how it is. The world is cruel like that sometimes.
-*** Do people always look the same since they don't age?
-    <p>: So.. if people here don't age, does that mean their appearance doesn't change since when they first find themselves here?
-
+*** If people here don't age, does that mean their appearance doesn't change since when they first find themselves here?
     Pretty much. Since I woke up here my appearance didn't change at all. The hair and the nails grow, but that's practically it. So Ib still have to
     look after them, but except that.. not much changes. You can get new clothes to change your looks a bit, certainly, but other than that the looks
     don't change too much. Some people actually wondered if anything could be done about that, but the research was started just recently and didn't
     go that far.
 
-    I see.. So after people wake up here, they are all already aged and that never changes. Were all people here grown-ups?
+    I see.. Were all people here uh.. grown-ups?
     
     Not all of them, no. The "age" ranged considerably, there were all kinds of people. You couldn't really judge anyone by their appearance, because
     someone could look like a child, but have lived a long life already. Perhaps, we could talk to the people who did research on the topic, provided
     we'd find someone like that. Maybe in the city, since most of them lived there, it was the place for researchers to gather.
 *** What's the city like in general?
-    <p>: What's the city we're heading to like in general?
-
     Uhm.. It's big! And it had a lot of people doing many things. A lot bigger than the village, you know. The buildings there were also actually
     built in regions designated for them, unlike in our village, where things were just made up as the time progressed and then were connected with a
     road. For the city, they actually planned areas for houses and for service and entertainment buildings, which where then built there gradually as
@@ -359,17 +351,15 @@
     help us since they require someone to operate them and I sure as hell have no idea how to do it. We can probably see some of them standing
     motionless though.
 
-    Interesting.. so, it's big, that's not really new.. What about nighttime, how's it at night?
+    Interesting.. What about nighttime, how's it at night?
 
     It'd be all lit up if there were people, night life there is a normal thing there, unlike in the village where we mostly go to bed and get up
     early; in the city, many people are more active at night, just because of the way they made their schedule; there are entertainment places where
     they go to meet their friends and make new ones, have a drink, dance. I tried that lifestyle for some time when I was in the city but I really
     just couldn't handle it, I think it takes a lot of time to get used to it; getting up so late just feels wrong.. and staying up after midnight is
     just too tiring for me..
-*** Is the food in the city any different?
-    <p>: Since the city is so big, they probably have some interesting different cuisine, right?
-
-    Precicely so. The food there is made of things gathered there from different places. Since they don't have much of their own food production, they
+*** Since the city is so big, they probably have some interesting different cuisine, right?
+    Precicely. The food there is made of things gathered there from different places. Since they don't have much of their own food production, they
     have to get it from all the places around the world, while the rest of the world gets the "techonolgy" pieces from them, like computers and
     phones. As a consequence, you can also get food from other parts of the world there for yourself if you go to the city. The milk I had for
     breakfast, for example, I got from my last trip to the city.
@@ -388,9 +378,7 @@
     only after that did people tried experimenting with other things. Not all of those experiments were that successful..
 
     # Set want to talk about plant based food AND want to talk about the computers UNLESS already talked about them
-*** Are we going to stay in the city for the night?
-    Are we gonna stay in the city this night? Do you know anywhere to stay in case we have to?
-
+*** Are we gonna stay in the city this night? Do you know anywhere to stay in case we have to?
     I hope we won't have to.. We got up pretty early and the day is still young, so there's a good chance we won't. Still, if we have to, we'll
     probably be able to stay at some kind of hotel, especially if there's nobody else there besides us. There are a few of those in the city, so
     finding one wouldn't be a problem. They were made especially for people like us, who come to the city for a short time and don't have any other
@@ -399,7 +387,7 @@
     Convinient..
 ** The city
    <Finally, after the long walk, you arrive. Judging by the position of the sun, it's somewhere around noon. The stone road you've been walking
-   gradually changes to asphalt>
+   gradually changes to asphalt.>
 
    <narra>: We're here, finally! That was hell of a walk. I guess we could just keep going on the road and not the sidewalk, since, presumably,
    there's no transport on the roads right now.. We're in the suburbs currenly, so the buildings here are mostly houses.

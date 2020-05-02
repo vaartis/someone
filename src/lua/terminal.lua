@@ -580,6 +580,12 @@ M.state_variables = {
    },
    day2 = {
       road_questions = {
+         computers = false,
+         food = false,
+         age = false,
+         city = false,
+         city_food = false,
+         stay = false
       }
    },
    talking_topics = {}
@@ -606,7 +612,6 @@ function M.debug_menu()
       M.set_first_line_on_screen(debug_menu_data.select_line_text)
       debug_menu_data.select_line_text = ""
    end
-
 
    local process_node
    process_node = function(name, data, parent)

@@ -1,0 +1,238 @@
+config:
+  chars:
+    narra:
+      color: [211, 0, 0]
+    player:
+      color: [255, 255, 255]
+  dialogue_between: [player, narra]
+
+hub:
+  char: player
+  responses:
+    - text: >-
+        So.. You have computers here? How do they actually work?
+      condition: |
+        return (TerminalModule.talking_topic_known("computers")
+                and not TerminalModule.state_variables.day2.road_questions.computers)
+      next: computers-1
+    - text: >-
+        It seems like all the food is made out of various plants. Do all people here only eat that?
+      condition: |
+        return (TerminalModule.talking_topic_known("food")
+                and not TerminalModule.state_variables.day2.road_questions.food)
+      next: food-1
+    - text: >-
+        If people here don't age, does that mean their appearance doesn't change since when they first find themselves here?
+      condition: return not TerminalModule.state_variables.day2.road_questions.age
+      next: age-1
+    - text: >-
+        What's the city like in general?
+      condition: return not TerminalModule.state_variables.day2.road_questions.city
+      next: city-1
+    - text: >-
+        Since the city is so big, they probably have some interesting different cuisine, right?
+      condition: return not TerminalModule.state_variables.day2.road_questions.city_food
+      next: city-food-1
+    - text: >-
+        Are we gonna stay in the city this night? Do you know anywhere to stay in case we have to?
+      condition: return not TerminalModule.state_variables.day2.road_questions.stay
+      next: stay-1
+    - text: Arrive
+      condition: |
+        local lume = require("lume")
+        return lume.all(TerminalModule.state_variables.day2.road_questions)
+      next: day2/city_suburbs/1
+
+computers-1:
+  char: narra
+  script: |
+    TerminalModule.state_variables.day2.road_questions.computers = true
+  text: >-
+    Yes, we do! I actually have one, too. You might've seen it in my living room. I got it recenly before everything disappeared, though now
+    it feels like it's been forever. I used to have a bigger one, until it eventually broke down, probably from being so ancient, just
+    refused to boot.. So I got a new one. Couldn't get the same one, they didn't make them like that anymore, I really got used to it, you
+    know. So I got a new one. It was faster, but really, I didn't care much. I'm not very good with computers anyway, and I don't do
+    anything complicated. Checking mail and blogging was good enough for me. We had a network that connected all computers together, making
+    remote communication really easy.
+
+computers-2:
+  responses:
+  - text: >-
+      You have a blog? What is it about?
+
+computers-3:
+  text: >-
+    Oh all the things, daily happenings, just sharing your status with friends, you know? So you don't loose touch. I was happy when I was
+    told about it, there were people I knew that moved to the city on there. So i started using it a lot. Of course, now that everyone's
+    gone, there is probably nobody on there..  We could still check it later when we get back. Or maybe we could find some kind of public
+    computer in the city.
+
+computers-4:
+  responses:
+  - text: >-
+      Yeah, maybe.
+    next: hub
+
+food-1:
+  char: narra
+  script: |
+    TerminalModule.state_variables.day2.road_questions.food = true
+  text: >-
+    Yes? Well, we wouldn't eat each other, would we?
+
+food-2:
+  responses:
+  - text: >-
+      Fair.. Here we have other foods, which are made of various creatures that are deemed not self-aware enough. People would raise them specifically
+      to cook them later. I can't remember why, but I know that it exists and how it happens..
+
+food-3:
+  text: >-
+    That sounds pretty awful.
+
+food-4:
+  responses:
+  - text: >-
+      It does, kind of. But these creatures live their best lives before they are made into food. They're well fed and cleaned. I can't say
+      I'm too much against that, especially if they really don't even recognize themselves, just follow the instincts.
+
+food-5:
+  text: >-
+    While I can understand that, we never really sank that low as to abuse the less aware creatures.
+
+food-6:
+  responses:
+  - text: >-
+      Yeah, I guess some of the reasoning for that would be that people in your world don't actually need to eat to survive. Eating other
+      creatures gives way more nutrients. Maybe that was the main reason people eat them: to survive the tougher times. I'm sure there are
+      people out there that are against that.
+
+food-7:
+  text: >-
+    In that case, it does make sense that people would use any means necessary to survive of course. Still, I'm glad that for us this
+    problem never existed and we could circumvent it entirely and don't have a dire need to abuse creatures to survive and it makes me feel
+    unwell that this had to happen in your case.
+
+food-8:
+  responses:
+  - text: >-
+      Again, surely there must be other people that feel like you out there. Although I bet the opposite is also true, there might be people
+      that enjoy it.
+
+food-9:
+  text: >-
+    What an awful world that must be. Still, surely, not all hope is lost if someone understand that it's bad.
+
+food-10:
+  responses:
+  - text: >-
+      I suppose that's just how it is. The world is cruel like that sometimes.
+    next: hub
+
+age-1:
+  char: narra
+  script: |
+    TerminalModule.state_variables.day2.road_questions.age = true
+  text: >-
+    Pretty much. Since I woke up here my appearance didn't change at all. The hair and the nails grow, but that's practically it. So Ib still have to
+    look after them, but except that.. not much changes. You can get new clothes to change your looks a bit, certainly, but other than that the looks
+    don't change too much. Some people actually wondered if anything could be done about that, but the research was started just recently and didn't
+    go that far.
+
+age-2:
+  responses:
+  - text: >-
+      I see.. Were all people here uh.. grown-ups?
+
+age-3:
+  text: >-
+    Not all of them, no. The "age" ranged considerably, there were all kinds of people. You couldn't really judge anyone by their
+    appearance, because someone could look like a child, but have lived a long life already. Perhaps, we could talk to the people who did
+    research on the topic, provided we'd find someone like that. Maybe in the city, since most of them lived there, it was the place for
+    researchers to gather.
+  next: hub
+
+city-1:
+  char: narra
+  script: |
+    TerminalModule.state_variables.day2.road_questions.city = true
+  text: >-
+    Uhm.. It's big! And it had a lot of people doing many things. A lot bigger than the village, you know. The buildings there were also
+    actually built in regions designated for them, unlike in our village, where things were just made up as the time progressed and then
+    were connected with a road. For the city, they actually planned areas for houses and for service and entertainment buildings, which
+    where then built there gradually as the amount of people and ideas of what to build raised. In the housing areas, the houses were made
+    with multiple floors and flats, to allow more people to live in those houses; and in the center of the city there is a lot less of
+    housing and a lot more of the fun stuff like clubs, cafes, restaurants. Plus, since the city is so big there are also means of easier
+    transportation between the parts of the city. Although they wouldn't help us since they require someone to operate them and I sure as
+    hell have no idea how to do it. We can probably see some of them standing motionless though.
+
+city-2:
+  responses:
+  - text: >-
+      Interesting.. What about nighttime, how's it at night?
+
+city-3:
+  text: >-
+    It'd be all lit up if there were people, night life there is a normal thing there, unlike in the village where we mostly go to bed and
+    get up early; in the city, many people are more active at night, just because of the way they made their schedule; there are
+    entertainment places where they go to meet their friends and make new ones, have a drink, dance. I tried that lifestyle for some time
+    when I was in the city but I really just couldn't handle it, I think it takes a lot of time to get used to it; getting up so late just
+    feels wrong.. and staying up after midnight is just too tiring for me..
+  next: hub
+
+city-food-1:
+  char: narra
+  script: |
+    TerminalModule.state_variables.day2.road_questions.city_food = true
+    TerminalModule.add_talking_topic("food")
+    TerminalModule.add_talking_topic("computers")
+  text: >-
+    Precicely. The food there is made of things gathered there from different places. Since they don't have much of their own food
+    production, they have to get it from all the places around the world, while the rest of the world gets the "techonolgy" pieces from
+    them, like computers and phones. As a consequence, you can also get food from other parts of the world there for yourself if you go to
+    the city. The milk I had for breakfast, for example, I got from my last trip to the city.
+
+city-food-2:
+  responses:
+  - text: >-
+      Wait.. Just to be clear, do you call that liquid you had "milk"?
+
+city-food-3:
+  text: >-
+    Yeah. That's what it's called.
+
+city-food-4:
+  responses:
+  - text: >-
+      Huh.. I wonder about the origins of that name.
+
+city-food-5:
+  text: >-
+    No idea, really. I just used the name the people gave it, I weren't the one who made it up or anything.
+
+city-food-6:
+  responses:
+  - text: >-
+      I see.. I guess it's the only kind of milk you've ever seen so there's no need to add anything to it's name.
+
+city-food-7:
+  text: >-
+    It's not really the ONLY one. There are kinds made from other things. It's just that since this one was discovered first, it got the name, and
+    only after that did people tried experimenting with other things. Not all of those experiments were that successful..
+  next: hub
+
+stay-1:
+  char: narra
+  script: |
+    TerminalModule.state_variables.day2.road_questions.stay = true
+  text: >-
+    I hope we won't have to.. We got up pretty early and the day is still young, so there's a good chance we won't. Still, if we have to,
+    we'll probably be able to stay at some kind of hotel, especially if there's nobody else there besides us. There are a few of those in
+    the city, so finding one wouldn't be a problem. They were made especially for people like us, who come to the city for a short time and
+    don't have any other place to stay at.
+
+stay-2:
+  responses:
+  - text: >-
+      Convinient..
+    next: hub
