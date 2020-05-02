@@ -41,7 +41,7 @@ int main() {
     auto &targetTexture = target.getTexture();
     sf::Sprite targetSprite(targetTexture);
 
-    StaticFonts::initFonts();
+    StaticFonts static_fonts;
 
     /*
     sf::Texture lightTexture;
@@ -64,7 +64,7 @@ int main() {
     auto package_cpath = std::filesystem::path("resources") / "lua" / "lib" / "lua" / SOMEONE_LUA_VERSION / "?." SOMEONE_LIB_EXT ";";
     lua["package"]["cpath"] = std::string(package_cpath.u8string()) + std::string(lua["package"]["cpath"]);
 
-    register_usertypes(lua);
+    register_usertypes(lua, static_fonts);
 
     lua.script("require('moonscript')");
     CoroutinesEnv coroutines_env(lua);

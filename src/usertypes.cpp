@@ -10,7 +10,6 @@
 #include <fmt/format.h>
 
 #include "usertypes.hpp"
-#include "fonts.hpp"
 #include "string_utils.hpp"
 #include "line_data.hpp"
 
@@ -73,7 +72,7 @@ decltype(auto) register_rect(sol::state &lua, std::string name) {
 }
 } // namespace
 
-void register_usertypes(sol::state &lua) {
+void register_usertypes(sol::state &lua, StaticFonts &fonts) {
 
     // Basic SFML types
 
@@ -263,8 +262,8 @@ void register_usertypes(sol::state &lua) {
 
     auto static_fonts_type = lua.new_usertype<StaticFonts>(
         "StaticFonts",
-        "main_font", sol::var(std::ref(StaticFonts::main_font)),
-        "font_size", sol::var(std::ref(StaticFonts::font_size))
+        "main_font", sol::var(std::ref(fonts.main_font)),
+        "font_size", sol::var(std::ref(fonts.font_size))
     );
 
     // Data

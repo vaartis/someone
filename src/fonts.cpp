@@ -2,12 +2,7 @@
 
 #include <exception>
 
-using namespace std;
-
-const uint32_t StaticFonts::font_size = 16;
-sf::Font StaticFonts::main_font;
-
-void StaticFonts::initFonts() {
+StaticFonts::StaticFonts() {
     if (!main_font.loadFromFile("resources/fonts/Ubuntu-R.ttf")) {
         throw std::runtime_error("Error loading font");
     }

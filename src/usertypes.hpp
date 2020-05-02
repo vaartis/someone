@@ -1,3 +1,5 @@
 #pragma once
 
-void register_usertypes(sol::state &lua);
+#include "fonts.hpp"
+
+void register_usertypes(sol::state &lua, StaticFonts &fonts);
