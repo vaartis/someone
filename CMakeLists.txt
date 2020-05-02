@@ -39,7 +39,7 @@ endif()
 
 target_include_directories(someone PRIVATE "src")
 
-if (CMAKE_BUILD_TYPE STREQUAL "Release")
+if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
   set(BUILD_SHARED_LIBS FALSE)
   set(YAML_BUILD_SHARED_LIBS FALSE)
 endif()
