@@ -253,7 +253,12 @@ void StoryParser::parse(lines_type &result, std::string file_name, sol::state &l
                             resp_next = next_name;
                         } else {
                             // Otherwise log that there was no more numbers, let "" be there
-                            spdlog::warn("Next numbered line not found for {} and there's no 'next'", inserted_name);
+                            spdlog::error(
+                                "response '{}' of {} has no 'next' and the next numbered line {} does not exist, the response "
+                                "needs to have somewhere to go to",
+                                resp_text, inserted_name, next_name
+                            );
+                            std::terminate();
                         }
                     } else {
                         spdlog::error(
