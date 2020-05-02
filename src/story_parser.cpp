@@ -237,7 +237,7 @@ void StoryParser::parse(lines_type &result, std::string file_name, sol::state &l
             decltype(TerminalVariantInputLineData::variants) variants;
 
             if (!node["responses"].IsSequence()) {
-                spdlog::error("'responses' needs to be a sequence, but it's not a sequence in {}", name);
+                spdlog::error("'responses' needs to be a sequence, but it's not a sequence in {}", inserted_name);
                 std::terminate();
             }
 
