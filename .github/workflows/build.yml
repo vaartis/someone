@@ -29,6 +29,12 @@ jobs:
         cd $GITHUB_WORKSPACE/_build/
         sudo cp -r someone resources/ /someone/someone-${{github.sha}}/
 
+    - name: Delete old artifacts
+      uses: c-hive/gha-remove-artifacts@v1.1.0
+      with:
+        age: 1 day
+        skip-tags: true
+
     - name: Upload the release artifact
       uses: actions/upload-artifact@v2
       with:
