@@ -299,11 +299,20 @@ load_room_toml = (name) ->
 
   room_toml
 
+_room_shader_name = nil
+room_shader_name = () -> _room_shader_name
+
 load_room = (name) ->
   reset_engine!
   physics_world = bump.newWorld()
 
   room_toml = load_room_toml(name)
+
+  if room_toml.shader_data
+    with room_toml.shader_data
+      _room_shader_name = .name
+  else
+    _room_shader_name = nil
 
   for entity_name, entity in pairs room_toml.entities
     new_ent = Entity()
@@ -476,5 +485,6 @@ draw = () ->
 
 {
   :add_event, :update, :draw
-  :state_variables, :load_room
+  :state_variables, :load_room,
+  :room_shader_name
 }

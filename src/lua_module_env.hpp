@@ -12,5 +12,6 @@ protected:
         auto res = fnc(args...);
         if (!res.valid())
             throw sol::error(res);
+        return res;
     }
 };

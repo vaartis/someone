@@ -1,3 +1,6 @@
+[shader_data]
+name = "screen_room_darker"
+
 # Background
 
 [entities.background.drawable]

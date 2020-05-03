@@ -1,12 +1,15 @@
 #pragma once
 
+#include <map>
 #include "lua_module_env.hpp"
 
 class WalkingEnv : public LuaModuleEnv {
 private:
-    sol::protected_function update_f, draw_f, add_event_f;
+    sol::protected_function update_f, draw_f, add_event_f, room_shader_name_f;
 
-    sf::Shader dark_room_shader;
+    std::vector<std::string> need_screen_size;
+    std::map<std::string, sf::Shader> shaders;
+
 public:
     WalkingEnv(sol::state &lua) : LuaModuleEnv(lua) {
         // This both defines a global for the module and returns it
@@ -15,8 +18,28 @@ public:
         update_f = module["update"];
         draw_f = module["draw"];
         add_event_f = module["add_event"];
+        room_shader_name_f = module["room_shader_name"];
 
-        dark_room_shader.loadFromFile("resources/shaders/room_darker.frag", sf::Shader::Fragment);
+        const float ambient_light_level = 0.4;
+
+        {
+            const auto &[pair, _] =
+                shaders.emplace(std::piecewise_construct, std::forward_as_tuple("room_darker"), std::forward_as_tuple());
+            auto &shader = pair->second;
+            shader.loadFromFile("resources/shaders/room_darker.frag", sf::Shader::Fragment);
+            shader.setUniform("ambientLightLevel", ambient_light_level);
+        }
+
+        {
+            const auto &[pair, _] =
+                shaders.emplace(std::piecewise_construct, std::forward_as_tuple("screen_room_darker"), std::forward_as_tuple());
+            auto &shader = pair->second;
+            shader.loadFromFile("resources/shaders/screen_room_darker.frag", sf::Shader::Fragment);
+            shader.setUniform("monitorTop", sf::Vector2f(237, 708));
+            shader.setUniform("monitorBottom", sf::Vector2f(237, 765));
+            shader.setUniform("ambientLightLevel", ambient_light_level);
+            need_screen_size.push_back("screen_room_darker");
+        }
     }
 
     void update(float dt) {
@@ -37,12 +60,20 @@ public:
     }
 
     void draw_target_to_window(sf::RenderWindow &target_window, sf::Sprite &final_sprite) {
-        dark_room_shader.setUniform("screenSize", sf::Vector2f(target_window.getSize()));
-        dark_room_shader.setUniform("monitorTop", sf::Vector2f(237, 708));
-        dark_room_shader.setUniform("monitorBottom", sf::Vector2f(237, 765));
-        dark_room_shader.setUniform("ambientLightLevel", 0.4f);
-        dark_room_shader.setUniform("currentTexture", sf::Shader::CurrentTexture);
+        auto name = call_or_throw(room_shader_name_f).get<std::optional<std::string>>();
 
-        target_window.draw(final_sprite, &dark_room_shader);
+        if (name) {
+            auto &shader = shaders[*name];
+
+            if (std::find(need_screen_size.begin(), need_screen_size.end(), name) != need_screen_size.end()) {
+                shader.setUniform("screenSize", sf::Vector2f(target_window.getSize()));
+            }
+
+            shader.setUniform("currentTexture", sf::Shader::CurrentTexture);
+
+            target_window.draw(final_sprite, &shader);
+        } else {
+            target_window.draw(final_sprite);
+        }
     }
 };

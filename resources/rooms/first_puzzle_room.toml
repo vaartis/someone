@@ -1,3 +1,6 @@
+[shader_data]
+name = "room_darker"
+
 [entities.background.drawable]
 kind = "sprite"
 texture_asset = "first_puzzle_room"
