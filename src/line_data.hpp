@@ -41,3 +41,11 @@ struct TerminalVariantInputLineData : TerminalLineData {
     TerminalVariantInputLineData(decltype(variants) variants)
         : variants(variants) { }
 };
+
+struct TerminalTextInputLineData : TerminalLineData {
+    std::string before, after, variable, next;
+    uint32_t max_length;
+
+    TerminalTextInputLineData(std::string before, std::string after, std::string variable, uint32_t max_length, std::string next)
+        : before(before), after(after), variable(variable), max_length(max_length), next(next) {}
+};

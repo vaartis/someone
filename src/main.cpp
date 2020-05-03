@@ -84,7 +84,9 @@ int main() {
     );
     current_state_type["GLOBAL"] = lua.create_table_with(
         "drawing_target", &target,
-        "set_current_state", [&](CurrentState new_state) { current_state = new_state; }
+        "set_current_state", [&](CurrentState new_state) { current_state = new_state; },
+        // Apparently lua doesn't have a good equivalent
+        "isalpha", [](int num) { return std::isalpha(num) != 0; }
     );
 
     bool debug_menu = false;

@@ -49,9 +49,11 @@ config:
 
 
 9:
-  responses:
-  - text: >-
-      Not really.. i suppose <p> would be fine for now, until I figure things out.
+  text_input:
+    before: "Not really.. I suppose "
+    after: " would be fine for now, until I figure things out."
+    variable: p
+    max_length: 10
 
 10:
   text: >-

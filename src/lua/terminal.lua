@@ -23,6 +23,17 @@ local first_line_on_screen
 local time_before_output = 0.5
 local time_per_letter = 0.01
 
+local M = {}
+
+function insert_variables(str)
+   return str:gsub(
+      "<(.)>",
+      function(name)
+         return M.state_variables.input_variables[name]
+      end
+   )
+end
+
 local TerminalLine = class("TerminalLine")
 function TerminalLine:initialize(name)
    self._name = name
@@ -52,7 +63,7 @@ local OutputLine = class("OutputLine", TerminalLine)
 function OutputLine:initialize(name, text, next_line_name)
    TerminalLine.initialize(self, name)
 
-   self._text = text
+   self._text = insert_variables(text)
    -- The name of the next line to be retreived and instantiated by next()
    self._next_line_name = next_line_name
    -- A place to store the next line instance when it's needed
@@ -125,24 +136,29 @@ function InputWaitLine:initialize(name, text, next_line)
    self._1_pressed = false
 end
 
-local press_1_text
+local help_text
+
+function draw_help_text(text)
+   if not help_text then
+      help_text = Text.new("", StaticFonts.main_font, 24)
+      help_text.fill_color = Color.Black
+   end
+   help_text.string = text
+
+   local win_size = GLOBAL.drawing_target.size
+   local width_offset, height_offset = win_size.x / 100, win_size.y / 100 * 2
+   local rect_height, rect_width = win_size.y / 100 * (80 - 10), win_size.x - (width_offset * 2)
+   local text_pos = Vector2f.new(width_offset, height_offset + rect_height + 30)
+   help_text.position = text_pos
+
+   GLOBAL.drawing_target:draw(help_text)
+end
 
 function InputWaitLine:current_text()
    local txt = OutputLine.current_text(self)
 
    if (self._letters_output == #self._text and not self._1_pressed) then
-      if not press_1_text then
-         press_1_text = Text.new("[Press 1 to continue]", StaticFonts.main_font, 24)
-         press_1_text.fill_color = Color.Black
-      end
-
-      local win_size = GLOBAL.drawing_target.size
-      local width_offset, height_offset = win_size.x / 100, win_size.y / 100 * 2
-      local rect_height, rect_width = win_size.y / 100 * (80 - 10), win_size.x - (width_offset * 2)
-      local text_pos = Vector2f.new(width_offset, height_offset + rect_height + 30)
-      press_1_text.position = text_pos
-
-      GLOBAL.drawing_target:draw(press_1_text)
+      draw_help_text("[Press 1 to continue]")
    end
 
    return txt
@@ -193,7 +209,7 @@ function VariantInputLine:initialize(name, variants)
 
    -- Process native variants into data
    for _, var in pairs(variants) do
-      local inserted_variant = { text = var.text, next = var.next }
+      local inserted_variant = { text = insert_variables(var.text), next = var.next }
 
       if var.condition then
          -- Compile the condition if it exists
@@ -326,7 +342,120 @@ function VariantInputLine:handle_interaction(event)
    end
 end
 
-local M = {}
+local TextInputLine = class("TextInputLine", TerminalLine)
+
+function TextInputLine:initialize(name, before, after, variable, max_length, nxt)
+   TerminalLine.initialize(self, name)
+
+   self._next = nxt
+   self._next_line = nil
+
+   self._before = insert_variables(before)
+   self._after = insert_variables(after)
+   self._variable = variable
+   self._max_length = max_length
+
+   self._done_input = false
+   self._input_text = ""
+end
+
+function TextInputLine:max_line_height()
+   local term_width = max_text_width()
+
+   -- Just put spaces instead of input characters
+   local fit_str = lume.wordwrap(self._before .. string.rep(" ", self._max_length) .. self._after, term_width)
+
+   local tmp_text = Text.new(fit_str, StaticFonts.main_font, StaticFonts.font_size)
+
+   return tmp_text.global_bounds.height
+end
+
+function TextInputLine:should_wait()
+   return not self._done_input or self._letters_output < #self._before + #self._input_text + #self._after
+end
+
+function TextInputLine:maybe_increment_letter_count()
+   if not self._done_input and self._letters_output < #self._before then
+      self._time_since_last_letter = 0.0
+      self._letters_output = self._letters_output + 1
+   elseif self._done_input and self._letters_output < #self._before + #self._input_text + #self._after then
+      self._time_since_last_letter = 0.0
+      self._letters_output = self._letters_output + 1
+   end
+end
+
+function TextInputLine:current_text()
+   local substr
+   if not self._done_input then
+      local str = (self._before .. self._input_text):sub(0, self._letters_output)
+      if self._letters_output >= #self._before then
+         str = str .. "_"
+      end
+
+      substr = lume.wordwrap(str,max_text_width())
+
+      draw_help_text("[Input text with keyboard]")
+   else
+      substr = lume.wordwrap(
+         (self._before .. self._input_text .. self._after):sub(0, self._letters_output),
+         max_text_width()
+      )
+   end
+
+   local txt = Text.new(substr, StaticFonts.main_font, StaticFonts.font_size)
+   txt.fill_color = self._character.color
+
+   return txt
+end
+
+function TextInputLine:is_interactive()
+   return self._letters_output >= #self._before and not self._done_input
+end
+
+-- This is used to not make the events not throttle when text is being inputted
+local inputting_text = false
+
+function TextInputLine:handle_interaction(event)
+   if self._letters_output >= #self._before and not self._done_input then
+      inputting_text = true
+
+      if event.type == EventType.KeyPressed then
+         if event.key.code == KeyboardKey.Backspace and #self._input_text > 0 then
+            -- Remove the last character
+            self._input_text = self._input_text:sub(1, -2)
+            self._letters_output = self._letters_output - 1
+
+            return true
+         elseif event.key.code == KeyboardKey.Return then
+            -- Finish input
+            inputting_text = false
+            self._done_input = true
+
+            -- Set the variable
+            M.state_variables.input_variables[self._variable] = self._input_text
+
+            return true
+         end
+      elseif event.type == EventType.TextEntered then
+         if (GLOBAL.isalpha(event.text.unicode) and #self._input_text < self._max_length) then
+            local char = string.char(event.text.unicode)
+            self._input_text = self._input_text .. char
+            self._letters_output = self._letters_output + 1
+
+            return true
+         end
+      end
+   end
+end
+
+function TextInputLine:next()
+   -- Create the next line if there is one and only do it if one wasn't created already
+   if self._next ~= "" and not self._next_line then
+      self._next_line = make_line(self._next, native_lines[self._next])
+   end
+
+   return self._next_line
+end
 
 local current_environment_texture, current_environment_sprite
 
@@ -336,11 +465,13 @@ function make_line(name, line)
 
    local to_insert
    if tp == "TerminalOutputLineData" then
-      to_insert = OutputLine(name, line.text, line.next, line.character_config)
+      to_insert = OutputLine(name, line.text, line.next)
    elseif tp == "TerminalInputWaitLineData" then
-      to_insert = InputWaitLine(name, line.text, line.next, line.character_config)
+      to_insert = InputWaitLine(name, line.text, line.next)
    elseif tp == "TerminalVariantInputLineData" then
-      to_insert = VariantInputLine(name, line.variants, line.character_config)
+      to_insert = VariantInputLine(name, line.variants)
+   elseif tp == "TerminalTextInputLineData" then
+      to_insert = TextInputLine(name, line.before, line.after, line.variable, line.max_length, line.next)
    else
       error(lume.format("Unknown line type {1}", {tp}))
    end
@@ -530,7 +661,7 @@ function M.process_event(event, dt)
 
       -- If line has an is_interactive function, use it
       if line.is_interactive then
-         if line:should_wait() and line:is_interactive() and time_since_last_interaction > time_between_interactions then
+         if line:should_wait() and line:is_interactive() and (inputting_text or time_since_last_interaction > time_between_interactions) then
             if line:handle_interaction(event) then
                time_since_last_interaction = 0
             end
@@ -579,6 +710,9 @@ M.active = true
 
 -- State variables for the story to set/get
 M.state_variables = {
+   input_variables = {
+      p = "<p>"
+   },
    day1 = {
       narra_house_hub = {
          living_room = false,

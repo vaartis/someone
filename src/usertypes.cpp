@@ -10,7 +10,6 @@
 #include <fmt/format.h>
 
 #include "usertypes.hpp"
-#include "string_utils.hpp"
 #include "line_data.hpp"
 
 // Custom to_string implementations for lua usage
@@ -210,7 +209,9 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
         "Num1", sf::Keyboard::Num1,
         "D", sf::Keyboard::D,
         "A", sf::Keyboard::A,
-        "E", sf::Keyboard::E
+        "E", sf::Keyboard::E,
+        "Return", sf::Keyboard::Return,
+        "Backspace", sf::Keyboard::Backspace
     );
     auto event_t_enum = lua.new_enum(
         "EventType",
@@ -304,5 +305,15 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
     auto input_wait_line_type = lua.new_usertype<TerminalInputWaitLineData>(
         "TerminalInputWaitLineData",
         sol::base_classes, sol::bases<TerminalLineData, TerminalOutputLineData>()
+    );
+
+    auto term_text_input_type = lua.new_usertype<TerminalTextInputLineData>(
+        "TerminalTextInputLineData",
+        sol::base_classes, sol::bases<TerminalLineData>(),
+        "before", sol::readonly(&TerminalTextInputLineData::before),
+        "after", sol::readonly(&TerminalTextInputLineData::after),
+        "variable", sol::readonly(&TerminalTextInputLineData::variable),
+        "max_length", sol::readonly(&TerminalTextInputLineData::max_length),
+        "next", sol::readonly(&TerminalTextInputLineData::next)
     );
 }

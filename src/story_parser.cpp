@@ -300,6 +300,53 @@ void StoryParser::parse(lines_type &result, std::string file_name, sol::state &l
             }
 
             result_object = sol::make_object<TerminalVariantInputLineData>(lua, variants);
+        } else if (node["text_input"]) {
+            auto data = node["text_input"];
+
+            std::string next;
+            if (node["next"]) {
+                next = node["next"].as<std::string>();
+            } else {
+                if (auto splitted = split_as_numbered(name); splitted) {
+                    auto [before_number_string, number] = *splitted;
+
+                    auto next_num = number + 1;
+                    // Next name is anything that was before + an incremented number,
+                    // or just an incremented number if the while name is a number
+                    std::string next_name = before_number_string + std::to_string(next_num);
+                    auto maybe_next_numbered = root_node[next_name];
+
+                    if (maybe_next_numbered) {
+                        // If it exists, mark it as next
+                        next = next_name;
+                    } else {
+                        // Otherwise log that there was no more numbers, let "" be there
+                        spdlog::warn("Next numbered line not found for {} and there's no 'next'", inserted_name);
+                    }
+                } else {
+                    // If there was no next at all and no patterns matched, let "" be there
+                    spdlog::warn("No 'next' on {} and no shortcut patterns matched", inserted_name);
+                }
+            }
+
+            // Now add the namespace to it
+            if (next != "") {
+                if (next.find('/') == std::string::npos)
+                    next = fmt::format("{}/{}", nmspace, next);
+                else
+                    // If the name is namespaced, parse the referenced file now
+                    maybe_parse_referenced_file(next, result, lua);
+
+
+                next_references_to_check.insert({inserted_name, next});
+            }
+
+            result_object =
+                sol::make_object<TerminalTextInputLineData>(
+                    lua,
+                    data["before"].as<std::string>(), data["after"].as<std::string>(), data["variable"].as<std::string>(),
+                    data["max_length"].as<uint32_t>(), next
+                );
         } else {
             spdlog::error("Unknown line type at {}", inserted_name);
             std::terminate();
