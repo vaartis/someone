@@ -144,6 +144,7 @@ config:
     the windows are dark, too. There is a central road around which all the houses seem to have been built.
 
 23:
+  char: narra
   text: >-
     My house is the one on the edge of the road. It was one of the early ones, built on what later became the outskirts of the village. The
     road was made a long time after it was built, connecting my house and the house of a friend of mine first, and then extending into the
