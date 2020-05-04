@@ -93,6 +93,13 @@ function OutputLine:initialize(name, text, next_line_name)
    self._next_line_name = next_line_name
    -- A place to store the next line instance when it's needed
    self._next_line = nil
+
+   self._text_object = Text.new("", StaticFonts.main_font, StaticFonts.font_size)
+end
+
+-- The character is set after initialization, so character-specific things need to be done after
+function OutputLine:update_for_character()
+   self._text_object.fill_color = self._character.color
 end
 
 function OutputLine:max_line_height()
@@ -111,13 +118,15 @@ function OutputLine:maybe_increment_letter_count()
 end
 
 function OutputLine:current_text()
-   local substr = lume.wordwrap(
-      self._text:sub(0, self._letters_output),
-      max_text_width()
-   )
+   local txt = self._text_object
 
-   local txt = Text.new(substr, StaticFonts.main_font, StaticFonts.font_size)
-   txt.fill_color = self._character.color
+   if #txt.string ~= self._letters_output then
+      local substr = lume.wordwrap(
+         self._text:sub(0, self._letters_output),
+         max_text_width()
+      )
+      txt.string = substr
+   end
 
    return txt
 end
@@ -176,7 +185,7 @@ end
 function InputWaitLine:current_text()
    local txt = OutputLine.current_text(self)
 
-   if (self._letters_output == #self._text and not self._1_pressed) then
+   if self._letters_output == #self._text and not self._1_pressed then
       draw_help_text("[Press 1 to continue]")
    end
 
@@ -221,36 +230,61 @@ function VariantInputLine:initialize(name, variants)
    -- A place to store the next line instance when the variant is selected
    self._selected_variant_next_instance = nil
 
-   -- All possible variants
+   -- Possible variants, filtered by whether their condition is satisfied
    self._variants = {}
-   -- Variants that are currently visible
-   self._visible_variants = {}
 
    -- Process native variants into data
-   for _, var in pairs(variants) do
-      local inserted_variant = { text = insert_variables(var.text), next = var.next }
-
+   for n, var in pairs(variants) do
+      -- Filter out variants with conditions if they're not satisfied
       if var.condition then
          -- Compile the condition if it exists
-         inserted_variant.condition, err = load(var.condition, lume.format("{1}.condition", {self._name}))
+         local condition, err = load(var.condition, lume.format("{1}.condition", {self._name}))
          if err then error(err) end
+
+         local cond_result = condition()
+         if type(cond_result) ~= "boolean" then
+            error(lume.format("The condition '{2}' (number {3}) in {1} doesn't return a boolean", {self._name, var.text, n}))
+         end
+
+         -- If the condition does not evaluate to truth, skip the line
+         if not cond_result then goto skip end
       end
 
+      -- Add the variant number before the text
+      local formatted_text = lume.format(
+         "{num}.  {text}",
+         { num = n, text = insert_variables(var.text) }
+      )
+      local inserted_variant = {
+         text = formatted_text,
+         text_object = Text.new("", StaticFonts.main_font, StaticFonts.font_size),
+         next = var.next,
+      }
       table.insert(self._variants, inserted_variant)
+
+      ::skip::
    end
 
    -- Find the longest variant to base text printing on
    self._longest_var_length = -1
+   self._longest_var_n = -1
    for n, var in ipairs(self._variants) do
       local len = #var.text
       if len > self._longest_var_length then
          self._longest_var_length = len
+         self._longest_var_n = n
       end
    end
 end
 
+function VariantInputLine:update_for_character()
+   for _, v in pairs(self._variants) do
+      v.text_object.fill_color = self._character.color
+   end
+end
+
 function VariantInputLine:max_line_height(variant)
-   return max_string_height(self._visible_variants[variant].text)
+   return max_string_height(self._variants[variant].text)
 end
 
 function VariantInputLine:should_wait()
@@ -268,42 +302,16 @@ end
 function VariantInputLine:current_text()
    local max_width = max_text_width()
 
-   -- If the line is the current line, allow updating the visible variants for it
-   if self:should_wait() then
-      local visible_vars = {}
-      for n, var in pairs(self._variants) do
-         -- If there's a condition, try checking it
-         if var.condition then
-            local condition_result = var.condition()
-            if type(condition_result) ~= "boolean" then
-               error(lume.format("The condition '{2}' (number {3}) in {1} doesn't return a boolean", {self._name, var.text, n}))
-            end
+   local longest_var_done = #self._variants[self._longest_var_n].text_object.string == self._letters_output
 
-            -- If the condition is successfull, continue with execution and add the line to the result
-            -- Otherwise, skip it and it won't be visible
-            if not condition_result then goto skip end
-         end
-
-         -- Add to visible variants
-         table.insert(visible_vars, var)
-
-         ::skip::
-      end
-
-      self._visible_variants = visible_vars
-   end
-
-   -- Form the result from the visible variants
+   -- Form the result from the variants
    local result = {}
-   for n, var in ipairs(self._visible_variants) do
-      local var_str = var.text
-
-      local substr = lume.format("{num}.  {text}", { num = n, text = lume.wordwrap(var_str:sub(0, self._letters_output), max_width) })
-      local txt = Text.new(substr, StaticFonts.main_font, StaticFonts.font_size)
-      txt.fill_color = self._character.color
-
-      if (self._selected_variant == n) then
-         txt.style = TextStyle.Underlined
+   for n, var in ipairs(self._variants) do
+      local txt = var.text_object
+      -- If the longest variant hasn't been fully output yet, keep updaing
+      if not longest_var_done then
+         local substr = lume.wordwrap(var.text:sub(0, self._letters_output), max_width)
+         txt.string = substr
       end
 
       table.insert(result, txt)
@@ -319,7 +327,7 @@ function VariantInputLine:next()
 
    -- If the next line wasn't instantiated yet, create it
    if not self._selected_variant_next_instance then
-      local nxt_name = self._visible_variants[self._selected_variant].next
+      local nxt_name = self._variants[self._selected_variant].next
 
       self._selected_variant_next_instance = make_line(nxt_name, native_lines[nxt_name])
    end
@@ -339,12 +347,13 @@ function VariantInputLine:handle_interaction(event)
       local chnum = tonumber(ch)
 
       -- Add 1 because indexes start at 1 in lua
-      -- Only use visible variants here, not all variants
-      if chnum and chnum >= 1 and chnum < #self._visible_variants + 1 then
+      if chnum and chnum >= 1 and chnum < #self._variants + 1 then
          -- If the text has already bean output, set the answer,
          -- if not, then skip all the printing and show the whole thing
          if self._letters_output == self._longest_var_length then
             self._selected_variant = chnum
+
+            self._variants[self._selected_variant].text_object.style = TextStyle.Underlined
          else
             self._letters_output = self._longest_var_length
          end
@@ -369,6 +378,12 @@ function TextInputLine:initialize(name, before, after, variable, max_length, nxt
 
    self._done_input = false
    self._input_text = ""
+
+   self._text_object = Text.new("", StaticFonts.main_font, StaticFonts.font_size)
+end
+
+function TextInputLine:update_for_character()
+   self._text_object.fill_color = self._character.color
 end
 
 function TextInputLine:max_line_height()
@@ -390,25 +405,28 @@ function TextInputLine:maybe_increment_letter_count()
 end
 
 function TextInputLine:current_text()
-   local substr
-   if not self._done_input then
-      local str = (self._before .. self._input_text):sub(0, self._letters_output)
-      if self._letters_output >= #self._before then
-         str = str .. "_"
+   local txt = self._text_object
+
+   if #self._text_object.string ~= self._letters_output then
+      local substr
+      if not self._done_input then
+         local str = (self._before .. self._input_text):sub(0, self._letters_output)
+         if self._letters_output >= #self._before then
+            str = str .. "_"
+         end
+
+         substr = lume.wordwrap(str,max_text_width())
+
+         draw_help_text("[Input text with keyboard]")
+      else
+         substr = lume.wordwrap(
+            (self._before .. self._input_text .. self._after):sub(0, self._letters_output),
+            max_text_width()
+         )
       end
 
-      substr = lume.wordwrap(str,max_text_width())
-
-      draw_help_text("[Input text with keyboard]")
-   else
-      substr = lume.wordwrap(
-         (self._before .. self._input_text .. self._after):sub(0, self._letters_output),
-         max_text_width()
-      )
+      txt.string = substr
    end
-
-   local txt = Text.new(substr, StaticFonts.main_font, StaticFonts.font_size)
-   txt.fill_color = self._character.color
 
    return txt
 end
@@ -442,7 +460,7 @@ function TextInputLine:handle_interaction(event)
             return true
          end
       elseif event.type == EventType.TextEntered then
-         if (GLOBAL.isalpha(event.text.unicode) and #self._input_text < self._max_length) then
+         if GLOBAL.isalpha(event.text.unicode) and #self._input_text < self._max_length then
             local char = string.char(event.text.unicode)
             self._input_text = self._input_text .. char
             self._letters_output = self._letters_output + 1
@@ -482,6 +500,7 @@ function make_line(name, line)
    end
 
    to_insert._character = line.character_config
+   to_insert:update_for_character()
 
    if line.script then
       -- Compile the script (if it exists)
@@ -764,7 +783,7 @@ function M.debug_menu()
    local submitted
    debug_menu_data.select_line_text, submitted = ImGui.InputText("Line selection", debug_menu_data.select_line_text)
    ImGui.SameLine()
-   if (ImGui.Button("Switch") or submitted) then
+   if ImGui.Button("Switch") or submitted then
       M.set_first_line_on_screen(debug_menu_data.select_line_text)
       debug_menu_data.select_line_text = ""
    end
