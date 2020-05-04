@@ -3,15 +3,40 @@ local inspect = require("inspect")
 local lume = require("lume")
 local coroutines = require("coroutines")
 
+-- Cache data for max_text_width
+local last_win_size, last_max_text_width
+
 -- Calculates the maximum text width in the terminal
 function max_text_width()
    local win_size = GLOBAL.drawing_target.size
 
-   local width_offset, height_offset = win_size.x / 100, win_size.y / 100 * 2
+   if not last_win_size or last_win_size.x ~= win_size.x or last_win_size.y ~= win_size.y then
+      last_win_size = win_size
 
-   local rect_height, rect_width = win_size.y / 100 * (80 - 10), win_size.x - (width_offset * 2)
+      local width_offset, height_offset = win_size.x / 100, win_size.y / 100 * 2
 
-   return math.floor((rect_width - (width_offset * 2)) / (StaticFonts.font_size / 2.0))
+      local rect_height, rect_width = win_size.y / 100 * (80 - 10), win_size.x - (width_offset * 2)
+
+      last_max_text_width = math.floor((rect_width - (width_offset * 2)) / (StaticFonts.font_size / 2.0))
+   end
+
+   return last_max_text_width
+end
+
+-- Text object used for max_string_height calculation
+local max_string_height_text
+
+function max_string_height(str)
+   local term_width = max_text_width()
+   local fit_str = lume.wordwrap(str, term_width)
+
+   if not max_string_height_text then
+      max_string_height_text = Text.new(fit_str, StaticFonts.main_font, StaticFonts.font_size)
+   else
+      max_string_height_text.string = fit_str
+   end
+
+   return max_string_height_text.global_bounds.height
 end
 
 -- Native lines, data received from C++
@@ -71,13 +96,7 @@ function OutputLine:initialize(name, text, next_line_name)
 end
 
 function OutputLine:max_line_height()
-   local term_width = max_text_width()
-
-   local fit_str = lume.wordwrap(self._text, term_width)
-
-   local tmp_text = Text.new(fit_str, StaticFonts.main_font, StaticFonts.font_size)
-
-   return tmp_text.global_bounds.height
+   return max_string_height(self._text)
 end
 
 function OutputLine:should_wait()
@@ -231,14 +250,7 @@ function VariantInputLine:initialize(name, variants)
 end
 
 function VariantInputLine:max_line_height(variant)
-   local term_width = max_text_width()
-
-   -- Get the text of the selected visible variant
-   local fit_str = lume.wordwrap(self._visible_variants[variant].text, term_width)
-
-   local tmp_text = Text.new(fit_str, StaticFonts.main_font, StaticFonts.font_size)
-
-   return tmp_text.global_bounds.height
+   return max_string_height(self._visible_variants[variant].text)
 end
 
 function VariantInputLine:should_wait()
@@ -360,14 +372,7 @@ function TextInputLine:initialize(name, before, after, variable, max_length, nxt
 end
 
 function TextInputLine:max_line_height()
-   local term_width = max_text_width()
-
-   -- Just put spaces instead of input characters
-   local fit_str = lume.wordwrap(self._before .. string.rep(" ", self._max_length) .. self._after, term_width)
-
-   local tmp_text = Text.new(fit_str, StaticFonts.main_font, StaticFonts.font_size)
-
-   return tmp_text.global_bounds.height
+   return max_string_height(self._before .. string.rep(" ", self._max_length) .. self._after)
 end
 
 function TextInputLine:should_wait()
