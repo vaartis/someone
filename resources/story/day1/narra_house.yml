@@ -73,7 +73,7 @@ living-room:
     Decently sized, has a sofa in it. On the opposite side of the room there are several bookshelves packed with various books, from
     titles you can guess some of them are probably scientific or philosophical. There's also something what seems to be a computer on
     the table nearby, but you decide not to touch it for now. The window in the room faces the other house nearby.
-  next: explore-the
+  next: hub
 
 kitchen:
   char: description
@@ -86,7 +86,7 @@ kitchen:
     of the food on the kitchen seems to be plant-based, except in the fridge there's something that looks like milk, but you decide not to
     touch it, since it's not your house. Maybe you could inquire Narra about the food here later. Other than all the storage
     places on the kitchen, there's a table with a few chairs and a window that faces the forest you just came from.
-  next: explore-the
+  next: hub
 
 bathroom:
   char: description
@@ -98,7 +98,7 @@ bathroom:
     there's a a small sink, with its own bar of soap. There's also a very small window near the ceiling, you can only see the dark sky
     through it. The bathroom floor and walls are made of stone-looking tiles, not wood, like the rest of the rooms. You check if the sink
     works, and sure enough it does. At first the water is very cold, but turning the knob on the faucet makes it warm or even hot.
-  next: explore-the
+  next: hub
 
 bed-after-explored:
   char: description
