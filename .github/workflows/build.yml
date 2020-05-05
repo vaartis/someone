@@ -3,6 +3,8 @@ name: Build
 on:
   push:
     branches: [ master ]
+  release:
+    types: [ published ]
 
 jobs:
   build-linux:
@@ -28,6 +30,18 @@ jobs:
         sudo mkdir -p /someone/someone-${{github.sha}}/
         cd $GITHUB_WORKSPACE/_build/
         sudo cp -r someone resources/ /someone/someone-${{github.sha}}/
+
+    - name: Upload release to itch.io
+      if: ${{ github.event_name == 'release' }}
+      env:
+        BUTLER_API_KEY: ${{ secrets.BUTLER_CREDENTIALS }}
+        CHANNEL: linux
+        RELDIR: "/someone/"
+      run: |
+        curl -L -o butler.zip https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/default
+        unzip butler.zip && chmod +x butler
+        ./butler push ${RELDIR} vaartis/someone:${CHANNEL} --userversion ${GITHUB_REF:10}
+
 
     - name: Delete old artifacts
       uses: c-hive/gha-remove-artifacts@v1.1.0
@@ -74,6 +88,21 @@ jobs:
               deps/lua/src/lua/src/lua53.dll /mingw64/bin/{libstdc++-6.dll,libgcc_s_seh-1.dll,libwinpthread-1.dll}\
               ../deps/sfml/extlibs/bin/x64/openal32.dll /d/someone-x86_64/someone-${{github.sha}}-x86_64
 
+    - name: Download butler
+      if: ${{ github.event_name == 'release' }}
+      run: |
+        curl -L -o butler.zip https://broth.itch.ovh/butler/windows-amd64/LATEST/archive/default
+        unzip butler.zip && chmod +x butler.exe
+
+    - name: Upload the x86_64 release to itch.io
+      if: ${{ github.event_name == 'release' }}
+      env:
+        BUTLER_API_KEY: ${{ secrets.BUTLER_CREDENTIALS }}
+        CHANNEL: windows-x86_64
+        RELDIR: "D:\\someone-x86_64"
+      run: |
+        ./butler push ${RELDIR} vaartis/someone:${CHANNEL} --userversion ${GITHUB_REF:10}
+
     - name: Upload the x86_64 release artifact
       uses: actions/upload-artifact@v2
       with:
@@ -99,6 +128,15 @@ jobs:
               deps/lua/src/lua/src/lua53.dll /mingw32/bin/{libstdc++-6.dll,libgcc_s_dw2-1.dll,libwinpthread-1.dll}\
               ../deps/sfml/extlibs/bin/x86/openal32.dll /d/someone-i686/someone-${{github.sha}}-i686
 
+    - name: Upload the i686 release to itch.io
+      if: ${{ github.event_name == 'release' }}
+      env:
+        BUTLER_API_KEY: ${{ secrets.BUTLER_CREDENTIALS }}
+        CHANNEL: windows-i686
+        RELDIR: "D:\\someone-i686"
+      run: |
+        ./butler push ${RELDIR} vaartis/someone:${CHANNEL} --userversion ${GITHUB_REF:10}
+
     - name: Upload the i686 release artifact
       uses: actions/upload-artifact@v2
       with:
@@ -123,6 +161,17 @@ jobs:
         sudo mkdir -p /Users/runner/someone/someone-${{github.sha}}/
         cd $GITHUB_WORKSPACE/_build/
         sudo cp -r someone.app /Users/runner/someone/someone-${{github.sha}}/
+
+    - name: Upload release to itch.io
+      if: ${{ github.event_name == 'release' }}
+      env:
+        BUTLER_API_KEY: ${{ secrets.BUTLER_CREDENTIALS }}
+        CHANNEL: macos
+        RELDIR: "/Users/runner/someone"
+      run: |
+        curl -L -o butler.zip https://broth.itch.ovh/butler/darwin-amd64/LATEST/archive/default
+        unzip butler.zip && chmod +x butler
+        ./butler push ${RELDIR} vaartis/someone:${CHANNEL} --userversion ${GITHUB_REF:10}
 
     - name: Upload the release artifact
       uses: actions/upload-artifact@v2
