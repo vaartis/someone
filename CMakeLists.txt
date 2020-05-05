@@ -26,7 +26,20 @@ if(WIN32)
   target_compile_definitions(someone PRIVATE -DSOMEONE_LIB_EXT="dll")
   target_link_options(someone PRIVATE -Wl,--export-all-symbols)
 else()
-  add_executable(someone ${someone_src})
+  if(APPLE)
+    add_executable(someone MACOSX_BUNDLE ${someone_src})
+
+    set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}")
+
+    install(CODE "
+    include(BundleUtilities)
+    fixup_bundle(\"${CMAKE_BINARY_DIR}/someone.app\" \"\" \"\")
+    " COMPONENT Runtime)
+    install(DIRECTORY "${CMAKE_BINARY_DIR}/resources" DESTINATION "${CMAKE_INSTALL_PREFIX}/someone.app/Contents/MacOS")
+  else()
+    add_executable(someone ${someone_src})
+  endif()
+
   target_link_libraries(someone dl)
   target_compile_definitions(someone PRIVATE -DSOMEONE_LIB_EXT="so")
 
@@ -46,7 +59,7 @@ endif()
 
 # === SFML
 
-add_subdirectory("${PROJECT_SOURCE_DIR}/deps/sfml")
+add_subdirectory("${PROJECT_SOURCE_DIR}/deps/sfml" EXCLUDE_FROM_ALL)
 target_link_libraries(someone sfml-graphics sfml-audio)
 set_target_properties(sfml-graphics sfml-audio PROPERTIES CXX_STANDARD 14)
 
@@ -57,7 +70,7 @@ set_target_properties(sfml-graphics sfml-audio PROPERTIES CXX_STANDARD 14)
 set(IMGUI_SFML_FIND_SFML FALSE)
 set(IMGUI_DIR "${PROJECT_SOURCE_DIR}/deps/imgui")
 set(SFML_DIR "${PROJECT_SOURCE_DIR}/deps/sfml")
-add_subdirectory("${PROJECT_SOURCE_DIR}/deps/imgui-sfml")
+add_subdirectory("${PROJECT_SOURCE_DIR}/deps/imgui-sfml" EXCLUDE_FROM_ALL)
 target_link_libraries(someone ImGui-SFML::ImGui-SFML)
 
 # ===
@@ -88,7 +101,7 @@ target_link_libraries(someone spdlog)
 # === sol2
 
 target_compile_definitions(someone PRIVATE SOL_ALL_SAFETIES_ON=1)
-add_subdirectory("${PROJECT_SOURCE_DIR}/deps/sol2")
+add_subdirectory("${PROJECT_SOURCE_DIR}/deps/sol2" EXCLUDE_FROM_ALL)
 target_link_libraries(someone sol2)
 
 # ===

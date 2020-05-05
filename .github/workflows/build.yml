@@ -116,13 +116,13 @@ jobs:
       run: |
         mkdir $GITHUB_WORKSPACE/_build && cd $GITHUB_WORKSPACE/_build
         cmake .. -DCMAKE_BUILD_TYPE=Release
-        make -j $(nproc)
+        make -j $(nproc) install
 
     - name: Copy the release to /Users/runner/someone/someone-${{github.sha}}/
       run: |
         sudo mkdir -p /Users/runner/someone/someone-${{github.sha}}/
         cd $GITHUB_WORKSPACE/_build/
-        sudo cp -r someone resources/ /Users/runner/someone/someone-${{github.sha}}/
+        sudo cp -r someone.app /Users/runner/someone/someone-${{github.sha}}/
 
     - name: Upload the release artifact
       uses: actions/upload-artifact@v2
