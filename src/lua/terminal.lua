@@ -164,29 +164,28 @@ function InputWaitLine:initialize(name, text, next_line)
    self._1_pressed = false
 end
 
-local help_text
+local help_text, help_text_active
 
-function draw_help_text(text)
-   if not help_text then
-      help_text = Text.new("", StaticFonts.main_font, 24)
-      help_text.fill_color = Color.Black
+function set_help_text(active, text)
+   help_text_active = active
+
+   if active then
+      if not help_text then
+         help_text = Text.new(text, StaticFonts.main_font, 24)
+         help_text.fill_color = Color.Black
+      else
+         help_text.string = text
+      end
    end
-   help_text.string = text
-
-   local win_size = GLOBAL.drawing_target.size
-   local width_offset, height_offset = win_size.x / 100, win_size.y / 100 * 2
-   local rect_height, rect_width = win_size.y / 100 * (80 - 10), win_size.x - (width_offset * 2)
-   local text_pos = Vector2f.new(width_offset, height_offset + rect_height + 30)
-   help_text.position = text_pos
-
-   GLOBAL.drawing_target:draw(help_text)
 end
 
 function InputWaitLine:current_text()
    local txt = OutputLine.current_text(self)
 
    if self._letters_output == #self._text and not self._1_pressed then
-      draw_help_text("[Press 1 to continue]")
+      set_help_text(true, "[Press 1 to continue]")
+   else
+      set_help_text(false)
    end
 
    return txt
@@ -407,6 +406,9 @@ end
 function TextInputLine:current_text()
    local txt = self._text_object
 
+   -- Show help when input is not done
+   set_help_text(not self._done_input and self._letters_output >= #self._before, "[Input text with keyboard]")
+
    if #self._text_object.string ~= self._letters_output then
       local substr
       if not self._done_input then
@@ -416,8 +418,6 @@ function TextInputLine:current_text()
          end
 
          substr = lume.wordwrap(str,max_text_width())
-
-         draw_help_text("[Input text with keyboard]")
       else
          substr = lume.wordwrap(
             (self._before .. self._input_text .. self._after):sub(0, self._letters_output),
@@ -603,6 +603,18 @@ function M.draw(dt)
    rect.fill_color = Color.Black
    rect.position = Vector2f.new(width_offset, height_offset)
    GLOBAL.drawing_target:draw(rect)
+
+   -- Draw the help text if it's active
+   if help_text_active then
+      if not help_text then
+         help_text = Text.new("", StaticFonts.main_font, 24)
+         help_text.fill_color = Color.Black
+      end
+      local text_pos = Vector2f.new(width_offset, height_offset + rect_height + 30)
+      help_text.position = text_pos
+
+      GLOBAL.drawing_target:draw(help_text)
+   end
 
    -- Offset for the first line to start at
    local first_line_height_offset = height_offset * 2
