@@ -24,7 +24,10 @@ enum class CurrentState {
     Walking
 };
 
-int main() {
+int main(int argc, char **argv) {
+    // Change cwd to where the program is
+    std::filesystem::current_path(std::filesystem::path(argv[0]).parent_path());
+  
     #ifndef NDEBUG
     spdlog::set_level(spdlog::level::debug);
     #endif
