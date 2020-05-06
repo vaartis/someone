@@ -89,12 +89,14 @@ jobs:
               ../deps/sfml/extlibs/bin/x64/openal32.dll /d/someone-x86_64/someone-${{github.sha}}-x86_64
 
     - name: Download butler
+      shell: msys2 {0}
       if: ${{ github.event_name == 'release' }}
       run: |
         curl -L -o butler.zip https://broth.itch.ovh/butler/windows-amd64/LATEST/archive/default
         unzip butler.zip && chmod +x butler.exe
 
     - name: Upload the x86_64 release to itch.io
+      shell: msys2 {0}
       if: ${{ github.event_name == 'release' }}
       env:
         BUTLER_API_KEY: ${{ secrets.BUTLER_CREDENTIALS }}
@@ -129,6 +131,7 @@ jobs:
               ../deps/sfml/extlibs/bin/x86/openal32.dll /d/someone-i686/someone-${{github.sha}}-i686
 
     - name: Upload the i686 release to itch.io
+      shell: msys2 {0}
       if: ${{ github.event_name == 'release' }}
       env:
         BUTLER_API_KEY: ${{ secrets.BUTLER_CREDENTIALS }}
