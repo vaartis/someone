@@ -89,7 +89,6 @@ jobs:
               ../deps/sfml/extlibs/bin/x64/openal32.dll /d/someone-x86_64/someone-${{github.sha}}-x86_64
 
     - name: Download butler
-      shell: msys2 {0}
       if: ${{ github.event_name == 'release' }}
       run: |
         curl -L -o butler.zip https://broth.itch.ovh/butler/windows-amd64/LATEST/archive/default

@@ -232,6 +232,7 @@ function VariantInputLine:initialize(name, variants)
    -- Possible variants, filtered by whether their condition is satisfied
    self._variants = {}
 
+   local var_num = 0
    -- Process native variants into data
    for n, var in pairs(variants) do
       -- Filter out variants with conditions if they're not satisfied
@@ -249,10 +250,11 @@ function VariantInputLine:initialize(name, variants)
          if not cond_result then goto skip end
       end
 
+      var_num = var_num + 1
       -- Add the variant number before the text
       local formatted_text = lume.format(
          "{num}.  {text}",
-         { num = n, text = insert_variables(var.text) }
+         { num = var_num, text = insert_variables(var.text) }
       )
       local inserted_variant = {
          text = formatted_text,
