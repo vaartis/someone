@@ -2,6 +2,72 @@ local class = require("middleclass")
 local inspect = require("inspect")
 local lume = require("lume")
 local coroutines = require("coroutines")
+local toml = require("toml")
+
+local first_line_on_screen
+
+-- Native lines, data received from C++
+local native_lines = {}
+
+local M = {}
+
+function save_game(first_line, last_line)
+   local lines_to_save = {}
+   local current_line = first_line
+
+   while true do
+      table.insert(lines_to_save, current_line)
+      if current_line._name == last_line._name then break end
+      current_line = current_line:next()
+   end
+
+   -- Extract the data to save from the lines
+   local saved_data = { lines = { first_line = first_line._name, last_line = last_line._name } }
+   for _, line in pairs(lines_to_save) do
+      local line_saved_fields = {}
+      for _, field_name in ipairs(line:fields_to_save()) do
+         line_saved_fields[field_name] = line[field_name]
+      end
+
+      saved_data["lines"][line._name] = line_saved_fields
+   end
+
+   -- Encode and save the data
+   local toml_encoded = toml.encode(saved_data)
+   local file = io.open("save.toml", "w")
+   file:write(toml_encoded)
+   file:close()
+end
+
+function load_game()
+   local file = io.open("save.toml", "r")
+   if file then
+      local data, err = toml.parse(file:read("*all"))
+      if err then
+         error("Error decoding save data: " .. err)
+      end
+
+      file:close()
+
+      local first_line_name = data["lines"]["first_line"]
+      local last_line_name = data["lines"]["last_line"]
+
+      local first_line = make_line(first_line_name, native_lines[first_line_name])
+      local current_line = first_line
+      while true do
+         -- Copy the values, preserving the metatable
+         for k, v in pairs(data["lines"][current_line._name]) do
+            current_line[k] = v
+         end
+
+         if current_line._name == last_line_name then break end
+
+         current_line = current_line:next()
+      end
+
+      first_line_on_screen = first_line
+   end
+end
 
 -- Cache data for max_text_width
 local last_win_size, last_max_text_width
@@ -39,16 +105,8 @@ function max_string_height(str)
    return max_string_height_text.global_bounds.height
 end
 
--- Native lines, data received from C++
-local native_lines = {}
-
--- First line to be shown on screen every frame
-local first_line_on_screen
-
 local time_before_output = 0.5
 local time_per_letter = 0.01
-
-local M = {}
 
 function insert_variables(str)
    return str:gsub(
@@ -82,6 +140,20 @@ end
 
 function TerminalLine:tick_before_output_timer(dt)
    self._time_since_started_output = self._time_since_started_output + dt
+end
+
+function TerminalLine:fields_to_save()
+   local result = { "_letters_output" }
+
+   -- Save whether the script ran if there is a script
+   if self._script then
+      table.insert(result, "_script_executed")
+   end
+   if self._script_after then
+      table.insert(result, "_script_after_executed")
+   end
+
+   return result
 end
 
 local OutputLine = class("OutputLine", TerminalLine)
@@ -218,6 +290,11 @@ function InputWaitLine:handle_interaction(event)
          return true
       end
    end
+end
+
+function InputWaitLine:fields_to_save()
+   local parent = InputWaitLine.super.fields_to_save(self)
+   return lume.concat(parent, {"_1_pressed"})
 end
 
 local VariantInputLine = class("VariantInputLine", TerminalLine)
@@ -364,6 +441,11 @@ function VariantInputLine:handle_interaction(event)
    end
 end
 
+function VariantInputLine:fields_to_save()
+   local parent = VariantInputLine.super.fields_to_save(self)
+   return lume.concat(parent, {"_selected_variant"})
+end
+
 local TextInputLine = class("TextInputLine", TerminalLine)
 
 function TextInputLine:initialize(name, before, after, variable, max_length, nxt)
@@ -480,6 +562,11 @@ function TextInputLine:next()
    end
 
    return self._next_line
+end
+
+function TextInputLine:fields_to_save()
+   local parent = TextInputLine.super.fields_to_save(self)
+   return lume.concat(parent, {"_done_input", "_input_text"})
 end
 
 local current_environment_texture, current_environment_sprite
@@ -707,6 +794,21 @@ function M.process_event(event, dt)
       end
 
       if should_wait or line:next() == nil then
+         if time_since_last_interaction > time_between_interactions then
+            if Keyboard.is_key_pressed(KeyboardKey.LControl) then
+               -- Save the game
+               if Keyboard.is_key_pressed(KeyboardKey.S) then
+                  time_since_last_interaction = 0
+                  -- Pass the first and the last line
+                  save_game(first_line_on_screen, line)
+               elseif Keyboard.is_key_pressed(KeyboardKey.L) then
+                  time_since_last_interaction = 0
+                  -- Pass the first and the last line
+                  load_game()
+               end
+            end
+         end
+
          break
       end
 

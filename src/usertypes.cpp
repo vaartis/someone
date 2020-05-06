@@ -210,6 +210,9 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
         "D", sf::Keyboard::D,
         "A", sf::Keyboard::A,
         "E", sf::Keyboard::E,
+        "S", sf::Keyboard::S,
+        "L", sf::Keyboard::L,
+        "LControl", sf::Keyboard::LControl,
         "Return", sf::Keyboard::Return,
         "Backspace", sf::Keyboard::Backspace
     );
