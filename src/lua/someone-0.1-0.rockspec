@@ -1,14 +1,12 @@
 package = "someone"
-version = "someone-1"
+version = "0.1-0"
 
 dependencies = {
-   --"lovetoys==0.4.0",
    "middleclass==4.1.1",
    "inspect==3.1.1",
    "lume==2.3.0",
    "lua-path==0.3.1",
    "lunajson==1.2.2",
-   "lua-toml==2.0",
    "moonscript==0.5.0",
    "bump==3.1.7"
 }

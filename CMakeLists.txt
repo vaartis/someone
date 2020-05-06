@@ -179,25 +179,33 @@ add_custom_target(luarocks DEPENDS ${LUAROCKS_BIN})
 
 # Temporary (?) fix for lovetoys luarocks package being broken
 
-add_custom_command(
-  OUTPUT "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/lovetoys"
-  DEPENDS luarocks lua
-  COMMAND ${LUAROCKS_BIN} --tree=${PROJECT_BINARY_DIR}/resources/lua build
-  WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/deps/lovetoys"
-)
-add_custom_target(lovetoys-build DEPENDS "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/lovetoys")
+set(LUAROCKS_COMMAND ${LUAROCKS_BIN} --tree=${PROJECT_BINARY_DIR}/resources/lua)
+
+function(build_rockspec name rockspec output)
+  set(full_output_path "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/${output}")
+  add_custom_command(
+    OUTPUT ${full_output_path}
+    DEPENDS luarocks "${PROJECT_SOURCE_DIR}/src/lua/${rockspec}"
+    COMMAND ${LUAROCKS_COMMAND} build ${rockspec}
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/src/lua"
+  )
+  add_custom_target(${name}-rockspec-build DEPENDS ${full_output_path})
+endfunction()
+
+build_rockspec(lovetoys lovetoys-0.4.0-2.rockspec lovetoys)
+build_rockspec(toml lua-toml-2.1-0.rockspec toml.lua)
 
 add_custom_command(
-  OUTPUT "${PROJECT_BINARY_DIR}/resources/lua/share/lua/walking.moon"
-  DEPENDS lovetoys-build "${PROJECT_SOURCE_DIR}/src/lua/"
-  COMMAND ${LUAROCKS_BIN} --tree=${PROJECT_BINARY_DIR}/resources/lua build
+  OUTPUT "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/walking.moon"
+  DEPENDS lovetoys-rockspec-build toml-rockspec-build "${PROJECT_SOURCE_DIR}/src/lua/**"
+  COMMAND ${LUAROCKS_COMMAND} make someone-0.1-0.rockspec
   WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/src/lua"
 )
-add_custom_target(luarocks-build DEPENDS "${PROJECT_BINARY_DIR}/resources/lua/share/lua/walking.moon")
+add_custom_target(luarocks-build DEPENDS "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/walking.moon")
 
 # ===
 
-add_dependencies(someone luarocks-build lovetoys-build)
+add_dependencies(someone luarocks-build)
 
 # Copy all resources
 add_custom_target(copy-resources ALL
