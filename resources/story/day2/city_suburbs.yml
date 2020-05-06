@@ -129,8 +129,8 @@ laptop-5:
   wait: true
   text: >-
     You come up to the laptop and press a random key. The laptop wakes up. The screen is locked, but there's no password, you just click the
-    log in button and it does so. The only window on the is the blogging sofware. The top post says "Just got some new noodles, haven't seen
-    those around here before, gonna check em out soon", underneath the text it says "posted undefined ago".
+    log in button and it does so. The only window on the is the blogging software. The top post says "Just got some new noodles, haven't
+    seen those around here before, gonna check em out soon", underneath the text it says "posted undefined ago".
 
 laptop-6:
   responses:
