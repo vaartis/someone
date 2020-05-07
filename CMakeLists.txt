@@ -181,23 +181,50 @@ add_custom_target(luarocks DEPENDS ${LUAROCKS_BIN})
 
 set(LUAROCKS_COMMAND ${LUAROCKS_BIN} --tree=${PROJECT_BINARY_DIR}/resources/lua)
 
-function(build_rockspec name rockspec output)
-  set(full_output_path "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/${output}")
-  add_custom_command(
-    OUTPUT ${full_output_path}
-    DEPENDS luarocks "${PROJECT_SOURCE_DIR}/src/lua/${rockspec}"
-    COMMAND ${LUAROCKS_COMMAND} build ${rockspec}
-    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/src/lua"
-  )
-  add_custom_target(${name}-rockspec-build DEPENDS ${full_output_path})
+
+# A function with a variable amount of arguments to sequentially bulild rocks from rockspecs
+# (as luarocks doesn't seem to work when trying to build multiple rocks in parallel), it
+# makes each subsequent rock depend on the previous one and exposes the last one as LAST_ROCKSPEC_TARGET
+# so that the next target could depend on it and build them all at once
+# Each argument is a list of "name;rockspec;output"
+function(build_rockspecs)
+  set(current_arg_n 0)
+  # Loop through the arguments
+  while(${current_arg_n} LESS ${ARGC})
+    # Get the values from the lists into variables
+    list(GET ARGV${current_arg_n} 0 name)
+    list(GET ARGV${current_arg_n} 1 rockspec)
+    list(GET ARGV${current_arg_n} 2 output)
+
+    set(full_output_path "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/${output}")
+    add_custom_command(
+      OUTPUT ${full_output_path}
+      DEPENDS luarocks "${PROJECT_SOURCE_DIR}/src/lua/${rockspec}"
+      COMMAND ${LUAROCKS_COMMAND} build ${rockspec}
+      WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/src/lua"
+      )
+    add_custom_target(${name}-rockspec-build DEPENDS ${full_output_path})
+
+    # If there was a target before, add a dependency on that target
+    if(DEFINED last_target)
+      add_dependencies(${name}-rockspec-build ${last_target})
+    endif()
+    set(last_target ${name}-rockspec-build)
+
+    math(EXPR current_arg_n "${current_arg_n} + 1")
+  endwhile()
+
+  set(LAST_ROCKSPEC_TARGET ${last_target} PARENT_SCOPE)
 endfunction()
 
-build_rockspec(lovetoys lovetoys-0.4.0-2.rockspec lovetoys)
-build_rockspec(toml lua-toml-2.1-0.rockspec toml.lua)
+build_rockspecs(
+  "lovetoys;lovetoys-0.4.0-2.rockspec;lovetoys"
+  "toml;lua-toml-2.1-0.rockspec;toml.lua"
+)
 
 add_custom_command(
   OUTPUT "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/walking.moon"
-  DEPENDS lovetoys-rockspec-build toml-rockspec-build "${PROJECT_SOURCE_DIR}/src/lua/**"
+  DEPENDS ${LAST_ROCKSPEC_TARGET} "${PROJECT_SOURCE_DIR}/src/lua/**"
   COMMAND ${LUAROCKS_COMMAND} make someone-0.1-0.rockspec
   WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/src/lua"
 )
