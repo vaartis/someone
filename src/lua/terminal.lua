@@ -3,6 +3,7 @@ local inspect = require("inspect")
 local lume = require("lume")
 local coroutines = require("coroutines")
 local toml = require("toml")
+local util = require("util")
 
 local first_line_on_screen
 
@@ -22,7 +23,10 @@ function save_game(first_line, last_line)
    end
 
    -- Extract the data to save from the lines
-   local saved_data = { lines = { first_line = first_line._name, last_line = last_line._name } }
+   local saved_data = {
+      lines = { first_line = first_line._name, last_line = last_line._name },
+      variables = M.state_variables
+   }
    for _, line in pairs(lines_to_save) do
       local line_saved_fields = {}
       for _, field_name in ipairs(line:fields_to_save()) do
@@ -66,6 +70,8 @@ function load_game()
       end
 
       first_line_on_screen = first_line
+
+      M.state_variables = util.deep_merge(M.state_variables, data["variables"])
    end
 end
 
