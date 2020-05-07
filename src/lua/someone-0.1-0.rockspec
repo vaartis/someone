@@ -26,6 +26,7 @@ build = {
          terminal = "terminal.lua",
          walking = "walking.moon",
          coroutines = "coroutines.moon",
+         util = "util.moon",
 
          ["components.first_puzzle"] = "components/first_puzzle.moon"
       }

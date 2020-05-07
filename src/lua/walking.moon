@@ -13,6 +13,7 @@ coroutines = require("coroutines")
 terminal = require("terminal")
 
 first_puzzle = require("components.first_puzzle")
+util = require("util")
 
 state_variables = {}
 
@@ -248,19 +249,6 @@ load_assets = () ->
     for name, path in pairs l_sounds
       assets.add_to_known_assets("sounds", name, path)
 
-deep_merge = (t1, t2) ->
-  result = {}
-  for k, v in pairs t1
-    result[k] = v
-
-  for k, _ in pairs t2
-    if type(t1[k]) == "table" and type(t2[k]) == "table"
-      result[k] = deep_merge(t1[k], t2[k])
-    else
-      result[k] = t2[k] or t1[k]
-
-  result
-
 reset_engine = () ->
   engine = Engine()
   with engine
@@ -293,7 +281,7 @@ load_room_toml = (name) ->
               -- Remove the entity
               prefab_room.entities[k] = nil
 
-        room_toml = deep_merge(prefab_room, room_toml)
+        room_toml = util.deep_merge(prefab_room, room_toml)
     -- Remove the mention of the prefab
     room_toml.prefab = nil
 
@@ -325,7 +313,7 @@ load_room = (name) ->
           \close()
         data
 
-      entity = deep_merge(prefab_data, entity)
+      entity = util.deep_merge(prefab_data, entity)
 
       -- Remove the mention of the prefab from the entity
       entity.prefab = nil
