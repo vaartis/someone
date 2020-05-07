@@ -6,8 +6,8 @@ class CoroutinesEnv : public LuaModuleEnv {
 private:
     sol::protected_function run_f;
 public:
-    void run() {
-        call_or_throw(run_f);
+    void run(float dt) {
+        call_or_throw(run_f, dt);
     }
 
     CoroutinesEnv(sol::state &lua) : LuaModuleEnv(lua) {

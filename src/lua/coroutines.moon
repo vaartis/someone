@@ -10,10 +10,18 @@ create_coroutine = (fnc, finish_callback) ->
     finish_callback: finish_callback
   }
 
-run = ->
+  cor
+
+abandon_coroutine = (cor) ->
+  _, n = lume.match(coroutines, (c) -> c.cor == cor)
+  if n ~= nil
+    if coroutine.status(coroutines[n].cor) ~= "dead"
+      table.remove(coroutines, n)
+
+run = (dt) ->
   to_remove = {}
   for n, cor in pairs coroutines
-    _, err = coroutine.resume(cor.cor)
+    _, err = coroutine.resume(cor.cor, dt)
     if err then error(err)
 
     if coroutine.status(cor.cor) == "dead"
@@ -42,4 +50,4 @@ black_screen_out = ->
 
     GLOBAL.drawing_target\draw(black_rect)
 
-{ :create_coroutine, :run, :black_screen_out }
+{ :create_coroutine, :abandon_coroutine, :run, :black_screen_out }

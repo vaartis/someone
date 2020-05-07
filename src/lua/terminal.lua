@@ -12,6 +12,53 @@ local native_lines = {}
 
 local M = {}
 
+local info_message_coro
+function show_info_message(message)
+   if info_message_coro then
+      coroutines.abandon_coroutine(info_message_coro)
+      info_message_coro = nil
+   end
+
+   info_message_coro =
+      coroutines.create_coroutine(
+         function(dt)
+            local current_color = Color.new(0, 0, 0, 0)
+            local text = Text.new(message, StaticFonts.main_font, StaticFonts.font_size)
+
+            local win_size = GLOBAL.drawing_target.size
+            local text_size = text.global_bounds
+            local text_pos = Vector2f.new(win_size.x - 10 - text_size.width, win_size.y - 10 - text_size.height)
+            text.position = text_pos
+
+            -- Show the text
+            while current_color.a < 255 do
+               current_color.a = current_color.a + 5
+               text.fill_color = current_color
+
+               GLOBAL.drawing_target:draw(text)
+               coroutine.yield()
+            end
+
+            -- Wait five seconds
+            local timer = 0
+            while timer < 5 do
+               timer = timer + dt
+               GLOBAL.drawing_target:draw(text)
+               coroutine.yield()
+            end
+
+            -- Hide the text
+            while current_color.a > 0 do
+               current_color.a = current_color.a - 5
+               text.fill_color = current_color
+
+               GLOBAL.drawing_target:draw(text)
+               coroutine.yield()
+            end
+         end
+   )
+end
+
 function save_game(first_line, last_line)
    local lines_to_save = {}
    local current_line = first_line
@@ -41,6 +88,8 @@ function save_game(first_line, last_line)
    local file = io.open("save.toml", "w")
    file:write(toml_encoded)
    file:close()
+
+   show_info_message("Game saved")
 end
 
 function load_game()
@@ -72,6 +121,8 @@ function load_game()
       first_line_on_screen = first_line
 
       M.state_variables = util.deep_merge(M.state_variables, data["variables"])
+
+      show_info_message("Game loaded")
    end
 end
 

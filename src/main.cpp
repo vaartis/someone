@@ -27,7 +27,7 @@ enum class CurrentState {
 int main(int argc, char **argv) {
     // Change cwd to where the program is
     std::filesystem::current_path(std::filesystem::path(argv[0]).parent_path());
-  
+
     #ifndef NDEBUG
     spdlog::set_level(spdlog::level::debug);
     #endif
@@ -166,7 +166,7 @@ int main(int argc, char **argv) {
 
         // After everything has been drawn and processed, but before it's actually drawn to the screen,
         // run the coroutines
-        coroutines_env.run();
+        coroutines_env.run(dt);
 
         target.display();
 
