@@ -563,7 +563,7 @@ function TextInputLine:current_text()
    if #self._text_object.string ~= self._letters_output then
       local substr
       if not self._done_input then
-         local str = (self._before .. self._input_text):sub(0, self._letters_output)
+         local str = (self._before .. self._input_text):sub(1, self._letters_output)
          if self._letters_output >= #self._before then
             str = str .. "_"
          end
@@ -588,7 +588,13 @@ end
 
 function TextInputLine:handle_interaction(event)
    if self._letters_output >= #self._before and not self._done_input then
-      inputting_text = true
+      if not inputting_text then
+         inputting_text = true
+         -- Add 1 to the letters output when starting text input,
+         -- so that the number aligns correctly and draws the inputted
+         -- letters as needed
+         self._letters_output = self._letters_output + 1
+      end
 
       if event.type == EventType.KeyPressed then
          if event.key.code == KeyboardKey.Backspace and #self._input_text > 0 then
