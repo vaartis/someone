@@ -139,6 +139,8 @@ config:
 22:
   char: description
   wait: true
+  script: |
+    TerminalModule.set_environment_image('midnight_village')
   text: >-
     You see a village. There are a lot of houses of all shapes and colors. No living creature seems to be around except the two of you. All
     the windows are dark, too. There is a central road around which all the houses seem to have been built.
