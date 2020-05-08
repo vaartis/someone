@@ -7,6 +7,13 @@ local util = require("util")
 
 local first_line_on_screen
 
+-- This is used to not make the events not throttle when text is being inputted
+local inputting_text = false
+
+function reset_after_text_input()
+   inputting_text = false
+end
+
 -- Native lines, data received from C++
 local native_lines = {}
 
@@ -117,6 +124,9 @@ function load_game()
 
          current_line = current_line:next()
       end
+
+      -- Just in case, reset like after text input
+      reset_after_text_input()
 
       first_line_on_screen = first_line
 
@@ -576,9 +586,6 @@ function TextInputLine:is_interactive()
    return self._letters_output >= #self._before and not self._done_input
 end
 
--- This is used to not make the events not throttle when text is being inputted
-local inputting_text = false
-
 function TextInputLine:handle_interaction(event)
    if self._letters_output >= #self._before and not self._done_input then
       inputting_text = true
@@ -592,7 +599,7 @@ function TextInputLine:handle_interaction(event)
             return true
          elseif event.key.code == KeyboardKey.Return then
             -- Finish input
-            inputting_text = false
+            reset_after_text_input()
             self._done_input = true
 
             -- Set the variable
@@ -672,6 +679,9 @@ end
 
 -- Called from C++ to set up the first line on screen
 function M.set_first_line_on_screen(name)
+   -- Reset like after text input
+   reset_after_text_input()
+
    if native_lines[name] then
       first_line_on_screen = make_line(name, native_lines[name])
    else
