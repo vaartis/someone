@@ -44,7 +44,7 @@ sound_player = { sound_asset = "puzzle_jingle", activate_callback_name = "first_
 [entities.passage]
 prefab = "passage"
 transformable = { position = [120, 750], scale = [1, 1] }
-interaction = { args = { room = "computer_room_first_puzzle", player_pos = [900, 644] } }
+interaction = { args = { room = "day2/computer_room", player_pos = [900, 644] } }
 
 [entities.interaction_text]
 prefab = "interaction_text"

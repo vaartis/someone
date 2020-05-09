@@ -85,7 +85,7 @@ config:
 
 16:
   wait: true
-  script_after: TerminalModule.switch_to_walking("computer_room")
+  script_after: TerminalModule.switch_to_walking("day1/computer_room")
   next: day1/forest_and_village/1
   text: >-
     Try checking out your surroundings, maybe there's something obvious you can try?

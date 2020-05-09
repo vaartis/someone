@@ -1,5 +1,5 @@
 [prefab]
-name = "computer_room"
+name = "day1/computer_room"
 removed_entities = [ "button" ]
 
 [entities.table.interaction]
@@ -11,4 +11,4 @@ callback_name = "computer_switch_to_terminal"
 [entities.passage]
 prefab = "passage"
 transformable = { position = [1000, 750] }
-interaction = { args = { room = "first_puzzle_room" } }
+interaction = { args = { room = "day2/first_puzzle_room" } }
