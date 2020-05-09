@@ -10,6 +10,9 @@ local first_line_on_screen
 -- This is used to not make the events not throttle when text is being inputted
 local inputting_text = false
 
+-- Data for environment images
+local current_environment_name, current_environment_texture, current_environment_sprite
+
 function reset_after_text_input()
    inputting_text = false
 end
@@ -79,7 +82,8 @@ function save_game(first_line, last_line)
    -- Extract the data to save from the lines
    local saved_data = {
       lines = { first_line = first_line._name, last_line = last_line._name },
-      variables = M.state_variables
+      variables = M.state_variables,
+      environment = { name = current_environment_name }
    }
    for _, line in pairs(lines_to_save) do
       local line_saved_fields = {}
@@ -143,6 +147,10 @@ function load_game()
       first_line_on_screen = first_line
 
       M.state_variables = util.deep_merge(M.state_variables, data["variables"])
+
+      if data.environment then
+         M.set_environment_image(data.environment.name)
+      end
 
       show_info_message("Game loaded")
    end
@@ -651,8 +659,6 @@ function TextInputLine:fields_to_save()
    return lume.concat(parent, {"_done_input", "_input_text"})
 end
 
-local current_environment_texture, current_environment_sprite
-
 -- A function to create lines from their name and the native line data
 function make_line(name, line)
    local tp = line.__type.name
@@ -914,6 +920,8 @@ function M.set_environment_image(name)
    current_environment_texture:load_from_file(full_name)
 
    current_environment_sprite.texture = current_environment_texture
+
+   current_environment_name = name
 end
 
 function M.switch_to_walking(room)
