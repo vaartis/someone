@@ -11,6 +11,8 @@ config:
 1:
   char: description
   wait: true
+  script: |
+    TerminalModule.set_environment_image('narra_hall')
   text: >-
     She finds the light switch on the left and turns the lights on.
 
