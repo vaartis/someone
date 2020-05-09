@@ -92,7 +92,13 @@ function save_game(first_line, last_line)
 
    -- Encode and save the data
    local toml_encoded = toml.encode(saved_data)
-   local file = io.open("save.toml", "w")
+   local file, err = io.open("save.toml", "w")
+   if err then
+      show_info_message("Error while saving: \"" .. err .. "\"")
+
+      return
+   end
+
    file:write(toml_encoded)
    file:close()
 
@@ -100,11 +106,17 @@ function save_game(first_line, last_line)
 end
 
 function load_game()
-   local file = io.open("save.toml", "r")
+   local file, err = io.open("save.toml", "r")
+   if err then
+      show_info_message("Error loading save data: \"" .. err .. "\"")
+   end
+
    if file then
       local data, err = toml.parse(file:read("*all"))
       if err then
-         error("Error decoding save data: " .. err)
+         show_info_message("Error decoding save data: \"" .. err .. "\"")
+
+         return
       end
 
       file:close()
