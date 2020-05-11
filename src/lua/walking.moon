@@ -376,6 +376,7 @@ load_room = (name) ->
           anim = with shared_components.AnimationComponent(sheet_frames)
             .playable = comp.playable if type(comp.playable) == "boolean"
             .playing = comp.playing if type(comp.playing) == "boolean"
+            .current_frame = comp.starting_frame or 1
 
           new_ent\add(anim)
         when "interaction"
