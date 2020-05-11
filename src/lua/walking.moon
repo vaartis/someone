@@ -304,15 +304,29 @@ load_room = (name) ->
   for entity_name, entity in pairs room_toml.entities
     new_ent = Entity()
 
-    if entity.prefab then
+    if entity.prefab
+      local prefab_name, removed_components
+      -- Allow prefab to either be just a name or a table with more info
+      switch type(entity.prefab)
+        when "table"
+          prefab_name = entity.prefab.name
+          removed_components = entity.prefab.removed_components
+        when "string"
+          prefab_name = entity.prefab
+
       prefab_data = do
         local data
-        with io.open("resources/rooms/prefabs/#{entity.prefab}.toml", "r")
+        with io.open("resources/rooms/prefabs/#{prefab_name}.toml", "r")
           data = toml.parse(\read("*all"))
           \close()
         data
 
       entity = util.deep_merge(prefab_data, entity)
+
+      -- Clear the components requested by removed_components
+      if removed_components
+        for _, name_to_remove in pairs removed_components
+          entity[name_to_remove] = nil
 
       -- Remove the mention of the prefab from the entity
       entity.prefab = nil
