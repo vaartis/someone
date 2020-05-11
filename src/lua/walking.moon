@@ -287,8 +287,8 @@ load_room_toml = (name) ->
 
   room_toml
 
-_room_shader_name = nil
-room_shader_name = () -> _room_shader_name
+_room_shaders = {}
+room_shaders = () -> _room_shaders
 
 load_room = (name) ->
   reset_engine!
@@ -296,11 +296,10 @@ load_room = (name) ->
 
   room_toml = load_room_toml(name)
 
-  if room_toml.shader_data
-    with room_toml.shader_data
-      _room_shader_name = .name
+  if room_toml.shaders
+      _room_shaders = room_toml.shaders
   else
-    _room_shader_name = nil
+    _room_shaders = {}
 
   for entity_name, entity in pairs room_toml.entities
     new_ent = Entity()
@@ -474,5 +473,5 @@ draw = () ->
 {
   :add_event, :update, :draw
   :state_variables, :load_room,
-  :room_shader_name
+  :room_shaders
 }

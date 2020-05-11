@@ -1,5 +1,6 @@
-[shader_data]
-name = "room_darker"
+[shaders.room_darker]
+n = 1
+ambientLightLevel = 0.4
 
 [entities.background.drawable]
 kind = "sprite"

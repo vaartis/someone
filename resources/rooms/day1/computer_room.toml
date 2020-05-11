@@ -1,5 +1,11 @@
-[shader_data]
-name = "screen_room_darker"
+[shaders.room_darker]
+n = 1
+ambientLightLevel = 0.4
+
+[shaders.circle_light]
+n = 2
+point = [237, 740]
+brightness = 0.1
 
 # Background
 
