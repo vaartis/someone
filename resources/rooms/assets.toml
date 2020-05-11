@@ -3,6 +3,7 @@
 # Backgrounds
 computer_room = "resources/sprites/room/room.png"
 first_puzzle_room = "resources/sprites/room/first_puzzle_room.png"
+first_puzzle_room_wall_overlay = "resources/sprites/room/first_puzzle_room_wall_overlay.png"
 
 table = "resources/sprites/room/table/table.png"
 button = "resources/sprites/room/button/button.png"
