@@ -5,7 +5,7 @@
 
 class WalkingEnv : public LuaModuleEnv {
 private:
-    sol::protected_function update_f, draw_f, add_event_f, room_shaders_f;
+    sol::protected_function update_f, draw_f, draw_overlay_f, add_event_f, room_shaders_f;
 
     std::vector<std::string> need_screen_size;
     std::map<std::string, sf::Shader> shaders;
@@ -19,6 +19,7 @@ public:
 
         update_f = module["update"];
         draw_f = module["draw"];
+        draw_overlay_f = module["draw_overlay"];
         add_event_f = module["add_event"];
         room_shaders_f = module["room_shaders"];
 
@@ -42,6 +43,10 @@ public:
 
     void draw() {
         call_or_throw(draw_f);
+    }
+
+    void draw_overlay() {
+        call_or_throw(draw_overlay_f);
     }
 
     void add_event(sf::Event &event) {

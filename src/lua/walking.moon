@@ -249,8 +249,15 @@ load_assets = () ->
     for name, path in pairs l_sounds
       assets.add_to_known_assets("sounds", name, path)
 
+
+CustomEngine = _G.class("CustomEgine", Engine)
+CustomEngine.draw = (layer) =>
+  for _, system in ipairs(@systems["draw"]) do
+    if system.active then
+        system\draw(layer)
+
 reset_engine = () ->
-  engine = Engine()
+  engine = CustomEngine()
   with engine
     \addSystem(shared_components.RenderSystem())
     \addSystem(shared_components.AnimationSystem())
@@ -354,7 +361,12 @@ load_room = (name) ->
             else
               error("Unknown kind of drawable kind in #{entity_name}.#{comp_name}")
 
-          new_ent\add(shared_components.DrawableComponent(drawable, comp.z, comp.kind, if comp.enabled ~= nil then comp.enabled else true))
+          new_ent\add(
+            shared_components.DrawableComponent(
+              drawable, comp.z, comp.kind, (if comp.enabled ~= nil then comp.enabled else true), comp.layer
+            )
+          )
+
           new_ent\add(shared_components.TransformableComponent(drawable))
         when "transformable"
           table.insert(
@@ -485,8 +497,11 @@ update = (dt) ->
 draw = () ->
   engine\draw()
 
+draw_overlay = () ->
+  engine\draw("overlay")
+
 {
-  :add_event, :update, :draw
+  :add_event, :update, :draw, :draw_overlay
   :state_variables, :load_room,
   :room_shaders
 }

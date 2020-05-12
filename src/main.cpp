@@ -152,14 +152,25 @@ int main(int argc, char **argv) {
             }
         }
 
+        window.clear();
+
         switch (current_state) {
         case CurrentState::Terminal:
             terminal_env.update_event_timer(dt);
             terminal_env.draw(dt);
+
+            window.draw(targetSprite);
             break;
         case CurrentState::Walking:
             walking_env.update(dt);
+
             walking_env.draw();
+            walking_env.draw_target_to_window(window, targetSprite);
+
+            // Now clear the target and draw the overlay
+            target.clear(sf::Color::Transparent);
+            walking_env.draw_overlay();
+            window.draw(targetSprite);
 
             break;
         }
@@ -169,17 +180,6 @@ int main(int argc, char **argv) {
         coroutines_env.run(dt);
 
         target.display();
-
-        window.clear();
-
-        switch (current_state) {
-        case CurrentState::Terminal:
-            window.draw(targetSprite);
-            break;
-        case CurrentState::Walking:
-            walking_env.draw_target_to_window(window, targetSprite);
-            break;
-        }
 
         if (debug_menu) {
             ImGui::SFML::Update(window, dt_time);

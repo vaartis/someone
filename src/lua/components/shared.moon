@@ -8,7 +8,7 @@ lovetoys.initialize({
       globals: true
 })
 
-DrawableComponent = Component.create("Drawable", {"drawable", "z", "kind", "enabled"})
+DrawableComponent = Component.create("Drawable", {"drawable", "z", "kind", "enabled", "layer"})
 
 RenderSystem = _G.class("RenderSystem", System)
 RenderSystem.requires = () =>
@@ -34,12 +34,19 @@ RenderSystem._sort_targets = () =>
 RenderSystem.onAddEntity = () => @_sort_targets!
 RenderSystem.onRemoveEntity = () => @_sort_targets!
 
-RenderSystem.draw = () =>
+RenderSystem.draw = (layer) =>
   for _, entity in ipairs @_sorted_targets
     drawable = entity\get("Drawable")
 
     if drawable.enabled
-      GLOBAL.drawing_target\draw(drawable.drawable)
+      if layer
+        -- If the layer is specified, only draw entities on the layer
+        if drawable.layer == layer
+          GLOBAL.drawing_target\draw(drawable.drawable)
+      else
+        -- Otherwise draw those that don't have a layer
+        if not drawable.layer
+          GLOBAL.drawing_target\draw(drawable.drawable)
 
 TransformableComponent = Component.create("Transformable", {"transformable"})
 
