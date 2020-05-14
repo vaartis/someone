@@ -9,6 +9,8 @@ table = "resources/sprites/room/table/table.png"
 button = "resources/sprites/room/button/button.png"
 passage = "resources/sprites/room/passage/passage.png"
 
+note = "resources/sprites/room/note/note.png"
+
 mainchar = "resources/sprites/mainchar/mainchar.png"
 
 [sounds]

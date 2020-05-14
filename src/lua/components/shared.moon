@@ -78,7 +78,9 @@ AnimationSystem.update = (dt) =>
 
       entity\get("Drawable").drawable.texture_rect = .frames[.current_frame].rect
 
-load_sheet_frames = (dir_path) ->
+SlicesComponent = Component.create("Slices", {"slices"})
+
+load_sheet_data = (dir_path) ->
   dir_basename = path.basename(path.remove_dir_end(dir_path))
   json_path = "#{path.join(dir_path, dir_basename)}.json"
 
@@ -92,6 +94,7 @@ load_sheet_frames = (dir_path) ->
     frame_f = frame["frame"]
 
     -- Extract the frame number from the name
+    -- For this to work, the format in sprite export has to be set to {frame1}
     frame_num = tonumber(fname)
 
     animation_frames[frame_num] = {
@@ -102,11 +105,20 @@ load_sheet_frames = (dir_path) ->
       )
     }
 
-  animation_frames
+  local slices
+  if sprite_json.meta.slices
+    slices = {}
+    for _, slice in pairs(sprite_json.meta.slices)
+      -- For now, just get the first one
+      with slice.keys[1].bounds
+        slices[slice.name] = IntRect.new(.x, .y, .w, .h)
+
+  animation_frames, slices
 
 {
   :DrawableComponent, :RenderSystem,
   :AnimationComponent, :AnimationSystem,
   :TransformableComponent,
-  :load_sheet_frames
+  :SlicesComponent
+  :load_sheet_data
 }

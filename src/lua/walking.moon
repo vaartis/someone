@@ -42,6 +42,39 @@ native_event_manager\addListener("NativeEvent", event_store, event_store.add_eve
 
 physics_world = bump.newWorld()
 
+NoteComponent = Component.create("Note", {"text", "bottom_text", "text_object", "bottom_text_object"})
+
+NoteSystem = _G.class("NoteSystem", System)
+NoteSystem.requires = () => {"Slices", "Note", "Transformable"}
+NoteSystem.draw = () =>
+  for _, entity in pairs @targets
+    drawable = entity\get("Drawable")
+
+    if drawable.enabled
+      tf = entity\get("Transformable")
+      slice, bottom_slice = do
+        slices = entity\get("Slices").slices
+        slices.text, slices.bottom_text
+
+      note = entity\get("Note")
+
+      if not note._formatted
+        note._formatted = true
+
+        max_text_len = util.rect_max_text_width(slice.width)
+        note.text_object.string = lume.wordwrap(note.text, max_text_len)
+        note.text_object.position = tf.transformable.position + Vector2f.new(slice.left, slice.top)
+
+        note.bottom_text_object.string = lume.wordwrap(note.bottom_text, max_text_len)
+        bottom_text_width = note.bottom_text_object.global_bounds.width
+        note.bottom_text_object.position = tf.transformable.position + Vector2f.new(
+            bottom_slice.left + bottom_slice.width - bottom_text_width,
+            bottom_slice.top
+        )
+      GLOBAL.drawing_target\draw(note.text_object)
+      GLOBAL.drawing_target\draw(note.bottom_text_object)
+
+
 InteractionTextTag = Component.create("InteractionTextTag")
 
 ColliderComponent = Component.create("Collider", {"physics_world", "mode", "trigger"}, {trigger: false})
@@ -90,7 +123,7 @@ ColliderUpdateSystem.update_from_sprite = (entity) ->
       scale_modifier = if tf.scale.x > 0 then 1 - tf.scale.x else tf.scale.x * -1
       x += sprite_size.width * scale_modifier
 
-      -- Return the data for the transforamble position
+      -- Return the data for the transformable position
       Vector2f.new(x, y)
   else
     -- If the item isn't in the world yet, add it there, but putting it at the
@@ -268,6 +301,8 @@ reset_engine = () ->
 
     \addSystem(first_puzzle.FirstPuzzleButtonSystem())
 
+    \addSystem(NoteSystem(), "draw")
+
     --\addSystem(DebugColliderDrawingSystem())
 
 -- Loads the room's toml file, processing parent relationships
@@ -383,7 +418,7 @@ load_room = (name) ->
                 .scale = Vector2f.new(comp.scale[1], comp.scale[2]) if comp.scale
           )
         when "animation"
-          sheet_frames = shared_components.load_sheet_frames(comp.sheet)
+          sheet_frames = shared_components.load_sheet_data(comp.sheet)
 
           anim = with shared_components.AnimationComponent(sheet_frames)
             .playable = comp.playable if type(comp.playable) == "boolean"
@@ -391,6 +426,9 @@ load_room = (name) ->
             .current_frame = comp.starting_frame or 1
 
           new_ent\add(anim)
+        when "slices"
+          _, slices = shared_components.load_sheet_data(comp.sheet)
+          new_ent\add(shared_components.SlicesComponent(slices))
         when "interaction"
           unless interaction_callbacks[comp.callback_name]
             error(lume.format("{1}.{2} requires a {3} interaction callback that doesn't exist", {entity_name, comp_name, comp.callback_name}))
@@ -460,6 +498,13 @@ load_room = (name) ->
                 new_ent\add(InteractionTextTag())
               else
                 error("Unknown tag in #{entity_name}.#{comp_name}: #{tag}")
+        when "note"
+          note_text = with Text.new("", StaticFonts.main_font, StaticFonts.font_size)
+            .fill_color = Color.Black
+          bottom_text = with Text.new("", StaticFonts.main_font, StaticFonts.font_size)
+            .fill_color = Color.Black
+
+          new_ent\add(NoteComponent(comp.text, comp.bottom_text, note_text, bottom_text))
         else
           component_processors = {
             player_components.process_components,
