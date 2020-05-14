@@ -166,11 +166,10 @@ function max_text_width()
    if not last_win_size or last_win_size.x ~= win_size.x or last_win_size.y ~= win_size.y then
       last_win_size = win_size
 
-      local width_offset, height_offset = win_size.x / 100, win_size.y / 100 * 2
+      local width_offset = win_size.x / 100
+      local rect_width = win_size.x - (width_offset * 2)
 
-      local rect_height, rect_width = win_size.y / 100 * (80 - 10), win_size.x - (width_offset * 2)
-
-      last_max_text_width = math.floor((rect_width - (width_offset * 2)) / (StaticFonts.font_size / 2.0))
+      last_max_text_width = util.rect_max_text_width(rect_width - (width_offset * 2))
    end
 
    return last_max_text_width

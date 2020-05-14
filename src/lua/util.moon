@@ -1,3 +1,7 @@
+-- Calculates the amount of characters to fit into the specified width
+rect_max_text_width = (rect_width) ->
+  math.floor(rect_width / (StaticFonts.font_size / 2.0))
+
 deep_merge = (t1, t2) ->
   result = {}
   for k, v in pairs t1
@@ -11,4 +15,4 @@ deep_merge = (t1, t2) ->
 
   result
 
-{:deep_merge}
+{:deep_merge, :rect_max_text_width}
