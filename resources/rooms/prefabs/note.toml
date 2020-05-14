@@ -1,0 +1,8 @@
+[drawable]
+kind = "sprite"
+texture_asset = "note"
+z = 1
+layer = "overlay"
+
+[slices]
+sheet = "resources/sprites/room/note/"

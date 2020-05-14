@@ -83,7 +83,7 @@ NoteInteractionSystem.update = (dt) =>
     drawable = entity\get("Drawable")
 
     if drawable.enabled
-      -- Move to activation callback
+      -- Keep the interaction system disabled
       engine\stopSystem("InteractionSystem")
 
       seconds_since_last_interaction += dt
@@ -93,8 +93,8 @@ NoteInteractionSystem.update = (dt) =>
         if seconds_since_last_interaction > seconds_before_next_interaction and
            event.type == EventType.KeyReleased and event.key.code == KeyboardKey.E then
             seconds_since_last_interaction = 0
-            -- Hide the node and re-enable interactions
-            drawable.enabled = false
+            -- Delete the note entity and re-enable interactions
+            engine\removeEntity(entity)
             engine\startSystem("InteractionSystem")
 
 
@@ -252,7 +252,7 @@ find_player = () ->
 
   pents[player_key]
 
-local load_room
+local load_room, load_prefab, instantiate_entity
 
 activatable_callbacks = {
   first_button_pressed: () -> state_variables.first_button_pressed == true
@@ -293,6 +293,22 @@ interaction_callbacks = {
       physics_world\update(player, player_pos[1], player_pos[2])
 
   first_puzzle_button: first_puzzle.button_callback
+  read_note: (state, note_name) ->
+    local notes
+    with io.open("resources/rooms/notes.toml", "r")
+      notes = toml.parse(\read("*all"))
+      \close()
+
+    note = notes[note_name]
+
+    if not note
+      error("Note #{note} not found")
+
+    note_entity = instantiate_entity("note_paper", {
+        prefab: "note",
+        note: { text: note.text, bottom_text: note.bottom_text }
+    })
+    engine\addEntity(note_entity)
 }
 
 load_assets = () ->
@@ -364,6 +380,195 @@ load_room_toml = (name) ->
 _room_shaders = {}
 room_shaders = () -> _room_shaders
 
+load_prefab = (prefab_name_or_conf, base_data) ->
+  local prefab_name, removed_components
+  -- Allow prefab to either be just a name or a table with more info
+  switch type(prefab_name_or_conf)
+    when "table"
+      prefab_name = prefab_name_or_conf.name
+      removed_components = prefab_name_or_conf.removed_components
+    when "string"
+      prefab_name = prefab_name_or_conf
+
+  prefab_data = do
+    local data
+    with io.open("resources/rooms/prefabs/#{prefab_name}.toml", "r")
+      data = toml.parse(\read("*all"))
+      \close()
+    data
+
+  base_data = util.deep_merge(prefab_data, base_data)
+
+  -- Clear the components requested by removed_components
+  if removed_components
+    for _, name_to_remove in pairs removed_components
+      base_data[name_to_remove] = nil
+
+  -- Remove the mention of the prefab from the entity
+  base_data.prefab = nil
+
+  base_data
+
+
+instantiate_entity = (entity_name, entity) ->
+  new_ent = Entity()
+
+  if entity.prefab
+    entity = load_prefab(entity.prefab, entity)
+
+  add_transformable_actions = {}
+  add_collider_actions = {}
+
+  for comp_name, comp in pairs entity
+    switch comp_name
+      when "drawable"
+        unless comp.z then
+          error(lume.format("{1}.{2} requires a {3} value", {entity_name, comp_name, "z"}))
+
+        local drawable
+        switch comp.kind
+          when "sprite"
+            texture_asset = assets.assets.textures[comp.texture_asset]
+            unless texture_asset
+              error(lume.format("{1}.{2} requires a texture named {3}", {entity_name, comp_name, comp.texture_asset}))
+
+            drawable = with Sprite.new!
+              .texture = texture_asset
+          when "text"
+            drawable = Text.new(comp.text.text, StaticFonts.main_font, comp.text.font_size or StaticFonts.font_size)
+          else
+            error("Unknown kind of drawable kind in #{entity_name}.#{comp_name}")
+
+        new_ent\add(
+          shared_components.DrawableComponent(
+            drawable, comp.z, comp.kind, (if comp.enabled ~= nil then comp.enabled else true), comp.layer
+          )
+        )
+
+        new_ent\add(shared_components.TransformableComponent(drawable))
+      when "transformable"
+        table.insert(
+          add_transformable_actions,
+          ->
+            unless new_ent\has("Transformable")
+              -- If there's no transformable component, create and add it
+              new_ent\add(shared_components.TransformableComponent(Transformable.new()))
+            tf_component = new_ent\get("Transformable")
+
+            with tf_component.transformable
+              .position = Vector2f.new(comp.position[1], comp.position[2]) if comp.position
+              .origin = Vector2f.new(comp.origin[1], comp.origin[2]) if comp.origin
+              .scale = Vector2f.new(comp.scale[1], comp.scale[2]) if comp.scale
+        )
+      when "animation"
+        sheet_frames = shared_components.load_sheet_data(comp.sheet)
+
+        anim = with shared_components.AnimationComponent(sheet_frames)
+          .playable = comp.playable if type(comp.playable) == "boolean"
+          .playing = comp.playing if type(comp.playing) == "boolean"
+          .current_frame = comp.starting_frame or 1
+
+        new_ent\add(anim)
+      when "slices"
+        _, slices = shared_components.load_sheet_data(comp.sheet)
+        new_ent\add(shared_components.SlicesComponent(slices))
+      when "interaction"
+        unless interaction_callbacks[comp.callback_name]
+          error(lume.format("{1}.{2} requires a {3} interaction callback that doesn't exist", {entity_name, comp_name, comp.callback_name}))
+        if comp.activatable_callback_name
+          unless activatable_callbacks[comp.activatable_callback_name]
+            error(lume.format("{1}.{2} requires a {3} activatable callback that doesn't exist", {entity_name, comp_name, comp.activatable_callback_name}))
+
+        local interaction_sound
+        if comp.interaction_sound_asset
+          interaction_sound = with Sound.new!
+            .buffer = assets.assets.sounds[comp.interaction_sound_asset]
+
+        new_ent\add(
+          InteractionComponent(
+            interaction_callbacks[comp.callback_name],
+            if comp.activatable_callback_name then activatable_callbacks[comp.activatable_callback_name] else nil,
+            comp.args,
+            comp.initial_state,
+            comp.state_map,
+            interaction_sound,
+            comp.action_text
+          )
+        )
+      when "collider"
+        table.insert(
+          add_collider_actions,
+          ->
+            unless new_ent\has("Transformable")
+              error("Transformable is required for a collider on #{entity_name}")
+
+            pos = new_ent\get("Transformable").transformable.position
+
+            switch comp.mode
+              when "sprite"
+                unless new_ent\has("Drawable") and new_ent\get("Drawable").kind == "sprite"
+                  error("Drawable sprite is required for a collider with sprite mode on #{entity_name}")
+
+                -- Add the collider component and update the collider from the sprite, also adding it to the physics world
+                new_ent\add(ColliderComponent(physics_world, comp.mode, comp.trigger))
+                ColliderUpdateSystem.update_from_sprite(new_ent)
+              when "constant"
+                unless comp.size
+                  error("size is required for a collider with constant mode on #{entity_name}")
+                ph_width, ph_height = comp.size[1], comp.size[2]
+
+                physics_world\add(new_ent, pos.x, pos.y, ph_width, ph_height)
+                new_ent\add(ColliderComponent(physics_world, comp.mode, comp.trigger))
+              else
+                error("Unknown collider mode #{comp.mode} for #{entity_name}")
+        )
+      when "sound_player"
+        callback = activatable_callbacks[comp.activate_callback_name]
+        unless callback
+          error(lume.format("{1}.{2} requires a {3} interaction callback that doesn't exist", {entity_name, comp_name, comp.activate_callback_name}))
+
+        sound = with Sound.new!
+          .buffer = assets.assets.sounds[comp.sound_asset]
+
+        new_ent\add(SoundPlayerComponent(sound, callback))
+      when "tags"
+        -- TODO: this tag system doesn't seem like a very good solution, maybe
+        -- it should be changed somehow to allow selecting entities by tags directly,
+        -- though it is likely that this change has to be done in the ECS itself
+        for _, tag in pairs comp
+          switch tag
+            when "interaction_text"
+              new_ent\add(InteractionTextTag())
+            else
+              error("Unknown tag in #{entity_name}.#{comp_name}: #{tag}")
+      when "note"
+        note_text = with Text.new("", StaticFonts.main_font, StaticFonts.font_size)
+          .fill_color = Color.Black
+        bottom_text = with Text.new("", StaticFonts.main_font, StaticFonts.font_size)
+          .fill_color = Color.Black
+
+        new_ent\add(NoteComponent(comp.text, comp.bottom_text, note_text, bottom_text))
+      else
+        component_processors = {
+          player_components.process_components,
+          first_puzzle.process_components
+        }
+
+        processed = false
+        for _, processor in pairs component_processors
+          if processor(new_ent, comp_name, comp)
+            processed = true
+            break
+        if not processed
+          error("Unknown component: #{comp_name} on #{entity_name}")
+
+  -- Call all the "after all inserted" actions
+  for _, actions in pairs {add_transformable_actions, add_collider_actions}
+      for _, action in pairs actions
+        action!
+
+  new_ent
+
 load_room = (name) ->
   reset_engine!
   physics_world = bump.newWorld()
@@ -376,187 +581,7 @@ load_room = (name) ->
     _room_shaders = {}
 
   for entity_name, entity in pairs room_toml.entities
-    new_ent = Entity()
-
-    if entity.prefab
-      local prefab_name, removed_components
-      -- Allow prefab to either be just a name or a table with more info
-      switch type(entity.prefab)
-        when "table"
-          prefab_name = entity.prefab.name
-          removed_components = entity.prefab.removed_components
-        when "string"
-          prefab_name = entity.prefab
-
-      prefab_data = do
-        local data
-        with io.open("resources/rooms/prefabs/#{prefab_name}.toml", "r")
-          data = toml.parse(\read("*all"))
-          \close()
-        data
-
-      entity = util.deep_merge(prefab_data, entity)
-
-      -- Clear the components requested by removed_components
-      if removed_components
-        for _, name_to_remove in pairs removed_components
-          entity[name_to_remove] = nil
-
-      -- Remove the mention of the prefab from the entity
-      entity.prefab = nil
-
-    add_transformable_actions = {}
-    add_collider_actions = {}
-
-    for comp_name, comp in pairs entity
-      switch comp_name
-        when "drawable"
-          unless comp.z then
-            error(lume.format("{1}.{2} requires a {3} value", {entity_name, comp_name, "z"}))
-
-          local drawable
-          switch comp.kind
-            when "sprite"
-              texture_asset = assets.assets.textures[comp.texture_asset]
-              unless texture_asset
-                error(lume.format("{1}.{2} requires a texture named {3}", {entity_name, comp_name, comp.texture_asset}))
-
-              drawable = with Sprite.new!
-                .texture = texture_asset
-            when "text"
-              drawable = Text.new(comp.text.text, StaticFonts.main_font, comp.text.font_size or StaticFonts.font_size)
-            else
-              error("Unknown kind of drawable kind in #{entity_name}.#{comp_name}")
-
-          new_ent\add(
-            shared_components.DrawableComponent(
-              drawable, comp.z, comp.kind, (if comp.enabled ~= nil then comp.enabled else true), comp.layer
-            )
-          )
-
-          new_ent\add(shared_components.TransformableComponent(drawable))
-        when "transformable"
-          table.insert(
-            add_transformable_actions,
-            ->
-              unless new_ent\has("Transformable")
-                -- If there's no transformable component, create and add it
-                new_ent\add(shared_components.TransformableComponent(Transformable.new()))
-              tf_component = new_ent\get("Transformable")
-
-              with tf_component.transformable
-                .position = Vector2f.new(comp.position[1], comp.position[2]) if comp.position
-                .origin = Vector2f.new(comp.origin[1], comp.origin[2]) if comp.origin
-                .scale = Vector2f.new(comp.scale[1], comp.scale[2]) if comp.scale
-          )
-        when "animation"
-          sheet_frames = shared_components.load_sheet_data(comp.sheet)
-
-          anim = with shared_components.AnimationComponent(sheet_frames)
-            .playable = comp.playable if type(comp.playable) == "boolean"
-            .playing = comp.playing if type(comp.playing) == "boolean"
-            .current_frame = comp.starting_frame or 1
-
-          new_ent\add(anim)
-        when "slices"
-          _, slices = shared_components.load_sheet_data(comp.sheet)
-          new_ent\add(shared_components.SlicesComponent(slices))
-        when "interaction"
-          unless interaction_callbacks[comp.callback_name]
-            error(lume.format("{1}.{2} requires a {3} interaction callback that doesn't exist", {entity_name, comp_name, comp.callback_name}))
-          if comp.activatable_callback_name
-            unless activatable_callbacks[comp.activatable_callback_name]
-              error(lume.format("{1}.{2} requires a {3} activatable callback that doesn't exist", {entity_name, comp_name, comp.activatable_callback_name}))
-
-          local interaction_sound
-          if comp.interaction_sound_asset
-            interaction_sound = with Sound.new!
-              .buffer = assets.assets.sounds[comp.interaction_sound_asset]
-
-          new_ent\add(
-            InteractionComponent(
-              interaction_callbacks[comp.callback_name],
-              if comp.activatable_callback_name then activatable_callbacks[comp.activatable_callback_name] else nil,
-              comp.args,
-              comp.initial_state,
-              comp.state_map,
-              interaction_sound,
-              comp.action_text
-            )
-          )
-        when "collider"
-          table.insert(
-            add_collider_actions,
-            ->
-              unless new_ent\has("Transformable")
-                error("Transformable is required for a collider on #{entity_name}")
-
-              pos = new_ent\get("Transformable").transformable.position
-
-              switch comp.mode
-                when "sprite"
-                  unless new_ent\has("Drawable") and new_ent\get("Drawable").kind == "sprite"
-                    error("Drawable sprite is required for a collider with sprite mode on #{entity_name}")
-
-                  -- Add the collider component and update the collider from the sprite, also adding it to the physics world
-                  new_ent\add(ColliderComponent(physics_world, comp.mode, comp.trigger))
-                  ColliderUpdateSystem.update_from_sprite(new_ent)
-                when "constant"
-                  unless comp.size
-                    error("size is required for a collider with constant mode on #{entity_name}")
-                  ph_width, ph_height = comp.size[1], comp.size[2]
-
-                  physics_world\add(new_ent, pos.x, pos.y, ph_width, ph_height)
-                  new_ent\add(ColliderComponent(physics_world, comp.mode, comp.trigger))
-                else
-                  error("Unknown collider mode #{comp.mode} for #{entity_name}")
-          )
-        when "sound_player"
-          callback = activatable_callbacks[comp.activate_callback_name]
-          unless callback
-            error(lume.format("{1}.{2} requires a {3} interaction callback that doesn't exist", {entity_name, comp_name, comp.activate_callback_name}))
-
-          sound = with Sound.new!
-            .buffer = assets.assets.sounds[comp.sound_asset]
-
-          new_ent\add(SoundPlayerComponent(sound, callback))
-        when "tags"
-          -- TODO: this tag system doesn't seem like a very good solution, maybe
-          -- it should be changed somehow to allow selecting entities by tags directly,
-          -- though it is likely that this change has to be done in the ECS itself
-          for _, tag in pairs comp
-            switch tag
-              when "interaction_text"
-                new_ent\add(InteractionTextTag())
-              else
-                error("Unknown tag in #{entity_name}.#{comp_name}: #{tag}")
-        when "note"
-          note_text = with Text.new("", StaticFonts.main_font, StaticFonts.font_size)
-            .fill_color = Color.Black
-          bottom_text = with Text.new("", StaticFonts.main_font, StaticFonts.font_size)
-            .fill_color = Color.Black
-
-          new_ent\add(NoteComponent(comp.text, comp.bottom_text, note_text, bottom_text))
-        else
-          component_processors = {
-            player_components.process_components,
-            first_puzzle.process_components
-          }
-
-          processed = false
-          for _, processor in pairs component_processors
-            if processor(new_ent, comp_name, comp)
-              processed = true
-              break
-          if not processed
-            error("Unknown component: #{comp_name} on #{entity_name}")
-
-    -- Call all the "after all inserted" actions
-    for _, actions in pairs {add_transformable_actions, add_collider_actions}
-      for _, action in pairs actions
-        action!
-
-    engine\addEntity(new_ent)
+    engine\addEntity(instantiate_entity(entity_name, entity))
 
 -- Load the assets.toml file
 load_assets!
