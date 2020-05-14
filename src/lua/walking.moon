@@ -42,6 +42,9 @@ native_event_manager\addListener("NativeEvent", event_store, event_store.add_eve
 
 physics_world = bump.newWorld()
 
+seconds_since_last_interaction = 0 -- Time tracked by dt, since last interaction
+seconds_before_next_interaction = 0.3 -- A constant that represents how long to wait between interactions
+
 NoteComponent = Component.create("Note", {"text", "bottom_text", "text_object", "bottom_text_object"})
 
 NoteSystem = _G.class("NoteSystem", System)
@@ -73,6 +76,26 @@ NoteSystem.draw = () =>
         )
       GLOBAL.drawing_target\draw(note.text_object)
       GLOBAL.drawing_target\draw(note.bottom_text_object)
+NoteInteractionSystem = _G.class("NoteInteractionSystem", System)
+NoteInteractionSystem.requires = () => {"Note", "Drawable"}
+NoteInteractionSystem.update = (dt) =>
+  for _, entity in pairs @targets
+    drawable = entity\get("Drawable")
+
+    if drawable.enabled
+      -- Move to activation callback
+      engine\stopSystem("InteractionSystem")
+
+      seconds_since_last_interaction += dt
+
+      for _, native_event in pairs event_store.events
+        event = native_event.event
+        if seconds_since_last_interaction > seconds_before_next_interaction and
+           event.type == EventType.KeyReleased and event.key.code == KeyboardKey.E then
+            seconds_since_last_interaction = 0
+            -- Hide the node and re-enable interactions
+            drawable.enabled = false
+            engine\startSystem("InteractionSystem")
 
 
 InteractionTextTag = Component.create("InteractionTextTag")
@@ -143,18 +166,22 @@ InteractionComponent = Component.create(
 )
 
 InteractionSystem = _G.class("InteractionSystem", System)
-InteractionSystem._seconds_since_last_interaction = 0 -- Time tracked by dt, since last interaction
-InteractionSystem._seconds_before_next_interaction = 0.3 -- A constant that represents how long to wait between interactions
 InteractionSystem.requires = () => {
   objects: {"Interaction", "Collider"},
   interaction_text: {"InteractionTextTag"}
 }
+InteractionSystem.onStopSystem = () =>
+  interaction_text_key = lume.first(lume.keys(@targets.interaction_text))
+  if not interaction_text_key then error("No interaction text entity found")
+  interaction_text_drawable = @targets.interaction_text[interaction_text_key]\get("Drawable")
+  interaction_text_drawable.enabled = false
+
 InteractionSystem.update = (dt) =>
   interaction_text_key = lume.first(lume.keys(@targets.interaction_text))
   if not interaction_text_key then error("No interaction text entity found")
   interaction_text_drawable = @targets.interaction_text[interaction_text_key]\get("Drawable")
 
-  @_seconds_since_last_interaction += dt
+  seconds_since_last_interaction += dt
 
   any_interactables_touched = false
   for _, obj in pairs @targets.objects
@@ -179,9 +206,9 @@ InteractionSystem.update = (dt) =>
 
       for _, native_event in pairs event_store.events
         event = native_event.event
-        if @_seconds_since_last_interaction > @_seconds_before_next_interaction and
+        if seconds_since_last_interaction > seconds_before_next_interaction and
            event.type == EventType.KeyReleased and event.key.code == KeyboardKey.E then
-          @_seconds_since_last_interaction = 0
+          seconds_since_last_interaction = 0
           args = if interaction_comp.interaction_args
             if lume.isarray(interaction_comp.interaction_args)
                 table.unpack(interaction_comp.interaction_args)
@@ -288,6 +315,10 @@ CustomEngine.draw = (layer) =>
   for _, system in ipairs(@systems["draw"]) do
     if system.active then
         system\draw(layer)
+CustomEngine.stopSystem = (name) =>
+  CustomEngine.super.stopSystem(self, name)
+  system = @systemRegistry[name]
+  if system and system.onStopSystem then system\onStopSystem!
 
 reset_engine = () ->
   engine = CustomEngine()
@@ -301,7 +332,8 @@ reset_engine = () ->
 
     \addSystem(first_puzzle.FirstPuzzleButtonSystem())
 
-    \addSystem(NoteSystem(), "draw")
+    \addSystem(NoteSystem())
+    \addSystem(NoteInteractionSystem())
 
     --\addSystem(DebugColliderDrawingSystem())
 
