@@ -49,10 +49,21 @@ first_puzzle_solved = () ->
 
 first_puzzle_not_solved = () -> not first_puzzle_solved()
 
+local played_music
+first_puzzle_solved_music = () ->
+  -- Return true only if music has not already played
+  result = first_puzzle_solved! and not played_music
+
+  if result
+    -- Mark that music has played
+    if not played_music then played_music = true
+
+  result
+
 {
   :FirstPuzzleButtonComponent,
   :FirstPuzzleButtonSystem,
   :process_components, :add_systems,
   :button_callback,
-  :first_puzzle_solved, :first_puzzle_not_solved
+  :first_puzzle_solved, :first_puzzle_not_solved, :first_puzzle_solved_music
 }

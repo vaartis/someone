@@ -45,7 +45,7 @@ interaction = { args = [ "third" ] }
 first_puzzle_button = { n = "third" }
 
 [entities.puzzle_jingle_player]
-sound_player = { sound_asset = "puzzle_jingle", activate_callback_name = "first_puzzle_solved" }
+sound_player = { sound_asset = "puzzle_jingle", activate_callback_name = "first_puzzle_solved_music" }
 
 [entities.passage]
 prefab = "passage"
