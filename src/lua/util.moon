@@ -15,4 +15,17 @@ deep_merge = (t1, t2) ->
 
   result
 
-{:deep_merge, :rect_max_text_width}
+-- Lazy loading of the rooms and entities modules, because nothing can directly depend on them,
+-- as that would cause a circular dependency
+local rooms, entities
+rooms_mod = () ->
+  if not rooms
+    rooms = require("components.rooms")
+  rooms
+
+entities_mod = () ->
+  if not entities
+    entities = require("components.entities")
+  entities
+
+{:deep_merge, :rect_max_text_width, :rooms_mod, :entities_mod}
