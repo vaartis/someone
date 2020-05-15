@@ -9,6 +9,7 @@ bump = require("bump")
 assets = require("components.assets")
 shared_components = require("components.shared")
 player_components = require("components.player")
+debug_components = require("components.debug")
 coroutines = require("coroutines")
 terminal = require("terminal")
 
@@ -101,20 +102,6 @@ NoteInteractionSystem.update = (dt) =>
 InteractionTextTag = Component.create("InteractionTextTag")
 
 ColliderComponent = Component.create("Collider", {"physics_world", "mode", "trigger"}, {trigger: false})
-
-DebugColliderDrawingSystem = _G.class("DebugColliderDrawingSystem", System)
-DebugColliderDrawingSystem.requires = () => {"Collider"}
-DebugColliderDrawingSystem.draw = () =>
-  for _, entity in pairs @targets
-    physics_world = entity\get("Collider").physics_world
-
-    x, y, w, h = physics_world\getRect(entity)
-    shape = RectangleShape.new(Vector2f.new(w, h))
-    shape.outline_thickness = 1.0
-    shape.outline_color = Color.Red
-    shape.fill_color = Color.new(0, 0, 0, 0)
-    shape.position = Vector2f.new(x, y)
-    GLOBAL.drawing_target\draw(shape)
 
 ColliderUpdateSystem = _G.class("ColliderUpdateSystem", System)
 ColliderUpdateSystem.requires = () => {"Collider"}
@@ -339,19 +326,18 @@ CustomEngine.stopSystem = (name) =>
 reset_engine = () ->
   engine = CustomEngine()
   with engine
-    \addSystem(shared_components.RenderSystem())
-    \addSystem(shared_components.AnimationSystem())
-    \addSystem(player_components.PlayerMovementSystem())
+    shared_components.add_systems(engine)
+    player_components.add_systems(engine)
+    first_puzzle.add_systems(engine)
+
     \addSystem(InteractionSystem())
     \addSystem(ColliderUpdateSystem())
     \addSystem(SoundPlayerSystem())
 
-    \addSystem(first_puzzle.FirstPuzzleButtonSystem())
-
     \addSystem(NoteSystem())
     \addSystem(NoteInteractionSystem())
 
-    --\addSystem(DebugColliderDrawingSystem())
+    debug_components.add_systems(engine)
 
 -- Loads the room's toml file, processing parent relationships
 load_room_toml = (name) ->
@@ -421,31 +407,6 @@ instantiate_entity = (entity_name, entity) ->
 
   for comp_name, comp in pairs entity
     switch comp_name
-      when "drawable"
-        unless comp.z then
-          error(lume.format("{1}.{2} requires a {3} value", {entity_name, comp_name, "z"}))
-
-        local drawable
-        switch comp.kind
-          when "sprite"
-            texture_asset = assets.assets.textures[comp.texture_asset]
-            unless texture_asset
-              error(lume.format("{1}.{2} requires a texture named {3}", {entity_name, comp_name, comp.texture_asset}))
-
-            drawable = with Sprite.new!
-              .texture = texture_asset
-          when "text"
-            drawable = Text.new(comp.text.text, StaticFonts.main_font, comp.text.font_size or StaticFonts.font_size)
-          else
-            error("Unknown kind of drawable kind in #{entity_name}.#{comp_name}")
-
-        new_ent\add(
-          shared_components.DrawableComponent(
-            drawable, comp.z, comp.kind, (if comp.enabled ~= nil then comp.enabled else true), comp.layer
-          )
-        )
-
-        new_ent\add(shared_components.TransformableComponent(drawable))
       when "transformable"
         table.insert(
           add_transformable_actions,
@@ -460,18 +421,6 @@ instantiate_entity = (entity_name, entity) ->
               .origin = Vector2f.new(comp.origin[1], comp.origin[2]) if comp.origin
               .scale = Vector2f.new(comp.scale[1], comp.scale[2]) if comp.scale
         )
-      when "animation"
-        sheet_frames = shared_components.load_sheet_data(comp.sheet)
-
-        anim = with shared_components.AnimationComponent(sheet_frames)
-          .playable = comp.playable if type(comp.playable) == "boolean"
-          .playing = comp.playing if type(comp.playing) == "boolean"
-          .current_frame = comp.starting_frame or 1
-
-        new_ent\add(anim)
-      when "slices"
-        _, slices = shared_components.load_sheet_data(comp.sheet)
-        new_ent\add(shared_components.SlicesComponent(slices))
       when "interaction"
         unless interaction_callbacks[comp.callback_name]
           error(lume.format("{1}.{2} requires a {3} interaction callback that doesn't exist", {entity_name, comp_name, comp.callback_name}))
@@ -550,6 +499,7 @@ instantiate_entity = (entity_name, entity) ->
         new_ent\add(NoteComponent(comp.text, comp.bottom_text, note_text, bottom_text))
       else
         component_processors = {
+          shared_components.process_components,
           player_components.process_components,
           first_puzzle.process_components
         }

@@ -77,7 +77,11 @@ process_components = (new_ent, comp_name, comp) ->
 
       true
 
+add_systems = (engine) ->
+  with engine
+    \addSystem(PlayerMovementSystem())
+
 {
   :PlayerMovementComponent, :PlayerMovementSystem,
-  :process_components
+  :process_components, :add_systems
 }

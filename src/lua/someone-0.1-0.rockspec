@@ -23,12 +23,13 @@ build = {
          ["components.shared"] = "components/shared.moon",
          ["components.player"] = "components/player.moon",
          ["components.assets"] = "components/assets.moon",
+         ["components.first_puzzle"] = "components/first_puzzle.moon",
+         ["components.debug"] = "components/debug.moon",
+
          terminal = "terminal.lua",
          walking = "walking.moon",
          coroutines = "coroutines.moon",
          util = "util.moon",
-
-         ["components.first_puzzle"] = "components/first_puzzle.moon"
       }
    }
 }

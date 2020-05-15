@@ -20,6 +20,10 @@ process_components = (new_ent, comp_name, comp) ->
 
       true
 
+add_systems = (engine) ->
+  with engine
+    \addSystem(FirstPuzzleButtonSystem())
+
 button_callback = (curr_state, n) ->
   with WalkingModule.state_variables.first_puzzle
     switch n
@@ -48,7 +52,7 @@ first_puzzle_not_solved = () -> not first_puzzle_solved()
 {
   :FirstPuzzleButtonComponent,
   :FirstPuzzleButtonSystem,
-  :process_components,
+  :process_components, :add_systems,
   :button_callback,
   :first_puzzle_solved, :first_puzzle_not_solved
 }

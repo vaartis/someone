@@ -3,6 +3,8 @@ path = require("path")
 json = require("lunajson")
 lume = require("lume")
 
+assets = require("components.assets")
+
 lovetoys.initialize({
       debug: true,
       globals: true
@@ -115,10 +117,62 @@ load_sheet_data = (dir_path) ->
 
   animation_frames, slices
 
+process_components = (new_ent, comp_name, comp) ->
+  switch comp_name
+    when "drawable"
+      unless comp.z then
+        error(lume.format("{1}.{2} requires a {3} value", {entity_name, comp_name, "z"}))
+
+      local drawable
+      switch comp.kind
+        when "sprite"
+          texture_asset = assets.assets.textures[comp.texture_asset]
+          unless texture_asset
+            error(lume.format("{1}.{2} requires a texture named {3}", {entity_name, comp_name, comp.texture_asset}))
+
+          drawable = with Sprite.new!
+            .texture = texture_asset
+        when "text"
+          drawable = Text.new(comp.text.text, StaticFonts.main_font, comp.text.font_size or StaticFonts.font_size)
+        else
+          error("Unknown kind of drawable kind in #{entity_name}.#{comp_name}")
+
+      new_ent\add(
+        DrawableComponent(
+          drawable, comp.z, comp.kind, (if comp.enabled ~= nil then comp.enabled else true), comp.layer
+        )
+      )
+
+      new_ent\add(TransformableComponent(drawable))
+
+      true
+    when "animation"
+      sheet_frames = load_sheet_data(comp.sheet)
+
+      anim = with AnimationComponent(sheet_frames)
+        .playable = comp.playable if type(comp.playable) == "boolean"
+        .playing = comp.playing if type(comp.playing) == "boolean"
+        .current_frame = comp.starting_frame or 1
+
+      new_ent\add(anim)
+
+      true
+    when "slices"
+      _, slices = load_sheet_data(comp.sheet)
+      new_ent\add(SlicesComponent(slices))
+
+      true
+
+add_systems = (engine) ->
+  with engine
+    \addSystem(RenderSystem())
+    \addSystem(AnimationSystem())
+
 {
+  :process_components, :add_systems,
   :DrawableComponent, :RenderSystem,
   :AnimationComponent, :AnimationSystem,
   :TransformableComponent,
-  :SlicesComponent
+  :SlicesComponent,
   :load_sheet_data
 }
