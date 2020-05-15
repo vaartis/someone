@@ -159,25 +159,31 @@ int main(int argc, char **argv) {
             terminal_env.update_event_timer(dt);
             terminal_env.draw(dt);
 
-            window.draw(targetSprite);
+            // Don't draw to the screen yet, will be drawn after coroutines run
+
             break;
         case CurrentState::Walking:
             walking_env.update(dt);
 
+            // Run all the drawing in lua and then draw it to the screen
             walking_env.draw();
             walking_env.draw_target_to_window(window, targetSprite);
 
             // Now clear the target and draw the overlay
             target.clear(sf::Color::Transparent);
             walking_env.draw_overlay();
-            window.draw(targetSprite);
+
+            // Don't draw yet, wait for coroutines to run,
+            // then everything will be drawn
 
             break;
         }
 
-        // After everything has been drawn and processed, but before it's actually drawn to the screen,
-        // run the coroutines
+        // After everything has been drawn and processed, run the coroutines
         coroutines_env.run(dt);
+
+        // Draw what hasn't been drawn yet
+        window.draw(targetSprite);
 
         target.display();
 
