@@ -358,20 +358,20 @@ function InputWaitLine:is_interactive()
 end
 
 function InputWaitLine:handle_interaction(event)
-   if event.type == EventType.KeyReleased then
-      local key = event.key.code
-
-      if key == KeyboardKey.Num1 then
-         self._1_pressed = true
-
-         return true
-      end
-   elseif self._letters_output < #self._text and event.type == EventType.KeyPressed then
+   if self._letters_output < #self._text and event.type == EventType.KeyPressed then
       -- Allow skipping by pressing 1
       local key = event.key.code
 
       if key == KeyboardKey.Num1 then
          self._letters_output = #self._text
+
+         return true
+      end
+   elseif event.type == EventType.KeyReleased then
+      local key = event.key.code
+
+      if key == KeyboardKey.Num1 then
+         self._1_pressed = true
 
          return true
       end
