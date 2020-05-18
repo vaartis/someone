@@ -36,16 +36,28 @@ NoteSystem.draw = () =>
       GLOBAL.drawing_target\draw(note.text_object)
       GLOBAL.drawing_target\draw(note.bottom_text_object)
 NoteInteractionSystem = _G.class("NoteInteractionSystem", System)
-NoteInteractionSystem.requires = () => {"Note", "Drawable"}
+NoteInteractionSystem.requires = () => {
+  objects: {"Note", "Drawable"},
+  interaction_text: {"InteractionTextTag"}
+}
+
 NoteInteractionSystem.update = (dt) =>
-  for _, entity in pairs @targets
+  for _, entity in pairs @targets.objects
     drawable = entity\get("Drawable")
 
     if drawable.enabled
       engine = util.rooms_mod!.engine
 
-      -- Keep the interaction system disabled
+      -- Keep the interaction and movement system disabled
       engine\stopSystem("InteractionSystem")
+      engine\stopSystem("PlayerMovementSystem")
+
+      interaction_text_key = lume.first(lume.keys(@targets.interaction_text))
+      if not interaction_text_key then error("No interaction text entity found")
+      interaction_text_drawable = @targets.interaction_text[interaction_text_key]\get("Drawable")
+      if not interaction_text_drawable.enabled
+        interaction_text_drawable.enabled = true
+        interaction_text_drawable.drawable.string = "[E] to close the note"
 
       -- Lazy-load interaction_components
       if not interaction_components
@@ -58,9 +70,10 @@ NoteInteractionSystem.update = (dt) =>
         if interaction_components.seconds_since_last_interaction > interaction_components.seconds_before_next_interaction and
            event.type == EventType.KeyReleased and event.key.code == KeyboardKey.E then
             interaction_components.seconds_since_last_interaction = 0
-            -- Delete the note entity and re-enable interactions
+            -- Delete the note entity and re-enable interactions and movement
             engine\removeEntity(entity)
             engine\startSystem("InteractionSystem")
+            engine\startSystem("PlayerMovementSystem")
 
 process_components = (new_ent, comp_name, comp, entity_name) ->
   switch comp_name
