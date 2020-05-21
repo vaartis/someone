@@ -135,7 +135,6 @@ M.interaction_callbacks = {
 
 M.try_get_fnc_from_module = (comp_name, comp, entity_name, field, module_field, needed_for) ->
   if not comp[field]
-    print require("inspect")(comp)
     error(
       "#{entity_name}.#{comp_name} does not have the required '#{field}' field"
     )
