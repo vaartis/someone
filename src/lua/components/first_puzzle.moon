@@ -24,46 +24,49 @@ add_systems = (engine) ->
   with engine
     \addSystem(FirstPuzzleButtonSystem())
 
-button_callback = (curr_state, n) ->
-  with WalkingModule.state_variables.first_puzzle
-    switch n
-      when "first"
-        .first = if .first == "right" then "wrong" else "right"
-        .third = if .third == "right" then "wrong" else "right"
-      when "second"
-        .second = if .second == "right" then "wrong" else "right"
-        .first = if .first == "right" then "wrong" else "right"
-      when "third"
-        .third = if .third == "right" then "wrong" else "right"
-  with WalkingModule.state_variables.first_puzzle
-    if lume.all({.first, .second, .third}, (x) -> x == "right")
-      WalkingModule.state_variables.first_puzzle.solved = true
+interaction_callbacks = {
+  button_callback: (curr_state, n) ->
+    with WalkingModule.state_variables.first_puzzle
+      switch n
+        when "first"
+          .first = if .first == "right" then "wrong" else "right"
+          .third = if .third == "right" then "wrong" else "right"
+        when "second"
+          .second = if .second == "right" then "wrong" else "right"
+          .first = if .first == "right" then "wrong" else "right"
+        when "third"
+          .third = if .third == "right" then "wrong" else "right"
+    with WalkingModule.state_variables.first_puzzle
+      if lume.all({.first, .second, .third}, (x) -> x == "right")
+        WalkingModule.state_variables.first_puzzle.solved = true
 
-  WalkingModule.state_variables.first_puzzle[n]
+    WalkingModule.state_variables.first_puzzle[n]
+}
 
-first_puzzle_solved = () ->
-  if not WalkingModule.state_variables.first_puzzle
-    WalkingModule.state_variables.first_puzzle = { first: "wrong", second: "wrong", third: "wrong", solved: false }
 
-  WalkingModule.state_variables.first_puzzle.solved
+local played_music, activatable_callbacks
 
-first_puzzle_not_solved = () -> not first_puzzle_solved()
+activatable_callbacks = {
+  first_puzzle_solved: () ->
+    if not WalkingModule.state_variables.first_puzzle
+      WalkingModule.state_variables.first_puzzle = { first: "wrong", second: "wrong", third: "wrong", solved: false }
+    WalkingModule.state_variables.first_puzzle.solved
 
-local played_music
-first_puzzle_solved_music = () ->
-  -- Return true only if music has not already played
-  result = first_puzzle_solved! and not played_music
+  first_puzzle_not_solved: () -> not activatable_callbacks.first_puzzle_solved()
+  first_puzzle_solved_music: () ->
+    -- Return true only if music has not already played
+    result = activatable_callbacks.first_puzzle_solved! and not played_music
 
-  if result
-    -- Mark that music has played
-    if not played_music then played_music = true
+    if result
+      -- Mark that music has played
+      if not played_music then played_music = true
 
-  result
+    result
+}
 
 {
   :FirstPuzzleButtonComponent,
   :FirstPuzzleButtonSystem,
   :process_components, :add_systems,
-  :button_callback,
-  :first_puzzle_solved, :first_puzzle_not_solved, :first_puzzle_solved_music
+  :interaction_callbacks, :activatable_callbacks
 }

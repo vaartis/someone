@@ -19,7 +19,7 @@ M.InteractionTextTag = Component.create("InteractionTextTag")
 
 M.InteractionComponent = Component.create(
    "Interaction",
-   {"on_interaction", "is_activatable" , "interaction_args", "current_state", "state_map", "interaction_sound", "action_text"}
+   {"on_interaction", "interaction_args", "is_activatable" , "activatable_args", "current_state", "state_map", "interaction_sound", "action_text"}
 )
 
 M.InteractionSystem = _G.class("InteractionSystem", System)
@@ -54,7 +54,14 @@ M.InteractionSystem.update = (dt) =>
     -- If the player is in the rectangle of the sprite, then check if the interaction button is pressed
     if lume.any(cols, (e) -> e\has("PlayerMovement")) then
       if interaction_comp.is_activatable
-        unless interaction_comp.is_activatable(interaction_comp.current_state)
+        unless interaction_comp.is_activatable(
+          interaction_comp.current_state,
+          if interaction_comp.activatable_args
+            if lume.isarray(interaction_comp.activatable_args)
+              table.unpack(interaction_comp.activatable_args)
+            else
+              interaction_comp.activatable_args
+        )
           continue
       any_interactables_touched = true
 
@@ -66,15 +73,15 @@ M.InteractionSystem.update = (dt) =>
         if M.seconds_since_last_interaction > M.seconds_before_next_interaction and
            event.type == EventType.KeyReleased and event.key.code == KeyboardKey.E then
           M.seconds_since_last_interaction = 0
-          args = if interaction_comp.interaction_args
-            if lume.isarray(interaction_comp.interaction_args)
-                table.unpack(interaction_comp.interaction_args)
-            else
-                interaction_comp.interaction_args
-          else
-            {}
 
-          interaction_res = interaction_comp.on_interaction(interaction_comp.current_state, args)
+          interaction_res = interaction_comp.on_interaction(
+            interaction_comp.current_state,
+            if interaction_comp.interaction_args
+              if lume.isarray(interaction_comp.interaction_args)
+                table.unpack(interaction_comp.interaction_args)
+              else
+                interaction_comp.interaction_args
+          )
 
           -- If some kind of result was returned, use it as the new state
           if interaction_res ~= nil and interaction_res ~= interaction_comp.current_state
@@ -91,12 +98,9 @@ M.InteractionSystem.update = (dt) =>
       anim = obj\get("Animation")
       anim.current_frame = interaction_comp.state_map[interaction_comp.current_state]
 
+
 M.activatable_callbacks = {
-  first_button_pressed: () -> WalkingModule.state_variables.first_button_pressed == true
-  state_is_disabled: (curr_state) -> curr_state == "disabled",
-  first_puzzle_solved: first_puzzle.first_puzzle_solved,
-  first_puzzle_solved_music: first_puzzle.first_puzzle_solved_music,
-  first_puzzle_not_solved: first_puzzle.first_puzzle_not_solved
+  state_equal: (curr_state, to) -> curr_state == to
 }
 
 M.interaction_callbacks = {
@@ -130,19 +134,49 @@ M.interaction_callbacks = {
 
       physics_world = player\get("Collider").physics_world
       physics_world\update(player, player_pos[1], player_pos[2])
-
-  first_puzzle_button: first_puzzle.button_callback,
-  read_note: note_components.read_note
 }
 
+M.try_get_fnc_from_module = (comp_name, comp, entity_name, field, module_field, needed_for) ->
+  if not comp[field]
+    print require("inspect")(comp)
+    error(
+      "#{entity_name}.#{comp_name} does not have the required '#{field}' field"
+    )
+
+  status, callback_module = pcall(require, comp[field].module)
+  if not status
+    error(
+      "#{entity_name}.#{comp_name} requires a module named '#{comp[field].module}' for its #{needed_for} callback, but that module cannot be imported"
+    )
+
+  module_exported_table = callback_module[module_field]
+  if not module_exported_table
+    error(
+      "#{entity_name}.#{comp_name} requires '#{module_field}' in a module named '#{comp[field].module}' for its #{needed_for} callback, but the module does not export that field"
+    )
+
+  callback_function = module_exported_table[comp[field].name]
+  if not callback_function
+    error(
+      "#{entity_name}.#{comp_name} requires a function named '#{comp[field].name}' from module '#{comp[field].module}' for its #{needed_for} callback, but that function is not in the module's #{module_field}"
+    )
+
+  callback_function
+
 M.process_components = (new_ent, comp_name, comp, entity_name) ->
+
   switch comp_name
     when "interaction"
-      unless M.interaction_callbacks[comp.callback_name]
-        error(lume.format("{1}.{2} requires a {3} interaction callback that doesn't exist", {entity_name, comp_name, comp.callback_name}))
-      if comp.activatable_callback_name
-        unless M.activatable_callbacks[comp.activatable_callback_name]
-          error(lume.format("{1}.{2} requires a {3} activatable callback that doesn't exist", {entity_name, comp_name, comp.activatable_callback_name}))
+
+      interaction_callback = M.try_get_fnc_from_module(comp_name, comp, entity_name, "callback", "interaction_callbacks", "interaction")
+      local interaction_args
+      if comp.callback.args
+        interaction_args = comp.callback.args
+
+      local activatable_callback, activatable_args
+      if comp.activatable_callback
+        activatable_callback = M.try_get_fnc_from_module(comp_name, comp, entity_name, "activatable_callback", "activatable_callbacks", "activatable")
+        activatable_args = comp.activatable_callback.args
 
       local interaction_sound
       if comp.interaction_sound_asset
@@ -151,9 +185,12 @@ M.process_components = (new_ent, comp_name, comp, entity_name) ->
 
       new_ent\add(
         M.InteractionComponent(
-          M.interaction_callbacks[comp.callback_name],
-          if comp.activatable_callback_name then M.activatable_callbacks[comp.activatable_callback_name] else nil,
-          comp.args,
+          interaction_callback,
+          interaction_args,
+
+          activatable_callback,
+          activatable_args,
+
           comp.initial_state,
           comp.state_map,
           interaction_sound,

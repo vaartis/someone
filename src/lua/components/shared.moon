@@ -117,7 +117,7 @@ load_sheet_data = (dir_path) ->
 
   animation_frames, slices
 
-process_components = (new_ent, comp_name, comp) ->
+process_components = (new_ent, comp_name, comp, entity_name) ->
   switch comp_name
     when "drawable"
       unless comp.z then

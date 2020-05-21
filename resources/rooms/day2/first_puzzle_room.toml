@@ -29,28 +29,28 @@ collider = { mode = "constant", size = [10, 400] }
 [entities.first_button]
 prefab = "first_puzzle_button"
 transformable = { position = [ 300, 650 ] }
-interaction = { args = [ "first" ] }
+interaction = { callback = { args = [ "first" ] } }
 first_puzzle_button = { n = "first" }
 
 [entities.second_button]
 prefab = "first_puzzle_button"
 transformable = { position = [ 400, 650 ] }
-interaction = { args = [ "second" ] }
+interaction = { callback = { args = [ "second" ] } }
 first_puzzle_button = { n = "second" }
 
 [entities.third_button]
 prefab = "first_puzzle_button"
 transformable = { position = [ 500, 650 ] }
-interaction = { args = [ "third" ] }
+interaction = { callback = { args = [ "third" ] } }
 first_puzzle_button = { n = "third" }
 
 [entities.puzzle_jingle_player]
-sound_player = { sound_asset = "puzzle_jingle", activate_callback_name = "first_puzzle_solved_music" }
+sound_player = { sound_asset = "puzzle_jingle", activatable_callback = { module = "components.first_puzzle", name = "first_puzzle_solved_music" } }
 
 [entities.passage]
 prefab = "passage"
 transformable = { position = [120, 750], scale = [1, 1] }
-interaction = { args = { room = "day2/computer_room", player_pos = [900, 644] } }
+interaction = { callback = { args = { room = "day2/computer_room", player_pos = [900, 644] } } }
 
 [entities.interaction_text]
 prefab = "interaction_text"

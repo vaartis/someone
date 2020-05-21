@@ -12,8 +12,8 @@ playable = false
 initial_state = "wrong"
 state_map = { right = 2, wrong = 1 }
 interaction_sound_asset = "button_press"
-callback_name = "first_puzzle_button"
-activatable_callback_name = "first_puzzle_not_solved"
+callback = { module = "components.first_puzzle", name = "button_callback" }
+activatable_callback = { module = "components.first_puzzle", name = "first_puzzle_not_solved" }
 action_text = "press the button"
 
 [collider]

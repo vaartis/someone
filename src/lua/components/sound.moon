@@ -17,10 +17,10 @@ process_components = (new_ent, comp_name, comp, entity_name) ->
     when "sound_player"
       if not interaction_components
         interaction_components = require("components.interaction")
-          
-      callback = interaction_components.activatable_callbacks[comp.activate_callback_name]
-      unless callback
-        error(lume.format("{1}.{2} requires a {3} interaction callback that doesn't exist", {entity_name, comp_name, comp.activate_callback_name}))
+
+      callback = interaction_components.try_get_fnc_from_module(
+        comp_name, comp, entity_name, "activatable_callback", "activatable_callbacks", "activatable"
+      )
 
       sound = with Sound.new!
         .buffer = assets.assets.sounds[comp.sound_asset]

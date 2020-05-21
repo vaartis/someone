@@ -8,7 +8,7 @@ origin = [0, 184]
 scale = [-1, 1]
 
 [interaction]
-callback_name = "switch_room"
+callback = { module = "components.interaction", name = "switch_room" }
 action_text = "go through"
 
 [collider]

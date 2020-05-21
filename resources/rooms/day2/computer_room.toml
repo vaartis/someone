@@ -3,12 +3,11 @@ name = "day1/computer_room"
 removed_entities = [ "button" ]
 
 [entities.table.interaction]
-activatable_callback_name = "first_puzzle_solved"
-callback_name = "computer_switch_to_terminal"
+activatable_callback = { module = "components.first_puzzle", name = "first_puzzle_solved" }
 
 # Passage
 
 [entities.passage]
 prefab = "passage"
 transformable = { position = [1000, 750] }
-interaction = { args = { room = "day2/first_puzzle_room" } }
+interaction = { callback = { args = { room = "day2/first_puzzle_room" } } }

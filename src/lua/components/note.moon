@@ -92,25 +92,27 @@ add_systems = (engine) ->
     \addSystem(NoteSystem())
     \addSystem(NoteInteractionSystem())
 
-read_note = (state, note_name) ->
-    local notes
-    with io.open("resources/rooms/notes.toml", "r")
-      notes = toml.parse(\read("*all"))
-      \close()
+interaction_callbacks = {
+  read_note: (state, note_name) ->
+      local notes
+      with io.open("resources/rooms/notes.toml", "r")
+        notes = toml.parse(\read("*all"))
+        \close()
 
-    note = notes[note_name]
+      note = notes[note_name]
 
-    if not note
-      error("Note #{note} not found")
+      if not note
+        error("Note #{note} not found")
 
-    note_entity = util.entities_mod!.instantiate_entity("note_paper", {
-        prefab: "note",
-        note: { text: note.text, bottom_text: note.bottom_text }
-    })
-    util.rooms_mod!.engine\addEntity(note_entity)
+      note_entity = util.entities_mod!.instantiate_entity("note_paper", {
+          prefab: "note",
+          note: { text: note.text, bottom_text: note.bottom_text }
+      })
+      util.rooms_mod!.engine\addEntity(note_entity)
+}
 
 {
   NoteComponent, NoteSystem, NoteInteractionSystem,
   :add_systems, :process_components,
-  :read_note
+  :interaction_callbacks
 }
