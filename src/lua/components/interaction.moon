@@ -5,9 +5,6 @@ terminal = require("terminal")
 coroutines = require("coroutines")
 util = require("util")
 
-note_components = require("components.note")
-entities = require("components.entities")
-first_puzzle = require("components.first_puzzle")
 assets = require("components.assets")
 
 M = {}
