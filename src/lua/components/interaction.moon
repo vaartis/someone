@@ -141,6 +141,8 @@ M.try_get_fnc_from_module = (comp_name, comp, entity_name, field, module_field, 
 
   status, callback_module = pcall(require, comp[field].module)
   if not status
+    -- Print the error first
+    print(callback_module)
     error(
       "#{entity_name}.#{comp_name} requires a module named '#{comp[field].module}' for its #{needed_for} callback, but that module cannot be imported"
     )
