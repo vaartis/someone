@@ -18,14 +18,15 @@ M.ColliderUpdateSystem.update = (dt) =>
         self.update_from_sprite(entity)
 M.ColliderUpdateSystem.update_from_sprite = (entity) ->
   sprite_size = entity\get("Drawable").drawable.global_bounds
-  tf = entity\get("Transformable").transformable
+  tfc = entity\get("Transformable")
+  tf = tfc.transformable
   physics_world = entity\get("Collider").physics_world
 
   if physics_world\hasItem(entity)
     -- If the item is already in the world, sychronize the position from the
     -- physics world, by getting the position from there and adding the origin change,
     -- plus putting the current width and height in the world from the sprite
-    tf.position = do
+    tfc\set_world_position(entity, do
       x, y = physics_world\getRect(entity)
 
       -- Update the physics world with the new size
@@ -39,11 +40,13 @@ M.ColliderUpdateSystem.update_from_sprite = (entity) ->
 
       -- Return the data for the transformable position
       Vector2f.new(x, y)
+   )
   else
     -- If the item isn't in the world yet, add it there, but putting it at the
     -- transformable position minus the origin change
 
-    x, y = tf.position.x - (tf.origin.x * tf.scale.x), tf.position.y - (tf.origin.y * tf.scale.y)
+    pos = tfc\world_position(entity)
+    x, y = pos.x - (tf.origin.x * tf.scale.x), pos.y - (tf.origin.y * tf.scale.y)
 
     -- Adjust the position for scale
     scale_modifier = if tf.scale.x > 0 then 1 - tf.scale.x else tf.scale.x * -1
@@ -55,7 +58,7 @@ M.process_collider_component = (new_ent, comp, entity_name) ->
   unless new_ent\has("Transformable")
     error("Transformable is required for a collider on #{entity_name}")
 
-  pos = new_ent\get("Transformable").transformable.position
+  pos = new_ent\get("Transformable")\world_position(new_ent)
 
   switch comp.mode
     when "sprite"

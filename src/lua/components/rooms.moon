@@ -128,7 +128,7 @@ M.load_room = (name) ->
     _room_shaders = {}
 
   for entity_name, entity in pairs room_toml.entities
-    M.engine\addEntity(entities.instantiate_entity(entity_name, entity))
+    entities.instantiate_entity(entity_name, entity)
 
 M.find_player = () ->
   pents = M.engine\getEntitiesWithComponent("PlayerMovement")

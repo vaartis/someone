@@ -50,7 +50,45 @@ RenderSystem.draw = (layer) =>
         if not drawable.layer
           GLOBAL.drawing_target\draw(drawable.drawable)
 
-TransformableComponent = Component.create("Transformable", {"transformable"})
+TransformableComponent = Component.create("Transformable", {"transformable", "local_position"})
+TransformableComponent.world_position = (ent) =>
+  if not ent.parent or not ent.parent.id
+    @transformable.position
+  else
+    parent_tf = ent.parent\get("Transformable")
+
+    @local_position + parent_tf\world_position(ent.parent)
+TransformableComponent.set_world_position = (ent, pos) =>
+  if not ent.parent or not ent.parent.id
+    @transformable.position = pos
+  else
+    parent_tf = ent.parent\get("Transformable")
+
+    @transformable.position = pos
+    @local_position = @transformable.position - parent_tf\world_position(ent.parent)
+
+  for _, child in pairs(ent.children)
+    child_tf = child\get("Transformable")
+    child_tf\update_local_position(child)
+TransformableComponent.set_local_position = (ent, pos) =>
+  if not ent.parent or not ent.parent.id
+    @transformable.position = pos
+  else
+    parent_tf = ent.parent\get("Transformable")
+
+    @local_position = pos
+    @update_local_position(ent)
+
+  for _, child in pairs(ent.children)
+    child_tf = child\get("Transformable")
+    child_tf\update_local_position(child)
+TransformableComponent.update_local_position = (ent) =>
+    parent_tf = ent.parent\get("Transformable")
+
+    @transformable.position = @local_position + parent_tf\world_position(ent.parent)
+    for _, child in pairs(ent.children)
+      child_tf = child\get("Transformable")
+      child_tf\update_local_position(child)
 
 AnimationComponent = Component.create(
    "Animation",

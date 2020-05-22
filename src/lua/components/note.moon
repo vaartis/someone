@@ -25,11 +25,11 @@ NoteSystem.draw = () =>
 
         max_text_len = util.rect_max_text_width(slice.width)
         note.text_object.string = lume.wordwrap(note.text, max_text_len)
-        note.text_object.position = tf.transformable.position + Vector2f.new(slice.left, slice.top)
+        note.text_object.position = tf\world_position(entity) + Vector2f.new(slice.left, slice.top)
 
         note.bottom_text_object.string = lume.wordwrap(note.bottom_text, max_text_len)
         bottom_text_width = note.bottom_text_object.global_bounds.width
-        note.bottom_text_object.position = tf.transformable.position + Vector2f.new(
+        note.bottom_text_object.position = tf\world_position(entity) + Vector2f.new(
             bottom_slice.left + bottom_slice.width - bottom_text_width,
             bottom_slice.top
         )
@@ -104,11 +104,10 @@ interaction_callbacks = {
       if not note
         error("Note #{note} not found")
 
-      note_entity = util.entities_mod!.instantiate_entity("note_paper", {
+      util.entities_mod!.instantiate_entity("note_paper", {
           prefab: "note",
           note: { text: note.text, bottom_text: note.bottom_text }
       })
-      util.rooms_mod!.engine\addEntity(note_entity)
 }
 
 {

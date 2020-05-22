@@ -39,12 +39,12 @@ load_prefab = (prefab_name_or_conf, base_data) ->
   base_data
 
 
-instantiate_entity = (entity_name, entity) ->
+instantiate_entity = (entity_name, entity, parent) ->
   -- Has to be required from here to avoid recursive dependency
   if not interaction_components
     interaction_components = require("components.interaction")
 
-  new_ent = Entity()
+  new_ent = Entity(parent)
 
   if entity.prefab
     entity = load_prefab(entity.prefab, entity)
@@ -64,7 +64,16 @@ instantiate_entity = (entity_name, entity) ->
             tf_component = new_ent\get("Transformable")
 
             with tf_component.transformable
-              .position = Vector2f.new(comp.position[1], comp.position[2]) if comp.position
+              if parent
+                parent_tf = parent\get("Transformable").transformable
+                relative_position = Vector2f.new(comp.position[1], comp.position[2])
+                -- Apply the position in relation to the parent position
+                .position = parent_tf.position + relative_position
+
+                tf_component.local_position = relative_position
+              else
+                .position = Vector2f.new(comp.position[1], comp.position[2])
+
               .origin = Vector2f.new(comp.origin[1], comp.origin[2]) if comp.origin
               .scale = Vector2f.new(comp.scale[1], comp.scale[2]) if comp.scale
         )
@@ -83,6 +92,8 @@ instantiate_entity = (entity_name, entity) ->
               new_ent\add(interaction_components.InteractionTextTag())
             else
               error("Unknown tag in #{entity_name}.#{comp_name}: #{tag}")
+      when "children"
+        continue
       else
         component_processors = {
           shared_components,
@@ -106,6 +117,10 @@ instantiate_entity = (entity_name, entity) ->
       for _, action in pairs actions
         action!
 
+  util.rooms_mod!.engine\addEntity(new_ent)
+  if entity.children
+    for name, data in pairs(entity.children)
+      instantiate_entity(name, data, new_ent)
   new_ent
 
 {:instantiate_entity}
