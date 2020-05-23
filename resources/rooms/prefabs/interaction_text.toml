@@ -1,4 +1,4 @@
-tags = [ "interaction_text" ]
+tags = [ "InteractionText" ]
 
 [drawable]
 kind = "text"

@@ -39,6 +39,16 @@ load_prefab = (prefab_name_or_conf, base_data) ->
   base_data
 
 
+-- This is used to create components for tags. When a tag is encountered for the first time,
+-- a component class is created for it. It is reused when the same tag name is used again.
+tag_classes = {}
+make_tag = (name) ->
+  if not tag_classes[name]
+    class_name = "#{name}Tag"
+    tag_classes[name] = Component.create(class_name)
+
+  tag_classes[name]
+
 instantiate_entity = (entity_name, entity, parent) ->
   -- Has to be required from here to avoid recursive dependency
   if not interaction_components
@@ -83,15 +93,9 @@ instantiate_entity = (entity_name, entity, parent) ->
           -> collider_components.process_collider_component(new_ent, comp, entity_name)
         )
       when "tags"
-        -- TODO: this tag system doesn't seem like a very good solution, maybe
-        -- it should be changed somehow to allow selecting entities by tags directly,
-        -- though it is likely that this change has to be done in the ECS itself
         for _, tag in pairs comp
-          switch tag
-            when "interaction_text"
-              new_ent\add(interaction_components.InteractionTextTag())
-            else
-              error("Unknown tag in #{entity_name}.#{comp_name}: #{tag}")
+          -- Add a tag component for each tag
+          new_ent\add(make_tag(tag)())
       when "children"
         continue
       else

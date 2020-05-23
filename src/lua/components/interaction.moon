@@ -12,8 +12,6 @@ M = {}
 M.seconds_since_last_interaction = 0 -- Time tracked by dt, since last interaction
 M.seconds_before_next_interaction = 0.3 -- A constant that represents how long to wait between interactions
 
-M.InteractionTextTag = Component.create("InteractionTextTag")
-
 M.InteractionComponent = Component.create(
    "Interaction",
    {"on_interaction", "interaction_args", "is_activatable" , "activatable_args", "current_state", "state_map", "interaction_sound", "action_text"}
