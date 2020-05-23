@@ -1,0 +1,27 @@
+[transformable]
+position = [600, 200]
+
+[children.back.drawable]
+kind = "sprite"
+texture_asset = "dial"
+z = 1
+layer = "overlay"
+
+[children.back.transformable]
+position = [ 0, 0 ]
+origin = [ 15.5, 15.5 ]
+scale = [10, 10]
+
+[children.handle]
+tags = [ "DialHandle" ]
+
+[children.handle.drawable]
+kind = "sprite"
+texture_asset = "dial_handle"
+z = 2
+layer = "overlay"
+
+[children.handle.transformable]
+position = [ 0, 0 ]
+origin = [ 15.5, 15.5 ]
+scale = [ 10, 10 ]

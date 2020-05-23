@@ -78,7 +78,7 @@ int main(int argc, char **argv) {
     TerminalEnv terminal_env(lua);
     WalkingEnv walking_env(lua);
 
-    auto current_state = CurrentState::Terminal;
+    auto current_state = CurrentState::Walking;
 
     auto current_state_type = lua.new_enum(
         "CurrentState",

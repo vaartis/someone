@@ -13,6 +13,7 @@ assets = require("components.assets")
 entities = require("components.entities")  
 
 first_puzzle = require("components.first_puzzle")
+dial_puzzle = require("components.dial_puzzle")
 
 M = {}
 
@@ -85,11 +86,13 @@ reset_engine = () ->
   modules = {
     shared_components,
     player_components,
-    first_puzzle,
     interaction_components,
     collider_components,
     sound_components,
     note_components,
+
+    first_puzzle,
+    dial_puzzle,
 
     debug_components
   }

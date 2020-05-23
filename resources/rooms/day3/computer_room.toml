@@ -1,0 +1,9 @@
+[prefab]
+name = "day2/computer_room"
+
+[entities.passage]
+interaction = { callback = { args = { room = "day3/first_puzzle_room" } } }
+
+[entities.table.interaction]
+activatable_callback = { module = "components.first_puzzle", name = "first_puzzle_solved" } # TODO: replace
+callback = { module = "components.interaction", name = "computer_switch_to_terminal" }

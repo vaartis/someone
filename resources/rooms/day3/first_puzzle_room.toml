@@ -1,0 +1,61 @@
+[shaders.circle_light]
+n = 2
+point = [1030, 690]
+brightness = 0.15
+
+[prefab]
+name = "day2/first_puzzle_room"
+removed_entities = [ "background_wall_overlay" ]
+
+[entities.passage]
+interaction = { callback = { args = { room = "day3/computer_room"} } }
+
+[entities.first_button]
+prefab = { name = "first_puzzle_button", removed_components = ["interaction", "collider", "first_puzzle_button"] }
+animation = { starting_frame = 2 }
+
+[entities.second_button]
+prefab = { name = "first_puzzle_button", removed_components = ["interaction", "collider", "first_puzzle_button"] }
+animation = { starting_frame = 2 }
+
+[entities.third_button]
+prefab = { name = "first_puzzle_button", removed_components = ["interaction", "collider", "first_puzzle_button"] }
+animation = { starting_frame = 2 }
+
+[entities.right_wall.transformable]
+position = [1140, 500]
+
+[entities.table.drawable]
+kind = "sprite"
+texture_asset = "first_puzzle_room_table"
+z = 1
+
+[entities.table.transformable]
+position = [922, 709]
+
+[entities.lamp.drawable]
+kind = "sprite"
+texture_asset = "table_lamp"
+z = 2
+
+[entities.lamp.transformable]
+position = [1018, 670]
+
+[entities.note]
+transformable = { position = [1010, 720] }
+drawable = { kind = "sprite", texture_asset = "table_note", z = 2 }
+collider = { mode = "sprite", trigger = true }
+
+[entities.note.interaction]
+callback = { module = "components.note", name = "read_note", args = [ "hunger_iteration" ] }
+action_text = "read the note"
+
+[entities.dial]
+transformable = { position = [ 800, 680 ] }
+drawable = { kind = "sprite", texture_asset = "dial_full", z = 2 }
+collider = { mode = "sprite", trigger = true }
+
+[entities.dial.interaction]
+callback = { module = "components.dial_puzzle", name = "open_dial" }
+#activatable_callback = { module = "components.dial_puzzle", name = "solved" }
+action_text = "look closer"

@@ -97,7 +97,20 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
         "position", sol::property(
             &sf::Transformable::getPosition,
             sol::resolve<void(const sf::Vector2f&)>(&sf::Transformable::setPosition)
-        )
+        ),
+        "origin", sol::property(
+            &sf::Transformable::getOrigin,
+            sol::resolve<void(const sf::Vector2f&)>(&sf::Transformable::setOrigin)
+        ),
+        "scale", sol::property(
+            &sf::Transformable::getScale,
+            sol::resolve<void(const sf::Vector2f&)>(&sf::Transformable::setScale)
+        ),
+        "rotation", sol::property(
+            &sf::Transformable::getRotation,
+            &sf::Transformable::setRotation
+        ),
+        "rotate", &sf::Transformable::rotate
     );
 
     auto render_target_type = lua.new_usertype<sf::RenderTarget>(
@@ -165,14 +178,6 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
         "Sprite", sol::constructors<sf::Sprite()>(),
         sol::base_classes, sol::bases<sf::Drawable, sf::Transformable>(),
         "texture", sol::property(&sf::Sprite::getTexture, [](sf::Sprite &sprite, const sf::Texture &texture) { sprite.setTexture(texture); }),
-        "origin",  sol::property(
-            &sf::Sprite::getOrigin,
-            sol::resolve<void(const sf::Vector2f&)>(&sf::Sprite::setOrigin)
-        ),
-        "scale",  sol::property(
-            &sf::Sprite::getScale,
-            sol::resolve<void(const sf::Vector2f&)>(&sf::Sprite::setScale)
-        ),
         "texture_rect", sol::property(&sf::Sprite::getTextureRect, &sf::Sprite::setTextureRect),
         "global_bounds", sol::property(&sf::Sprite::getGlobalBounds)
     );
@@ -229,6 +234,10 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
     );
     auto sound_type = lua.new_usertype<sf::Sound>(
         "Sound", sol::constructors<sf::Sound()>(),
+        "volume", sol::property(
+            &sf::Sound::getVolume,
+            &sf::Sound::setVolume
+        ),
         "buffer", sol::property(
             &sf::Sound::getBuffer,
             &sf::Sound::setBuffer

@@ -720,3 +720,20 @@
    <p>: Still, I appriciate it. Let's see what tomorrow brings.
 
    <She falls asleep fast, you soon follow.>
+* Day 3
+** Night after day 3 :walking:
+   The second part of the puzzle room is now open (and all the buttons are green, since the puzzle has already been solved). There's a table on the
+   other side of the room, with a note which should open as a full screen thing allowing to read it properly. The text on it is:
+
+   That last iteration wasn't a good idea at all. It seems like most of the features implemented don't work that well for the world, this time they
+   turned violent against other creatures. Eventually, when they eradicated those, they started killing each other.. Except her, of course. I should've seen
+   that coming. This one's going to the archive too.
+
+   passwd: aqualung
+
+   Small text on the bottom of the page: "ctrl z switch instance"
+   
+   There's also a working lamp on the table, which the player should be able to take and put back in the computer room.
+
+   After that, when the player gets back to the computer, the screen will still be black and the text on the bottom should say
+   something like Ctrl+Z to switch instance.

@@ -24,13 +24,15 @@ build = {
          ["components.player"] = "components/player.moon",
          ["components.assets"] = "components/assets.moon",
          ["components.interaction"] = "components/interaction.moon",
-         ["components.first_puzzle"] = "components/first_puzzle.moon",
          ["components.debug"] = "components/debug.moon",
          ["components.rooms"] = "components/rooms.moon",
          ["components.entities"] = "components/entities.moon",
          ["components.collider"] = "components/collider.moon",
          ["components.sound"] = "components/sound.moon",
          ["components.note"] = "components/note.moon",
+
+         ["components.first_puzzle"] = "components/first_puzzle.moon",
+         ["components.dial_puzzle"] = "components/dial_puzzle.moon",
 
          terminal = "terminal.lua",
          walking = "walking.moon",

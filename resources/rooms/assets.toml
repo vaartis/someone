@@ -9,7 +9,14 @@ table = "resources/sprites/room/table/table.png"
 button = "resources/sprites/room/button/button.png"
 passage = "resources/sprites/room/passage/passage.png"
 
+first_puzzle_room_table = "resources/sprites/room/first_puzzle_room_table.png"
+table_lamp = "resources/sprites/room/table_lamp.png"
 note = "resources/sprites/room/note/note.png"
+table_note = "resources/sprites/room/table_note.png"
+
+dial = "resources/sprites/room/dial/dial.png"
+dial_handle = "resources/sprites/room/dial/dial_handle.png"
+dial_full = "resources/sprites/room/dial/dial_full.png"
 
 mainchar = "resources/sprites/mainchar/mainchar.png"
 
@@ -17,3 +24,4 @@ mainchar = "resources/sprites/mainchar/mainchar.png"
 button_press = "resources/sounds/button_press.ogg"
 footstep = "resources/sounds/footstep.ogg"
 puzzle_jingle = "resources/sounds/puzzle_jingle/puzzle_jingle.ogg"
+rotation_click = "resources/sounds/rotation_click.ogg"

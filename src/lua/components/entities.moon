@@ -3,11 +3,13 @@ util = require("util")
 
 shared_components = require("components.shared")
 player_components = require("components.player")
-first_puzzle = require("components.first_puzzle")
 collider_components = require("components.collider")
 note_components = require("components.note")
 local interaction_components
 sound_components = require("components.sound")
+
+first_puzzle = require("components.first_puzzle")
+dial_puzzle = require("components.dial_puzzle")
 
 load_prefab = (prefab_name_or_conf, base_data) ->
   local prefab_name, removed_components
@@ -105,7 +107,9 @@ instantiate_entity = (entity_name, entity, parent) ->
           interaction_components,
           sound_components,
           note_components,
-          first_puzzle
+
+          first_puzzle,
+          dial_puzzle
         }
 
         processed = false
