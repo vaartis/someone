@@ -5,7 +5,7 @@ brightness = 0.15
 
 [prefab]
 name = "day2/first_puzzle_room"
-removed_entities = [ "background_wall_overlay" ]
+removed_entities = [ "background_wall_overlay", "puzzle_jingle_player" ]
 
 [entities.passage]
 interaction = { callback = { args = { room = "day3/computer_room"} } }
@@ -57,5 +57,9 @@ collider = { mode = "sprite", trigger = true }
 
 [entities.dial.interaction]
 callback = { module = "components.dial_puzzle", name = "open_dial" }
-#activatable_callback = { module = "components.dial_puzzle", name = "solved" }
 action_text = "look closer"
+
+[entities.dial_jingle_player.sound_player]
+sound_asset = "dial_jingle"
+activatable_callback = { module = "components.dial_puzzle", name = "solved_music" }
+volume = 30

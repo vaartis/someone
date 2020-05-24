@@ -4,22 +4,35 @@ assets = require("components.assets")
 
 interaction_components = require("components.interaction")
 
-interaction_callbacks =
-  open_dial: () ->
-    if not WalkingModule.state_variables.dial_puzzle
-      WalkingModule.state_variables.dial_puzzle = { solved: false }
-
-    util.entities_mod!.instantiate_entity("dial_closeup", { prefab: "dial" })
-
-DialHandleComponent = Component.create("DialHandleComponent", {"position"}, {position: 1})
-
-position = 1
 position_rotations = {
   0, 36, 58, 88, 126, 148, 180,
   216, 236, 270, 302, 322
 }
 
-combination = { 4, 1, 10 }
+interaction_callbacks =
+  open_dial: () ->
+    if not WalkingModule.state_variables.dial_puzzle
+      WalkingModule.state_variables.dial_puzzle = with { solved: false, music_played: false }
+        .combination = {}
+        for i = 1, 3
+          .combination[i] = math.random(1, #position_rotations)
+
+      print require("inspect")(WalkingModule.state_variables.dial_puzzle.combination)
+
+    util.entities_mod!.instantiate_entity("dial_closeup", { prefab: "dial" })
+
+activatable_callbacks =
+  solved_music: () ->
+    if WalkingModule.state_variables.dial_puzzle
+      with WalkingModule.state_variables.dial_puzzle
+        if .solved and not .music_played
+          .music_played = true
+
+          return true
+        else
+          return false
+
+DialHandleComponent = Component.create("DialHandleComponent")
 
 combination_n = 1
 
@@ -80,6 +93,7 @@ DialHandleSystem.update = (dt) =>
         rotation_click_sound = with Sound.new!
           .buffer = assets.assets.sounds["rotation_click"]
 
+      combination = WalkingModule.state_variables.dial_puzzle.combination
       if position_num == combination[combination_n]
         -- When approached from a different side, count as the correct value
         if rotation_change ~= last_side

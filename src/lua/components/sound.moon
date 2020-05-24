@@ -24,6 +24,7 @@ process_components = (new_ent, comp_name, comp, entity_name) ->
 
       sound = with Sound.new!
         .buffer = assets.assets.sounds[comp.sound_asset]
+        if comp.volume then .volume = comp.volume
 
       new_ent\add(SoundPlayerComponent(sound, callback))
 
