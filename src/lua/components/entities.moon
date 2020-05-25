@@ -129,6 +129,7 @@ instantiate_entity = (entity_name, entity, parent) ->
   if entity.children
     for name, data in pairs(entity.children)
       instantiate_entity(name, data, new_ent)
+
   new_ent
 
 {:instantiate_entity}

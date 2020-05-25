@@ -80,7 +80,7 @@ CustomEngine.stopSystem = (name) =>
   system = @systemRegistry[name]
   if system and system.onStopSystem then system\onStopSystem!
     
-reset_engine = () ->
+M.reset_engine = () ->
   M.engine = CustomEngine()
 
   modules = {

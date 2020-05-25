@@ -7,6 +7,25 @@ on:
     types: [ published ]
 
 jobs:
+  test-linux:
+    runs-on: ubuntu-18.04
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Install deps
+      run: |
+        sudo apt-get update && sudo apt-get install -y build-essential clang cmake xorg-dev libgl-dev\
+             libudev-dev libopenal-dev libvorbis-dev libflac-dev libreadline-dev libncurses-dev xvfb
+
+    - name: Build, run tests, upload coverage
+      run: |
+        mkdir $GITHUB_WORKSPACE/_build && cd $GITHUB_WORKSPACE/_build
+        cmake .. -DCMAKE_BUILD_TYPE=Debug -DSOMEONE_TESTING=TRUE
+        xvfb-run -a -s "-screen 0 1920x1080x24 +extension GLX +render" make -j $(nproc) test
+        ./resources/lua/bin/luacov-coveralls -t ${{ secrets.COVERALLS_TOKEN }}
+
   build-linux:
     runs-on: ubuntu-18.04
     steps:

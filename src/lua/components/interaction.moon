@@ -29,11 +29,14 @@ M.InteractionSystem.onStopSystem = () =>
   interaction_text_drawable.enabled = false
 
 M.InteractionSystem.update = (dt) =>
-  interaction_text_key = lume.first(lume.keys(@targets.interaction_text))
-  if not interaction_text_key then error("No interaction text entity found")
-  interaction_text_drawable = @targets.interaction_text[interaction_text_key]\get("Drawable")
+  -- If there are any interactables, look up the interaction text entity
+  local interaction_text_drawable
+  if #@targets.objects > 0
+    interaction_text_key = lume.first(lume.keys(@targets.interaction_text))
+    if not interaction_text_key then error("No interaction text entity found")
+    interaction_text_drawable = @targets.interaction_text[interaction_text_key]\get("Drawable")
 
-  M.seconds_since_last_interaction += dt
+    M.seconds_since_last_interaction += dt
 
   any_interactables_touched = false
   for _, obj in pairs @targets.objects

@@ -4,7 +4,7 @@ interaction_components = require("components.interaction")
 state_variables = {}
 
 -- Load the room
-rooms.load_room "day3/first_puzzle_room"
+--rooms.load_room "day3/first_puzzle_room"
 
 update = (dt) ->
   rooms.engine\update(dt)

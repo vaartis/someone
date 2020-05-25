@@ -184,25 +184,44 @@ set(LUAROCKS_COMMAND ${LUAROCKS_BIN} --tree=${PROJECT_BINARY_DIR}/resources/lua)
 
 # A function with a variable amount of arguments to sequentially bulild rocks from rockspecs
 # (as luarocks doesn't seem to work when trying to build multiple rocks in parallel), it
-# makes each subsequent rock depend on the previous one and exposes the last one as LAST_ROCKSPEC_TARGET
+# makes each subsequent rock depend on the previous one and exposes the last one as LAST_ROCK_TARGET
 # so that the next target could depend on it and build them all at once
-# Each argument is a list of "name;rockspec;output"
-function(build_rockspecs)
+# Each argument is a list of either "name;rockspec;output" to build a rockspec, or "name;output" to
+# install a package
+function(install_rocks)
   set(current_arg_n 0)
   # Loop through the arguments
   while(${current_arg_n} LESS ${ARGC})
-    # Get the values from the lists into variables
-    list(GET ARGV${current_arg_n} 0 name)
-    list(GET ARGV${current_arg_n} 1 rockspec)
-    list(GET ARGV${current_arg_n} 2 output)
+
+    list(LENGTH ARGV${current_arg_n} arg_length)
+    # 2 args = install package, 3 args = build rockspec
+    if(${arg_length} EQUAL 3)
+      # Get the values from the lists into variables
+      list(GET ARGV${current_arg_n} 0 name)
+      list(GET ARGV${current_arg_n} 1 rockspec)
+      list(GET ARGV${current_arg_n} 2 output)
+    elseif(${ARGC} EQUAL 2)
+      list(GET ARGV${current_arg_n} 0 name)
+      unset(rockspec)
+      list(GET ARGV${current_arg_n} 1 output)
+    endif()
 
     set(full_output_path "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/${output}")
-    add_custom_command(
-      OUTPUT ${full_output_path}
-      DEPENDS luarocks "${PROJECT_SOURCE_DIR}/src/lua/${rockspec}"
-      COMMAND ${LUAROCKS_COMMAND} build ${rockspec}
-      WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/src/lua"
-      )
+
+    # If rockspec is defined, build it, otherwise install the package by name
+    if (rockspec)
+      add_custom_command(
+        OUTPUT ${full_output_path}
+        DEPENDS luarocks "${PROJECT_SOURCE_DIR}/src/lua/${rockspec}"
+        COMMAND ${LUAROCKS_COMMAND} build ${rockspec}
+        WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/src/lua")
+    else()
+      add_custom_command(
+        OUTPUT ${full_output_path}
+        DEPENDS luarocks
+        COMMAND ${LUAROCKS_COMMAND} install ${name})
+    endif()
+
     add_custom_target(${name}-rockspec-build DEPENDS ${full_output_path})
 
     # If there was a target before, add a dependency on that target
@@ -214,17 +233,17 @@ function(build_rockspecs)
     math(EXPR current_arg_n "${current_arg_n} + 1")
   endwhile()
 
-  set(LAST_ROCKSPEC_TARGET ${last_target} PARENT_SCOPE)
+  set(LAST_ROCK_TARGET ${last_target} PARENT_SCOPE)
 endfunction()
 
-build_rockspecs(
+install_rocks(
   "lovetoys;lovetoys-0.4.0-2.rockspec;lovetoys"
   "toml;lua-toml-2.1-0.rockspec;toml.lua"
 )
 
 add_custom_command(
   OUTPUT "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/walking.moon"
-  DEPENDS ${LAST_ROCKSPEC_TARGET} "${PROJECT_SOURCE_DIR}/src/lua/**"
+  DEPENDS ${LAST_ROCK_TARGET} "${PROJECT_SOURCE_DIR}/src/lua/**"
   COMMAND ${LUAROCKS_COMMAND} make someone-0.1-0.rockspec
   WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/src/lua"
 )
@@ -239,3 +258,37 @@ add_custom_target(copy-resources ALL
   COMMAND ${CMAKE_COMMAND} -E copy_directory
   ${CMAKE_SOURCE_DIR}/resources/ ${CMAKE_CURRENT_BINARY_DIR}/resources
 )
+add_dependencies(someone copy-resources)
+
+# Testing
+
+if (SOMEONE_TESTING)
+  target_compile_definitions(someone PRIVATE SOMEONE_TESTING)
+
+  add_custom_command(
+    OUTPUT "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/test/walking.moon"
+    DEPENDS ${LAST_ROCK_TARGET} "${PROJECT_SOURCE_DIR}/test/lua/**"
+    COMMAND ${LUAROCKS_COMMAND} make someone-test-0.1-0.rockspec
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/test/lua"
+    )
+  add_custom_target(lua-test-build DEPENDS "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/test/walking.moon")
+
+  add_custom_command(
+    OUTPUT "${PROJECT_BINARY_DIR}/.luacov"
+    DEPENDS "${PROJECT_SOURCE_DIR}/test/lua/.luacov"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PROJECT_SOURCE_DIR}/test/lua/.luacov" "${PROJECT_BINARY_DIR}/.luacov")
+  add_custom_target(lua-test-copy-luacov DEPENDS "${PROJECT_BINARY_DIR}/.luacov")
+
+  add_custom_target(lua-test-compile-moonscript
+    COMMAND "${PROJECT_BINARY_DIR}/resources/lua/bin/moonc" .
+    DEPENDS copy-resources luarocks-build lua-test-build
+    WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/"
+  )
+
+  add_custom_target(lua-test
+    DEPENDS someone lua-test-copy-luacov lua-test-compile-moonscript
+    COMMAND ./someone
+  )
+
+  add_custom_target(test DEPENDS lua-test)
+endif()

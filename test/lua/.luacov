@@ -1,0 +1,7 @@
+return {
+   include = {
+      "walking", "terminal$", "util.moon$", "components%/.+"
+   },
+   exclude = { "test" },
+   runreport = true
+}

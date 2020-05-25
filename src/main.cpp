@@ -71,9 +71,16 @@ int main(int argc, char **argv) {
     auto package_cpath = std::filesystem::path("resources") / "lua" / "lib" / "lua" / SOMEONE_LUA_VERSION / "?." SOMEONE_LIB_EXT ";";
     lua["package"]["cpath"] = std::string(package_cpath.u8string()) + std::string(lua["package"]["cpath"]);
 
+    #ifdef SOMEONE_TESTING
+    // Has to be included as the first thing to cover everything
+    lua.script("require('luacov')");
+    #else
+    // In testing mode, moonscript is compiled to lua
+    lua.script("require('moonscript')");
+    #endif
+
     register_usertypes(lua, static_fonts);
 
-    lua.script("require('moonscript')");
     CoroutinesEnv coroutines_env(lua);
     TerminalEnv terminal_env(lua);
     WalkingEnv walking_env(lua);
@@ -85,12 +92,22 @@ int main(int argc, char **argv) {
         "Terminal", CurrentState::Terminal,
         "Walking", CurrentState::Walking
     );
-    current_state_type["GLOBAL"] = lua.create_table_with(
+    lua["GLOBAL"] = lua.create_table_with(
         "drawing_target", &target,
         "set_current_state", [&](CurrentState new_state) { current_state = new_state; },
         // Apparently lua doesn't have a good equivalent
         "isalpha", [](int num) { return std::isalpha(num) != 0; }
     );
+
+#ifdef SOMEONE_TESTING
+    for (int i = 1; i < argc; i++) {
+        lua[sol::create_if_nil]["arg"][i] = std::string(argv[i]);
+    }
+
+    walking_env.run_tests();
+
+    return 0;
+#endif
 
     bool debug_menu = false;
 
@@ -115,8 +132,7 @@ int main(int argc, char **argv) {
             case sf::Event::Closed:
                 window.close();
 
-                return 0;
-
+                break;
             case sf::Event::Resized: {
                 float width = event.size.width,
                     height = event.size.height;
@@ -129,7 +145,7 @@ int main(int argc, char **argv) {
                 break;
             }
             case sf::Event::KeyReleased: {
-                // Activate debug menu on ~+1
+                // Activate debug menu on ~
                 if (event.key.code == sf::Keyboard::Tilde)
                     debug_menu = !debug_menu;
                 break;

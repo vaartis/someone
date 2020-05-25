@@ -69,7 +69,8 @@ TransformableComponent.set_world_position = (ent, pos) =>
 
   for _, child in pairs(ent.children)
     child_tf = child\get("Transformable")
-    child_tf\update_local_position(child)
+    child_tf\update_position(child)
+
 TransformableComponent.set_local_position = (ent, pos) =>
   if not ent.parent or not ent.parent.id
     @transformable.position = pos
@@ -77,18 +78,19 @@ TransformableComponent.set_local_position = (ent, pos) =>
     parent_tf = ent.parent\get("Transformable")
 
     @local_position = pos
-    @update_local_position(ent)
+    @update_position(ent)
 
   for _, child in pairs(ent.children)
     child_tf = child\get("Transformable")
-    child_tf\update_local_position(child)
-TransformableComponent.update_local_position = (ent) =>
+    child_tf\update_position(child)
+TransformableComponent.update_position = (ent) =>
     parent_tf = ent.parent\get("Transformable")
 
     @transformable.position = @local_position + parent_tf\world_position(ent.parent)
+
     for _, child in pairs(ent.children)
       child_tf = child\get("Transformable")
-      child_tf\update_local_position(child)
+      child_tf\update_position(child)
 
 AnimationComponent = Component.create(
    "Animation",
