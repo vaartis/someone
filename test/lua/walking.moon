@@ -5,14 +5,13 @@ entities = require("components.entities")
 lume = require("lume")
 
 describe "ECS", ->
-  describe "TransformableComponent", ->
-    before_each ->
-      rooms.reset_engine!
+  before_each ->
+    rooms.reset_engine!
 
+  describe "TransformableComponent", ->
     describe "without a parent", ->
       local ent
       before_each ->
-        rooms.reset_engine!
         ent = entities.instantiate_entity(
           "test",
           {transformable: { position: { 100, 100 } }}
@@ -86,3 +85,24 @@ describe "ECS", ->
         assert.are.equal Vector2f.new(200, 200), child_tf.local_position
 
         assert.are.equal Vector2f.new(500, 500), child2_tf\world_position(child2)
+
+  describe "RenderSystem", ->
+    local ent, ent2, drawable, drawable2
+    before_each ->
+      ent = entities.instantiate_entity(
+        "test1",
+        {
+          drawable: { kind: "text", text: { text: "Test 1" }, z: 2 }
+        }
+      )
+      ent2 = entities.instantiate_entity(
+        "test2",
+        {
+          drawable: { kind: "text", text: { text: "Test 2" }, z: 1 }
+        }
+      )
+      drawable = ent\get("Drawable")
+      drawable2 = ent2\get("Drawable")
+
+    it "sorts entities by Z level", ->
+      assert.are.same { ent2, ent }, rooms.engine.systemRegistry["RenderSystem"]._sorted_targets
