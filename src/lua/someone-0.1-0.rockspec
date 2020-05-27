@@ -7,7 +7,6 @@ dependencies = {
    "lume==2.3.0",
    "lua-path==0.3.1",
    "lunajson==1.2.2",
-   "moonscript==0.5.0",
    "bump==3.1.7"
 }
 
@@ -20,24 +19,24 @@ build = {
    modules = {},
    install = {
       lua = {
-         ["components.shared"] = "components/shared.moon",
-         ["components.player"] = "components/player.moon",
-         ["components.assets"] = "components/assets.moon",
-         ["components.interaction"] = "components/interaction.moon",
-         ["components.debug"] = "components/debug.moon",
-         ["components.rooms"] = "components/rooms.moon",
-         ["components.entities"] = "components/entities.moon",
-         ["components.collider"] = "components/collider.moon",
-         ["components.sound"] = "components/sound.moon",
-         ["components.note"] = "components/note.moon",
+         ["components.shared"] = "components/shared.lua",
+         ["components.player"] = "components/player.lua",
+         ["components.assets"] = "components/assets.lua",
+         ["components.interaction"] = "components/interaction.lua",
+         ["components.debug"] = "components/debug.lua",
+         ["components.rooms"] = "components/rooms.lua",
+         ["components.entities"] = "components/entities.lua",
+         ["components.collider"] = "components/collider.lua",
+         ["components.sound"] = "components/sound.lua",
+         ["components.note"] = "components/note.lua",
 
-         ["components.first_puzzle"] = "components/first_puzzle.moon",
-         ["components.dial_puzzle"] = "components/dial_puzzle.moon",
+         ["components.first_puzzle"] = "components/first_puzzle.lua",
+         ["components.dial_puzzle"] = "components/dial_puzzle.lua",
 
          terminal = "terminal.lua",
-         walking = "walking.moon",
-         coroutines = "coroutines.moon",
-         util = "util.moon",
+         walking = "walking.lua",
+         coroutines = "coroutines.lua",
+         util = "util.lua",
       }
    }
 }

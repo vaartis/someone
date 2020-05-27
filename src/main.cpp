@@ -74,8 +74,7 @@ int main(int argc, char **argv) {
     #ifdef SOMEONE_TESTING
     // Has to be included as the first thing to cover everything
     lua.script("require('luacov')");
-    #else
-    // In testing mode, moonscript is compiled to lua
+    // Tests use moonscript
     lua.script("require('moonscript')");
     #endif
 

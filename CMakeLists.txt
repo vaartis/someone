@@ -242,12 +242,12 @@ install_rocks(
 )
 
 add_custom_command(
-  OUTPUT "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/walking.moon"
+  OUTPUT "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/walking.lua"
   DEPENDS ${LAST_ROCK_TARGET} "${PROJECT_SOURCE_DIR}/src/lua/**"
   COMMAND ${LUAROCKS_COMMAND} make someone-0.1-0.rockspec
   WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/src/lua"
 )
-add_custom_target(luarocks-build DEPENDS "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/walking.moon")
+add_custom_target(luarocks-build DEPENDS "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/walking.lua")
 
 # ===
 
@@ -279,14 +279,8 @@ if (SOMEONE_TESTING)
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PROJECT_SOURCE_DIR}/test/lua/.luacov" "${PROJECT_BINARY_DIR}/.luacov")
   add_custom_target(lua-test-copy-luacov DEPENDS "${PROJECT_BINARY_DIR}/.luacov")
 
-  add_custom_target(lua-test-compile-moonscript
-    COMMAND "${PROJECT_BINARY_DIR}/resources/lua/bin/moonc" .
-    DEPENDS copy-resources luarocks-build lua-test-build
-    WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/"
-  )
-
   add_custom_target(lua-test
-    DEPENDS someone lua-test-copy-luacov lua-test-compile-moonscript
+    DEPENDS someone lua-test-build lua-test-copy-luacov
     COMMAND ./someone
   )
 
