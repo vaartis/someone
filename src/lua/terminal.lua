@@ -196,7 +196,7 @@ local time_per_letter = 0.01
 
 function insert_variables(str)
    return str:gsub(
-      "<(.)>",
+      "<(.+)>",
       function(name)
          return M.state_variables.input_variables[name]
       end
