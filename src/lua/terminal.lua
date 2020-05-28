@@ -622,7 +622,7 @@ function TextInputLine:handle_interaction(event)
             self._letters_output = self._letters_output - 1
 
             return true
-         elseif event.key.code == KeyboardKey.Return then
+         elseif event.key.code == KeyboardKey.Return and #self._input_text > 0 then
             -- Finish input
             reset_after_text_input()
             self._done_input = true
