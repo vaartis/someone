@@ -100,7 +100,7 @@ bar-7:
 
 bar-8:
   text: >-
-    The one I have here is a mix of milk and various syrops. It's not exactly a thing you'd get at the club, more like a coctail. Wanna try
+    The one I have here is a mix of milk and various syrops. It's not exactly a thing you'd get at the club, more like a cocktail. Wanna try
     it?
 
 bar-9:
@@ -112,7 +112,7 @@ bar-10:
   char: description
   wait: true
   text: >-
-    You take a sip of the coctail. It is, indeed, a mixture of milk and various sweet syrops, although the which exact ones you can't quite
+    You take a sip of the cocktail. It is, indeed, a mixture of milk and various sweet syrops, although the which exact ones you can't quite
     figure out.
 
 bar-11:

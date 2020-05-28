@@ -504,11 +504,11 @@
 
      Actually.. maybe is is.. huh.
 
-     The one I have here is a mix of milk and various syrops. It's not exactly a thing you'd get at the club, more like a coctail. Wanna try it?
+     The one I have here is a mix of milk and various syrops. It's not exactly a thing you'd get at the club, more like a cocktail. Wanna try it?
 
      Alright..
 
-     <You take a sip of the coctail. It is, indeed, a mixture of milk and various sweet syrops, although the which exact ones you can't quite figure
+     <You take a sip of the cocktail. It is, indeed, a mixture of milk and various sweet syrops, although the which exact ones you can't quite figure
      out.>
 
      Uh.. don't know if I like it.
@@ -628,7 +628,7 @@
    <p>: Yeah.. There was some kind of a corridor, with a stupid puzzle. So I pressed a few buttons, a melody played, and that somehow brought back the
    city. And you, too, it seems. Looking forward to more changes like that in the future.
 
-   <maj>: Wow.. that is a lot to process.. First off, it's very sad Narra had to experience this. But that's behind you now, and everything's gonan be
+   <maj>: Wow.. that is a lot to process.. First off, it's very sad Narra had to experience this. But that's behind you now, and everything's gonna be
    fine, right?
 
    <narra>: I.. sure hope so. There are still so many people missing.. But we'll try to get them back! We've been to the city with <p> today, it's
