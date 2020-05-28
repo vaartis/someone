@@ -123,7 +123,8 @@ void StoryParser::parse(lines_type &result, std::string file_name, sol::state &l
         if (config["dialogue_between"]) {
             auto dialogue_chars = config["dialogue_between"].as<std::vector<std::string>>();
             dialogue_between_chars.insert(dialogue_between_chars.end(), dialogue_chars.begin(), dialogue_chars.end());
-            dialogue_between_chars_current = 0;
+            // When run for the first time, the first character will be selected, bringing this to 0
+            dialogue_between_chars_current = -1;
         }
     }
 

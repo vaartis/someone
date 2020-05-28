@@ -1,5 +1,7 @@
 #pragma once
 
+#include <SFML/Graphics/Color.hpp>
+
 struct CharacterConfig {
     sf::Color color;
 

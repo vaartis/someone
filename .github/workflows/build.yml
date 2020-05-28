@@ -16,19 +16,34 @@ jobs:
 
     - name: Install deps
       run: |
-        sudo apt-get update && sudo apt-get install -y build-essential clang cmake xorg-dev libgl-dev\
+        # Install a newer version of LLVM
+        wget https://apt.llvm.org/llvm.sh
+        chmod +x llvm.sh
+        sudo ./llvm.sh 10
+
+        sudo apt-get update && sudo apt-get install -y build-essential cmake xorg-dev libgl-dev\
              libudev-dev libopenal-dev libvorbis-dev libflac-dev libreadline-dev libncurses-dev xvfb
 
     - name: Build and run tests
       run: |
         mkdir $GITHUB_WORKSPACE/_build && cd $GITHUB_WORKSPACE/_build
-        cmake .. -DCMAKE_BUILD_TYPE=Debug -DSOMEONE_TESTING=TRUE
-        xvfb-run -a -s "-screen 0 1920x1080x24 +extension GLX +render" make -j $(nproc) test
+        cmake .. -DCMAKE_BUILD_TYPE=Debug -DSOMEONE_TESTING=TRUE -DCMAKE_C_COMPILER=clang-10 -DCMAKE_CXX_COMPILER=clang++-10
+        # Run lua tests, they require a window
+        xvfb-run -a -s "-screen 0 1920x1080x24 +extension GLX +render" make -j $(nproc) lua-test
+        # Run C++ test, they don't need a window
+        make -j $(nproc) cpp-test
+        llvm-profdata-10 merge -sparse -o default.prof default.profraw
+        llvm-cov-10 export -format lcov -instr-profile default.prof ./someone_tests ../src/ > default.info
 
-    - name: Upload coverage
+    - name: Upload lua coverage
       uses: codecov/codecov-action@v1
       with:
         file: /home/runner/work/someone/someone/_build/luacov.report.out
+
+    - name: Upload C++ coverage
+      uses: codecov/codecov-action@v1
+      with:
+        file: /home/runner/work/someone/someone/_build/default.info
 
   build-linux:
     runs-on: ubuntu-18.04

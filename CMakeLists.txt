@@ -3,8 +3,18 @@ cmake_minimum_required(VERSION 3.16)
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
 if(NOT WIN32)
-  set(CMAKE_C_COMPILER clang)
-  set(CMAKE_CXX_COMPILER clang++)
+  # To allow overriding to clang of different name
+  if(NOT CMAKE_C_COMPILER)
+    set(CMAKE_C_COMPILER clang)
+  endif()
+  if(NOT CMAKE_CXX_COMPILER)
+    set(CMAKE_CXX_COMPILER clang++)
+  endif()
+endif()
+
+if(SOMEONE_TESTING)
+  add_compile_options(-O0 -g -fprofile-instr-generate -fcoverage-mapping)
+  add_link_options(-O0 -g -fprofile-instr-generate -fcoverage-mapping)
 endif()
 
 project(someone CXX)
@@ -16,18 +26,22 @@ set(someone_src
   "src/fonts.cpp"
   "src/string_utils.cpp"
   "src/usertypes.cpp"
-  "src/story_parser.cpp"
-  "src/main.cpp"
-)
+  "src/story_parser.cpp")
+
+set(someone_main
+  "src/main.cpp")
+
+add_library(someone_lib STATIC ${someone_src})
+set_target_properties(someone_lib PROPERTIES OUTPUT_NAME "someone")
 
 if(WIN32)
-  add_executable(someone WIN32 ${someone_src})
+  add_executable(someone WIN32 ${someone_main})
 
-  target_compile_definitions(someone PRIVATE -DSOMEONE_LIB_EXT="dll")
-  target_link_options(someone PRIVATE -Wl,--export-all-symbols)
+  target_compile_definitions(someone_lib PUBLIC -DSOMEONE_LIB_EXT="dll")
+  target_link_options(someone_lib PUBLIC -Wl,--export-all-symbols)
 else()
   if(APPLE)
-    add_executable(someone MACOSX_BUNDLE ${someone_src})
+    add_executable(someone MACOSX_BUNDLE ${someone_main})
 
     set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}")
 
@@ -37,20 +51,22 @@ else()
     " COMPONENT Runtime)
     install(DIRECTORY "${CMAKE_BINARY_DIR}/resources" DESTINATION "${CMAKE_INSTALL_PREFIX}/someone.app/Contents/MacOS")
   else()
-    add_executable(someone ${someone_src})
+    add_executable(someone ${someone_main})
   endif()
 
-  target_link_libraries(someone dl)
-  target_compile_definitions(someone PRIVATE -DSOMEONE_LIB_EXT="so")
+  target_link_libraries(someone_lib dl)
+  target_compile_definitions(someone_lib PUBLIC -DSOMEONE_LIB_EXT="so")
 
   if(APPLE)
-    target_link_options(someone PRIVATE -Wl,-export_dynamic)
+    target_link_options(someone_lib PUBLIC -Wl,-export_dynamic)
   else()
-    target_link_options(someone PRIVATE -Wl,-E)
+    target_link_options(someone_lib PUBLIC -Wl,-E)
   endif()
 endif()
 
-target_include_directories(someone PRIVATE "src")
+target_link_libraries(someone someone_lib)
+
+target_include_directories(someone_lib PUBLIC "src")
 
 if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
   set(BUILD_SHARED_LIBS FALSE)
@@ -60,7 +76,7 @@ endif()
 # === SFML
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/deps/sfml" EXCLUDE_FROM_ALL)
-target_link_libraries(someone sfml-graphics sfml-audio)
+target_link_libraries(someone_lib sfml-graphics sfml-audio)
 set_target_properties(sfml-graphics sfml-audio PROPERTIES CXX_STANDARD 14)
 
 # ===
@@ -71,14 +87,14 @@ set(IMGUI_SFML_FIND_SFML FALSE)
 set(IMGUI_DIR "${PROJECT_SOURCE_DIR}/deps/imgui")
 set(SFML_DIR "${PROJECT_SOURCE_DIR}/deps/sfml")
 add_subdirectory("${PROJECT_SOURCE_DIR}/deps/imgui-sfml" EXCLUDE_FROM_ALL)
-target_link_libraries(someone ImGui-SFML::ImGui-SFML)
+target_link_libraries(someone_lib ImGui-SFML::ImGui-SFML)
 
 # ===
 
 # === fmt
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/deps/fmt")
-target_link_libraries(someone fmt)
+target_link_libraries(someone_lib fmt)
 
 # ===
 
@@ -87,22 +103,22 @@ target_link_libraries(someone fmt)
 set(YAML_CPP_BUILD_CONTRIB FALSE)
 set(YAML_CPP_BUILD_TOOLS FALSE)
 add_subdirectory("${PROJECT_SOURCE_DIR}/deps/yaml-cpp")
-target_link_libraries(someone yaml-cpp)
+target_link_libraries(someone_lib yaml-cpp)
 
 # === yaml-cpp
 
 # === spdlog
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/deps/spdlog")
-target_link_libraries(someone spdlog)
+target_link_libraries(someone_lib spdlog)
 
 # ===
 
 # === sol2
 
-target_compile_definitions(someone PRIVATE SOL_ALL_SAFETIES_ON=1)
+target_compile_definitions(someone_lib PUBLIC SOL_ALL_SAFETIES_ON=1)
 add_subdirectory("${PROJECT_SOURCE_DIR}/deps/sol2" EXCLUDE_FROM_ALL)
-target_link_libraries(someone sol2)
+target_link_libraries(someone_lib sol2)
 
 # ===
 
@@ -140,9 +156,9 @@ else()
 endif()
 
 set(SOMEONE_LUA_VERSION "5.3")
-target_compile_definitions(someone PRIVATE SOMEONE_LUA_VERSION="${SOMEONE_LUA_VERSION}")
-target_link_libraries(someone ${LUA_LIBRARY})
-target_include_directories(someone PRIVATE ${LUA_SRC})
+target_compile_definitions(someone_lib PUBLIC SOMEONE_LUA_VERSION="${SOMEONE_LUA_VERSION}")
+target_link_libraries(someone_lib ${LUA_LIBRARY})
+target_include_directories(someone_lib PUBLIC ${LUA_SRC})
 
 # ===
 
@@ -251,19 +267,21 @@ add_custom_target(luarocks-build DEPENDS "${PROJECT_BINARY_DIR}/resources/lua/sh
 
 # ===
 
-add_dependencies(someone luarocks-build)
+add_dependencies(someone_lib luarocks-build)
 
 # Copy all resources
 add_custom_target(copy-resources ALL
   COMMAND ${CMAKE_COMMAND} -E copy_directory
   ${CMAKE_SOURCE_DIR}/resources/ ${CMAKE_CURRENT_BINARY_DIR}/resources
 )
-add_dependencies(someone copy-resources)
+add_dependencies(someone_lib copy-resources)
 
 # Testing
 
 if (SOMEONE_TESTING)
-  target_compile_definitions(someone PRIVATE SOMEONE_TESTING)
+  target_compile_definitions(someone PUBLIC SOMEONE_TESTING)
+
+  # Lua tests
 
   add_custom_command(
     OUTPUT "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/test/walking.moon"
@@ -281,8 +299,26 @@ if (SOMEONE_TESTING)
 
   add_custom_target(lua-test
     DEPENDS someone lua-test-build lua-test-copy-luacov
-    COMMAND ./someone
-  )
+    COMMAND ./someone)
 
-  add_custom_target(test DEPENDS lua-test)
+  # C++ tests
+
+  add_subdirectory("${PROJECT_SOURCE_DIR}/deps/catch2" EXCLUDE_FROM_ALL)
+  add_executable(someone_tests
+    test/cpp/main.cpp
+    test/cpp/story_parser_test.cpp)
+
+  target_link_libraries(someone_tests Catch2::Catch2 someone_lib)
+
+
+  # Copy test resources
+  add_custom_target(copy-test-resources ALL
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    ${CMAKE_SOURCE_DIR}/test/resources/ ${CMAKE_CURRENT_BINARY_DIR}/resources/
+    )
+  add_dependencies(someone_tests copy-test-resources)
+
+  add_custom_target(cpp-test
+    DEPENDS someone_tests
+    COMMAND ./someone_tests)
 endif()

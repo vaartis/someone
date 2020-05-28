@@ -1,5 +1,7 @@
 #pragma once
 
+#include <map>
+
 class StoryParser {
 public:
     using lines_type = std::map<std::string, sol::object>;
