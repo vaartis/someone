@@ -15,6 +15,10 @@ M.interaction_callbacks = {}
 function M.interaction_callbacks.open_dial()
    if not WalkingModule.state_variables.dial_puzzle then
       local puzzle_state = { solved = false, music_played = false, combination = {} }
+
+      -- Update the random seed so that the numbers are actually random
+      math.randomseed(os.time())
+
       for i = 1, 3 do
          puzzle_state.combination[i] = math.random(1, #position_rotations)
       end
