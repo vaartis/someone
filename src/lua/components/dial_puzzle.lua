@@ -20,7 +20,21 @@ function M.interaction_callbacks.open_dial()
       math.randomseed(os.time())
 
       for i = 1, 3 do
-         puzzle_state.combination[i] = math.random(1, #position_rotations)
+         local should_regenerate
+         repeat
+            random_num = math.random(1, #position_rotations)
+
+            -- Combination digits must be unique.
+            -- Also, the first number can't be on the first position.
+            -- If these aren't true, a new number needs to be generated for this position.
+            if (i ~= 1 and lume.find(puzzle_state.combination, random_num)) or (i == 1 and random_num == 1) then
+               should_regenerate = true
+            else
+               should_regenerate = false
+
+               puzzle_state.combination[i] = random_num
+            end
+         until not should_regenerate
       end
 
       WalkingModule.state_variables.dial_puzzle = puzzle_state
