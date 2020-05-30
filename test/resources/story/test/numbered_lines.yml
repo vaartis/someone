@@ -11,11 +11,22 @@ config:
 
 2:
   text: test2
+  next: test-3
 
 3:
-  text: test2
-  char: test2
+  responses:
+  - text: test3
 
 4:
-  text: test1
-  next: ""
+  text: test4
+  next: test-5
+
+test-5:
+  text: test5
+
+test-6:
+  text: test6
+  next: test-end
+
+test-end:
+  text: test-end

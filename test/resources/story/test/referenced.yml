@@ -7,15 +7,9 @@ config:
   dialogue_between: [test1, test2]
 
 1:
-  text: test1
+  text: referenced
 
 2:
-  text: test2
-
-3:
-  text: test2
-  char: test2
-
-4:
-  text: test1
-  next: ""
+  responses:
+  - text: test
+    next: test/referenced_2/1

@@ -1,0 +1,23 @@
+config:
+  chars:
+    test1:
+      color: [0, 0, 0]
+  dialogue_between: [test1]
+
+1:
+  text_input:
+    before: before
+    after: after
+    variable: v1
+    max_length: 1
+  next: 2
+
+2:
+  text_input:
+    before: before2
+    after: after2
+    variable: v2
+    max_length: 2
+
+3:
+  text: test3
