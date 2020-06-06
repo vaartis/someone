@@ -98,8 +98,26 @@ public:
                     shader.setUniform("screenSize", sf::Vector2f(target_window.getSize()));
                 }
 
+                bool enabled = true;
+
                 for (auto &param_data : shader_data) {
                     auto [name, value] = param_data;
+
+                    if (name == "enabled") {
+                        if (value.is<sol::protected_function>()) {
+                            // If "enabled" is a function, call it and convert result to bool
+                            auto result_function = value.as<sol::protected_function>();
+                            enabled = bool(call_or_throw(result_function));
+                        } else {
+                            // Otherwise just convert to bool
+                            enabled = bool(value);
+                        }
+
+                        // If the shader is evaluated as enabled, skip the paramter
+                        // and go to the next one, if it's disabled, stop processing paramters
+                        // and don't run the shader
+                        if (enabled) continue; else break;
+                    }
 
                     // Skip the n field
                     if (name == "n") continue;
@@ -120,7 +138,7 @@ public:
                     spdlog::error("Parameter {} of unknown type in shader {}", name, shader_name);
                 }
 
-                target_window.draw(shaders_sprite, &shader);
+                if (enabled) target_window.draw(shaders_sprite, &shader);
             }
         }
     }

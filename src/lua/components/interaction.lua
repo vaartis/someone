@@ -9,6 +9,12 @@ local assets = require("components.assets")
 
 local M = {}
 
+-- Another initialization because the module may be included early
+lovetoys.initialize({
+      debug = true,
+      globals = true
+})
+
 M.seconds_since_last_interaction = 0 -- Time tracked by dt, since last interaction
 M.seconds_before_next_interaction = 0.3 -- A constant that represents how long to wait between interactions
 
@@ -44,6 +50,11 @@ function InteractionSystem:update(dt)
 
    local any_interactables_touched = false
    for _, obj in pairs(self.targets.objects) do
+
+      -- If the entity has a drawable and it's not enabled, do not process interactions with it
+      local maybe_drawable = obj:get("Drawable")
+      if not maybe_drawable.enabled then goto continue end
+
       local interaction_comp = obj:get("Interaction")
       local physics_world = obj:get("Collider").physics_world
 

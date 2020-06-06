@@ -4,11 +4,7 @@ local json = require("lunajson")
 local lume = require("lume")
 
 local assets = require("components.assets")
-
-lovetoys.initialize({
-      debug = true,
-      globals = true
-})
+local interaction_components = require("components.interaction")
 
 local DrawableComponent = Component.create("Drawable", {"drawable", "z", "kind", "enabled", "layer"})
 
@@ -40,7 +36,12 @@ function RenderSystem:draw(layer)
    for _, entity in ipairs(self._sorted_targets) do
       local drawable = entity:get("Drawable")
 
-      if drawable.enabled then
+      local enabled = drawable.enabled
+      if type(enabled) == "function" then
+         enabled = enabled()
+      end
+
+      if enabled then
          if layer then
             -- If the layer is specified, only draw entities on the layer
             if drawable.layer == layer then GLOBAL.drawing_target:draw(drawable.drawable) end
@@ -200,7 +201,14 @@ function M.process_components(new_ent, comp_name, comp, entity_name)
 
       local enabled
       if comp.enabled ~= nil then
-         enabled = comp.enabled
+         local typ = type(comp.enabled)
+         if typ == "table" then
+            enabled = interaction_components.try_get_fnc_from_module(
+               comp_name, comp, entity_name, "enabled", "activatable_callbacks", "drawing"
+            )
+         else
+            enabled = comp.enabled
+         end
       else
          enabled = true
       end
