@@ -64,10 +64,6 @@ function M.activatable_callbacks.first_puzzle_solved()
    return WalkingModule.state_variables.first_puzzle.solved
 end
 
-function M.activatable_callbacks.first_puzzle_not_solved()
-   return not M.activatable_callbacks.first_puzzle_solved()
-end
-
 function M.activatable_callbacks.first_puzzle_solved_music()
    -- Return true only if music has not already played
    local result = M.activatable_callbacks.first_puzzle_solved() and not played_music
