@@ -110,12 +110,11 @@ function M.load_room(name)
    if room_toml.shaders then
       _room_shaders = room_toml.shaders
       for _, shader in pairs(_room_shaders) do
-         if type(shader.enabled) == "table" then
-            -- If it's a callback specification, look it up
-            shader.enabled = interaction_components.try_get_fnc_from_module(
-               "load_room", shader, "rooms", "enabled", "activatable_callbacks", "shader enabled"
-            )
-         end
+         shader.enabled = interaction_components.process_activatable(
+            shader,
+            "enabled",
+            { entity_name = "rooms", comp_name = "load_room", needed_for = "shader enabled" }
+         )
       end
    else
       _room_shaders = {}

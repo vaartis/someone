@@ -199,19 +199,11 @@ function M.process_components(new_ent, comp_name, comp, entity_name)
          error("Unknown kind of drawable in " .. tostring(entity_name) .. "." .. tostring(comp_name))
       end
 
-      local enabled
-      if comp.enabled ~= nil then
-         local typ = type(comp.enabled)
-         if typ == "table" then
-            enabled = interaction_components.try_get_fnc_from_module(
-               comp_name, comp, entity_name, "enabled", "activatable_callbacks", "drawing"
-            )
-         else
-            enabled = comp.enabled
-         end
-      else
-         enabled = true
-      end
+      local enabled = interaction_components.process_activatable(
+         comp,
+         "enabled",
+         { entity_name = entity_name, comp_name = comp_name, needed_for = "enabled" }
+      )
 
       new_ent:add(
          DrawableComponent(drawable, comp.z, comp.kind, enabled, comp.layer)

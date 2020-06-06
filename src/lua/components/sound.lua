@@ -25,8 +25,11 @@ function M.process_components(new_ent, comp_name, comp, entity_name)
          interaction_components = require("components.interaction")
       end
 
-      local callback =
-         interaction_components.try_get_fnc_from_module(comp_name, comp, entity_name, "activatable_callback", "activatable_callbacks", "activatable")
+      local callback = interaction_components.process_activatable(
+         comp,
+         "activatable_callback",
+         { entity_name = entity_name, comp_name = comp_name, needed_for = "activatable" }
+      )
 
       local sound = Sound.new()
       sound.buffer = assets.assets.sounds[comp.sound_asset]
