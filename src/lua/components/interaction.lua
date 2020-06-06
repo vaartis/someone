@@ -192,7 +192,7 @@ function try_get_fnc_from_module(fnc_data, module_field, context)
       error(
          lume.format(
             "{full_name} requires a module named '{module}' for its {needed_for} callback, but that module cannot be imported",
-            { full_name = full_name, module = fnc_data.module, context.needed_for }
+            { full_name = full_name, module = fnc_data.module, needed_for = context.needed_for }
          )
       )
    end

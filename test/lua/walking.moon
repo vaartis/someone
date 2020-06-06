@@ -1,5 +1,6 @@
 require("busted.runner")()
 
+interaction_components = require("components.interaction")
 rooms = require("components.rooms")
 entities = require("components.entities")
 lume = require("lume")
@@ -106,3 +107,36 @@ describe "ECS", ->
 
     it "sorts entities by Z level", ->
       assert.are.same { ent2, ent }, rooms.engine.systemRegistry["RenderSystem"]._sorted_targets
+
+walking_data = require("test.walking_data")
+
+describe "Callbacks", ->
+  describe "for interactions", ->
+    it "find functions in modules", ->
+      found_f = interaction_components.process_interaction(
+        { callback: { module: "test.walking_data", name: "test_interaction" } },
+        "callback",
+        { entity_name: "test_ent", comp_name: "test_comp", needed_for: "testing" }
+      )
+
+      assert.are.equal found_f, walking_data.interaction_callbacks.test_interaction
+  describe "for activation", ->
+    it "find functions in modules", ->
+      found_f = interaction_components.process_activatable(
+        { activation_callback: { module: "test.walking_data", name: "test_activation" } },
+        "activation_callback",
+        { entity_name: "test_ent", comp_name: "test_comp", needed_for: "testing" }
+      )
+
+      assert.are.equal found_f, walking_data.activatable_callbacks.test_activation
+
+    it "understand the 'not' operation", ->
+      found_f = interaction_components.process_activatable(
+        { activation_callback: { "not": { module: "test.walking_data", name: "test_activation" } } },
+        "activation_callback",
+        { entity_name: "test_ent", comp_name: "test_comp", needed_for: "testing" }
+      )
+
+      -- The result should be the opposite, since the original function is wrapped to return the negation
+      assert.are_not.equal found_f, walking_data.activatable_callbacks.test_activation
+      assert.is_false found_f(true)
