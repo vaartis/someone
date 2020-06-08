@@ -990,26 +990,14 @@ local debug_menu_data = {
 function M.debug_menu()
    local submitted
    debug_menu_data.select_line_text, submitted = ImGui.InputText("Line selection", debug_menu_data.select_line_text)
+
    ImGui.SameLine()
    if ImGui.Button("Switch") or submitted then
       M.set_first_line_on_screen(debug_menu_data.select_line_text)
       debug_menu_data.select_line_text = ""
    end
 
-   local process_node
-   process_node = function(name, data, parent)
-      if type(data) == "table" then
-         if ImGui.TreeNode(name) then
-            for k, v in pairs(data) do process_node(tostring(k), v, data) end
-            ImGui.TreePop()
-         end
-      elseif type(data) == "boolean" then
-         parent[name] = ImGui.Checkbox(name, data)
-      else
-         ImGui.Text(name .. " = " .. tostring(data))
-      end
-   end
-   process_node("State variables", M.state_variables)
+   util.debug_menu_process_state_variable_node("State variables", M.state_variables)
 end
 
 return M

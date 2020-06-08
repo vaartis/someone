@@ -212,6 +212,7 @@ int main(int argc, char **argv) {
                 terminal_env.debug_menu();
                 break;
             case CurrentState::Walking:
+                walking_env.debug_menu();
                 break;
             }
 

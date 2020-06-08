@@ -43,4 +43,17 @@ function M.entities_mod()
    return entities
 end
 
+function M.debug_menu_process_state_variable_node(name, data, parent)
+   if type(data) == "table" then
+      if ImGui.TreeNode(name) then
+         for k, v in pairs(data) do M.debug_menu_process_state_variable_node(tostring(k), v, data) end
+         ImGui.TreePop()
+      end
+   elseif type(data) == "boolean" then
+      parent[name] = ImGui.Checkbox(name, data)
+   else
+      ImGui.Text(name .. " = " .. tostring(data))
+   end
+end
+
 return M
