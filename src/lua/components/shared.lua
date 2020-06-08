@@ -134,7 +134,13 @@ function AnimationSystem:update(dt)
          anim_comp.current_frame = 1
       end
 
-      entity:get("Drawable").drawable.texture_rect = anim_comp.frames[anim_comp.current_frame].rect
+      local next_frame = anim_comp.frames[anim_comp.current_frame]
+      if not next_frame then
+         local name = entity:get("Name").name
+         error(lume.format("Can't find animation frame {1} for entity {2}", {anim_comp.current_frame, name}))
+      end
+
+      entity:get("Drawable").drawable.texture_rect = next_frame.rect
    end
 end
 
