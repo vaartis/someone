@@ -24,7 +24,7 @@ position = [97, 706]
 
 [entities.table.interaction]
 initial_state = "disabled"
-activatable_callback = { module = "components.interaction", name = "first_button_pressed" }
+activatable_callback = { module = "components.interaction", name = "state_variable_equal", args = [ ["first_button_pressed"], true ] }
 callback = { module = "components.interaction", name = "computer_switch_to_terminal" }
 action_text = "use the computer"
 
@@ -51,7 +51,7 @@ playable = false
 initial_state = "disabled"
 state_map = { disabled = 1, enabled = 2 }
 activatable_callback = { module = "components.interaction", name = "state_equal", args = ["disabled"] }
-callback = { module = "components.interaction", name = "activate_computer" }
+callback = { module = "components.interaction", name = "state_variable_set", args = [ ["first_button_pressed"], true, "enabled" ] }
 interaction_sound_asset = "button_press"
 action_text = "press the button"
 

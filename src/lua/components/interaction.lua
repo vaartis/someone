@@ -113,15 +113,70 @@ end
 
 M.activatable_callbacks = {}
 
-function M.activatable_callbacks.first_button_pressed()
-   return WalkingModule.state_variables.first_button_pressed
-end
-
 function M.activatable_callbacks.state_equal(curr_state, to)
    return curr_state == to
 end
 
+--- Ensures that the state variable at path can be placed at that path
+--- after the call, by creating the tables up to the variable name and
+--- returning the table to place the variable into and the name at which
+--- the variable should be assigned
+local function state_variable_ensure_path_up_to(variable_path)
+   local containing_table = WalkingModule.state_variables
+   for n, var_name in ipairs(variable_path) do
+      if n == #variable_path then
+         -- If the current value is the last one, return the containing table
+         return containing_table, var_name
+      else
+         -- Otherwise create them if needed or traverse them if they exist
+         if containing_table[var_name] == nil then
+            containing_table[var_name] = {}
+         elseif type(containing_table[var_name]) ~= "table" then
+            error(
+               lume.format(
+                  "Expected {1} in state variables to be a table, but it's {2}",
+                  var_name, containing_table[var_name]
+               )
+            )
+         end
+
+         containing_table = containing_table[var_name]
+      end
+   end
+end
+
+--- Returns the state variable at the path priovided,
+--- creating that path if needed and returning nil on undefined variables
+local function state_variable_at_path(variable_path)
+   local containing_table, var_name = state_variable_ensure_path_up_to(variable_path)
+
+   return containing_table[var_name]
+end
+
+--- Checks if the state variable is equal to some provided value, handling
+--- boolean values by converting the state variable to boolean and checking equality with that
+function M.activatable_callbacks.state_variable_equal(_state, variable_path, value)
+   local var = state_variable_at_path(variable_path)
+
+   if type(value) == "boolean" then
+      -- not not is a trick to convert a variable to boolean
+      return (not not var) == value
+   else
+      return var == value
+   end
+end
+
 M.interaction_callbacks = {}
+
+--- Sets the state variable at path to a new value, optionally setting the new state of the interactable
+function M.interaction_callbacks.state_variable_set(_state, variable_path, value, new_state)
+   local containing_table, var_name = state_variable_ensure_path_up_to(variable_path)
+
+   containing_table[var_name] = value
+
+   return new_state
+end
+
 function M.interaction_callbacks.computer_switch_to_terminal(curr_state)
    local player = util.rooms_mod().find_player()
 
@@ -134,12 +189,6 @@ function M.interaction_callbacks.computer_switch_to_terminal(curr_state)
          terminal.active = true
       end
    )
-
-   return "enabled"
-end
-
-function M.interaction_callbacks.activate_computer(curr_state)
-   WalkingModule.state_variables.first_button_pressed = true
 
    return "enabled"
 end
