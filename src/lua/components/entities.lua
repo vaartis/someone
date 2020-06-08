@@ -55,6 +55,8 @@ end
 
 local M = {}
 
+local NameComponent = Component.create("Name", {"name"})
+
 function M.instantiate_entity(entity_name, entity, parent)
    -- Has to be required from here to avoid recursive dependency
    if not interaction_components then
@@ -143,6 +145,8 @@ function M.instantiate_entity(entity_name, entity, parent)
          M.instantiate_entity(name, data, new_ent)
       end
    end
+
+   new_ent:add(NameComponent(entity_name))
 
    return new_ent
 end
