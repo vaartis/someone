@@ -131,7 +131,7 @@ int main(int argc, char **argv) {
             case sf::Event::Closed:
                 window.close();
 
-                break;
+                return 0;
             case sf::Event::Resized: {
                 float width = event.size.width,
                     height = event.size.height;
