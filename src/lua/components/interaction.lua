@@ -20,7 +20,7 @@ M.seconds_before_next_interaction = 0.3 -- A constant that represents how long t
 
 local InteractionComponent = Component.create(
    "Interaction",
-   {"on_interaction", "interaction_args", "is_activatable" , "activatable_args", "current_state", "state_map", "interaction_sound", "action_text"}
+   {"on_interaction", "is_activatable", "current_state", "state_map", "interaction_sound", "action_text"}
 )
 
 local InteractionSystem = class("InteractionSystem", System)
@@ -64,19 +64,9 @@ function InteractionSystem:update(dt)
       -- If the player is in the rectangle of the sprite, then check if the interaction button is pressed
       if lume.any(cols, function(e) return e:has("PlayerMovement") end) then
          if interaction_comp.is_activatable then
-            local is_activatable = interaction_comp.is_activatable(
-               interaction_comp.current_state,
-               (function()
-                     if interaction_comp.activatable_args then
-                        if lume.isarray(interaction_comp.activatable_args) then
-                           return table.unpack(interaction_comp.activatable_args)
-                        else
-                           return interaction_comp.activatable_args
-                        end
-                     end
-               end)())
-
-            if not is_activatable then goto continue end
+            if not interaction_comp.is_activatable(interaction_comp.current_state) then
+               goto continue
+            end
          end
          any_interactables_touched = true
 
@@ -84,7 +74,7 @@ function InteractionSystem:update(dt)
          if interaction_comp.action_text then
             action_name = interaction_comp.action_text
          else
-            action_name "interact"
+            action_name = "interact"
          end
          interaction_text_drawable.drawable.string = "[E] to " .. action_name
 
@@ -94,18 +84,7 @@ function InteractionSystem:update(dt)
             event.type == EventType.KeyReleased and event.key.code == KeyboardKey.E then
                M.seconds_since_last_interaction = 0
 
-               local interaction_res = interaction_comp.on_interaction(
-                  interaction_comp.current_state,
-                  (function()
-                        if interaction_comp.interaction_args then
-                           if lume.isarray(interaction_comp.interaction_args) then
-                              return table.unpack(interaction_comp.interaction_args)
-                           else
-                              return interaction_comp.interaction_args
-                           end
-                        end
-                  end)()
-               )
+               local interaction_res = interaction_comp.on_interaction(interaction_comp.current_state)
 
                -- If some kind of result was returned, use it as the new state
                if interaction_res ~= nil and interaction_res ~= interaction_comp.current_state then
@@ -218,7 +197,20 @@ function try_get_fnc_from_module(fnc_data, module_field, context)
       )
    end
 
-   return callback_function
+   -- If there are args specified, put them after whatever is provided when calling
+   if fnc_data.args then
+      if lume.isarray(fnc_data.args) then
+         return function(...)
+            return callback_function(..., table.unpack(fnc_data.args))
+         end
+      else
+         return function(...)
+            return callback_function(..., fnc_data.args)
+         end
+      end
+   else
+      return callback_function
+   end
 end
 
 function M.process_activatable(comp, field, context)
@@ -262,19 +254,14 @@ function M.process_components(new_ent, comp_name, comp, entity_name)
          "callback",
          { entity_name = entity_name, comp_name = comp_name, needed_for = "interaction" }
       )
-      local interaction_args
-      if comp.callback.args then
-         interaction_args = comp.callback.args
-      end
 
-      local activatable_callback, activatable_args
+      local activatable_callback
       if comp.activatable_callback then
          activatable_callback = M.process_activatable(
             comp,
             "activatable_callback",
             { entity_name = entity_name, comp_name = comp_name, needed_for =  "activatable" }
          )
-         activatable_args = comp.activatable_callback.args
       end
 
       local interaction_sound
@@ -286,10 +273,7 @@ function M.process_components(new_ent, comp_name, comp, entity_name)
       new_ent:add(
          InteractionComponent(
             interaction_callback,
-            interaction_args,
-
             activatable_callback,
-            activatable_args,
 
             comp.initial_state,
             comp.state_map,

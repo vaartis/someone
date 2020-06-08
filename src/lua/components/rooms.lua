@@ -17,6 +17,8 @@ local dial_puzzle = require("components.dial_puzzle")
 
 local M = {}
 
+toml.strict = false
+
 -- Loads the room's toml file, processing parent relationships
 local function load_room_toml(name)
    local file = io.open("resources/rooms/" .. tostring(name) .. ".toml", "r")
