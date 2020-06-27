@@ -20,16 +20,28 @@ local M = {}
 toml.strict = false
 
 -- Loads the room's toml file, processing parent relationships
-local function load_room_toml(name)
-   local file = io.open("resources/rooms/" .. tostring(name) .. ".toml", "r")
-   local room_toml = toml.parse(file:read("*all"))
+local function load_room_file(name)
+   local without_extension = "resources/rooms/" .. name
+
+   local room_table
+
+   local file = io.open(without_extension .. ".lua", "r")
+   if file then
+      local loaded, err = load(file:read("*all"), without_extension .. ".lua")
+      if err then error(err) end
+      room_table = loaded()
+   else
+      file = io.open(without_extension .. ".toml", "r")
+      room_table = toml.parse(file:read("*all"))
+   end
+
    file:close()
 
    -- If there's a prefab/base room, load it
-   if room_toml.prefab then
+   if room_table.prefab then
       do
-         local prefab = room_toml.prefab
-         local prefab_room = load_room_toml(prefab.name)
+         local prefab = room_table.prefab
+         local prefab_room = load_room_file(prefab.name)
 
          if prefab.removed_entities then
             for k, v in pairs(prefab_room.entities) do
@@ -40,13 +52,13 @@ local function load_room_toml(name)
             end
          end
 
-         room_toml = util.deep_merge(prefab_room, room_toml)
+         room_table = util.deep_merge(prefab_room, room_table)
       end
       -- Remove the mention of the prefab
-      room_toml.prefab = nil
+      room_table.prefab = nil
    end
 
-   return room_toml
+   return room_table
 end
 
 local CustomEngine = class("CustomEgine", Engine)
@@ -107,7 +119,7 @@ function M.load_room(name)
    M.reset_engine()
    collider_components.reset_world()
 
-   local room_toml = load_room_toml(name)
+   local room_toml = load_room_file(name)
 
    if room_toml.shaders then
       _room_shaders = room_toml.shaders
