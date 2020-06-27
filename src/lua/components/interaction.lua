@@ -48,13 +48,9 @@ function InteractionSystem:update(dt)
       M.seconds_since_last_interaction = M.seconds_since_last_interaction + dt
    end
 
+   local interactables_touched = {}
    local any_interactables_touched = false
    for _, obj in pairs(self.targets.objects) do
-
-      -- If the entity has a drawable and it's not enabled, do not process interactions with it
-      local maybe_drawable = obj:get("Drawable")
-      if not maybe_drawable.enabled then goto continue end
-
       local interaction_comp = obj:get("Interaction")
       local physics_world = obj:get("Collider").physics_world
 
@@ -68,38 +64,8 @@ function InteractionSystem:update(dt)
                goto continue
             end
          end
-         any_interactables_touched = true
-
-         local action_name
-         if interaction_comp.action_text then
-            action_name = interaction_comp.action_text
-         else
-            action_name = "interact"
-         end
-         interaction_text_drawable.drawable.string = "[E] to " .. action_name
-
-         for _, native_event in pairs(M.event_store.events) do
-            local event = native_event.event
-            if M.seconds_since_last_interaction > M.seconds_before_next_interaction and
-            event.type == EventType.KeyReleased and event.key.code == KeyboardKey.E then
-               M.seconds_since_last_interaction = 0
-
-               local interaction_res = interaction_comp.on_interaction(interaction_comp.current_state)
-
-               -- If some kind of result was returned, use it as the new state
-               if interaction_res ~= nil and interaction_res ~= interaction_comp.current_state then
-                  interaction_comp.current_state = interaction_res
-
-                  -- Play the sound if there is one
-                  if interaction_comp.interaction_sound then
-                     interaction_comp.interaction_sound:play()
-                  end
-               end
-            end
-         end
+         table.insert(interactables_touched, interaction_comp)
       end
-
-      interaction_text_drawable.enabled = any_interactables_touched
 
       -- Update the current texture frame if there's a state map
       if interaction_comp.state_map then
@@ -108,6 +74,94 @@ function InteractionSystem:update(dt)
       end
 
       ::continue::
+   end
+
+   interaction_text_drawable.enabled = #interactables_touched > 0
+   if #interactables_touched > 0 then
+      local pressed_e, pressed_number
+      for _, native_event in pairs(M.event_store.events) do
+         local event = native_event.event
+         if M.seconds_since_last_interaction > M.seconds_before_next_interaction then
+            if event.type == EventType.KeyReleased and event.key.code == KeyboardKey.E then
+               M.seconds_since_last_interaction = 0
+
+               pressed_e = true
+            elseif event.type == EventType.TextEntered then
+               local ch = string.char(event.text.unicode)
+
+               -- Convert the character to it's number equivalent
+               pressed_number = tonumber(ch)
+            end
+         end
+      end
+
+      local interaction_to_execute
+      local drawable_string
+      if self._selecting_interactable then
+         -- If the player is currently selecting an interactable from the list,
+         -- collect the interaction strings and show all of the numbered
+         local desc_texts = {}
+         for n, interactable in ipairs(interactables_touched) do
+            local action_name
+            if interactable.action_text then
+               action_name = interactable.action_text
+            else
+               action_name = "interact"
+            end
+
+            table.insert(desc_texts, lume.format("{1}. {2}", {n, action_name}))
+         end
+
+         drawable_string = table.concat(desc_texts, "\n")
+
+         -- If any number was pressed, look it up in the touched list
+         -- If a number is not in there, it will just be nil anyway
+         if pressed_number then
+            interaction_to_execute = interactables_touched[pressed_number]
+         end
+      else
+         -- If not and there's more than one interactable, prompt to select one
+         if #interactables_touched > 1 then
+            drawable_string = "[E] to..."
+            if pressed_e then
+               self._selecting_interactable = true
+            end
+         else
+            -- If there's only one interactable, just use that one
+            local interactable = interactables_touched[1]
+
+            if interactable.action_text then
+               action_name = interactable.action_text
+            else
+               action_name = "interact"
+            end
+
+            drawable_string = "[E] to " .. action_name
+
+            -- If action was pressed, mark it as the one to execute
+            if pressed_e then
+               interaction_to_execute = interactable
+            end
+         end
+      end
+
+      interaction_text_drawable.drawable.string = drawable_string
+
+      if interaction_to_execute then
+         local interaction_res = interaction_to_execute.on_interaction(interaction_to_execute.current_state)
+
+         -- If some kind of result was returned, use it as the new state
+         if interaction_res ~= nil and interaction_res ~= interaction_to_execute.current_state then
+            interaction_to_execute.current_state = interaction_res
+
+            -- Play the sound if there is one
+            if interaction_to_execute.interaction_sound then
+               interaction_to_execute.interaction_sound:play()
+            end
+         end
+      end
+   elseif self._selecting_interactable then
+      self._selecting_interactable = false
    end
 end
 

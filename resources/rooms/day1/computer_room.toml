@@ -76,6 +76,3 @@ collider = { mode = "constant", size = [10, 400] }
 [entities.right_wall]
 transformable = { position = [1130, 500] }
 collider = { mode = "constant", size = [10, 400] }
-
-[entities.interaction_text]
-prefab = "interaction_text"

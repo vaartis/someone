@@ -14,3 +14,15 @@ footstep_sound_asset = "footstep"
 
 [collider]
 mode = "sprite"
+
+[children.interaction_text]
+tags = [ "InteractionText" ]
+
+[children.interaction_text.drawable]
+kind = "text"
+text = { text = "[E] to", font_size = 24 }
+z = 2
+enabled = false
+
+[children.interaction_text.transformable]
+position = [-50, 0]
