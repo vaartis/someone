@@ -2,6 +2,7 @@
 n = 2
 point = [1030, 690]
 brightness = 0.15
+enabled = { module = "components.interaction", name = "state_variable_equal", args = [ ["first_puzzle_lamp", "taken"], false ] }
 
 [prefab]
 name = "day2/first_puzzle_room"
@@ -34,12 +35,22 @@ z = 1
 position = [922, 709]
 
 [entities.lamp.drawable]
+enabled = { module = "components.interaction", name = "state_variable_equal", args = [ ["first_puzzle_lamp", "taken"], false ] }
 kind = "sprite"
 texture_asset = "table_lamp"
 z = 2
 
+[entities.lamp.collider]
+mode = "sprite"
+trigger = true
+
 [entities.lamp.transformable]
 position = [1018, 670]
+
+[entities.lamp.interaction]
+activatable_callback = { module = "components.interaction", name = "state_variable_equal", args = [ ["first_puzzle_lamp", "taken"], false ] }
+callback = { module = "components.interaction", name = "state_variable_set", args = [ ["first_puzzle_lamp", "taken"], true ] }
+action_text = "take the lamp"
 
 [entities.note]
 transformable = { position = [1010, 720] }

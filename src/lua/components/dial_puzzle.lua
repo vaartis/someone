@@ -11,8 +11,7 @@ local position_rotations = {
 
 local M = {}
 
-M.interaction_callbacks = {}
-function M.interaction_callbacks.open_dial()
+local function ensure_state_init()
    if not WalkingModule.state_variables.dial_puzzle then
       local puzzle_state = { solved = false, music_played = false, combination = {} }
 
@@ -39,16 +38,30 @@ function M.interaction_callbacks.open_dial()
 
       WalkingModule.state_variables.dial_puzzle = puzzle_state
    end
+end
+
+M.interaction_callbacks = {}
+function M.interaction_callbacks.open_dial()
+   ensure_state_init()
 
    util.entities_mod().instantiate_entity("dial_closeup", { prefab = "dial" })
 end
 
 
 M.activatable_callbacks = {}
+
+function M.activatable_callbacks.puzzle_solved()
+   ensure_state_init()
+
+   return WalkingModule.state_variables.dial_puzzle.solved
+end
+
 function M.activatable_callbacks.solved_music()
+   ensure_state_init()
+
    if WalkingModule.state_variables.dial_puzzle then
       local state = WalkingModule.state_variables.dial_puzzle
-      if state.solved and not state.music_played then
+      if M.activatable_callbacks.puzzle_solved() and not state.music_played then
          state.music_played = true
 
          return true
