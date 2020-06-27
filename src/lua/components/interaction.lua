@@ -332,6 +332,16 @@ function M.process_activatable(comp, field, context)
          return function(...)
             return not fnc(...)
          end
+      elseif got_field["and"] then
+         local conds = {}
+         for _, cnd in ipairs(got_field["and"]) do
+            table.insert(conds, try_get_fnc_from_module(cnd, "activatable_callbacks", context))
+         end
+
+         return function(...)
+            local args = { ... }
+            return lume.all(conds, function(f) return f(table.unpack(args)) end)
+         end
       else
          return try_get_fnc_from_module(got_field, "activatable_callbacks", context)
       end
