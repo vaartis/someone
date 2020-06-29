@@ -19,6 +19,7 @@ build = {
    modules = {},
    install = {
       lua = {
+         walking = "walking.lua",
          ["components.shared"] = "components/shared.lua",
          ["components.player"] = "components/player.lua",
          ["components.assets"] = "components/assets.lua",
@@ -34,7 +35,8 @@ build = {
          ["components.dial_puzzle"] = "components/dial_puzzle.lua",
 
          terminal = "terminal.lua",
-         walking = "walking.lua",
+         ["terminal.lines"] = "terminal/lines.lua",
+
          coroutines = "coroutines.lua",
          util = "util.lua",
       }
