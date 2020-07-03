@@ -32,6 +32,8 @@ template <> struct convert<CharacterConfig> {
 
         if (node["color"])
             rhs.color = node["color"].as<sf::Color>();
+        if (node["font_size"])
+            rhs.font_size = node["font_size"].as<uint32_t>();
 
         return true;
     }

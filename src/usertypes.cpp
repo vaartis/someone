@@ -139,7 +139,8 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
         ),
         "global_bounds", sol::property(&sf::Text::getGlobalBounds),
         "fill_color", sol::property(&sf::Text::getFillColor, &sf::Text::setFillColor),
-        "style", sol::property(&sf::Text::getStyle, &sf::Text::setStyle)
+        "style", sol::property(&sf::Text::getStyle, &sf::Text::setStyle),
+        "character_size", sol::property(&sf::Text::getCharacterSize, &sf::Text::setCharacterSize)
     );
 
     auto text_style_enum = lua.new_enum(
@@ -283,7 +284,8 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
 
     auto char_config_type = lua.new_usertype<CharacterConfig>(
         "CharacterConfig",
-        "color", sol::readonly(&CharacterConfig::color)
+        "color", sol::readonly(&CharacterConfig::color),
+        "font_size", sol::readonly(&CharacterConfig::font_size)
     );
 
     auto term_line_type = lua.new_usertype<TerminalLineData>(

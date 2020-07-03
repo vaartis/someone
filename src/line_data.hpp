@@ -1,11 +1,13 @@
 #pragma once
 
 #include <SFML/Graphics/Color.hpp>
+#include "fonts.hpp"
 
 struct CharacterConfig {
     sf::Color color;
+    uint32_t font_size;
 
-    CharacterConfig(sf::Color color_ = sf::Color::White) : color(color_) {}
+    CharacterConfig(sf::Color color = sf::Color::White, uint32_t size = StaticFonts::font_size) : color(color), font_size(size) {}
 };
 
 struct TerminalLineData {
@@ -50,4 +52,12 @@ struct TerminalTextInputLineData : TerminalLineData {
 
     TerminalTextInputLineData(std::string before, std::string after, std::string variable, uint32_t max_length, std::string next)
         : before(before), after(after), variable(variable), max_length(max_length), next(next) {}
+};
+
+struct TerminalCustomLineData : TerminalLineData {
+    sol::object class_;
+    sol::object data;
+
+    TerminalCustomLineData(sol::object class_, sol::object data)
+        : data(data), class_(class_) { }
 };
