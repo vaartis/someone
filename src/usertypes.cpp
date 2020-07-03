@@ -330,4 +330,11 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
         "max_length", sol::readonly(&TerminalTextInputLineData::max_length),
         "next", sol::readonly(&TerminalTextInputLineData::next)
     );
+
+    auto custom_line_type = lua.new_usertype<TerminalCustomLineData>(
+        "TerminalCustomLineData",
+        sol::base_classes, sol::bases<TerminalLineData>(),
+        "class", sol::readonly(&TerminalCustomLineData::class_),
+        "data", sol::readonly(&TerminalCustomLineData::data)
+    );
 }

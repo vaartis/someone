@@ -350,6 +350,61 @@ void StoryParser::parse(lines_type &result, std::string file_name, sol::state &l
                     data["before"].as<std::string>(), data["after"].as<std::string>(), data["variable"].as<std::string>(),
                     data["max_length"].as<uint32_t>(), next
                 );
+        } else if (node["custom"]) {
+            auto custom = node["custom"];
+
+            std::string module = custom["class"]["module"].as<std::string>();
+            std::string class_ = custom["class"]["class"].as<std::string>();
+
+            auto imported_module = lua.script(fmt::format("return require('{}')", module));
+
+            sol::optional<sol::table> maybe_class = imported_module.get<sol::table>()[class_];
+            if (!maybe_class) {
+                spdlog::error("Cannot find the {} class in the {} module for the {} custom line", class_, module, inserted_name);
+                std::terminate();
+            }
+
+            std::function<sol::object (const YAML::Node &)> convert =
+                [&](const YAML::Node &data_entry) -> sol::object {
+                    using namespace YAML;
+
+                    switch (data_entry.Type()) {
+                    case NodeType::Null:
+                        return sol::object();
+                    case NodeType::Scalar:
+                        if (float val; YAML::convert<float>::decode(data_entry, val))
+                            return sol::make_object(lua, val);
+                        else if (int val; YAML::convert<int>::decode(data_entry, val))
+                            return sol::make_object(lua, val);
+                        else if (std::string val; YAML::convert<std::string>::decode(data_entry, val)) {
+                            return sol::make_object(lua, val);
+                        }
+                    case NodeType::Sequence: {
+                        auto arr = lua.create_table();
+                        for (auto val : data_entry) {
+                            arr.add(convert(val));
+                        }
+
+                        return arr;
+                    }
+                    case NodeType::Map: {
+                        sol::table table = lua.create_table();
+
+                        for (const auto &kv : data_entry) {
+                            auto name = kv.first.as<std::string>();
+                            auto data_entry = kv.second;
+
+                            table[name] = convert(data_entry);
+                        }
+
+                        return table;
+                    }
+                    case NodeType::Undefined:
+                        throw std::runtime_error("Undefined key found?");
+                    }
+                };
+
+            result_object = sol::make_object<TerminalCustomLineData>(lua, *maybe_class, convert(custom["data"]));
         } else {
             spdlog::error("Unknown line type at {}", inserted_name);
             std::terminate();

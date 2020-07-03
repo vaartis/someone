@@ -524,6 +524,8 @@ function M.make_line(name, line)
       to_insert = M.VariantInputLine(name, line.variants)
    elseif tp == "TerminalTextInputLineData" then
       to_insert = M.TextInputLine(name, line.before, line.after, line.variable, line.max_length, line.next)
+   elseif tp == "TerminalCustomLineData" then
+      to_insert = line.class(name, line.data)
    else
       error(lume.format("Unknown line type {1}", {tp}))
    end
