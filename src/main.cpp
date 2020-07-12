@@ -95,7 +95,8 @@ int main(int argc, char **argv) {
         "drawing_target", &target,
         "set_current_state", [&](CurrentState new_state) { current_state = new_state; },
         // Apparently lua doesn't have a good equivalent
-        "isalpha", [](int num) { return std::isalpha(num) != 0; }
+        "isalpha", [](int num) { return std::isalpha(num) != 0; },
+        "story_parser", terminal_env.parser
     );
 
 #ifdef SOMEONE_TESTING

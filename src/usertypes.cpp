@@ -9,6 +9,7 @@
 #include "sol/sol.hpp"
 #include <fmt/format.h>
 
+#include "story_parser.hpp"
 #include "usertypes.hpp"
 #include "line_data.hpp"
 
@@ -273,6 +274,11 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
 
 
     // Helper classes
+
+    auto story_parser_type = lua.new_usertype<StoryParser>(
+        "StoryParser",
+        "maybe_parse_referenced_file", &StoryParser::maybe_parse_referenced_file
+    );
 
     auto static_fonts_type = lua.new_usertype<StaticFonts>(
         "StaticFonts",
