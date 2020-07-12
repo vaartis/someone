@@ -149,12 +149,11 @@ end
 
 local time_before_output = 0.5
 
--- Called from C++ to add native lines
-function M.add_native_lines(in_lines)
-   -- Setting them by key allows merging
-   for name, line in pairs(in_lines) do
-      lines.native_lines[name] = line
-   end
+-- Called from C++ to set native lines
+function M.set_native_lines(in_lines)
+   -- This replaces the native lines with data from C++, which also updates
+   -- when updated from C++
+   lines.native_lines = in_lines
 end
 
 -- Called from C++ to set up the first line on screen

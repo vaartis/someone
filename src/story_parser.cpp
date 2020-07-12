@@ -50,25 +50,25 @@ std::string namespace_of(std::string next) {
     }
 }
 
-void StoryParser::maybe_parse_referenced_file(std::string next, lines_type &result, sol::state &lua) {
+void StoryParser::maybe_parse_referenced_file(std::string next) {
     // If it IS namespaced, try parsing a file that it references if it's not parsed yet
 
     auto next_namespace = namespace_of(next);
 
-    auto any_already = std::find_if(
-        result.begin(),
-        result.end(),
-        [&](auto pair) {
-            auto &[k, v] = pair;
-            return namespace_of(k) == next_namespace;
+    bool any_already = false;
+    for (const auto &[key, value] : lines) {
+        if (namespace_of(key.as<std::string>()) == next_namespace) {
+            any_already = true;
+
+            break;
         }
-    );
+    }
 
     // If it has not already been parsed, parse the referenced file
-    if (any_already == result.end()) {
+    if (!any_already) {
         spdlog::debug("Encountered a reference to a new namespace {}, parsing it", next_namespace);
 
-        StoryParser::parse(result, next_namespace, lua);
+        StoryParser::parse(next_namespace);
     }
 }
 
@@ -93,7 +93,7 @@ std::optional<std::tuple<std::string, uint32_t>> split_as_numbered(const std::st
     }
 }
 
-void StoryParser::parse(lines_type &result, std::string file_name, sol::state &lua) {
+void StoryParser::parse(std::string file_name) {
     auto full_file_name = std::filesystem::path("resources/story/") / file_name;
     full_file_name.replace_extension(".yml");
 
@@ -225,7 +225,7 @@ void StoryParser::parse(lines_type &result, std::string file_name, sol::state &l
                     next = fmt::format("{}/{}", nmspace, next);
                 else
                     // If the name is namespaced, parse the referenced file now
-                    maybe_parse_referenced_file(next, result, lua);
+                    maybe_parse_referenced_file(next);
 
 
                 next_references_to_check.insert({inserted_name, next});
@@ -285,7 +285,7 @@ void StoryParser::parse(lines_type &result, std::string file_name, sol::state &l
                 if (resp_next.find('/') == std::string::npos)
                     resp_next = fmt::format("{}/{}", nmspace, resp_next);
                 else
-                    maybe_parse_referenced_file(resp_next, result, lua);
+                    maybe_parse_referenced_file(resp_next);
 
                 next_references_to_check.insert({
                         fmt::format("response '{}' of {}", resp_text, inserted_name),
@@ -338,7 +338,7 @@ void StoryParser::parse(lines_type &result, std::string file_name, sol::state &l
                     next = fmt::format("{}/{}", nmspace, next);
                 else
                     // If the name is namespaced, parse the referenced file now
-                    maybe_parse_referenced_file(next, result, lua);
+                    maybe_parse_referenced_file(next);
 
 
                 next_references_to_check.insert({inserted_name, next});
@@ -415,11 +415,13 @@ void StoryParser::parse(lines_type &result, std::string file_name, sol::state &l
         general_line.script = node_script;
         general_line.script_after = node_script_after;
 
-        result.insert({inserted_name, result_object});
+        lines[inserted_name] = result_object;
     }
 
     for (auto &[at, expected_next] : next_references_to_check) {
-        if (!result[expected_next]) {
+        sol::optional maybe_next = lines[expected_next];
+
+        if (!maybe_next) {
             spdlog::warn("{} wants {} as next, but it does not exist", at, expected_next);
         }
     }

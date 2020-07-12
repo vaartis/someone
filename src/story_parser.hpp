@@ -3,13 +3,16 @@
 #include <map>
 
 class StoryParser {
+    sol::state &lua;
 public:
-    using lines_type = std::map<std::string, sol::object>;
+    sol::table &lines;
 
-    static void parse(lines_type &result, std::string file_name, sol::state &lua);
-private:
+    StoryParser(sol::table &lines, sol::state &state) : lua(state), lines(lines) {}
+
+    void parse(std::string file_name);
+
     /** If "next" references a namespace, parse the file that contains
      *  this namespace if it hasn't already been parsed.
      */
-    static void maybe_parse_referenced_file(std::string next, lines_type &result, sol::state &lua);
+    void maybe_parse_referenced_file(std::string next);
 };

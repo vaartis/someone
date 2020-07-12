@@ -5,13 +5,15 @@
 
 class TerminalEnv : public LuaModuleEnv {
 private:
-    StoryParser::lines_type lines;
+    sol::table lines;
 
-    sol::protected_function add_lines_f, set_first_line_f, draw_f, process_event_f, update_event_timer_f,
+    sol::protected_function set_lines_f, set_first_line_f, draw_f, process_event_f, update_event_timer_f,
         debug_menu_f;
 public:
-    void add_lines(StoryParser::lines_type &lines) {
-        call_or_throw(add_lines_f, lines);
+    StoryParser parser;
+
+    void set_lines() {
+        call_or_throw(set_lines_f, lines);
     }
 
     void set_first_line(std::string &&line) {
@@ -34,11 +36,11 @@ public:
         call_or_throw(debug_menu_f);
     }
 
-    TerminalEnv(sol::state &lua) : LuaModuleEnv(lua) {
+    TerminalEnv(sol::state &lua) : lines(lua.create_table()), LuaModuleEnv(lua), parser(StoryParser(lines, lua)) {
         // This both defines a global for the module and returns it
         module = lua.require_script("TerminalModule", "return require('terminal')");
 
-        add_lines_f = module["add_native_lines"];
+        set_lines_f = module["set_native_lines"];
         set_first_line_f = module["set_first_line_on_screen"];
         draw_f = module["draw"];
         process_event_f = module["process_event"];
@@ -46,9 +48,11 @@ public:
         debug_menu_f = module["debug_menu"];
 
         // Parse the lines from the prologue file and going forward from it
-        StoryParser::parse(lines, "day1/prologue", lua);
+        parser.parse("day1/prologue");
+        parser.parse("instances/menu");
+
         // Add the lines from the loaded file
-        add_lines(lines);
+        set_lines();
         // After the lines are added, set up the first line on screen
         set_first_line("day1/prologue/1");
     }
