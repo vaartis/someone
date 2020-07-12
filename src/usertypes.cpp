@@ -90,7 +90,8 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
         "a", &sf::Color::a,
 
         "Black", sol::var(sf::Color::Black),
-        "Red", sol::var(sf::Color::Red)
+        "Red", sol::var(sf::Color::Red),
+        "Yellow", sol::var(sf::Color::Yellow)
     );
 
     auto tf_type = lua.new_usertype<sf::Transformable>(
@@ -219,6 +220,7 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
         "E", sf::Keyboard::E,
         "S", sf::Keyboard::S,
         "L", sf::Keyboard::L,
+        "Z", sf::Keyboard::Z,
         "LControl", sf::Keyboard::LControl,
         "Return", sf::Keyboard::Return,
         "Backspace", sf::Keyboard::Backspace

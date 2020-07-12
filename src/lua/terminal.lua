@@ -4,6 +4,7 @@ local coroutines = require("coroutines")
 local toml = require("toml")
 local util = require("util")
 
+local instance_menu = require("terminal.instance_menu")
 local lines = require("terminal.lines")
 
 local first_line_on_screen
@@ -60,7 +61,7 @@ function show_info_message(message)
    )
 end
 
-function save_game(first_line, last_line)
+local function save_game(first_line, last_line)
    local lines_to_save = {}
    local current_line = first_line
 
@@ -100,7 +101,7 @@ function save_game(first_line, last_line)
    show_info_message("Game saved")
 end
 
-function load_game()
+local function load_game()
    local file, err = io.open("save.toml", "r")
    if err then
       show_info_message("Error loading save data: \"" .. err .. "\"")
@@ -326,6 +327,8 @@ function M.update_event_timer(dt)
    time_since_last_interaction = time_since_last_interaction + dt
 end
 
+local main_instance_saved_first
+
 function M.process_event(event, dt)
    local line = first_line_on_screen
    while true do
@@ -352,6 +355,16 @@ function M.process_event(event, dt)
                   time_since_last_interaction = 0
                   -- Pass the first and the last line
                   load_game()
+               elseif Keyboard.is_key_pressed(KeyboardKey.Z) then
+                  time_since_last_interaction = 0
+
+                  if not main_instance_saved_first then
+                     main_instance_saved_first = first_line_on_screen
+                     M.set_first_line_on_screen("instances/menu/1")
+                  else
+                     first_line_on_screen = main_instance_saved_first
+                     main_instance_saved_first = nil
+                  end
                end
             end
          end
@@ -428,7 +441,8 @@ M.state_variables = {
          dance_floor = false
       }
    },
-   talking_topics = {}
+   talking_topics = {},
+   decrypted_instances = {}
 }
 
 function M.talking_topic_known(topic)

@@ -1,0 +1,9 @@
+config:
+  chars:
+    test:
+      color: [255, 0, 0]
+
+1:
+  text: test
+  char: test
+  next: ""

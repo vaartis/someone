@@ -35,6 +35,7 @@ build = {
          ["components.dial_puzzle"] = "components/dial_puzzle.lua",
 
          terminal = "terminal.lua",
+         ["terminal.instance_menu"] = "terminal/instance_menu.lua",
          ["terminal.lines"] = "terminal/lines.lua",
 
          coroutines = "coroutines.lua",

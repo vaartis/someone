@@ -1,0 +1,41 @@
+config:
+  chars:
+    text:
+      color: [255, 255, 255]
+    big_text:
+      color: [255, 255, 255]
+      font_size: 32
+    warn_text:
+      color: [255, 255, 0]
+    err_text:
+      color: [255, 0, 0]
+
+1:
+  text: INSTANCE SELECTION
+  char: big_text
+
+2:
+  text: |-
+    Input archive password with keyboard to decrypt archived instances.
+    Input instance number to select instance.
+    Press Ctrl+Z again to exit the menu.
+  char: text
+
+3:
+  text: "WARNING: Could not mount archive storage as read-write, mounting as read-only."
+  char: warn_text
+
+4:
+  custom:
+    class: { module: "terminal.instance_menu", class: "InstanceMenuLine" }
+    data:
+      instance_menu:
+      - name: Famine
+        password: aqualung
+        next: "instances/hunger/1"
+  char: text
+
+wrong_password:
+  char: err_text
+  text: "Password not recognized"
+  next: 4

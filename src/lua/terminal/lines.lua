@@ -6,10 +6,10 @@ local M = {
    -- This is used to not make the events not throttle when text is being input
    inputting_text = false,
    -- Native lines, data received from C++
-   native_lines = {}
-}
+   native_lines = {},
 
-local time_per_letter = 0.01
+   time_per_letter = 0.01
+}
 
 local function insert_variables(str)
    return str:gsub(
@@ -23,14 +23,15 @@ end
 -- Text object used for max_string_height calculation
 local max_string_height_text
 
-local function max_string_height(str)
+function M.max_string_height(str, font_size)
    local term_width = M.max_text_width()
    local fit_str = lume.wordwrap(str, term_width)
 
    if not max_string_height_text then
-      max_string_height_text = Text.new(fit_str, StaticFonts.main_font, StaticFonts.font_size)
+      max_string_height_text = Text.new(fit_str, StaticFonts.main_font, font_size)
    else
       max_string_height_text.string = fit_str
+      max_string_height_text.character_size = font_size
    end
 
    return max_string_height_text.global_bounds.height
@@ -114,10 +115,11 @@ end
 -- The character is set after initialization, so character-specific things need to be done after
 function M.OutputLine:update_for_character()
    self._text_object.fill_color = self._character.color
+   self._text_object.character_size = self._character.font_size
 end
 
 function M.OutputLine:max_line_height()
-   return max_string_height(self._text)
+   return M.max_string_height(self._text, self._character.font_size)
 end
 
 function M.OutputLine:should_wait()
@@ -125,7 +127,7 @@ function M.OutputLine:should_wait()
 end
 
 function M.OutputLine:maybe_increment_letter_count()
-   if self._letters_output < #self._text and self._time_since_last_letter >= time_per_letter then
+   if self._letters_output < #self._text and self._time_since_last_letter >= M.time_per_letter then
       self._time_since_last_letter = 0.0
       self._letters_output = self._letters_output + 1
    end
@@ -298,19 +300,20 @@ end
 function M.VariantInputLine:update_for_character()
    for _, v in pairs(self._variants) do
       v.text_object.fill_color = self._character.color
+      v.text_object.character_size = self._character.font_size
    end
 end
 
 function M.VariantInputLine:max_line_height(variant)
-   return max_string_height(self._variants[variant].text)
+   return M.max_string_height(self._variants[variant].text, self._character.font_size)
 end
 
 function M.VariantInputLine:should_wait()
-   return (self._letters_output < self._longest_var_length and self._time_since_last_letter < time_per_letter) or not self._selected_variant;
+   return (self._letters_output < self._longest_var_length) or not self._selected_variant;
 end
 
 function M.VariantInputLine:maybe_increment_letter_count()
-   if self._letters_output < self._longest_var_length and self._time_since_last_letter >= time_per_letter then
+   if self._letters_output < self._longest_var_length and self._time_since_last_letter >= M.time_per_letter then
       self._time_since_last_letter = 0.0;
 
       self._letters_output = self._letters_output + 1
@@ -339,10 +342,6 @@ function M.VariantInputLine:current_text()
 end
 
 function M.VariantInputLine:next()
-   if not self._selected_variant then
-      return "";
-   end
-
    -- If the next line wasn't instantiated yet, create it
    if not self._selected_variant_next_instance then
       local nxt_name = self._variants[self._selected_variant].next
@@ -406,10 +405,11 @@ end
 
 function M.TextInputLine:update_for_character()
    self._text_object.fill_color = self._character.color
+   self._text_object.character_size = self._character.font_size
 end
 
 function M.TextInputLine:max_line_height()
-   return max_string_height(self._before .. string.rep(" ", self._max_length) .. self._after)
+   return M.max_string_height(self._before .. string.rep(" ", self._max_length) .. self._after, self._character.font_size)
 end
 
 function M.TextInputLine:should_wait()
@@ -417,12 +417,14 @@ function M.TextInputLine:should_wait()
 end
 
 function M.TextInputLine:maybe_increment_letter_count()
-   if not self._done_input and self._letters_output < #self._before then
-      self._time_since_last_letter = 0.0
-      self._letters_output = self._letters_output + 1
-   elseif self._done_input and self._letters_output < #self._before + #self._input_text + #self._after then
-      self._time_since_last_letter = 0.0
-      self._letters_output = self._letters_output + 1
+   if self._time_since_last_letter >= M.time_per_letter then
+      if not self._done_input and self._letters_output < #self._before then
+         self._time_since_last_letter = 0.0
+         self._letters_output = self._letters_output + 1
+      elseif self._done_input and self._letters_output < #self._before + #self._input_text + #self._after then
+         self._time_since_last_letter = 0.0
+         self._letters_output = self._letters_output + 1
+      end
    end
 end
 
