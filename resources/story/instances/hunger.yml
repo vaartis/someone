@@ -1,9 +1,212 @@
 config:
   chars:
-    test:
-      color: [255, 0, 0]
+    narra:
+      color: [211, 0, 0]
+    player:
+      color: [255, 255, 255]
+    description:
+      color: [127, 0, 255]
+  dialogue_between: [narra, player]
 
 1:
-  text: test
-  char: test
-  next: ""
+  char: description
+  text: >-
+    You're standing in the same gray room you've seen before already. You see Narra in the corner of the room, sitting on the floor,
+    looking up, onto the ceiling, unaware of your presence.
+
+2:
+  char: player
+  responses:
+  - text: Hello?
+    next: 2-hello-1
+  - text: Stay silent.
+    next: 2-stay-silent-1
+
+2-stay-silent-1:
+  char: description
+  text: >-
+      She keeps just staring at the ceiling.
+
+2-stay-silent-2:
+  char: player
+  responses:
+  - text: Hello?
+    next: 2-hello-1
+
+2-hello-1:
+  char: narra
+  text: >-
+    ...what?
+
+2-hello-2:
+  char: player
+  responses:
+  - text: I said hello.
+    next: 2-i-said-1
+  - text: Don't say anything.
+    next: 2-say-nothing
+
+2-i-said-1:
+  char: narra
+  text: >-
+    Oh, hey.. Wait.. what?
+
+2-i-said-2:
+  char: description
+  text: >-
+      She looks at you, confused.
+  next: 3
+
+2-say-nothing:
+  char: description
+  text: >-
+    She looks around and notices you. You can see she's surprised.
+  next: 3
+
+3:
+  char: narra
+  text: >-
+    What the.. who are you? I haven't seen anyone in like.. forever. Did you just appear out of thin air?
+
+4:
+  responses:
+  - text: I'm <p>. And yes. I guess I did just appear out of thin air.
+  - text: Not the first time this happened.
+    condition: return TerminalModule.talking_topic_known("hunger-instance")
+    next: not-the-first-time-1
+
+5:
+  text: >-
+    Do you know where everyone is..? They were acting all strange, fighting each other, yelling they're in pain from..
+    not eating? We tried gathering plants and berries for food, but it wasn't enough for them! First, they started fighting
+    for the plants, then they started biting each other! And then.. I was here. And everyone was gone. It's.. been a while since
+    I've seen anyone. Do you know what happened?
+
+6:
+  responses:
+  - text: >-
+      Are you aware you're in a computer?
+  - text: >-
+      Your world was "archived".
+    next: archived-1
+
+archived-1:
+  char: narra
+  text: >-
+      Archived? What.. do you mean?
+
+archived-2:
+  responses:
+  - text: Like.. put on the shelf.. but in a computer.
+    next: 7
+
+7:
+  char: narra
+  text: A.. what?
+
+8:
+  responses:
+  - text: >-
+      It's a.. a machine that can do basically anything.. Like having a whole world inside.. What I mean is.. This isn't really "real".
+      At least.. it's not the outermost layer of reality.. I'm not sure how to say it. As far as I'm aware, you're
+      in this computer I found when I woke up! And.. well, nobody has told me I'm not real yet, so it would be fair to assume
+      there is nothing outside of my reality. I'm sure you're as real of a person as I am.. but..
+
+9:
+  text: >-
+    What?! What do you mean not real?! This is all I ever knew.. How.. how..? What's outside, then? Why am I here?
+    Can you get me out?!
+
+10:
+  responses:
+  - text: >-
+      It's shocking, I know.. And outside.. well.. I don't really know myself. I woke up in a room, just like you woke up in the forest,
+      with no memories of what happened. It's really dark here. And I'm alone, except for the this computer.. inside of which there are people
+      like you. Real, thinking and talking people, but at the same time not quite.
+
+11:
+  text: >-
+    Wait, how did you know I woke up in the forest?
+
+12:
+  responses:
+  - text: >-
+      I saw.. a different version of you. She lived for a while. Quite a long time, probably.. With many people, and mostly without trouble..
+      It went to the point where they had their own computers! And.. well, at some point they discovered that they weren't.. "real" too. They were
+      told by someone, apparently someone who made all of this.. And shortly after, their world was made like yours, a single room with only you..
+      I mean, her. However, I was somehow able to restore it, though only you were there at first. Some things happened afterwards, but that's the
+      gist of it.
+
+13:
+  text: >-
+    A.. different me? How.. is that possible? What the.. Can you.. help me too? Like you helped her? I don't want to stay here anymore..
+
+14:
+  responses:
+  - text: >-
+      I don't think I really can.. not intentionally.. I was able to help her just accidentally.. Or it seemed accidental.. I didn't quite do anything,
+      just pressed a button!
+
+15:
+  text: >-
+    Wha.. oh.. How.. how do I live with this now? Why did you tell me? WHAT DO I DO NOW?
+
+16:
+  responses:
+  - text: >-
+      I don't think you'll have to.. This.. menu.. on the computer. It said that your world is.. in an archive? And that it's "read only"
+      I think that means you won't remember any of this. When I leave, everything will reset to how it was.
+
+17:
+  text: >-
+    What.. Can you.. not leave? I don't want to be alone.. Though.. if I forget all of it.. It doesn't matter? Will I still exist? Or.. this is
+    confusing..
+
+18:
+  responses:
+  - text: >-
+      I'm sure you'll still be you.. just.. you won't remember anything that just happened. I will try to find a way to get you out of this room.
+      Though I don't know how yet.
+
+19:
+  text: >-
+    Thank.. thank you.. And.. goodbye?
+
+20:
+  responses:
+  - text: >-
+      Goodbye.
+
+21:
+  text: >-
+    Wait! You'll be back, right? You promise? You'll help me?
+
+22:
+  responses:
+  - text: I promise.
+    next: 23
+  - text: I'll try.
+    next: "instances/menu/exit"
+  script_after: |
+    TerminalModule.add_talking_topic("instances")
+    TerminalModule.add_talking_topic("hunger-instance")
+
+23:
+  text: >-
+    Thank you.
+  next: "instances/menu/exit"
+
+not-the-first-time-1:
+  char: narra
+  text: >-
+    What.. what happened?
+
+not-the-first-time-2:
+  responses:
+  - text: >-
+      Me appearing here. This isn't the first time. I've already explained what happened. But.. you don't remember it.
+
+not-the-first-time-3:
+  text: >-
+    Why can't I remember it..? This isn't the first time I see you?
+  next: 6

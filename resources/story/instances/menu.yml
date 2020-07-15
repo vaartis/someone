@@ -39,3 +39,9 @@ wrong_password:
   char: err_text
   text: "Password not recognized"
   next: 4
+
+exit:
+  char: warn_text
+  text: >-
+    WARNING: Could not save instance changes.
+  next: 1
