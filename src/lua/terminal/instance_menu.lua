@@ -141,7 +141,6 @@ function M.InstanceMenuLine:handle_interaction(event)
       elseif event.key.code == KeyboardKey.Return and #self._password_input_text.text > self._password_input_text.initial_length then
          -- Finish input
          lines.reset_after_text_input()
-
          self._done_input = true
 
          return true
