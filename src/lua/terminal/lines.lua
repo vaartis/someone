@@ -279,7 +279,7 @@ function M.VariantInputLine:initialize(name, variants)
 
          local cond_result = condition()
          if type(cond_result) ~= "boolean" then
-            error(lume.format("The condition '{2}' (number {3}) in {1} doesn't return a boolean", {self._name, var.text, n}))
+            error(lume.format("The condition '{2}' (number {3}) in {1} doesn't return a boolean, but a {4}", {self._name, var.text, n, type(cond_result)}))
          end
 
          -- If the condition does not evaluate to truth, skip the line
