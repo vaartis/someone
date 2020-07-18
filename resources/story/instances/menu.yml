@@ -32,7 +32,7 @@ config:
       instance_menu:
       - name: Famine
         password: aqualung
-        next: "instances/hunger/1"
+        next: !line-name "instances/hunger/1"
   char: text
 
 wrong_password:

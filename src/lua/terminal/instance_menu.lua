@@ -159,7 +159,6 @@ function M.InstanceMenuLine:next()
             if instance.password == password then
                table.insert(TerminalModule.state_variables.decrypted_instances, instance.name)
 
-               GLOBAL.story_parser:maybe_parse_referenced_file(instance.next)
                self._next_instance = lines.make_line(instance.next, lines.native_lines[instance.next])
             end
          end

@@ -372,6 +372,18 @@ void StoryParser::parse(std::string file_name) {
                     case NodeType::Null:
                         return sol::object();
                     case NodeType::Scalar:
+                        // If there's a line-name tag, parse the data as a line name and try resolving the reference
+                        if (data_entry.Tag() == "!line-name") {
+                            std::string val = data_entry.as<std::string>();
+                            if (val.find('/') == std::string::npos)
+                                val = fmt::format("{}/{}", nmspace, val);
+                            else
+                                // If the name is namespaced, parse the referenced file now
+                                maybe_parse_referenced_file(val);
+
+                            return sol::make_object(lua, val);
+                        }
+
                         if (float val; YAML::convert<float>::decode(data_entry, val))
                             return sol::make_object(lua, val);
                         else if (int val; YAML::convert<int>::decode(data_entry, val))
