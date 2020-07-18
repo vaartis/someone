@@ -1,6 +1,7 @@
 local lume = require("lume")
 local class = require("middleclass")
 local util = require("util")
+local liluat = require("liluat")
 
 local M = {
    -- This is used to not make the events not throttle when text is being input
@@ -11,13 +12,29 @@ local M = {
    time_per_letter = 0.01
 }
 
-local function insert_variables(str)
-   return str:gsub(
-      "<(.+)>",
-      function(name)
-         return TerminalModule.state_variables.input_variables[name]
-      end
+local render_env
+local function insert_variables(name, str)
+   local compiled = liluat.compile(
+      str,
+      {
+         start_tag = "<",
+         end_tag = ">"
+      },
+      name
    )
+
+   if WalkingModule and not render_env then
+      render_env = lume.merge(
+         TerminalModule,
+         {
+            walking_state_variables = WalkingModule.state_variables,
+            lume = lume,
+         }
+      )
+   end
+
+   -- Just reference the whole environment
+   return liluat.render(compiled, render_env, { reference = true })
 end
 
 -- Text object used for max_string_height calculation
@@ -103,7 +120,7 @@ M.OutputLine = class("OutputLine", M.TerminalLine)
 function M.OutputLine:initialize(name, text, next_line_name)
    M.TerminalLine.initialize(self, name)
 
-   self._text = insert_variables(text)
+   self._text = insert_variables(name, text)
    -- The name of the next line to be retreived and instantiated by next()
    self._next_line_name = next_line_name
    -- A place to store the next line instance when it's needed
@@ -273,7 +290,7 @@ function M.VariantInputLine:initialize(name, variants)
       -- Add the variant number before the text
       local formatted_text = lume.format(
          "{num}.  {text}",
-         { num = var_num, text = insert_variables(var.text) }
+         { num = var_num, text = insert_variables(name, var.text) }
       )
       local inserted_variant = {
          text = formatted_text,
@@ -392,8 +409,8 @@ function M.TextInputLine:initialize(name, before, after, variable, max_length, n
    self._next = nxt
    self._next_line = nil
 
-   self._before = insert_variables(before)
-   self._after = insert_variables(after)
+   self._before = insert_variables(name, before)
+   self._after = insert_variables(name, after)
    self._variable = variable
    self._max_length = max_length
 

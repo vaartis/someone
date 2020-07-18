@@ -85,7 +85,7 @@ config:
 14:
   wait: true
   text: >-
-    Ah, that's <p>. They're.. uh.. new here. Apparently they're from the "outside", like the "creator" was.
+    Ah, that's <= state_variables.input_variables.p >. They're.. uh.. new here. Apparently they're from the "outside", like the "creator" was.
 
 15:
   text: >-
@@ -124,7 +124,8 @@ config:
     a very long wait for me. All that was left of the world was a single room with gray walls, and nothing else, and that's where I was all
     that time. I'm a bit envious of you not having to experience that. I never want to stay alone with nothing and nobody else but
     myself. I'm glad you're back too now, it's been about a day since the world has returned back to normal.. well.. except all the
-    people. <p> helped me get out of that room by doing somethig on the outside. Something also changed this night, while I was asleep.
+    people. <= state_variables.input_variables.p > helped me get out of that room by doing somethig on the outside. Something also
+    changed this night, while I was asleep.
 
 21:
   char: player
@@ -143,8 +144,8 @@ config:
 23:
   wait: true
   text: >-
-    I.. sure hope so. There are still so many people missing.. But we'll try to get them back! We've been to the city with <p> today, it's
-    as empty as everything else, so we really just wasted a lot of time.
+    I.. sure hope so. There are still so many people missing.. But we'll try to get them back! We've been to the city with
+    <= state_variables.input_variables.p > today, it's as empty as everything else, so we really just wasted a lot of time.
 
 24:
   wait: true
@@ -163,8 +164,8 @@ config:
 
 27:
   text: >-
-    We'll be progressing with that soon, I hope. In the meantime, <p>, Maj was one of the people who designed the first computers around
-    here! So you can ask something about them..
+    We'll be progressing with that soon, I hope. In the meantime, <= state_variables.input_variables.p >, Maj was one of the people who
+    designed the first computers around here! So you can ask something about them..
 
 28:
   char: player
@@ -287,7 +288,8 @@ config:
   wait: true
   text: >-
     I'm actually suddenly very tired, probably because the trip, I just realized it. Didn't notice at first because I was so excited to see
-    you! We'll probably head back to my place then, <p> is staying at my house for now, until we maybe figure out else.
+    you! We'll probably head back to my place then, <= state_variables.input_variables.p > is staying at my house for now, until we maybe figure
+    out else.
 
 48:
   text: >-

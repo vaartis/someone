@@ -7,7 +7,8 @@ dependencies = {
    "lume==2.3.0",
    "lua-path==0.3.1",
    "lunajson==1.2.2",
-   "bump==3.1.7"
+   "bump==3.1.7",
+   "liluat==1.2.0"
 }
 
 source = {

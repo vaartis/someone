@@ -70,7 +70,7 @@ config:
 
 4:
   responses:
-  - text: I'm <p>. And yes. I guess I did just appear out of thin air.
+  - text: I'm <= state_variables.input_variables.p >. And yes. I guess I did just appear out of thin air.
   - text: Not the first time this happened.
     condition: return TerminalModule.talking_topic_known("hunger-instance")
     next: not-the-first-time-1

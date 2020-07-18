@@ -57,7 +57,7 @@ config:
 
 10:
   text: >-
-    Alright, <p>.
+    Alright, <= state_variables.input_variables.p >.
 
 11:
   responses:
