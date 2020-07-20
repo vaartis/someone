@@ -1,0 +1,176 @@
+config:
+  chars:
+    narra:
+      color: [211, 0, 0]
+    player:
+      color: [255, 255, 255]
+    description:
+      color: [127, 0, 255]
+  dialogue_between: [player, narra]
+
+talk-about:
+  char: player
+  text: Talk about..
+  next: hub
+    
+hub:
+  char: player
+  responses:
+  - text: I found a lamp and put it on my table.
+    condition: |-
+      -- Cast to boolean
+      return not not (WalkingModule.state_variables.first_puzzle_lamp and WalkingModule.state_variables.first_puzzle_lamp.put and
+        not TerminalModule.state_variables.talks.narra.found_lamp)
+    next: lamp-1
+  - text: >-
+        < if not lume.any(state_variables.talks.narra.instances) then >
+        I saw.. a different version of you?
+        < else -- Supposedly if there are a new known instance >
+        I saw another version of you.
+        < end >
+    condition: |-
+        local lume = require("lume")
+        -- If not all instances are already talked about
+        return lume.any(TerminalModule.state_variables.explored_instances) and not lume.all(TerminalModule.state_variables.talks.narra.instances)
+    next: instances-hub-1
+  - text: Nothing.
+    next: return
+
+lamp-1:
+  char: narra
+  text: >-
+      A lamp? That's good. Gonna make your life a little brighter, haha.
+
+lamp-2:
+  script_after: |
+    TerminalModule.state_variables.talks.narra.found_lamp = true
+  responses:
+  - text: I will cherish this lamp. Nothing will happen to it, not on my watch.
+    next: lamp-cherish-1
+  - text: Yeah. Brighter. A bit. It's just a moderately sized table lamp.
+    next: a-bit-brighter-1
+
+lamp-cherish-1:
+  char: narra
+  text: >-
+      Gee.. Don't you think the lamp won't like your overprotectiveness?
+
+lamp-cherish-2:
+  responses:
+  - text: We'll see.
+    next: talk-about
+  - text: No, the lamp loves me.
+    next: talk-about
+
+a-bit-brighter-1:
+  character: narra
+  text: >-
+    That is more or less what I expected. You wouldn't be able to carry a bigger lamp with you, right?
+
+a-bit-brighter-2:
+  responses:
+  - text: >-
+      Yeah. I'm not very strong..
+    next: talk-about
+
+return:
+  char: player
+  custom:
+    class: { module: "terminal.save_and_return_lines", class: "ReturnLine" }
+    data:
+      next_was: !line-name "talks/narra/talk-about"
+
+instances-hub-1:
+  char: narra
+  text: >-
+    < if not lume.any(state_variables.talks.narra.instances) then >
+    What..? A different version of me? I'm me, how can there be another me?
+    < else -- Supposedly if there are a new known instance >
+    < local possible_responses = { "There are more..?", "What? Another one?", "Just how many are there?" } >
+    <= lume.randomchoice(possible_responses) >
+    < end >
+
+instances-hub-2:  
+  custom:
+    class: { module: "terminal.select_line", class: "SelectLine" }
+    data:
+    - condition: |-
+          local lume = require("lume")
+          return not lume.any(TerminalModule.state_variables.talks.narra.instances)
+      next: !line-name another-me-1
+    - next: !line-name instance-hub-2
+
+another-me-1:
+  char: player
+  responses:
+  - text: >-
+      She was like you, but.. her world got.. "archived". So it all shrinked to a single room,
+      like yours did.
+
+another-me-2:
+  text: >-
+    It's because this is all in a computer, isn't it? Am I just a copy of her?
+
+another-me-3:
+  responses:
+  - text: >-
+      Not a copy. You share appearence, but you are different people, whose personality depends on the life you lived.
+      And her world certainly didn't exist for as long as yours. And now that it's "archived", it seems like nothing new can be added
+      to it.
+
+another-me-4:
+  text: >-
+      Can we help her? Like you helped me? I know it's not that easy, but.. Archived? Can you not affect her world at all?
+
+another-me-5:
+  responses:
+  - text: We can certainly try to help.. I can talk to her, but it seems she can't remember any of it after I leave.
+
+another-me-6:
+  text: Can you tell me more about her?
+  next: instances-hub-3
+      
+instances-hub-3:
+  char: player
+  responses:
+  - text: >-
+        In her version of the world, everyone was fighting for food.
+    condition: |-
+        return TerminalModule.state_variables.explored_instances.hunger and not TerminalModule.state_variables.talks.narra.instances.hunger
+    next: instance-hunger-1
+
+instance-hunger-1:
+  char: narra
+  text: >-
+    Fighting for food..? Like in your world?
+
+instance-hunger-2:
+  responses:
+  - text: >-
+      Yes, like here.. They tried just eating plants and berries but it didn't quite work out it seems.. So they started fighting for food.
+      Though.. it didn't affect their version of you it seems, she couldn't understand what was happening to them. Things just went too fast
+      for her to do anything..
+
+instance-hunger-3:
+  text: >-
+    That explains why we don't have that need..
+
+instance-hunger-4:
+  responses:
+  - text: >-
+      I learned how to get to that.. world.. from a note I found.. It said that things didn't work out well, just like "other things" didn't.
+      So there must be more than this one.. then.. and one of them is yours, the latest one. I would imagine it's the latest one at least,
+      since you were here when I woke up, and things seemed to be going well for you.
+
+instance-hunger-5:
+  text: >-
+    A note, you say.. and you think there are more? Well.. Look out for them.. I hope we'll be able to do something.. To keep them like that
+    is just cruel, they're just as much of a person as.. whoever did this.
+
+instance-hunger-6:
+  script_after: |-
+      TerminalModule.state_variables.talks.narra.instances.hunger = true
+  responses:
+  - text: >-
+      Hopefully we will. Surely there must be some reason behind this..
+    next: talk-about

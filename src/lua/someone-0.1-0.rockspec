@@ -38,6 +38,8 @@ build = {
          terminal = "terminal.lua",
          ["terminal.instance_menu"] = "terminal/instance_menu.lua",
          ["terminal.lines"] = "terminal/lines.lua",
+         ["terminal.save_and_return_lines"] = "terminal/save_and_return_lines.lua",
+         ["terminal.select_line"] = "terminal/select_line.lua",
 
          coroutines = "coroutines.lua",
          util = "util.lua",

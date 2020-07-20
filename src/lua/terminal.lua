@@ -281,6 +281,8 @@ function M.draw(dt)
          -- Add a bit more after the last line
          total_text_height = total_text_height + StaticFonts.font_size / 2
          line_height_offset = first_line_height_offset + total_text_height
+      elseif text == nil then
+            -- Line doesn't output anything, just do nothing
       else
          -- It's a single line of text
 
@@ -377,7 +379,7 @@ function M.process_event(event, dt)
 end
 
 function M.set_environment_image(name)
-   do return end
+   --do return end
 
    -- Create the sprite if it doesn't exist yet
    if not current_environment_sprite then
@@ -441,8 +443,22 @@ M.state_variables = {
          dance_floor = false
       }
    },
-   talking_topics = {},
-   decrypted_instances = {}
+   -- Instances that were decrypted
+   decrypted_instances = {},
+   -- Explored instances
+   explored_instances = {
+      hunger = false,
+   },
+   talks = {
+      narra = {
+         found_lamp = false,
+         -- Instances the player talked about
+         instances = {
+            hunger = false
+         }
+      }
+   },
+   talking_topics = {}
 }
 
 function M.talking_topic_known(topic)

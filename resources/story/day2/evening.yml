@@ -336,5 +336,8 @@ config:
 
 56:
   char: description
+  wait: true
+  script_after: TerminalModule.switch_to_walking("day3/computer_room")
+  next: day3/village/1
   text: >-
     She falls asleep fast, you soon follow.

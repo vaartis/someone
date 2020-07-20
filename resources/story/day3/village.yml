@@ -1,0 +1,63 @@
+config:
+  chars:
+    player:
+      color: [255, 255, 255]
+    description:
+      color: [127, 0, 255]
+    narra:
+      color: [211, 0, 0]
+  dialogue_between: [player, narra]
+1:
+  char: description
+  text: >-
+    It's morning again. You get out of bed and go to the kitchen. Narra is already there, same as yesterday, having breakfast.
+
+2:
+  char: narra
+  text: Hey. Slept well?
+
+3:
+  responses:
+  - text: Sure did.
+    next: sure-did-1
+  - text: You gotta stop asking, come on, you know I'm not sleeping.
+    next: stop-asking-1
+
+stop-asking-1:
+  char: narra
+  text: >-
+    Haha, come on. It's the most natural thing, what else would I say to start the conversation in the morning anyway?
+  next: 4
+
+sure-did-1:
+  char: narra
+  text: >-
+    Well, I'm glad to hear that.
+  next: 4
+
+4:
+  char: narra
+  text: >-
+    So.. how's it been on the outside tonight?
+
+5:
+  responses:
+  - text: >-
+      Not too different. Another "puzzle", another.. "melody". A different one, too.
+
+6:
+  text: >-
+    Not much.. anything else?
+
+7:
+  char: player
+  custom:
+    class: { module: "terminal.save_and_return_lines", class: "SaveLine" }
+    data:
+      next: !line-name "talks/narra/talk-about"
+      return_to: !line-name 8
+
+8:
+  char: player
+  text: >-
+    test 2

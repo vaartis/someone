@@ -72,15 +72,15 @@ config:
   responses:
   - text: I'm <= state_variables.input_variables.p >. And yes. I guess I did just appear out of thin air.
   - text: Not the first time this happened.
-    condition: return TerminalModule.talking_topic_known("hunger-instance")
+    condition: return TerminalModule.state_variables.explored_instances.hunger
     next: not-the-first-time-1
 
 5:
   text: >-
     Do you know where everyone is..? They were acting all strange, fighting each other, yelling they're in pain from..
-    not eating? We tried gathering plants and berries for food, but it wasn't enough for them! First, they started fighting
-    for the plants, then they started biting each other! And then.. I was here. And everyone was gone. It's.. been a while since
-    I've seen anyone. Do you know what happened?
+    not eating? I don't quite understand.. We tried gathering plants and berries for food, but it wasn't enough for them!
+    First, they started fighting for the plants, then they started biting each other! And then.. I was here. And everyone was gone.
+    It's.. been a while since I've seen anyone. Do you know what happened?
 
 6:
   responses:
@@ -165,7 +165,7 @@ archived-2:
 18:
   responses:
   - text: >-
-      I'm sure you'll still be you.. just.. you won't remember anything that just happened. I will try to find a way to get you out of this room.
+      I'm sure you'll still be you.. just.. you won't remember anything that just happened. I will try to find a way to get you out of here.
       Though I don't know how yet.
 
 19:
@@ -188,8 +188,7 @@ archived-2:
   - text: I'll try.
     next: "instances/menu/exit"
   script_after: |
-    TerminalModule.add_talking_topic("instances")
-    TerminalModule.add_talking_topic("hunger-instance")
+    TerminalModule.state_variables.explored_instances.hunger = true
 
 23:
   text: >-
