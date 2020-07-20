@@ -456,16 +456,24 @@ function M.add_talking_topic(topic)
 end
 
 local debug_menu_data = {
-   select_line_text = ""
+   select_line_text = "",
+   add_topic_text = ""
 }
 function M.debug_menu()
    local submitted
-   debug_menu_data.select_line_text, submitted = ImGui.InputText("Line selection", debug_menu_data.select_line_text)
 
+   debug_menu_data.select_line_text, submitted = ImGui.InputText("Line selection", debug_menu_data.select_line_text)
    ImGui.SameLine()
    if ImGui.Button("Switch") or submitted then
       M.set_first_line_on_screen(debug_menu_data.select_line_text)
       debug_menu_data.select_line_text = ""
+   end
+
+   debug_menu_data.add_topic_text, submitted = ImGui.InputText("Add talking topic", debug_menu_data.add_topic_text)
+   ImGui.SameLine()
+   if ImGui.Button("Add") or submitted then
+      M.add_talking_topic(debug_menu_data.add_topic_text)
+      debug_menu_data.add_topic_text = ""
    end
 
    util.debug_menu_process_state_variable_node("State variables", M.state_variables)
