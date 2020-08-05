@@ -68,9 +68,9 @@ config:
 11:
   wait: true
   text: >-
-    Ah.. ha.. hi! I'm really lost.. since everything went down I can't remember much.. The panic, then darkness, and then I wake up in the
-    forest this morning. I couldn't wrap my head around what happened, so I thought I'd just head back home, what else could I do? So I there I was,
-    alone.. Which was scary.. so I just spent the whole day at home..
+    ah.. ha.. hi! i'm really lost.. since everything went down i can't remember much.. the panic, then darkness, and then i wake up in the
+    forest this morning. i couldn't wrap my head around what happened, so i thought i'd just head back home, what else could i do? so here i was,
+    alone.. which was scary.. so i just spent the whole day at home..
 
 12:
   wait: true
@@ -80,7 +80,7 @@ config:
 13:
   wait: true
   text: >-
-    Ohh.. yeah! Sure.. and who's the person behind you might be..? If you don't mind me asking..
+    ohh.. yeah! sure.. and who's the person behind you might be..? if you don't mind me asking..
 
 14:
   wait: true
@@ -89,7 +89,7 @@ config:
 
 15:
   text: >-
-    Wow! Never thought I'd meet someone like that ever again..
+    wow! never thought i'd meet someone like that ever again..
 
 16:
   char: player
@@ -101,7 +101,7 @@ config:
   char: maj
   wait: true
   text: >-
-    Oh.. shame.. but still, welcome! Let's head into the kitchen and have some tea at least, like Narra suggested, we shouldn't
+    oh.. shame.. but still, welcome! let's head into the kitchen and have some tea at least, like Narra suggested, we shouldn't
     just stand in the doors.
 
 18:
@@ -116,7 +116,7 @@ config:
   char: maj
   wait: true
   text: >-
-    So, how have you been?
+    so, how have you been?
 
 20:
   text: >-
@@ -138,7 +138,7 @@ config:
   char: maj
   wait: true
   text: >-
-    Wow.. that is a lot to process.. First off, it's very sad Narra had to experience this. But that's behind you now, and everything's
+    wow.. that is a lot to process.. first off, it's very sad Narra had to experience this. but that's behind you now, and everything's
     gonna be fine, right?
 
 23:
@@ -150,7 +150,7 @@ config:
 24:
   wait: true
   text: >-
-    Such a big city and nobody there too.. So we're the only people here..
+    such a big city and nobody there too.. so we're the only people here..
 
 25:
   wait: true
@@ -160,7 +160,7 @@ config:
 26:
   wait: true
   text: >-
-    Oh I can't wait for that..! I already miss all the life around here..
+    oh I can't wait for that..! i already miss all the life around here..
 
 27:
   text: >-
@@ -177,7 +177,7 @@ config:
   char: maj
   wait: true
   text: >-
-    You see.. I really don't like big crowds of people and the city is ALL about that.. I get all anxious.. So I'd rather stay.. besides,
+    you see.. i really don't like big crowds of people and the city is ALL about that.. i get all anxious.. so i'd rather stay.. besides,
     the scientific community has grown a lot since the beginning and I'm sure they can go on without me.
 
 30:
@@ -188,10 +188,10 @@ config:
 
 31:
   text: >-
-    Yes.. ok, ok, you got me. I don't really like to admit it, because it'd sound like I'm bragging. But enough about that, there's another
+    yes.. ok, ok, you got me. i don't really like to admit it, because it'd sound like I'm bragging. but enough about that, there's another
     interesting thing: we designed the computers with long range networking in mind, and put some big servers in places where they'd be
-    needed and where we could connect computers to them and then connect the servers together. One of them is actually right here, in the
-    basement of my house, I rarely go down there so it might be a bit dusty, but we can go see it.. if you're interested.
+    needed and where we could connect computers to them and then connect the servers together. one of them is actually right here, in the
+    basement of my house, i rarely go down there so it might be a bit dusty, but we can go see it.. if you're interested.
 
 32:
   char: player
@@ -217,7 +217,7 @@ config:
 35:
   char: maj
   text: >-
-    Do you really spend all your time in an almost empty concrete box?
+    do you really spend all your time in an almost empty concrete box?
 
 36:
   char: player
@@ -228,18 +228,18 @@ config:
 37:
   char: maj
   text: >-
-    Anyway. Here it is, this big boy handles all the communication between the village and the city.
+    anyway. here it is, this big boy handles all the communication between the village and the city.
 
 38:
   char: description
   wait: true
   text: >-
-    You look at the server. It's a rack filled with all kinds of boxes and wires, all blinking with different colors.
+    you look at the server. It's a rack filled with all kinds of boxes and wires, all blinking with different colors.
 
 39:
   char: maj
   text: >-
-    In the city, there are a few of servers like this once, since it's a lot bigger. The city is like a hub for communication.
+    in the city, there are a few of servers like this once, since it's a lot bigger. the city is like a hub for communication.
 
 40:
   char: player
@@ -250,7 +250,7 @@ config:
 41:
   char: maj
   text: >-
-    It only makes sense that the city would be the center of all things, doesn't it? So.. I wasn't sure about how to use the basement for a
+    it only makes sense that the city would be the center of all things, doesn't it? so.. i wasn't sure about how to use the basement for a
     while, but this thingy here fit in quite well, and it doesn't take space in the house, plus it gets all the underground coolness.
 
 42:
@@ -267,9 +267,9 @@ config:
 
 44:
   text: >-
-    Yes! Besides being underground, this place is also additionally cooled down artificially. Otherwise it'd get pretty hot in here, this thing
-    produces a lot of heat. There's not much to see other than the server, but I am proud of it and will take any opportunity to show this setup to
-    someone if they ask, albeit it might sound like braggning, it did take some planning to set up. Now, let's get out of here, I'm feeling cold
+    yes! besides being underground, this place is also additionally cooled down artificially. otherwise it'd get pretty hot in here, this thing
+    produces a lot of heat. there's not much to see other than the server, but i am proud of it and will take opportunity to show this setup to
+    someone if they ask, albeit it might sound like bragging, it did take some planning to set up. now, let's get out of here, i'm feeling cold
     myself.
 
 45:
@@ -282,7 +282,7 @@ config:
   char: maj
   wait: true
   text: >-
-    Now, it's getting really late, I'd love to talk some more, but maybe we should continue tomorrow?
+    now, it's getting really late, i'd love to talk some more, but maybe we should continue tomorrow?
 
 47:
   wait: true
@@ -293,7 +293,7 @@ config:
 
 48:
   text: >-
-    See you tomorrow, then!
+    see you tomorrow, then!
 
 49:
   char: player
@@ -304,7 +304,7 @@ config:
 50:
   char: maj
   text: >-
-    We'll know sooner if we go to sleep sonner, haha.
+    we'll know sooner if we go to sleep sonner, haha.
 
 51:
   char: player
@@ -315,7 +315,7 @@ config:
 52:
   char: maj
   text: >-
-    You too!
+    you too!
 
 53:
   char: description
