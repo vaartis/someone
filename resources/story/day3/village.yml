@@ -6,6 +6,8 @@ config:
       color: [127, 0, 255]
     narra:
       color: [211, 0, 0]
+    maj:
+      color: [135,206,235]
   dialogue_between: [player, narra]
 1:
   char: description
@@ -58,6 +60,66 @@ sure-did-1:
       return_to: !line-name 8
 
 8:
-  char: player
+  char: narra
   text: >-
-    test 2
+    Well.. I'm gonna chill for a bit, all the yesterday's walking made my legs sore, haven't walked that much in a very long while.
+    Maybe you could look around for a bit, just don't go too far.. I don't want you to get lost.. Come back a bit later and we'll try searching
+    for more people together. Sounds alright?
+
+9:
+  responses:
+  - text: Sure.
+  - text: Oh well.
+
+10:
+  text: What to do now..?
+  next: village-hub
+
+village-hub:
+  responses:
+  - text: Visit Maj
+    next: go-to-maj
+  #- text: Go back to Narra's house
+  #  next:
+
+go-to-maj:
+  script_after: TerminalModule.state_variables.talks.maj.visited_before = true
+  custom:
+    class: { module: "terminal.select_line", class: "SelectLine" }
+    data:
+    - condition: return not TerminalModule.state_variables.talks.maj.visited_before
+      next: !line-name maj-1
+    - next: !line-name maj-5
+
+maj-1:
+  char: description
+  text: You walk to his house and knock on the door a few times.
+
+maj-2:
+  char: maj
+  text: let yourself in.
+
+maj-3:
+  char: description
+  text: You hear from inside the house.
+
+maj-4:
+  char: maj
+  text: the door's not locked.
+
+maj-5:
+  char: description
+  text: You enter the house and find Maj in the kitchen, with a laptop and a cup of tea.
+
+maj-6:
+  char: maj
+  text: hey <= state_variables.input_variables.p>.
+
+maj-7:
+  7:
+  char: player
+  custom:
+    class: { module: "terminal.save_and_return_lines", class: "SaveLine" }
+    data:
+      next: !line-name "talks/maj/talk-about"
+      return_to: !line-name village-hub

@@ -1,0 +1,125 @@
+config:
+  chars:
+    player:
+      color: [255, 255, 255]
+    description:
+      color: [127, 0, 255]
+    maj:
+      color: [135,206,235]
+  dialogue_between: [player, maj]
+
+talk-about:
+  char: player
+  text: Talk about..
+  next: hub
+
+hub:
+  char: player
+  responses:
+  - text: You guys have laptops, huh?
+    condition: return not TerminalModule.state_variables.talks.maj.laptops
+    next: laptops-1
+  - text: Do you drink tea all the time?
+    condition: return not TerminalModule.state_variables.talks.maj.tea
+    next: tea-1
+  - text: I found out there are other, older, worlds like yours.
+    condition: |-
+        local lume = require("lume")
+        return lume.any(TerminalModule.state_variables.explored_instances) and not TerminalModule.state_variables.talks.maj.instances
+    next: instances-1
+  - text: Nothing.
+    next: bye
+
+tea-1:
+  char: maj
+  text: >-
+    now that you say it.. kinda. i mean, i don't even notice it any more..
+
+tea-2:
+  text: >-
+    I guess you guys have all kinds of tea here, since you're so big on all the herbs and flowers..
+
+tea-3:
+  text: >-
+    even though i drink tea all the time, really i just take whatever tea i can find. preferably as much of it as i can get.
+    i could be picky but why bother? it's all damn good.
+
+tea-4:
+  script_after: |-
+    TerminalModule.state_variables.talks.maj.tea = true
+  responses:
+  - text: I like tea too.
+    next: like-tea
+  - text: I don't think tea's my thing..
+    next: dont-like-tea
+
+like-tea:
+  char: maj
+  text: nice. tea's great.
+  next: talk-about
+
+dont-like-tea:
+  char: maj
+  text: a shame! but i'm sure you'll find something for your liking.
+  next: talk-about
+
+bye:
+  char: maj
+  text: see you later.
+  next: return
+
+return:
+  custom:
+    class: { module: "terminal.save_and_return_lines", class: "ReturnLine" }
+    data:
+      next_was: !line-name "talks/maj/talk-about"
+
+laptops-1:
+  char: maj
+  text: >-
+    yeah! obviously people wanted to use their computers on the go,
+    so when we learned how to make them small enough, we were able
+    to put the whole thing into this small case. best invention since
+    stationary computers!
+
+laptops-2:
+  responses:
+  - text: >-
+      When we were in the suburbs with Narra, we uhm.. broke in one of the flats..
+      Well, not exactly broke in, it wasn't locked! Of course, there was nobody there,
+      but a laptop. It looked similiar to yours.. and it wasn't even protected at all, too..
+
+laptops-3:
+  script_after: |-
+      TerminalModule.state_variables.talks.maj.laptops = true
+  text: >-
+    they all look the same except for color and a bit of changes in the newer models, since they're all
+    made by the same people. many people don't care much about putting passwords on their computers, though
+    it's a bit more rare to see that in the city, i gotta admit.
+  next: talk-about
+
+instances-1:
+  char: maj
+  text: >-
+    other? what?
+
+instances-2:
+  responses:
+  - text: >-
+      There are.. older versions of this world. I can't affect them in any way, because they've been "archived",
+      and after I leave everything returns to how it was. I only saw Narra there, too, in a room like she told
+      you about yesterday.
+
+instances-3:
+  text: >-
+    i see.. surely it's not a coincidence. they must've been some kind of failed states if they got.. dumped like that.
+    it must've been a hard choice between killing the world and leaving it hanging like that forever.
+
+instances-4:
+  script_after: |-
+      TerminalModule.state_variables.talks.maj.instances = true
+  responses:
+  - text: >-
+      It seems so, and the one who did it left notes about why they did it, too. Maybe their memory wasn't too good or something,
+      if they had to write down something like that. As for their choice, well.. let us hope we find out more about it.
+    next: talk-about

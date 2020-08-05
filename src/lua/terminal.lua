@@ -443,6 +443,11 @@ M.state_variables = {
          dance_floor = false
       }
    },
+   day3 = {
+      village_hub = {
+
+      }
+   },
    -- Instances that were decrypted
    decrypted_instances = {},
    -- Explored instances
@@ -456,6 +461,12 @@ M.state_variables = {
          instances = {
             hunger = false
          }
+      },
+      maj = {
+         tea = false,
+         laptops = false,
+         instances = false,
+         visited_before = false
       }
    },
    talking_topics = {}
