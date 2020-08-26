@@ -445,7 +445,7 @@ M.state_variables = {
    },
    day3 = {
       village_hub = {
-
+         walk_around = false
       }
    },
    -- Instances that were decrypted

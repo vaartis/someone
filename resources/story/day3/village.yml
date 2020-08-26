@@ -79,6 +79,9 @@ village-hub:
   responses:
   - text: Visit Maj
     next: go-to-maj
+  - text: Walk around the village
+    condition: return not TerminalModule.state_variables.day3.village_hub.walk_around
+    next: walk-around-1
   #- text: Go back to Narra's house
   #  next:
 
@@ -123,3 +126,54 @@ maj-7:
     data:
       next: !line-name "talks/maj/talk-about"
       return_to: !line-name village-hub
+
+walk-around-1:
+  char: description
+  wait: true
+  text: >-
+    You walk, with a slow pace, in the general direction of the opposite part of the village.
+    First, on the right you see a small, compared to the others, house, with an equally small veranda,
+    some potted flowers growing on the railings and, looking through the window, some more flowers on the windowsill.
+
+walk-around-2:
+  char: description
+  wait: true
+  text: >-
+    Then, on the left, a colorful, normally sized house, contrasting the house across the street. The walls seem to be
+    made of stone and painted yellow, and the roof is orange. The house has a veranda too, albeit it is empty except for
+    a chair standing there, looking in the direction of where the sun would set. The windows don't have any curtains and
+    you can see a bit of a room inside: the room is probably the kitchen, as a fridge can be seen from the window,
+    standing right across the room, staring at the window.
+  # This house looks like a square lemon with an orange put on top of it.
+
+walk-around-3:
+  char: description
+  wait: true
+  text: >-
+    Next, again on the right, there is another small house, with pastel pink colored walls, and pastel red roof. Unlike the
+    other houses, this one doesn't have a veranda, and the house's foundation can't be seen from the outside, probably
+    buried all the way in the ground.  The windows do have curtains: one of the windows is completely closed up with
+    them, and the other one is half-closed, on the windowsill of the other half of the window you can see a few stuffed
+    toys. One of them is shaped like a person with red hair, purple shirt and blue jeans, whose arms and feet are shaped
+    like little beige spheres, the face can't be seen from this angle. The other one is something reminding of a person,
+    yet you haven't seen something like that before before, it's light green, clearly has two legs and hands, but not
+    sphere shaped, instead they limbs are all of the same diameter and have slightly lighter colored spots where hands
+    and feet would be; it is wearing a dark-blue dress, the hemline of which is white; on its head it has black hair and
+    pointy ears on top; as with the other toy, you can't see its face from this side of the window.
+
+walk-around-4:
+  char: description
+  wait: true
+  text: >-
+    The next house across the street is of very bleak yellow color, with a dark red roof. This house, too, doesn't have a veranda.
+    The curtains on all the windows are closed, so nothing can be seen inside. What can be seen from the outside is the chimney coming
+    out from the back of the house and rising up a bit higher than the roof.
+
+walk-around-5:
+  char: description
+  wait: true
+  script_after: TerminalModule.state_variables.day3.village_hub.walk_around = true
+  text: >-
+    At this point, the road splits in two, one going straight and the other turning to the right. Narra asked you to no go too far,
+    so that's the point where you turn back.
+  next: village-hub
