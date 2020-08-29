@@ -1,0 +1,466 @@
+config:
+  chars:
+    player:
+      color: [255, 255, 255]
+    description:
+      color: [127, 0, 255]
+    narra:
+      color: [211, 0, 0]
+    kipi:
+      color: [0, 121, 100]
+  dialogue_between: [player, narra]
+
+1:
+  char: description
+  text: >-
+    As you come out of the house, the sun is at its peak.
+2:
+  char: narra
+  text: >-
+    So, now that you've done something again, I think it's a good idea to go search
+    the forest where people wake up, maybe we could go straight to that spot.
+
+3:
+  char: player
+  responses:
+  - text: You're right, we should probably go there.
+    next: wakeup-spot-1
+  - text: Maybe we should look in other parts of the forest.
+    next: other-parts-1
+
+other-parts-1:
+  char: narra
+  text: >-
+    Sure, there are a few other places there where we could look. There's a meadow where people would gather in the
+    evenings and overnight to camp and sit by the fire. Then there's the spring where someone goes when they need water
+    but are far from home. The other thing that comes to mind is the entrance to the caves, nobody really goes there but
+    it's a good place to hide from the rain or the sun.
+  next: other-parts-hub
+
+where-to:
+  char: narra
+  text: >-
+      < if lume.any(state_variables.day3.forest_search.other_parts) then >
+      So, where should we search next?
+      < else >
+      So, where should we go first?
+      < end >
+  next: other-parts-hub
+
+other-parts-hub:
+  char: player
+  responses:
+  - text: The meadow.
+    condition: return not TerminalModule.state_variables.day3.forest_search.other_parts.meadow
+    next: meadow-1
+  - text: The spring.
+    condition: return not TerminalModule.state_variables.day3.forest_search.other_parts.spring
+    next: spring-1
+  - text: The caves entrance.
+    condition: return not TerminalModule.state_variables.day3.forest_search.other_parts.caves
+    next: caves-1
+
+meadow-1:
+  custom:
+    class: { module: "terminal.select_line", class: "SelectLine" }
+    data:
+    - condition: return TerminalModule.state_variables.day3.forest_search.time == 1
+      next: !line-name meadow-found
+    - next: !line-name meadow-empty-1
+
+meadow-empty-1:
+  char: description
+  text: >-
+    After some walking, you reach the meadow. It isn't that big, and in the middle of it
+    there is a fire pit, long gone cold.
+
+meadow-empty-2:
+  char: narra
+  text: >-
+    Nobody here..
+
+meadow-empty-3:
+  responses:
+  - text: Empty, just like all the other places.
+  - text: And here I was hoping..
+
+meadow-empty-4:
+  text: Wait a second..
+
+meadow-empty-5:
+  responses:
+  - text: Hm?
+
+meadow-empty-6:
+  char: description
+  text: >-
+    She points to the sand around the firepit. On the sand, there are footprints.
+
+meadow-empty-7:
+  text:  What do you think about these?
+
+meadow-empty-8:
+  char: player
+  responses:
+  - text: These seem to be recent.
+    next: recent-1
+
+  - text: It hasn't really been windy recently, has it?
+    next: not-windy-1
+
+  - text: I don't know
+    next: idk-1
+
+not-windy-1:
+  char: narra
+  text: >-
+    Not really, no.. Not yesterday, for sure. And not today. Do you think these may be old?
+
+not-windy-2:
+  responses:
+  - text: Maybe. Can't really tell.
+  - text: Probably.
+
+not-windy-3:
+  text: I see.. I suppose I shouldn't get my hopes up too much.
+  next: meadow-empty-leave
+
+idk-1:
+  char: narra
+  text: >-
+    I think they may mean someone was here not long ago. It couldn't have been Maj as he said
+    he went straight to his home..
+
+idk-2:
+  responses:
+  - text: Hopefully you're right.
+    next: meadow-empty-leave
+  - text: We'll see. Maybe we're not too far off.
+    next: meadow-empty-leave
+
+recent-1:
+  char: narra
+  text: >-
+    That's what I thought too.. Though we I can't really understand where they lead since they're only visible on the
+    sand.
+
+recent-2:
+  responses:
+  - text: Seems like someone was just passing through.
+  - text: Maybe they stopped here for a bit and left.
+
+recent-3:
+  text: >-
+    I suppose that's plausible..
+  next: meadow-empty-leave
+
+meadow-empty-leave:
+  char: description
+  script_after: TerminalModule.state_variables.day3.forest_search.other_parts.meadow = true
+  text: >-
+    There seems to be nothing more of interest here.
+  next: where-to
+
+meadow-found:
+  char: description
+  text: >-
+    As you approach the meadow, you notice someone sitting by the long cold firepit,
+    looking at the sky, with their bare feet on the sand.
+  next: found-1
+
+spring-1:
+  custom:
+    class: { module: "terminal.select_line", class: "SelectLine" }
+    data:
+    - condition: return TerminalModule.state_variables.day3.forest_search.time >= 2
+      next: !line-name spring-found-1
+    - condition: return TerminalModule.state_variables.day3.forest_search.caves == true
+      next: !line-name spring-empty-4
+    - next: !line-name spring-empty-1
+
+spring-empty-1:
+  char: description
+  text: >-
+    After a while, you see the spring. Though it appears that the water comes from somewhere upward and this
+    isn't actually the source.
+
+spring-empty-2:
+  char: player
+  responses:
+  - text: Where does the water come from?
+
+spring-empty-3:
+  wait: true
+  text: >-
+    Up there, where the caves are, the water comes down to here. There, it comes out from somewhere up on the
+    mountain.. Since it's quite a long way to the caves, people come to this spot, where the flow is relatively clear,
+    when they need some water.
+
+spring-empty-4:
+  char: description
+  text: >-
+    Looking around, it seems like nobody has been here for a while. No signs of anyone stopping here to get some water,
+    at least, as no footprints can be seen near the water.
+
+spring-empty-5:
+  char: narra
+  text: Doesn't seem like there's anyone here..
+
+spring-empty-6:
+  char: player
+  responses:
+  - text: Seems like no one visited this place for a long time.
+  - text: I'd say we're the first ones here in a while.
+
+spring-empty-7:
+  char: description
+  text: She sighs.
+
+spring-empty-8:
+  script_after: TerminalModule.state_variables.day3.forest_search.other_parts.spring = true
+  text: >-
+    You're probably right. Still, it's a good thing we checked..
+  next: where-to
+
+spring-found-1:
+  char: description
+  text: >-
+      After a while, you see the spring in the distance. And near it, a person, sitting on the bank and looking
+      somewhere into the forest.
+  next: found-1
+
+caves-1:
+  char: description
+  text: >-
+      After walking through the forest for a, admittedly, quite a while, uphill, you get to the caves entrance.
+      On the right, there is water running down into the forest.
+      < if state_variables.day3.forest_search.other_parts.spring then >
+      This must be where the spring starts.
+      < end >
+
+caves-2:
+  custom:
+    class: { module: "terminal.select_line", class: "SelectLine" }
+    data:
+    - condition: return not TerminalModule.state_variables.day3.forest_search.other_parts.spring
+      next: !line-name caves-3
+    - next: !line-name caves-5
+
+caves-3:
+  char: player
+  responses:
+  - text: Where does this water go from here?
+
+caves-4:
+  text: >-
+      It's very long, and goes through a good part of the forest.. Including a point where it's
+      relatively easily accessible for people, and not too far from the village. This point is
+      the spring I mentioned earlier, it's a lot easier to get there than here..
+
+      As for our search..
+
+caves-5:
+  char: narra
+  text: >-
+      Nobody seems to be here..
+
+caves-6:
+  char: player
+  responses:
+  - text: Unless the went deeper into the caves?
+    next: deeper
+  - text: Not out here, I guess..
+    next: caves-7
+
+deeper:
+  char: narra
+  text: >-
+      Unlikely.. I mean, they'd need a flashlight, or a torch. And assuming they just woke up in the forest,
+      it won't be easy to get one out here. And we don't have any either..
+  next: caves-7
+
+caves-7:
+  char: narra
+  text: >-
+    Not sure if checking here makes any sense, but I suppose we should be thorough with our search,
+    any effort is good.
+  next: caves-8
+
+caves-8:
+  script_after: TerminalModule.state_variables.day3.forest_search.other_parts.caves = true
+  responses:
+  - text: Right.
+    next: where-to
+  - text: Oh well. This was quite a hike..
+    next: where-to
+
+found-1:
+  char: narra
+  wait: true
+  text: >-
+    I can't believe it.. She's here! Though of course it would only makes sense for it to be her out here..
+    Let's go!
+
+found-2:
+  char: narra
+  text: Hey!
+
+found-3:
+  char: description
+  text: >-
+    Narra starts running, you follow her.
+
+found-4:
+  char: kipi
+  text: Oh, you scared me!
+
+found-5:
+  char: description
+  wait: true
+  text: >-
+    As you both run closer, the person stands up.
+
+found-6:
+  char: kipi
+  text: >-
+    Well, Hello!
+
+found-7:
+  char: narra
+  text: Hi Kipi!
+
+found-8:
+  char: description
+  wait: true
+  text: >-
+    Now that you are actually up close and she's standing up, you see that Kipi is about the same
+    height as Narra, has long brown hair, and looks quite a bit older than Narra or Maj.
+
+found-9:
+  char: narra
+  wait: true
+  text: >-
+    Soo.. It's probably a dumb question, but what are you doing out here?
+
+found-10:
+  char: kipi
+  wait: true
+  text: >-
+    Everything disappeared, and then I woke up on that same old place where we all did, I'm sure you remember it. It
+    was, of course, very strange. Nevertheless, I decided to visit a few places here in the forest, you know I love it
+    here. Though, I suppose we should head back home now, and I hope you can clear the situtation up for me a bit along
+    the way and introduce your new friend, I'm totally in the dark here.
+  next: day3/forest_back/1
+
+wakeup-spot-1:
+  custom:
+    class: { module: "terminal.select_line", class: "SelectLine" }
+    data:
+    - condition: return TerminalModule.state_variables.day3.forest_search.time == 1
+      next: !line-name spot-lying-1
+    - next: !line-name spot-sitting-1
+
+spot-sitting-1:
+  char: description
+  wait: true
+  text: >-
+      Narra leads you back to the place. As you are nearing the spot, you
+      notice someone is sitting on the ground. Narra immediately starts running towards
+      them.
+
+spot-sitting-2:
+  char: narra
+  text: Hey!
+
+spot-sitting-3:
+  char: kipi
+  text: Huh?
+
+spot-sitting-4:
+  char: narra
+  text: Kipi, are you ok?!
+
+spot-sitting-5:
+  char: description
+  wait: true
+  text: >-
+    As you approach, you see Kipi is about the same height as Narra, has long brown hair, and looks quite a bit older
+    than Narra or Maj.
+
+spot-sitting-6:
+  char: kipi
+  wait: true
+  text: >-
+    I.. I just woke up here.. Everything went black and then.. I was here..
+    I've been sitting here for some time, trying to recollect what happened, but I can't piece it together..
+
+spot-sitting-7:
+  char: narra
+  text: Let's go home, I'll tell you everything on the way.
+
+spot-sitting-8:
+  char: description
+  text: Narra gives Kipi a hand to get up.
+  wait: true
+  next: spot-thanks
+
+spot-lying-1:
+  char: description
+  wait: true
+  text: >-
+    Narra leads you back to the place. As you are nearing the spot, you
+    notice someone is lying on the ground. Narra immediately starts running towards
+    them.
+
+spot-lying-2:
+  char: narra
+  text: Hey! Are you ok?!
+
+spot-lying-3:
+  char: description
+  wait: true
+  text: >-
+    As you approach, you see it's a girl about the same height as Narra, that has long brown hair, and looks quite a bit
+    older than Narra or Maj, her eyes are closed. Narra drops on her knees and starts shaking her.
+
+spot-lying-4:
+  char: kipi
+  text: I..
+
+spot-lying-5:
+  char: narra
+  text: Kipi? Are you okay??
+
+spot-lying-6:
+  char: kipi
+  text: What.. happened..
+
+spot-lying-7:
+  char: description
+  text: She manages to sit up.
+
+spot-lying-8:
+  char: narra
+  wait: true
+  text: Can you remember anything?
+
+spot-lying-9:
+  char: kipi
+  wait: true
+  text: >-
+    Everything went black, and the next thing I remember is you shaking me..
+
+spot-lying-10:
+  char: narra
+  text: Let's go home, I'll tell you everything on the way.
+
+spot-lying-11:
+  char: description
+  text: Both them them get up.
+  next: spot-thanks
+
+spot-thanks:
+  char: kipi
+  text: Thank you.
+  wait: true
+  next: day3/forest_back/1

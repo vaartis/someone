@@ -445,8 +445,17 @@ M.state_variables = {
    },
    day3 = {
       village_hub = {
-         walk_around = false
-      }
+         walk_around = false,
+         back_to_narras = false
+      },
+      forest_search = {
+         time = 0,
+         other_parts = {
+            meadow = false,
+            spring = false,
+            caves = false
+         }
+      },
    },
    -- Instances that were decrypted
    decrypted_instances = {},

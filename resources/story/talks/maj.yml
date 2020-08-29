@@ -65,7 +65,7 @@ dont-like-tea:
 
 bye:
   char: maj
-  text: see you later.
+  text: see you later!
   next: return
 
 return:

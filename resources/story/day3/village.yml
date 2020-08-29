@@ -82,8 +82,10 @@ village-hub:
   - text: Walk around the village
     condition: return not TerminalModule.state_variables.day3.village_hub.walk_around
     next: walk-around-1
-  #- text: Go back to Narra's house
-  #  next:
+  - text: Go back to Narra's house
+    # TODO: add more things?
+    condition: return TerminalModule.state_variables.day3.village_hub.walk_around
+    next: back-to-narras-1
 
 go-to-maj:
   script_after: TerminalModule.state_variables.talks.maj.visited_before = true
@@ -96,6 +98,10 @@ go-to-maj:
 
 maj-1:
   char: description
+  script_after: |
+      -- Only add time on first visit
+      local forest_search = TerminalModule.state_variables.day3.forest_search
+      forest_search.time = forest_search.time + 1
   text: You walk to his house and knock on the door a few times.
 
 maj-2:
@@ -172,8 +178,38 @@ walk-around-4:
 walk-around-5:
   char: description
   wait: true
-  script_after: TerminalModule.state_variables.day3.village_hub.walk_around = true
+  script_after: |
+      TerminalModule.state_variables.day3.village_hub.walk_around = true
+
+      local forest_search = TerminalModule.state_variables.day3.forest_search
+      forest_search.time = forest_search.time + 1
   text: >-
     At this point, the road splits in two, one going straight and the other turning to the right. Narra asked you to no go too far,
     so that's the point where you turn back.
   next: village-hub
+
+back-to-narras-1:
+  char: description
+  text: >-
+    You go back to her house, first checking the kitchen. She is however not in the kitchen, where you find her is the
+    living room, lying on the sofa.
+
+back-to-narras-2:
+  char: narra
+  text: >-
+    Oh, hey. You're back and I'm rested for a bit, so I suppose we can go now.
+
+back-to-narras-3:
+  char: description
+  text: As she says that, she stands up from the sofa and goes towards the exit from the house.
+
+back-to-narras-4:
+  char: narra
+  text: Come on, let's go.
+
+back-to-narras-5:
+  script_after: TerminalModule.state_variables.day3.village_hub.back_to_narras = true
+  responses:
+  - text: >-
+      Alright.
+    next: day3/forest_search/1
