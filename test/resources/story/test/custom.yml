@@ -1,0 +1,15 @@
+config:
+  chars:
+    test1:
+      color: [0, 0, 0]
+
+1:
+  char: test1
+  custom:
+    terminal.select_line.SelectLine:
+    - !line-name 1
+    - 1.0
+    - 1
+    - test
+    - { a: b }
+    - null

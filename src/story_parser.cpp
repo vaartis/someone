@@ -353,8 +353,22 @@ void StoryParser::parse(std::string file_name) {
         } else if (node["custom"]) {
             auto custom = node["custom"];
 
-            std::string module = custom["class"]["module"].as<std::string>();
-            std::string class_ = custom["class"]["class"].as<std::string>();
+            auto as_map = custom.as<std::map<std::string, YAML::Node>>();
+            if (as_map.size() != 1) {
+                spdlog::error("custom directive must include exactly one key, but in line {} it includes {}", inserted_name, as_map.size());
+
+                std::terminate();
+            }
+            auto [custom_name, data] = *as_map.cbegin();
+
+            auto last_dot = custom_name.rfind('.');
+            if (last_dot == std::string::npos) {
+                spdlog::error("No dot separator found in custom line directive of {}", inserted_name);
+
+                std::terminate();
+            }
+            auto module = custom_name.substr(0, last_dot);
+            auto class_ = custom_name.substr(last_dot + 1, custom_name.size());
 
             auto imported_module = lua.script(fmt::format("return require('{}')", module));
 
@@ -370,7 +384,7 @@ void StoryParser::parse(std::string file_name) {
 
                     switch (data_entry.Type()) {
                     case NodeType::Null:
-                        return sol::object();
+                        return sol::lua_nil;
                     case NodeType::Scalar:
                         // If there's a line-name tag, parse the data as a line name and try resolving the reference
                         if (data_entry.Tag() == "!line-name") {
@@ -384,13 +398,14 @@ void StoryParser::parse(std::string file_name) {
                             return sol::make_object(lua, val);
                         }
 
-                        if (float val; YAML::convert<float>::decode(data_entry, val))
+                        // int convertion must be first, since a convertion
+                        // to a float succeedes from an integer just fine
+                        if (int val; YAML::convert<int>::decode(data_entry, val))
                             return sol::make_object(lua, val);
-                        else if (int val; YAML::convert<int>::decode(data_entry, val))
+                        else if (float val; YAML::convert<float>::decode(data_entry, val))
                             return sol::make_object(lua, val);
-                        else if (std::string val; YAML::convert<std::string>::decode(data_entry, val)) {
+                        else if (std::string val; YAML::convert<std::string>::decode(data_entry, val))
                             return sol::make_object(lua, val);
-                        }
                     case NodeType::Sequence: {
                         auto arr = lua.create_table();
                         for (auto val : data_entry) {
@@ -416,7 +431,7 @@ void StoryParser::parse(std::string file_name) {
                     }
                 };
 
-            result_object = sol::make_object<TerminalCustomLineData>(lua, *maybe_class, convert(custom["data"]));
+            result_object = sol::make_object<TerminalCustomLineData>(lua, *maybe_class, convert(custom[custom_name]));
         } else {
             spdlog::error("Unknown line type at {}", inserted_name);
             std::terminate();

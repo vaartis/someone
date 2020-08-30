@@ -62,8 +62,7 @@ other-parts-hub:
 
 meadow-1:
   custom:
-    class: { module: "terminal.select_line", class: "SelectLine" }
-    data:
+    terminal.select_line.SelectLine:
     - condition: return TerminalModule.state_variables.day3.forest_search.time == 1
       next: !line-name meadow-found
     - next: !line-name meadow-empty-1
@@ -170,8 +169,7 @@ meadow-found:
 
 spring-1:
   custom:
-    class: { module: "terminal.select_line", class: "SelectLine" }
-    data:
+    terminal.select_line.SelectLine:
     - condition: return TerminalModule.state_variables.day3.forest_search.time >= 2
       next: !line-name spring-found-1
     - condition: return TerminalModule.state_variables.day3.forest_search.caves == true
@@ -240,8 +238,7 @@ caves-1:
 
 caves-2:
   custom:
-    class: { module: "terminal.select_line", class: "SelectLine" }
-    data:
+    terminal.select_line.SelectLine:
     - condition: return not TerminalModule.state_variables.day3.forest_search.other_parts.spring
       next: !line-name caves-3
     - next: !line-name caves-5
@@ -352,8 +349,7 @@ found-10:
 
 wakeup-spot-1:
   custom:
-    class: { module: "terminal.select_line", class: "SelectLine" }
-    data:
+    terminal.select_line.SelectLine:
     - condition: return TerminalModule.state_variables.day3.forest_search.time == 1
       next: !line-name spot-lying-1
     - next: !line-name spot-sitting-1

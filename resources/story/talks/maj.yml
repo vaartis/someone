@@ -70,8 +70,7 @@ bye:
 
 return:
   custom:
-    class: { module: "terminal.save_and_return_lines", class: "ReturnLine" }
-    data:
+    terminal.save_and_return_lines.ReturnLine:
       next_was: !line-name "talks/maj/talk-about"
 
 laptops-1:

@@ -54,8 +54,7 @@ sure-did-1:
 7:
   char: player
   custom:
-    class: { module: "terminal.save_and_return_lines", class: "SaveLine" }
-    data:
+    terminal.save_and_return_lines.SaveLine:
       next: !line-name "talks/narra/talk-about"
       return_to: !line-name 8
 
@@ -90,8 +89,7 @@ village-hub:
 go-to-maj:
   script_after: TerminalModule.state_variables.talks.maj.visited_before = true
   custom:
-    class: { module: "terminal.select_line", class: "SelectLine" }
-    data:
+    terminal.select_line.SelectLine:
     - condition: return not TerminalModule.state_variables.talks.maj.visited_before
       next: !line-name maj-1
     - next: !line-name maj-5
@@ -128,8 +126,7 @@ maj-7:
   7:
   char: player
   custom:
-    class: { module: "terminal.save_and_return_lines", class: "SaveLine" }
-    data:
+    terminal.save_and_return_lines.SaveLine:
       next: !line-name "talks/maj/talk-about"
       return_to: !line-name village-hub
 

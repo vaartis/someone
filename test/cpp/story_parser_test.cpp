@@ -112,4 +112,37 @@ TEST_CASE("Story parser", "[story_parser]") {
             REQUIRE(l3.text == "test3");
         }
     }
+
+    SECTION("Custom lines parse correctly") {
+        // Load the libraries needed for the lua stuff
+        lua.open_libraries(sol::lib::base, sol::lib::table, sol::lib::string, sol::lib::package,
+                           sol::lib::coroutine, sol::lib::math, sol::lib::debug, sol::lib::os, sol::lib::io);
+
+        // Setup the lua path to see luarocks packages
+        auto package_path = std::filesystem::path("resources") / "lua" / "share" / "lua" / SOMEONE_LUA_VERSION / "?.lua;";
+        package_path += std::filesystem::path("resources") / "lua" / "share" / "lua" / SOMEONE_LUA_VERSION / "?" / "init.lua;";
+        lua["package"]["path"] = std::string(package_path.u8string()) + std::string(lua["package"]["path"]);
+
+        auto package_cpath = std::filesystem::path("resources") / "lua" / "lib" / "lua" / SOMEONE_LUA_VERSION / "?." SOMEONE_LIB_EXT ";";
+        lua["package"]["cpath"] = std::string(package_cpath.u8string()) + std::string(lua["package"]["cpath"]);
+
+        parser.parse("test/custom");
+
+        auto l1 = lines["test/custom/1"].get<TerminalCustomLineData>();
+
+        sol::object custom_class = lua.script("return require('terminal.select_line').SelectLine");
+        REQUIRE(l1.class_ == custom_class);
+
+        auto data_vec = l1.data.as<std::vector<sol::object>>();
+        // nil is not counted in tables
+        REQUIRE(data_vec.size() == 5);
+
+        REQUIRE(data_vec[0].as<std::string>() == "test/custom/1");
+        REQUIRE(data_vec[1].as<float>() == 1.0f);
+        REQUIRE(data_vec[2].as<int>() == 1);
+        REQUIRE(data_vec[3].as<std::string>() == "test");
+
+        auto data_vec_map = data_vec[4].as<std::map<std::string, std::string>>();
+        REQUIRE(data_vec_map["a"] == "b");
+    }
 }

@@ -26,14 +26,13 @@ config:
   char: warn_text
 
 4:
+  char: text
   custom:
-    class: { module: "terminal.instance_menu", class: "InstanceMenuLine" }
-    data:
+    terminal.instance_menu.InstanceMenuLine:
       instance_menu:
       - name: Famine
         password: aqualung
         next: !line-name "instances/hunger/1"
-  char: text
 
 wrong_password:
   char: err_text
