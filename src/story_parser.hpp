@@ -15,4 +15,8 @@ public:
      *  this namespace if it hasn't already been parsed.
      */
     void maybe_parse_referenced_file(std::string next);
+
+    #ifndef NDEBUG
+    void total_wordcount();
+    #endif
 };

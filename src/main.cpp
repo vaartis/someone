@@ -99,6 +99,10 @@ int main(int argc, char **argv) {
         "story_parser", terminal_env.parser
     );
 
+#ifndef NDEBUG
+    terminal_env.parser.total_wordcount();
+#endif
+
 #ifdef SOMEONE_TESTING
     for (int i = 1; i < argc; i++) {
         lua[sol::create_if_nil]["arg"][i] = std::string(argv[i]);

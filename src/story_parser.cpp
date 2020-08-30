@@ -41,6 +41,31 @@ template <> struct convert<CharacterConfig> {
 
 }
 
+#ifndef NDEBUG
+void StoryParser::total_wordcount() {
+  std::vector<std::string> all_strings;
+
+  for (const auto [_key, line_data] : lines) {
+      if (auto line = line_data.as<std::optional<TerminalOutputLineData>>(); line.has_value())
+          all_strings.push_back(line->text);
+      else if (auto line = line_data.as<std::optional<TerminalVariantInputLineData>>(); line.has_value())
+          for (auto &variant : line->variants)
+              all_strings.push_back(variant.text);
+      else if (auto line = line_data.as<std::optional<TerminalTextInputLineData>>(); line.has_value()) {
+          all_strings.push_back(line->before);
+          all_strings.push_back(line->after);
+      }
+  }
+
+  uint32_t wordcount = 0;
+  for (const auto &str : all_strings) {
+      wordcount += std::count_if(str.begin(), str.end(), [](const char &ch) { return std::isspace(ch); });
+  }
+
+  spdlog::debug("Total amount of words: {}", wordcount);
+}
+#endif
+
 std::string namespace_of(std::string next) {
     auto last_separator_pos = next.find_last_of("/");
     if (last_separator_pos != std::string::npos) {
