@@ -476,6 +476,9 @@ M.state_variables = {
          laptops = false,
          instances = false,
          visited_before = false
+      },
+      kipi = {
+         instances = false
       }
    },
    talking_topics = {}

@@ -1,0 +1,17 @@
+config:
+  chars:
+    player:
+      color: [255, 255, 255]
+    description:
+      color: [127, 0, 255]
+    narra:
+      color: [211, 0, 0]
+    kipi:
+      color: [0, 121, 100]
+    maj:
+      color: [135,206,235]
+
+  dialogue_between: [kipi, maj]
+
+1:
+  text: placeholder

@@ -11,4 +11,172 @@ config:
   dialogue_between: [narra, kipi]
 
 1:
-  text: placeholder
+  char: description
+  text: As you are on your way back to the village, Narra starts explaining what happened.
+
+2:
+  char: narra
+  wait: true
+  text: >-
+    We've already seen what you've said about your experience, it matches exactly with what Maj told..
+
+3:
+  wait: true
+  text: >-
+    Oh, I wasn't the only one, then. Are there any more people who share this experience?
+
+4:
+  wait: true
+  text: >-
+    We don't know. Presumably, everyone else, because everyone is gone. Maj woke up like you yesterday and
+    we met him at home, after we went to see if anything was different in the city. It wasn't, there was nobody
+    there too..
+
+5:
+  wait: true
+  text: >-
+    Wait.. Everybody is gone? Are we the only people here now? What happened to everyone?
+
+6:
+  wait: true
+  text: >-
+    Yes, everyone.. We don't know exactly what happened< if lume.any(state_variables.talks.narra.instances) then >,
+    though I think we may get to know more about that in the near future< end >. What we know is that <= state_variables.input_variables.p >,
+    our friend here, is probably able to help, as they are from the.. outside.
+
+7:
+  wait: true
+  text: >-
+    Outside? Hard to believe this is really happening again..
+
+8:
+  text: >-
+    I assure you, that's how it is. You'll have to trust me on this.
+
+9:
+  char: player
+  responses:
+  - text: It's true. Though things out here are not very impressive.
+
+10:
+  char: kipi
+  text: >-
+    Not very impressive?
+
+11:
+  char: player
+  responses:
+  - text: >-
+      I'm alone in front of a computer in a dark room with gray walls. There are a few other rooms
+      that have appeared but they're not much different from this one.
+
+12:
+  char: kipi
+  wait: true
+  text: >-
+    That does sounds like no good.. And Narra said you can help us?
+
+13:
+  wait: true
+  text: >-
+    Some things out there seem to result in changes in our world. While for you, it probably felt like you lost
+    consciousness and woke up immediately, that's not what happened to me. I've been trapped in a room, similiar to the
+    one <= state_variables.input_variables.p > described, for a very long time.. Hard to measure how long. Then,
+    <= state_variables.input_variables.p > just.. appeared and after pressing some kind of button there, on the outside,
+    we both found ourselves back in the forest. Similiar things happened the next nights, something triggered changes on the outside,
+    and in turn the world reacted and changed something outside, opening opportunities for <= state_variables.input_variables.p > to..
+    find out more. First, the city appeared, and with it Maj came back, though we only found him in the evening, when we came back.
+    Now you're back, too.
+
+14:
+  wait: true
+  text: >-
+    This story is just so bizzare.. I can't believe everyone just disappeared like that.. and that you spent so much time
+    waiting.. It's just a lot to take in, sorry.. Who could have done this?
+
+15:
+  wait: true
+  text: >-
+    < if lume.any(state_variables.talks.narra.instances) then >
+    Someone out there. We don't know why this happened, but there are other worlds like ours who experienced something very similiar.
+    < else >
+    We don't know yet.
+    < end >
+
+16:
+  custom:
+    terminal.select_line.SelectLine:
+    - condition: |-
+        local lume = require("lume")
+        return lume.any(TerminalModule.state_variables.talks.narra.instances)
+      next: !line-name 17
+    - next: !line-name 23
+
+17:
+  wait: true
+  char: kipi
+  text: What? Other worlds?
+
+18:
+  wait: true
+  text: >-
+    Yes.. I know, once again, it's hard to beleive.. But as <= state_variables.input_variables.p > has discovered, we
+    aren't the first ones.  There were people before us, whose world were similiarly restricted to a single room,
+    where.. only I remained. Not me you see before your eyes in person, but.. another me. Moreover, after
+    <= state_variables.input_variables.p > it seemed like all their interactions were erased after <= state_variables.input_variables.p >
+    left.
+
+19:
+  wait: true
+  text: >-
+    This is.. way out of the ordinary.. Can you help them?
+
+20:
+  char: description
+  text: She's looking at you.
+
+21:
+  char: player
+  responses:
+  - text: We didn't find a way yet.
+  - text: Sorry, I can't do anything to help right now.
+
+22:
+  char: kipi
+  script_after: TerminalModule.state_variables.talks.kipi.instances = true
+  text: >-
+    I see.. I need some time to think about all of this..
+
+23:
+  char: description
+  wait: true
+  text: For a few minutes, you walk in silence.
+
+24:
+  char: kipi
+  wait: true
+  text: So.. Maj is at home, right?
+
+25:
+  wait: true
+  text: He should be.. Unless he went out somewhere.
+
+26:
+  wait: true
+  text: I want say hi, so I plan to visit his place for a bit. I hope you're coming, too?
+
+27:
+  wait: true
+  text: Sure. I don't mind.
+
+28:
+  char: player
+  responses:
+  - text: Yeah
+
+29:
+  char: description
+  text: >-
+    The rest of they way is spent in silence. Kipi's face shows she is thinking about something. When you reach the village,
+    all of you head to Maj's house. Kipi knocks on the door.
+  next: day3/evening/1
