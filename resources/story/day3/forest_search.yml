@@ -255,9 +255,7 @@ caves-4:
   text: >-
       It's very long, and goes through a good part of the forest.. Including a point where it's
       relatively easily accessible for people, and not too far from the village. This point is
-      the spring I mentioned earlier, it's a lot easier to get there than here..
-
-      As for our search..
+      the spring I mentioned earlier, it's a lot easier to get there than here. As for our search..
 
 caves-5:
   char: narra
@@ -340,7 +338,7 @@ found-9:
   char: narra
   wait: true
   text: >-
-    Soo.. It's probably a dumb question, but what are you doing out here?
+    What are you doing out here?
 
 found-10:
   char: kipi
