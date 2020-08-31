@@ -59,7 +59,16 @@ void StoryParser::total_wordcount() {
 
   uint32_t wordcount = 0;
   for (const auto &str : all_strings) {
-      wordcount += std::count_if(str.begin(), str.end(), [](const char &ch) { return std::isspace(ch); });
+      bool in_script = false;
+
+      for (const char ch : str) {
+          if (ch == '<' && !in_script)
+              in_script = true;
+          if (ch == '>' && in_script)
+              in_script = false;
+          if (!in_script && std::isspace(ch))
+              wordcount += 1;
+      }
   }
 
   spdlog::debug("Total amount of words: {}", wordcount);
