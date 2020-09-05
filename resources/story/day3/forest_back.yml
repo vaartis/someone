@@ -176,6 +176,7 @@ config:
 
 29:
   char: description
+  wait: true
   text: >-
     The rest of they way is spent in silence. Kipi's face shows she is thinking about something. When you reach the village,
     all of you head to Maj's house. Kipi knocks on the door.

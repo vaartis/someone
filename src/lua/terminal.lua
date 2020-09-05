@@ -454,7 +454,8 @@ M.state_variables = {
             meadow = false,
             spring = false,
             caves = false
-         }
+         },
+         found_on = nil
       },
    },
    -- Instances that were decrypted

@@ -14,4 +14,259 @@ config:
   dialogue_between: [kipi, maj]
 
 1:
-  text: placeholder
+  char: maj
+  text: come in!
+
+2:
+  char: description
+  wait: true
+  text: >-
+      You all come in, unsurprisingly finding Maj in the same spot as yesterday. He is visibly surprised when he sees Kipi.
+      Everyone sits at the table with Maj, as he closes his laptop.
+
+3:
+  char: maj
+  wait: true
+  text: "hello everyone!! kipi, great to see you! <= state_variables.input_variables.p > did something and helped you too?"
+
+4:
+  char: kipi
+  wait: true
+  text: >-
+    I'm inclined to believe that's what happened. That's what Narra told me and, well.. that seems to be the case indeed. I woke up in the
+    forest and Narra and <= state_variables.input_variables.p > met me there.
+
+5:
+  char: narra
+  wait: true
+  text: >-
+    We went searching into the forest and.. well, we were lucky, I guess. Though Kipi would've gone home by herself already, probably.
+    We had some time to catch up on the way back. I told her the whole story.
+
+6:
+  char: kipi
+  wait: true
+  text: >-
+    It's still hard to believe but I think I'm over it now.
+
+7:
+  wait: true
+  text: >-
+      so.. same thing happened to you, right? everything goes to black and you wake up in the forest?
+
+8:
+  wait: true
+  text: >-
+    Exactly. Surely this isn't a conincidence. We must find out why this is happening and find where all the other people are. Things like that
+    don't just happen.
+
+9:
+  wait: true
+  text: >-
+    i know, i know.. it's strange! but we will find it out eventually, i believe it.
+
+10:
+  wait: true
+  text: >-
+    I hope so.
+
+11:
+  wait: true
+  text: >-
+    well.. anyways.. how was your day?
+
+12:
+  wait: true
+  text: >-
+    < local on = state_variables.day3.forest_search.found_on >
+    < if on == "spot-lying" then >
+    Well.. I actually woke up because Narra was shaking me.. and then we went home, basically.
+    < elseif on == "spot-sitting" then >
+    A bit after I woke up, Narra and <= state_variables.input_variables.p > found me on that same spot and we went home together.
+    < elseif on == "meadow" then >
+    After I woke up, I decided to walk around the forest a bit before going back and went to the meadow, I had no idea what happened at the time..
+    And then I met Narra and <= state_variables.input_variables.p > there, and they told me..
+    < elseif on == "spring" then >
+    After I woke up, I decided to walk around the forest a bit before going back and went to the meadow, and after sitting there for a bit to the
+    spring to get some whater, I had no idea what happened at the time.. And then I met Narra and <= state_variables.input_variables.p > there,
+    and they told me..
+    < end >
+    That's how my day was.
+
+13:
+  char: narra
+  wait: true
+  text: >-
+    We went into the forest in hopes of finding someone and we did! That's a great outcome for the day, honestly.
+    Though we did spend basically the whole day on foot again..
+
+14:
+  char: player
+  responses:
+  - text: At least it wasn't in vain.
+  - text: It wasn't for nothing.
+
+15:
+  char: narra
+  wait: true
+  text: I guess you're right..
+
+16:
+  char: maj
+  wait: true
+  text: >-
+    and i.. well, i spent my day mostly at home, as i usually do. went through all the long running software i had
+    on the server, and all of it pretty much went down because for.. however long we have been missing, apparently
+    the time on computer messed up and went negative.. needless to say, this wasn't supposed to happen for a very long time..
+    most things didn't handle that well. i'm honestly surprised things didn't break down completely somehow.
+
+17:
+  char: kipi
+  wait: true
+  text: And there I was thinking computers were the most reliable thing ever.
+
+18:
+  char: maj
+  wait: true
+  text: >-
+    oh, far from it.. never really thought about this exact situation. hopefully i'll be able to fix this somehow and
+    i have a few ideas in mind but i won't bother you with the technical details.
+
+19:
+  char: player
+  responses:
+  - text: I'd like to the technical details, actually.
+    next: tech-details-1
+  - text: Yeah, don't bother.
+    next: 20
+
+tech-details-1:
+  char: maj
+  text: >-
+    well.. if you insist.. i think about introducing some kind of monotonically increasing time into the system and something to handle time
+    leaps which may have happened, plus maybe somehow using arbitary sized numbers to allow keeping track of time past the current point, or
+    maybe introducing some kind of epoch to start counting time from zero and not lose the time data from before.. things
+    happened.. somehow. it's going to be a mess to handle all of this and make things work properly, especially while i'm alone on this
+    task. but then again.. that's how it is with computers. i'm trying to work things out for now and then hopefully when there are.. more
+    people to help, we're going to figure things out. it's better than doing nothing. uhm.. i hope you understood at least a bit of what i
+    said.
+
+tech-details-2:
+  char: player
+  responses:
+  - text: Nope. But thank you for telling nonetheless.
+    next: tech-details-nope
+  - text: Yes, actually. Somehow.
+    next: tech-details-yes-1
+
+tech-details-nope:
+  char: maj
+  text: >-
+      oh well. that's alright. you really don't need to know all this stuff. i spent a good part of my life here
+      tinkering with these things.
+  next: 20
+
+tech-details-yes-1:
+  char: maj
+  text: interesting. i wonder where this knowledge comes from.
+
+tech-details-yes-2:
+  char: player
+  responses:
+  - text: Somehow things just pop up in my head.
+    next: 20
+  - text: I wonder too.
+    next: 20
+
+20:
+  char: kipi
+  text: >-
+    While we're at it.. What were you guys doing when.. it happened? I think I kind of missed everything.. I remember the news about the
+    walls appearing and then I just kinda went on with my day, then they said the walls are growing closer and that's when I began
+    worrying.. and then, well, you all know what happened. I can't quite remember what I was doing, but I think I was at home
+    watering my plants.
+
+21:
+  char: player
+  responses:
+  - text: Oh, so that house with a bunch of plants is where you live?
+
+22:
+  char: kipi
+  wait: true
+  text: Yeah. That's the one. I see you took some time to look around.
+
+23:
+  char: maj
+  wait: true
+  text: >-
+    well.. i can't it was any different for me. i was at home at the time too, but then i'm at home most of the time really..
+
+24:
+  char: narra
+  wait: true
+  text: >-
+    As for me.. When the walls appeared, I took some time to go there and see them myself. Of course, it was as described,
+    it felt surreal. The next days I checked them out too, and then.. well, somehow I was in the center of that small room.
+    It's hard to explain, like suddenly everything around me shifted and I was suddenly there. Not a thing I'd ever want
+    to experience again, and I wouldn't wish that for anyone.
+
+25:
+  char: kipi
+  wait: true
+  text: >-
+    Your experience certainly differs a lot from ours..
+
+26:
+  char: narra
+  wait: true
+  text: >-
+    Indeed it does. On that note, it's getting late again.. I hope you guys wouldn't mind we go home now?
+
+27:
+  char: kipi
+  wait: true
+  text: >-
+    Not at all, I think getting a bit of sleep wouldn't hurt at all actually. With all these things to process, I need some rest.
+
+28:
+  char: maj
+  wait: true
+  text: sure.. goodnight, then. though i'll probably be staying up a bit more tonight.
+
+29:
+  char: player
+  responses:
+  - text: Goodnight everyone.
+
+30:
+  char: description
+  wait: true
+  text: >-
+      You, Narra and Kipi all leave the house. Kipi wishes you both goodnight again and you go home.
+      After a bath, Narra gets into bed, and so do you.
+
+31:
+  char: narra
+  text: What a day.. huh
+
+32:
+  char: player
+  responses:
+  - text: What a day indeed.
+  - text: Yeah.
+
+33:
+  char: narra
+  text: Goodnight. Or, well, whatever happens to you. Hopefully you'll discover more tonight.
+
+34:
+  char: player
+  responses:
+  - text: Goodnight.
+  - text: We'll see how tomorrow turns out.
+
+35:
+  char: description
+  text: For some time, you see Narra toss and turn, and then finally fall asleep. After some time, you do too.
+  next: ""

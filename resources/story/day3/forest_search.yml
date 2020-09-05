@@ -162,6 +162,7 @@ meadow-empty-leave:
 
 meadow-found:
   char: description
+  script_after: TerminalModule.state_variables.day3.forest_search.found_on = "meadow"
   text: >-
     As you approach the meadow, you notice someone sitting by the long cold firepit,
     looking at the sky, with their bare feet on the sand.
@@ -222,6 +223,7 @@ spring-empty-8:
 
 spring-found-1:
   char: description
+  script_after: TerminalModule.state_variables.day3.forest_search.found_on = "spring"
   text: >-
       After a while, you see the spring in the distance. And near it, a person, sitting on the bank and looking
       somewhere into the forest.
@@ -395,6 +397,7 @@ spot-sitting-7:
 spot-sitting-8:
   char: description
   text: Narra gives Kipi a hand to get up.
+  script_after: TerminalModule.state_variables.day3.forest_search.found_on = "spot-sitting"
   wait: true
   next: spot-thanks
 
@@ -451,6 +454,7 @@ spot-lying-10:
 spot-lying-11:
   char: description
   text: Both them them get up.
+  script_after: TerminalModule.state_variables.day3.forest_search.found_on = "spot-lying"
   next: spot-thanks
 
 spot-thanks:
