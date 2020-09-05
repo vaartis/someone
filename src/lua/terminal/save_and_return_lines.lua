@@ -13,15 +13,13 @@ Example usage:
 
 1:
   custom:
-    class: { module: "terminal.save_and_return_lines", class: "SaveLine" }
-    data:
+    terminal.save_and_return_lines.SaveLine:
       next: !line-name 2
       return_to: !line-name 3
 
 2:
   custom:
-    class: { module: "terminal.save_and_return_lines", class: "ReturnLine" }
-    data:
+    terminal.save_and_return_lines.ReturnLine:
       next_was: !line-name 2
 
 3:

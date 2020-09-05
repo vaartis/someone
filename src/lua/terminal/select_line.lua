@@ -14,8 +14,7 @@ Example usage:
 
 1:
   custom:
-    class: { module: "terminal.select_line", class: "SelectLine" }
-    data:
+    terminal.select_line.SelectLine:
     - condition: |-
           return TerminalModule.state_variables.know_about_stuff
       next: !line-name know-about-stuff
