@@ -227,7 +227,7 @@ function M.InputWaitLine:should_wait()
 end
 
 function M.InputWaitLine:is_interactive()
-   return not self._1_pressed
+   return self._letters_output < #self._text or not self._1_pressed
 end
 
 function M.InputWaitLine:handle_interaction(event)
