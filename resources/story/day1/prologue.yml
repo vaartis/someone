@@ -11,16 +11,16 @@ config:
 1:
   char: narra
   text: >-
-    Hello? Can you hear me?
+    Can you hear me?
 
 2:
   responses:
   - text: >-
-      Uh.. Yes? I think.. Who are you and where am I?
+      Uh.. Yes? Who are you and where am I?
 
 3:
   text: >-
-    I'm Narra, and we're.. here, in this empty room.
+    I'm Narra, and we're here, in this empty room.
 
 4:
   char: description
