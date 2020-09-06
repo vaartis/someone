@@ -9,6 +9,7 @@ config:
   dialogue_between: [player, narra]
 
 1:
+  char: narra
   text: >-
     Never seen these streets so empty, it was bright and full of people even at night. Not anymore. Didn't think they'd ever end up like
     this. Hope they'll be the way they were before someday, even though I didn't like it at the time, it's sad to see them so devoid of
@@ -214,7 +215,7 @@ dance-floor-8:
   wait: true
   text: >-
     You walk for bit more deeper into the city, until you see the big mall building. You know it's a mall because it has "City Mall" written
-    on it. Who could've thought.
+    on it.
 
 15:
   char: narra
