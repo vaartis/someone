@@ -381,6 +381,7 @@ function M.process_event(event, dt)
       end
 
       line = line:next()
+      if line == nil then break end
    end
 end
 
