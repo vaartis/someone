@@ -78,7 +78,8 @@ local function save_game(first_line, last_line)
    local saved_data = {
       lines = { first_line = first_line._name, last_line = last_line._name },
       variables = M.state_variables,
-      environment = { name = current_environment_name }
+      walking_variables = WalkingModule.state_variables,
+      environment = { name = current_environment_name },
    }
    for _, line in pairs(lines_to_save) do
       local line_saved_fields = {}
@@ -142,6 +143,10 @@ local function load_game()
       first_line_on_screen = first_line
 
       M.state_variables = util.deep_merge(M.state_variables, data["variables"])
+
+      if data["walking_variables"] then
+         WalkingModule.state_variables = util.deep_merge(WalkingModule.state_variables, data["walking_variables"])
+      end
 
       if data.environment then
          M.set_environment_image(data.environment.name)
