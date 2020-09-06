@@ -101,10 +101,9 @@ jobs:
         submodules: recursive
 
     - name: Install MSYS2 and dependencies
-      uses: eine/setup-msys2@v1
+      uses: msys2/setup-msys2@v2
       with:
         update: true
-        cache: true
         install: 'mingw-w64-x86_64-cmake mingw-w64-x86_64-gcc mingw-w64-i686-cmake mingw-w64-i686-gcc make'
         path-type: inherit
 
