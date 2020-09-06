@@ -379,7 +379,7 @@ function M.process_event(event, dt)
 end
 
 function M.set_environment_image(name)
-   --do return end
+   do return end
 
    -- Create the sprite if it doesn't exist yet
    if not current_environment_sprite then
