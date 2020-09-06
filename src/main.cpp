@@ -32,8 +32,18 @@ int main(int argc, char **argv) {
     spdlog::set_level(spdlog::level::debug);
     #endif
 
-    sf::RenderWindow window(sf::VideoMode(1280, 1024), "Someone");
+    constexpr std::pair<int, int> initial_size(1280, 1024);
+    const std::vector<sf::Vector2u> window_sizes = {
+        { initial_size.first, initial_size.second },
+        { initial_size.first / 2, initial_size.second / 2},
+        { initial_size.first * 2, initial_size.second * 2}
+    };
+    uint8_t current_window_size = 0;
+
+    const auto &default_size = window_sizes[current_window_size];
+    sf::RenderWindow window(sf::VideoMode(default_size.x, default_size.y), "Someone", sf::Style::Titlebar | sf::Style::Close);
     window.setFramerateLimit(60);
+    window.setPosition(sf::Vector2i(0, 0));
 
     ImGui::SFML::Init(window);
     ImGuiIO& io = ImGui::GetIO();
@@ -49,15 +59,6 @@ int main(int argc, char **argv) {
     sf::Sprite targetSprite(targetTexture);
 
     StaticFonts static_fonts;
-
-    /*
-    sf::Texture lightTexture;
-    lightTexture.loadFromFile("resources/sprites/room/light.png");
-    sf::Sprite lightSprite(lightTexture);
-    auto rect = lightSprite.getTextureRect();
-    lightSprite.setOrigin(rect.width / 2, rect.height / 2);
-    lightSprite.setPosition(387, 600);
-    */
 
     sol::state lua;
     lua.open_libraries(sol::lib::base, sol::lib::table, sol::lib::string, sol::lib::package,
@@ -137,21 +138,25 @@ int main(int argc, char **argv) {
                 window.close();
 
                 return 0;
-            case sf::Event::Resized: {
-                float width = event.size.width,
-                    height = event.size.height;
-                target.setView(
-                    sf::View(
-                        {width / 2, height / 2},
-                        {width, height}
-                    )
-                );
-                break;
-            }
             case sf::Event::KeyReleased: {
-                // Activate debug menu on ~
-                if (event.key.code == sf::Keyboard::Tilde)
+                switch (event.key.code) {
+                case sf::Keyboard::Tilde:
+                    // Activate debug menu on ~
                     debug_menu = !debug_menu;
+                    break;
+                case sf::Keyboard::F1:
+                    if (current_window_size + 1 >= window_sizes.size()) {
+                        current_window_size = 0;
+                    } else {
+                        current_window_size++;
+                    }
+                    window.setSize(window_sizes[current_window_size]);
+
+                    break;
+                default:
+                    break;
+                }
+
                 break;
             }
 
