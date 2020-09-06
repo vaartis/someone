@@ -23,7 +23,7 @@ function show_info_message(message)
 
    info_message_coro =
       coroutines.create_coroutine(
-         function(dt)
+         function()
             local current_color = Color.new(0, 0, 0, 0)
             local text = Text.new(message, StaticFonts.main_font, StaticFonts.font_size)
 
@@ -41,12 +41,15 @@ function show_info_message(message)
                coroutine.yield()
             end
 
+            local dt = 0
             -- Wait five seconds
             local timer = 0
             while timer < 5 do
                timer = timer + dt
                GLOBAL.drawing_target:draw(text)
-               coroutine.yield()
+
+               -- Update the delta time
+               dt = coroutine.yield()
             end
 
             -- Hide the text

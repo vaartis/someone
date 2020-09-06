@@ -4,12 +4,15 @@ local coroutines = {}
 
 local M = {}
 
-function M.create_coroutine(fnc, finish_callback)
+function M.create_coroutine(fnc, ...)
    local cor = coroutine.create(fnc)
 
    table.insert(
       coroutines,
-      { cor = cor, finish_callback = finish_callback }
+      {
+         cor = cor, finish_callback = finish_callback,
+         started = false, args = {...}
+      }
    )
 
    return cor
@@ -27,7 +30,15 @@ end
 function M.run(dt)
    local to_remove = { }
    for n, cor in pairs(coroutines) do
-      local _, err = coroutine.resume(cor.cor, dt)
+      local _, err
+      if not cor.started then
+         _, err = coroutine.resume(cor.cor, table.unpack(cor.args))
+
+         cor.started = true
+      else
+         _, err = coroutine.resume(cor.cor, dt)
+      end
+
       if err then error(err) end
 
       if coroutine.status(cor.cor) == "dead" then
@@ -42,7 +53,7 @@ function M.run(dt)
    lume.each(to_remove, function(n) table.remove(coroutines, n) end)
 end
 
-function M.black_screen_out()
+function M.black_screen_out(do_after)
    local screen_size = GLOBAL.drawing_target.size
    local black_rect = RectangleShape.new(
       Vector2f.new(screen_size.x, screen_size.y)
@@ -56,6 +67,11 @@ function M.black_screen_out()
       black_rect.fill_color = color
 
       GLOBAL.drawing_target:draw(black_rect)
+
+      if color.a == 255 and do_after then
+         -- On the last iteration, do whatever requested in the end
+         do_after()
+      end
 
       coroutine.yield()
    end
