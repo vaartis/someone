@@ -140,7 +140,12 @@ function M.OutputLine:max_line_height()
 end
 
 function M.OutputLine:should_wait()
-   return self._letters_output < #self._text and self._time_since_last_letter < 0.1
+   local script_done = true
+   if self._script_after then
+      script_done = self._script_after_executed
+   end
+
+   return self._letters_output < #self._text and script_done
 end
 
 function M.OutputLine:maybe_increment_letter_count()

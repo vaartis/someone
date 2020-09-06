@@ -285,7 +285,7 @@ function M.draw(dt)
          total_text_height = total_text_height + StaticFonts.font_size / 2
          line_height_offset = first_line_height_offset + total_text_height
       elseif text == nil then
-            -- Line doesn't output anything, just do nothing
+         -- Line doesn't output anything, just do nothing
       else
          -- It's a single line of text
 
@@ -344,11 +344,14 @@ function M.process_event(event, dt)
          if line:should_wait() and line:is_interactive() and (lines.inputting_text or time_since_last_interaction > time_between_interactions) then
             if line:handle_interaction(event) then
                time_since_last_interaction = 0
+
+               -- Stop anything else if an interaction has happened
+               break
             end
          end
       end
 
-      if should_wait or line:next() == nil then
+      if should_wait then
          if time_since_last_interaction > time_between_interactions then
             if Keyboard.is_key_pressed(KeyboardKey.LControl) then
                -- Save the game
