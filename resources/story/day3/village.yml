@@ -82,8 +82,6 @@ village-hub:
     condition: return not TerminalModule.state_variables.day3.village_hub.walk_around
     next: walk-around-1
   - text: Go back to Narra's house
-    # TODO: add more things?
-    condition: return TerminalModule.state_variables.day3.village_hub.walk_around
     next: back-to-narras-1
 
 go-to-maj:
@@ -193,18 +191,39 @@ back-to-narras-1:
 
 back-to-narras-2:
   char: narra
-  text: >-
-    Oh, hey. You're back and I'm rested for a bit, so I suppose we can go now.
+  text: Oh, hey. Wanted to talk about something?
 
 back-to-narras-3:
-  char: description
-  text: As she says that, she stands up from the sofa and goes towards the exit from the house.
+  char: player
+  responses:
+  - text: I think I do have something to talk about.
+    next: back-to-narras-talk
+  - text: You ready to do go?
+    condition: return TerminalModule.state_variables.day3.village_hub.walk_around
+    next: back-to-narras-4
+  - text: Nothing.
+    next: village-hub
+
+back-to-narras-talk:
+  custom:
+    terminal.save_and_return_lines.SaveLine:
+      next: !line-name "talks/narra/talk-about"
+      return_to: !line-name back-to-narras-3
 
 back-to-narras-4:
   char: narra
-  text: Come on, let's go.
+  text: >-
+    Yeah I rested for a bit more, so I suppose we can go now.
 
 back-to-narras-5:
+  char: description
+  text: As she says that, she stands up from the sofa and goes towards the exit from the house.
+
+back-to-narras-6:
+  char: narra
+  text: Come on, let's go.
+
+back-to-narras-7:
   script_after: TerminalModule.state_variables.day3.village_hub.back_to_narras = true
   responses:
   - text: >-
