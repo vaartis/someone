@@ -78,10 +78,18 @@ function M.reset_after_text_input()
 end
 
 M.TerminalLine = class("TerminalLine")
-function M.TerminalLine:initialize(name)
-   self._name = name
-   self._character = nil
 
+function M.TerminalLine.static:allocate(name, character, line_source)
+   local created = {}
+
+   created._name = name
+   created._line_source = line_source
+   created._character = character
+
+   return created
+end
+
+function M.TerminalLine:initialize()
    self._letters_output = 0
    self._time_since_last_letter = 0.0
    self._time_since_started_output = 0.0
@@ -117,8 +125,8 @@ function M.TerminalLine:fields_to_save()
 end
 
 M.OutputLine = class("OutputLine", M.TerminalLine)
-function M.OutputLine:initialize(name, text, next_line_name)
-   M.TerminalLine.initialize(self, name)
+function M.OutputLine:initialize(text, next_line_name)
+   M.OutputLine.super.initialize(self)
 
    self._text = insert_variables(name, text)
    -- The name of the next line to be retreived and instantiated by next()
@@ -127,10 +135,7 @@ function M.OutputLine:initialize(name, text, next_line_name)
    self._next_line = nil
 
    self._text_object = Text.new("", StaticFonts.main_font, StaticFonts.font_size)
-end
 
--- The character is set after initialization, so character-specific things need to be done after
-function M.OutputLine:update_for_character()
    self._text_object.fill_color = self._character.color
    self._text_object.character_size = self._character.font_size
 end
@@ -172,7 +177,7 @@ end
 function M.OutputLine:next()
    -- Create the next line if there is one and only do it if one wasn't created already
    if self._next_line_name ~= "" and not self._next_line then
-      self._next_line = M.make_line(self._next_line_name, M.native_lines[self._next_line_name])
+      self._next_line = M.make_line(self._next_line_name, self._line_source)
    end
 
    return self._next_line
@@ -196,8 +201,8 @@ function M.OutputLine:handle_interaction(event)
 end
 
 M.InputWaitLine = class("InputWaitLine", M.OutputLine)
-function M.InputWaitLine:initialize(name, text, next_line)
-   M.OutputLine.initialize(self, name, text, next_line)
+function M.InputWaitLine:initialize(text, next_line)
+   M.InputWaitLine.super.initialize(self, text, next_line)
 
    self._1_pressed = false
 end
@@ -262,8 +267,8 @@ function M.InputWaitLine:fields_to_save()
 end
 
 M.VariantInputLine = class("VariantInputLine", M.TerminalLine)
-function M.VariantInputLine:initialize(name, variants)
-   M.TerminalLine.initialize(self, name)
+function M.VariantInputLine:initialize(variants)
+   M.VariantInputLine.super.initialize(self)
 
    -- Same as if it was unset. Just to have the name mentioned somewhere beforehand
    self._selected_variant = nil
@@ -302,6 +307,9 @@ function M.VariantInputLine:initialize(name, variants)
          text_object = Text.new("", StaticFonts.main_font, StaticFonts.font_size),
          next = var.next,
       }
+      inserted_variant.text_object.fill_color = self._character.color
+      inserted_variant.text_object.character_size = self._character.font_size
+
       table.insert(self._variants, inserted_variant)
 
       ::skip::
@@ -316,13 +324,6 @@ function M.VariantInputLine:initialize(name, variants)
          self._longest_var_length = len
          self._longest_var_n = n
       end
-   end
-end
-
-function M.VariantInputLine:update_for_character()
-   for _, v in pairs(self._variants) do
-      v.text_object.fill_color = self._character.color
-      v.text_object.character_size = self._character.font_size
    end
 end
 
@@ -368,7 +369,7 @@ function M.VariantInputLine:next()
    if not self._selected_variant_next_instance then
       local nxt_name = self._variants[self._selected_variant].next
 
-      self._selected_variant_next_instance = M.make_line(nxt_name, M.native_lines[nxt_name])
+      self._selected_variant_next_instance = M.make_line(nxt_name, self._line_source)
    end
 
    return self._selected_variant_next_instance
@@ -408,8 +409,8 @@ function M.VariantInputLine:fields_to_save()
 end
 
 M.TextInputLine = class("TextInputLine", M.TerminalLine)
-function M.TextInputLine:initialize(name, before, after, variable, max_length, nxt)
-   M.TerminalLine.initialize(self, name)
+function M.TextInputLine:initialize(before, after, variable, max_length, nxt)
+   M.TextInputLine.super.initialize(self)
 
    self._next = nxt
    self._next_line = nil
@@ -423,9 +424,6 @@ function M.TextInputLine:initialize(name, before, after, variable, max_length, n
    self._input_text = ""
 
    self._text_object = Text.new("", StaticFonts.main_font, StaticFonts.font_size)
-end
-
-function M.TextInputLine:update_for_character()
    self._text_object.fill_color = self._character.color
    self._text_object.character_size = self._character.font_size
 end
@@ -524,7 +522,7 @@ end
 function M.TextInputLine:next()
    -- Create the next line if there is one and only do it if one wasn't created already
    if self._next ~= "" and not self._next_line then
-      self._next_line = M.make_line(self._next, M.native_lines[self._next])
+      self._next_line = M.make_line(self._next, self._line_source)
    end
 
    return self._next_line
@@ -536,26 +534,26 @@ function M.TextInputLine:fields_to_save()
 end
 
 -- A function to create lines from their name and the native line data
-function M.make_line(name, line)
+function M.make_line(name, line_source)
+   local line = line_source[name]
+
    local tp = line.__type.name
 
-   local to_insert
+   local to_insert = M.TerminalLine:allocate(name, line.character_config, line_source)
+
    if tp == "TerminalOutputLineData" then
-      to_insert = M.OutputLine(name, line.text, line.next)
+      to_insert = M.OutputLine:newFromAllocated(to_insert, line.text, line.next)
    elseif tp == "TerminalInputWaitLineData" then
-      to_insert = M.InputWaitLine(name, line.text, line.next)
+      to_insert = M.InputWaitLine:newFromAllocated(to_insert, line.text, line.next)
    elseif tp == "TerminalVariantInputLineData" then
-      to_insert = M.VariantInputLine(name, line.variants)
+      to_insert = M.VariantInputLine:newFromAllocated(to_insert, line.variants)
    elseif tp == "TerminalTextInputLineData" then
-      to_insert = M.TextInputLine(name, line.before, line.after, line.variable, line.max_length, line.next)
+      to_insert = M.TextInputLine:newFromAllocated(to_insert, line.before, line.after, line.variable, line.max_length, line.next)
    elseif tp == "TerminalCustomLineData" then
-      to_insert = line.class(name, line.data)
+      to_insert = line.class:newFromAllocated(to_insert, line.data)
    else
       error(lume.format("Unknown line type {1}", {tp}))
    end
-
-   to_insert._character = line.character_config
-   to_insert:update_for_character()
 
    if line.script then
       -- Compile the script (if it exists)

@@ -6,8 +6,8 @@ local lume = require("lume")
 local M = {}
 
 M.InstanceMenuLine = class("InstanceMenuLine", lines.TerminalLine)
-function M.InstanceMenuLine:initialize(name, args)
-   M.InstanceMenuLine.super:initialize(name)
+function M.InstanceMenuLine:initialize(args)
+   M.InstanceMenuLine.super.initialize(self)
 
    local line_counter = 1
 
@@ -20,6 +20,9 @@ function M.InstanceMenuLine:initialize(name, args)
       text = pwd_input_text,
       text_object = Text.new(pwd_input_text, StaticFonts.main_font, StaticFonts.font_size)
    }
+   self._password_input_text.text_object.fill_color = self._character.color
+   self._password_input_text.text_object.character_size = self._character.font_size
+
    self._done_input = false
 
    for _, instance in ipairs(self._instances) do
@@ -39,16 +42,6 @@ function M.InstanceMenuLine:initialize(name, args)
    end
 
    self:calculate_longest_line()
-end
-
-function M.InstanceMenuLine:update_for_character()
-   for _, line in ipairs(self._decrypted_lines_texts) do
-      line.text_object.fill_color = self._character.color
-      line.text_object.character_size = self._character.font_size
-   end
-
-   self._password_input_text.text_object.fill_color = self._character.color
-   self._password_input_text.text_object.character_size = self._character.font_size
 end
 
 function M.InstanceMenuLine:calculate_longest_line()
@@ -159,21 +152,20 @@ function M.InstanceMenuLine:next()
             if instance.password == password then
                table.insert(TerminalModule.state_variables.decrypted_instances, instance.name)
 
-               self._next_instance = lines.make_line(instance.next, lines.native_lines[instance.next])
+               self._next_instance = lines.make_line(instance.next, self._line_source)
             end
          end
 
          -- If not password matched, direct to the error line
          if not self._next_instance then
-            local err_line_name = "instances/menu/wrong_password"
-            self._next_instance = lines.make_line(err_line_name, lines.native_lines[err_line_name])
+            self._next_instance = lines.make_line("instances/menu/wrong_password", self._line_source)
          end
       else
          -- If an already known instance was selected, direct to it
          local instance_next = self._decrypted_lines_texts[self._selected_instance_n].next
 
          GLOBAL.story_parser:maybe_parse_referenced_file(instance_next)
-         self._next_instance = lines.make_line(instance_next, lines.native_lines[instance_next])
+               self._next_instance = lines.make_line(instance_next, self._line_source)
       end
    end
 

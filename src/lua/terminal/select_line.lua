@@ -25,8 +25,8 @@ Otherwise, the no-condition line matches and control transfers to dont-know. Not
 ]]
 
 M.SelectLine = class("SelectLine", lines.TerminalLine)
-function M.SelectLine:initialize(name, args)
-   M.SelectLine.super:initialize(name)
+function M.SelectLine:initialize(args)
+   M.SelectLine.super.initialize(self)
 
    local selected_next
    for n, var in ipairs(args) do
@@ -55,7 +55,6 @@ function M.SelectLine:initialize(name, args)
 
    self._next_instance = lines.make_line(selected_next, lines.native_lines[selected_next])
 end
-function M.SelectLine:update_for_character() end
 function M.SelectLine:current_text() end
 function M.SelectLine:should_wait() return false end
 function M.SelectLine:next() return self._next_instance end

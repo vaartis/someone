@@ -36,10 +36,10 @@ just saving your position and then go back to it.
 ]]
 
 M.SaveLine = class("SaveLine", lines.TerminalLine)
-function M.SaveLine:initialize(name, args)
-   M.SaveLine.super:initialize(name)
+function M.SaveLine:initialize(args)
+   M.SaveLine.super.initialize(self)
 
-   self._next_instance = lines.make_line(args.next, lines.native_lines[args.next])
+   self._next_instance = lines.make_line(args.next, self._line_source)
 
    if not TerminalModule.state_variables.save_to_return_lines then
       TerminalModule.state_variables.saved_to_return_lines = {}
@@ -48,20 +48,18 @@ function M.SaveLine:initialize(name, args)
    -- Use the target name as the ID for saving
    TerminalModule.state_variables.saved_to_return_lines[args.next] = args.return_to
 end
-function M.SaveLine:update_for_character() end
 function M.SaveLine:current_text() end
 function M.SaveLine:should_wait() return false end
 function M.SaveLine:next() return self._next_instance end
 
 M.ReturnLine = class("ReturnLine", lines.TerminalLine)
-function M.ReturnLine:initialize(name, args)
-   M.ReturnLine.super:initialize(name)
+function M.ReturnLine:initialize(args)
+   M.ReturnLine.super.initialize(self)
 
    local return_to = TerminalModule.state_variables.saved_to_return_lines[args.next_was]
 
-   self._next_instance = lines.make_line(return_to, lines.native_lines[return_to])
+   self._next_instance = lines.make_line(return_to, self._line_source)
 end
-function M.ReturnLine:update_for_character() end
 function M.ReturnLine:current_text() end
 function M.ReturnLine:should_wait() return false end
 function M.ReturnLine:next() return self._next_instance end

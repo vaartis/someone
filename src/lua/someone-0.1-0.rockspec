@@ -2,7 +2,6 @@ package = "someone"
 version = "0.1-0"
 
 dependencies = {
-   "middleclass==4.1.1",
    "inspect==3.1.1",
    "lume==2.3.0",
    "lua-path==0.3.1",

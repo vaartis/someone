@@ -124,7 +124,7 @@ local function load_game()
       local first_line_name = data["lines"]["first_line"]
       local last_line_name = data["lines"]["last_line"]
 
-      local first_line = lines.make_line(first_line_name, lines.native_lines[first_line_name])
+      local first_line = lines.make_line(first_line_name, lines.native_lines)
       local current_line = first_line
       while true do
          -- Copy the values, preserving the metatable
@@ -171,7 +171,7 @@ function M.set_first_line_on_screen(name)
    lines.reset_after_text_input()
 
    if lines.native_lines[name] then
-      first_line_on_screen = lines.make_line(name, lines.native_lines[name])
+      first_line_on_screen = lines.make_line(name, lines.native_lines)
    else
       print("Line " .. name .. " not found")
    end

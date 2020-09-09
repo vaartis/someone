@@ -255,6 +255,7 @@ endfunction()
 install_rocks(
   "lovetoys;lovetoys-0.4.0-2.rockspec;lovetoys"
   "toml;lua-toml-2.1-0.rockspec;toml.lua"
+  "middleclass;middleclass-4.1.2-0.rockspec;middleclass.lua"
 )
 
 add_custom_command(
