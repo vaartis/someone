@@ -121,10 +121,10 @@ TEST_CASE("Story parser", "[story_parser]") {
         // Setup the lua path to see luarocks packages
         auto package_path = std::filesystem::path("resources") / "lua" / "share" / "lua" / SOMEONE_LUA_VERSION / "?.lua;";
         package_path += std::filesystem::path("resources") / "lua" / "share" / "lua" / SOMEONE_LUA_VERSION / "?" / "init.lua;";
-        lua["package"]["path"] = std::string(package_path.u8string()) + std::string(lua["package"]["path"]);
+        lua["package"]["path"] = std::string(package_path.string()) + std::string(lua["package"]["path"]);
 
         auto package_cpath = std::filesystem::path("resources") / "lua" / "lib" / "lua" / SOMEONE_LUA_VERSION / "?." SOMEONE_LIB_EXT ";";
-        lua["package"]["cpath"] = std::string(package_cpath.u8string()) + std::string(lua["package"]["cpath"]);
+        lua["package"]["cpath"] = std::string(package_cpath.string()) + std::string(lua["package"]["cpath"]);
 
         parser.parse("test/custom");
 

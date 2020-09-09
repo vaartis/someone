@@ -527,7 +527,7 @@ sol::table StoryParser::load_mods(sol::state &lua) {
       continue;
     }
 
-    YAML::Node root_node = YAML::LoadFile(mod_yml);
+    YAML::Node root_node = YAML::LoadFile(mod_yml.string());
 
     auto entrypoint = root_node["entrypoint"].as<std::string>();
     auto last_slash = entrypoint.rfind('/');
