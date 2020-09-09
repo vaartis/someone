@@ -55,8 +55,15 @@
 
    - ~char~ :: The name of the character that is speaking the line.
      This is mandatory, unless the ~dialogue_between~ option is used.
-   - ~text~ :: The text that the line will output with the character specified. This makes the line an ~Output line~.
    - ~next~ :: Specifies which line should be taken after the current one.
+     To refer to lines in the current file, just the line name is enough. To refer to a line in a different file,
+     the path to that file needs to be used, e.g. for ~main.yml~ it would be ~main/1~.
+
+     *Note*, that if the name of the line is a number, or ends with ~-<number>~, then ~next~ is optional,
+     and the line with the increment of that number will be used, e.g. ~1~ -> ~2~, ~test-1~ -> ~test-2~.
+     This applies to all lines which have a ~next~ property, including ~Variant input line~ for which one
+     can omit ~next~ for a variant, so that it points to the next numbered line.
+   - ~text~ :: The text that the line will output with the character specified. This makes the line an ~Output line~.
      The text may use a simple templating engine to change things depending on game state. One can use ~<= some lua variable or function call >~
      to insert the result of some lua code evaluation straight into the text, this is useful for inserting variable values into text.
      One can also use ~< some controlling lua code >~ to control the flow of text; inside a single text block, all the templating code
@@ -165,7 +172,7 @@
        just save your position and then go back to it.
 
 * An example mod
-  An simple example mod could be structured like this:
+  A simple example mod could be structured like this:
 
   *mod.yml*:
   #+BEGIN_SRC yaml
