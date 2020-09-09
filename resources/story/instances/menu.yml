@@ -39,6 +39,11 @@ wrong_password:
   text: "Password not recognized"
   next: 4
 
+wrong_number:
+  char: err_text
+  text: "Instance number out of bounds"
+  next: 4
+
 exit:
   char: warn_text
   text: >-

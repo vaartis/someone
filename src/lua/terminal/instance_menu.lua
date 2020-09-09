@@ -1,6 +1,5 @@
 local class = require("middleclass")
 local lines = require("terminal.lines")
-local util = require("util")
 local lume = require("lume")
 
 local M = {}
@@ -48,10 +47,10 @@ function M.InstanceMenuLine:calculate_longest_line()
    -- -1 = password line is the longest one
    self._longest_line_n = -1
    self._longest_line_length = #self._password_input_text.text
-   for _, line in ipairs(self._decrypted_lines_texts) do
+   for i, line in ipairs(self._decrypted_lines_texts) do
       if #line.text > self._longest_line_length then
-         self._longest_line_length = #text
-         self._longest_line_n = line_counter
+         self._longest_line_length = #line.text
+         self._longest_line_n = i
       end
    end
 end
@@ -66,7 +65,7 @@ function M.InstanceMenuLine:current_text()
    if self._longest_line_n == -1 then
       longest_line = self._password_input_text.text_object
    else
-      longset_line = self._decrypted_lines_texts[self._longest_line_n].text_object
+      longest_line = self._decrypted_lines_texts[self._longest_line_n].text_object
    end
    local longest_done = #longest_line.string == self._letters_output
 
@@ -78,7 +77,7 @@ function M.InstanceMenuLine:current_text()
       table.insert(output, line.text_object)
    end
 
-   if not longest_done then
+   if not self._done_input then
       self._password_input_text.text_object.string =
          lume.wordwrap(self._password_input_text.text:sub(0, self._letters_output), max_width)
    end
@@ -89,8 +88,8 @@ function M.InstanceMenuLine:current_text()
 end
 
 function M.InstanceMenuLine:is_interactive()
-   -- An interaction could happen at any time, when printing it's
-   return self._letters_output == self._longest_line_length and not self._done_input
+   -- An interaction could happen at any time, when printing it or when done with input
+   return not self._done_input
 end
 
 function M.InstanceMenuLine:should_wait()
@@ -103,49 +102,41 @@ function M.InstanceMenuLine:handle_interaction(event)
    if event.type == EventType.TextEntered then
       local char = string.char(event.text.unicode)
 
-      if GLOBAL.isalpha(event.text.unicode) then
-         self._password_input_text.text = self._password_input_text.text .. char
-         self._letters_output = self._letters_output + 1
+      -- Because SFML considers backspace and return as inputting text, it has to be handled here
+      if char == "\b" then
+         if #self._password_input_text.text > self._password_input_text.initial_length then
+            -- Remove the last character
+            self._password_input_text.text = self._password_input_text.text:sub(1, -2)
 
-         self:calculate_longest_line()
+            self._letters_output = self._letters_output - 1
 
-         return true
-      else
-         local num = tonumber(char)
-         if num and num >= 1 and num <= #self._decrypted_lines_texts then
-            self._selected_instance_n = num
-
+            self:calculate_longest_line()
+         end
+      elseif char == "\r" then
+         if #self._password_input_text.text > self._password_input_text.initial_length then
             -- Finish input
             lines.reset_after_text_input()
             self._done_input = true
 
             return true
          end
+      else
+         self._password_input_text.text = self._password_input_text.text .. char
+         self._letters_output = self._letters_output + 1
       end
-   elseif event.type == EventType.KeyPressed then
-      if event.key.code == KeyboardKey.Backspace and #self._password_input_text.text > self._password_input_text.initial_length then
-         -- Remove the last character
-         self._password_input_text.text = self._password_input_text.text:sub(1, -2)
-         self._letters_output = self._letters_output - 1
 
-         self:calculate_longest_line()
+      self:calculate_longest_line()
 
-         return true
-      elseif event.key.code == KeyboardKey.Return and #self._password_input_text.text > self._password_input_text.initial_length then
-         -- Finish input
-         lines.reset_after_text_input()
-         self._done_input = true
-
-         return true
-      end
+      return true
    end
 end
 
 function M.InstanceMenuLine:next()
    if not self._next_instance then
-      -- If the line was NOT selected, it means that the password was input
-      -- Try and use the password
-      if not self._selected_instance_n then
+      local password = self._password_input_text.text:sub(self._password_input_text.initial_length + 1, -1)
+
+      -- If the text input is not a number, try and use it as a password
+      if not tonumber(password) then
          local password = self._password_input_text.text:sub(self._password_input_text.initial_length + 1, -1)
 
          for _, instance in ipairs(self._instances) do
@@ -161,11 +152,16 @@ function M.InstanceMenuLine:next()
             self._next_instance = lines.make_line("instances/menu/wrong_password", self._line_source)
          end
       else
-         -- If an already known instance was selected, direct to it
-         local instance_next = self._decrypted_lines_texts[self._selected_instance_n].next
-
-         GLOBAL.story_parser:maybe_parse_referenced_file(instance_next)
+         -- If the input is a number, try using it as the index of the already known instance
+         local num = tonumber(password)
+         if num and num >= 1 and num <= #self._decrypted_lines_texts then
+            -- If an already known instance was selected, direct to it
+            local instance = self._decrypted_lines_texts[num]
+            local instance_next = instance.next
                self._next_instance = lines.make_line(instance_next, self._line_source)
+         else
+            self._next_instance = lines.make_line("instances/menu/wrong_number", self._line_source)
+         end
       end
    end
 
