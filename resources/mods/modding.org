@@ -1,0 +1,208 @@
+* Creating a mod
+** The mod.yml file
+  To create a mod, a directory needs to be created in ~resources/mods/~, its name will be the name of your mod.
+  This directory must have a ~mod.yml~ file, which needs to have the following data in [[https:en.wikipedia.org/wiki/YAML][YAML]] format:
+
+  - ~entrypoint~ :: The entry point, that is, the first terminal line, of the mod, from which execution starts.
+    The format is ~path/to/file/<line-name>~. For example: ~main/1~. The path is relative to the mod's directory.
+    This field is mandatory. You can then access all the other story yml files in your directory,
+    /but not any other mod files or the main story files/.
+  - ~pretty_name~ :: This is the name that will be used when showing the mod in the selection menu.
+    If not set, the name of the mod itself (that is, the directory it is in) will be used as a name.
+  - ~lua~ :: This is a map of namespaces to lua files. Every level of the map introduces a nested namespace.
+    For example:
+    #+BEGIN_SRC yaml
+    lua:
+      test:
+        main: main.lua
+      not_main: not_main.lua
+    #+END_SRC
+
+    This will mark the files specified to be loaded on mod start. They will be accessible as ~mod.<namespace>~, so from the example above,
+    the two files will be accessible as ~mod.test.main~ and ~mod.not_main~. *Note*: the ~mod~ here is the literal name of the field, not the name
+    of your mod. /Nothing in the mod API depends on the mod name and it can be renamed however you want, just do it when the game is not running/.
+** Story file configuration
+   Every story file has its own set of configuration values. They are specified at the top level of each file. The format is as follows:
+   #+BEGIN_SRC yaml
+   config:
+     chars:
+       narra:
+         color: [211, 0, 0]
+         font_size: 32
+       player:
+         color: [255, 255, 255]
+     dialogue_between: [narra, player]
+   #+END_SRC
+   The ~chars~ field describes characters used in the file, the mandatory field ~color~ describes an RGB color of the text that
+   character uses, and the optional ~font_size~ specifies the font size of their text. The ~dialogue_between~ field allows
+   one to /omit/ the ~char~ field in situations where the dialogue is going between characters in a circle, in the example above the dialogue
+   flow would be ~narra-player-narra~ and so on. The diloaug will automatically switch to the next character in that list every time, unless the
+   character is explicitly specified.  If the character is specified, then, if it's one of those participating in the dialogue, the dialogue
+   tracking switches to that character, and if not, then it does nothing and the dialogue continues as usual on the next phrase.
+
+   *However*, it only correctly works if the dialogue is going linearly and there are no hubs or anything of sort,
+   then it might behave strangely. A good practice would be to put characters on every hub answer beginning.
+** Story lines
+   The story is made from so-called lines, which reference each other. The usual format for a line is as follows:
+   #+BEGIN_SRC yaml
+   line-name:
+     char: character
+     ...
+   #+END_SRC
+
+   Where ~line-name~ is the name by which lines refer to each other. The ~...~ part is where all the other properties of the line go.
+   Properties that are marked with ~This makes the line a ...~ are mutually exclusive and only one of them will work.
+
+   - ~char~ :: The name of the character that is speaking the line.
+     This is mandatory, unless the ~dialogue_between~ option is used.
+   - ~text~ :: The text that the line will output with the character specified. This makes the line an ~Output line~.
+   - ~next~ :: Specifies which line should be taken after the current one.
+     The text may use a simple templating engine to change things depending on game state. One can use ~<= some lua variable or function call >~
+     to insert the result of some lua code evaluation straight into the text, this is useful for inserting variable values into text.
+     One can also use ~< some controlling lua code >~ to control the flow of text; inside a single text block, all the templating code
+     can use the results of previous code, that is you can declare a variable inside a ~< block >~ and then use it in another block;
+     this is mostly useful for changing text with ~if/else~, for example:
+     #+BEGIN_SRC
+     I'm < if state_variables.ok then > ok < else > not ok < end >
+     #+END_SRC
+     The template lines have a limited environment available to them: they're allowed use everything in ~TerminalModule~ without qualification
+     (that is, you must not use the name TerminalModule, but instead just use the name of the needed thing directly), ~walking_state_variables~,
+     which is a reference to ~WalkingModule.walking_state_variables~ and ~lume~ which is [[https://github.com/rxi/lume][a lua library of helpful functions]].
+   - ~wait~ :: A boolean value (~true/false~) specifying whether the execution should pause and wait for player input before outputting the next line.
+     This is only useful with an ~Output line~. Use this when there are many non-interactive lines and you want to give the player time to read
+     them before continuing.
+   - ~responses~ :: This gives the player a choice of several responses. The usage is as follows:
+     #+BEGIN_SRC yaml
+     1:
+       responses:
+       - text: Text of response 1
+         condition: return Something.condition
+         next: next-if-response-1
+       - text: Text of response 2
+         next: next-if-response-2
+     #+END_SRC
+     Depending on which choice the player makes, the next line differs. Note, that this means that this line does /not/ need a ~next~ property
+     at the top level, but only in responses. The ~condition~ is a way to hide the response if certain requirements have not been met.
+     In this field, arbitary lua code can be used, this code must return a boolean value; this can be used to implement optional content or
+     hubs, in which already visited branches are hidden. This makes the line a ~Variant input line~.
+   - ~text_input~ :: This allows the player to input some text (but only a single word, without spaces or numbers).
+     The usage is as follows:
+     #+BEGIN_SRC yaml
+     1:
+       text_input:
+         before: "Before "
+         after: " after."
+         variable: var
+         max_length: 10
+     #+END_SRC
+     The ~before~ and ~after~ properties dictate what will be output before waiting for player input, and what will be output after
+     player submits input. Note that you have to add spaces yourself. ~variable~ is the name of the variable into which the input
+     will be saved, the variable is saved into ~TerminalModule.state_variables.input_variables~. ~max_length~ is the maximum
+     amount of characters the player can input. All these fields are mandatory. This makes the line a ~Text input line~.
+   - ~script~ and ~script_after~ :: These allow executing arbitary lua code before and after the line is shown.  The script properties may be
+     attached to any line, and run before or after the line has been fully finished, that is all the text is on screen and the line is not
+     interactive anymore. These scripts only run once per line instance. In this script, the whole lua environment is accessible, in particular
+     the ~TerminalModule~ which contains most of the useful things, particularly ~state_variables~ wher you should save your variables which need to persist between lines.
+     You can also use your own code if you specified it in the ~lua~ property of the ~mod.yml~ file.
+
+     *Note* that when a mod launches, it gets a fresh ~TerminalModule.state_variables~ instance every time, which only contains an
+     ~input_variables~ table which is empty. You may want to fill the ~state_variables~ with default values in your lua file or in your story file. This ~state_variables~
+     instance is destroyed when the mod exits.
+   - ~custom~ :: A custom line, there are several pre-defined ones and you can add yours.
+     *Note* that in custom lines, whenever one referes to some line in a parameter, it *must* be prefixed with ~!line-name~.
+
+     For an example, refer to existing lines in [[file:../../src/lua/terminal][the terminal directory]]. The usage is as follows:
+     #+BEGIN_SRC yaml
+     1:
+       module.Class:
+         parameters
+     #+END_SRC
+     The parameters differ from line to line, the useful built-in custom lines are:
+     - ~terminal.mod_lines.ModExitLine~ :: doesn't accept any parameters, this is the line you *must* use when you want to make
+       the mod exit back to the instance menu. Without it, after the final line the execution will stop completely.
+     - ~terminal.select_line.SelectLine~ :: allows one to select the next line based on some condition or some default, without showing any text.
+       When the condition matches, the control transfers to the line specified there and others are not checked.
+       If the line doesn't have a condition, it will always be selected when encountered, therefore such a line should only be placed at the end.
+       Example usage:
+       #+BEGIN_SRC yaml
+       1:
+         custom:
+           terminal.select_line.SelectLine:
+           - condition: |-
+               return TerminalModule.state_variables.know_about_stuff
+             next: !line-name know-about-stuff
+           - next: !line-name dont-know
+       #+END_SRC
+
+       Here, if the condition is satisfied and the player "knows about stuff", control will transfer to know-about-stuff.
+       Otherwise, the no-condition line matches and control transfers to dont-know. Note that it is an error if no variant is matched.
+     - ~terminal.save_and_return_lines.SaveLine / ReturnLine~ :: SaveLine saves the next position to the state_variables, from where it can be loaded by using
+       the same next value used in this line with ReturnLine. Example usage:
+
+       #+BEGIN_SRC yaml
+       1:
+         custom:
+           terminal.save_and_return_lines.SaveLine:
+             next: !line-name 2
+             return_to: !line-name 3
+
+       2:
+         custom:
+           terminal.save_and_return_lines.ReturnLine:
+             next_was: !line-name 2
+
+       3:
+         text: Result
+       #+END_SRC
+
+       When line 1 is encountered, execution jumps to line 2 (specified as next) and
+       line 3 (specified as return_to) is written into ~state_variables~. When line 2
+       uses itself as next_was, that record is loaded from ~state_variables~ and is resolved
+       to refer to line 3 (as specified in return_to), so execution "returns" to that line.
+
+       This is particularly useful when you need to have a line executed in multiple places
+       and want to return back afterwards without knowing exactly where to return to. So you
+       just save your position and then go back to it.
+
+* An example mod
+  An simple example mod could be structured like this:
+
+  *mod.yml*:
+  #+BEGIN_SRC yaml
+  pretty_name: An example mod
+  entrypoint: main/1
+  lua:
+    main: main.lua
+  #+END_SRC
+  *main.lua*:
+  #+BEGIN_SRC lua
+    return {
+       test = function() print("test") end
+    }
+  #+END_SRC
+  *main.yml*:
+  #+BEGIN_SRC yaml
+  config:
+    chars:
+      test:
+        color: [255, 255, 255]
+
+  1:
+    char: test
+    wait: true
+    text: test
+
+  2:
+    char: test
+    text: test2
+
+  3:
+    char: test
+    script_after: mod.main.test()
+    custom:
+      terminal.mod_lines.ModExitLine:
+  #+END_SRC
+* How to run a mod
+  When you put a mod into the mods folder, it is automatically loaded on startup. Afterwards, you will see it in the /instance menu/. If you don't
+  know what that is, you'll have to play the game for a bit :) In that menu, mods are marked with ~[MOD]~ in their name. You can then select by inputting
+  their number. After the mod exits, you will be sent back to the instance menu.

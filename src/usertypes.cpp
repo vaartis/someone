@@ -277,9 +277,13 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
 
     // Helper classes
 
-    auto story_parser_type = lua.new_usertype<StoryParser>(
-        "StoryParser",
-        "maybe_parse_referenced_file", &StoryParser::maybe_parse_referenced_file
+    auto mod_data_type = lua.new_usertype<ModData>(
+        "ModData",
+        "name", &ModData::name,
+        "pretty_name", &ModData::pretty_name,
+        "lua_files", &ModData::lua_files,
+        "lines", &ModData::lines,
+        "first_line", &ModData::first_line
     );
 
     auto static_fonts_type = lua.new_usertype<StaticFonts>(

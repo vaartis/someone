@@ -127,13 +127,13 @@ std::optional<std::tuple<std::string, uint32_t>> split_as_numbered(const std::st
     }
 }
 
-void StoryParser::parse(std::string file_name) {
-    auto full_file_name = std::filesystem::path("resources/story/") / file_name;
+void StoryParser::parse(std::string file_name, std::filesystem::path base) {
+    auto full_file_name = base / file_name;
     full_file_name.replace_extension(".yml");
 
     std::string nmspace = file_name;
 
-    YAML::Node root_node = YAML::LoadFile(full_file_name.u8string());
+    YAML::Node root_node = YAML::LoadFile(full_file_name.string());
 
     std::map<std::string, CharacterConfig> character_configs;
 
@@ -404,12 +404,29 @@ void StoryParser::parse(std::string file_name) {
             auto module = custom_name.substr(0, last_dot);
             auto class_ = custom_name.substr(last_dot + 1, custom_name.size());
 
-            auto imported_module = lua.script(fmt::format("return require('{}')", module));
+            sol::object imported_module = lua.script(fmt::format("return require('{}')", module));
+            if (!imported_module.is<sol::table>()) {
+              std::string string_repr = lua["tostring"](imported_module);
 
-            sol::optional<sol::table> maybe_class = imported_module.get<sol::table>()[class_];
+              spdlog::error(
+                "The {} module for the {} custom line is expected to export a table, but exports {}",
+                module, inserted_name, string_repr
+              );
+              std::terminate();
+            }
+
+            sol::optional<sol::object> maybe_class = imported_module.as<sol::table>().get<sol::optional<sol::object>>(class_);
             if (!maybe_class) {
                 spdlog::error("Cannot find the {} class in the {} module for the {} custom line", class_, module, inserted_name);
                 std::terminate();
+            }
+            if (!maybe_class->is<sol::table>()) {
+              std::string string_repr = lua["tostring"](*maybe_class);
+              spdlog::error(
+                "The object that is supposed to be a custom line class {}.{} for the line {} is actually {}",
+                module, class_, inserted_name, string_repr
+              );
+              std::terminate();
             }
 
             std::function<sol::object (const YAML::Node &)> convert =
@@ -486,4 +503,88 @@ void StoryParser::parse(std::string file_name) {
             spdlog::warn("{} wants {} as next, but it does not exist", at, expected_next);
         }
     }
+}
+
+sol::table StoryParser::load_mods(sol::state &lua) {
+  namespace fs = std::filesystem;
+
+  auto result = lua.create_table();
+
+  auto mods_path = fs::path("resources/mods");
+
+  if (!fs::exists(mods_path)) return result;
+
+  for (const auto &dir : fs::directory_iterator(mods_path)) {
+    if (!dir.is_directory()) continue;
+
+    auto name = dir.path().filename();
+    const auto name_string = name.string();
+
+    auto mod_yml = dir.path() / "mod.yml";
+    if (!fs::exists(mod_yml)) {
+      spdlog::warn("Mod {} is missing mod.yml, skipping", name_string);
+
+      continue;
+    }
+
+    YAML::Node root_node = YAML::LoadFile(mod_yml);
+
+    auto entrypoint = root_node["entrypoint"].as<std::string>();
+    auto last_slash = entrypoint.rfind('/');
+    if (last_slash == std::string::npos) {
+      spdlog::warn("No separator found in {} mod entrypoint, skipping", name_string);
+
+      continue;
+    }
+
+    auto entrypoint_file = entrypoint.substr(0, last_slash);
+    auto entrypoint_line = entrypoint.substr(last_slash + 1, entrypoint.size());
+
+    ModData mod_data = {
+      .name = name_string,
+      .first_line = fmt::format("{}/{}", entrypoint_file, entrypoint_line),
+      .lua_files = lua.create_table(),
+      .lines = lua.create_table(),
+      .parser = StoryParser(mod_data.lines, lua),
+    };
+    mod_data.parser.parse(entrypoint_file, mods_path / name);
+
+    if (auto pretty_name_node = root_node["pretty_name"]; pretty_name_node)
+      mod_data.pretty_name = pretty_name_node.as<std::string>();
+
+    if (auto lua_node = root_node["lua"]; lua_node) {
+      // Try to convert it to a lua map
+      if (lua_node.IsMap()) {
+        std::function<void(const YAML::Node&, sol::table &)> traverse_into_namespace = [&](const YAML::Node nm, sol::table into) {
+          for (auto pair : nm) {
+            auto key = pair.first.as<std::string>();
+            auto value = pair.second;
+
+            if (value.IsMap()) {
+              auto table = lua.create_table();
+              into[key] = table;
+              traverse_into_namespace(value, table);
+            } else {
+              into[key] = value.as<std::string>();
+            }
+          }
+        };
+
+        traverse_into_namespace(lua_node, mod_data.lua_files);
+      } else {
+        spdlog::warn(
+          "The lua key in mod.yml of {} was expected to be a sequence of namespaces and names to file names, skipping",
+          name_string
+        );
+
+        continue;
+      }
+    }
+
+    result.add(mod_data);
+
+    spdlog::info("Loaded mod {}", name_string);
+  }
+
+  return result;
 }

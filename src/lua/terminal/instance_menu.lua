@@ -1,6 +1,7 @@
 local class = require("middleclass")
 local lines = require("terminal.lines")
 local lume = require("lume")
+local mod_lines = require("terminal.mod_lines")
 
 local M = {}
 
@@ -10,7 +11,9 @@ function M.InstanceMenuLine:initialize(args)
 
    local line_counter = 1
 
-   self._instances = args.instance_menu
+   -- Make a shallow copy of the instance menu table, to which mod lines can be added
+   self._instances = lume.clone(args.instance_menu)
+
    self._decrypted_lines_texts = {}
 
    local pwd_input_text = "Password: "
@@ -24,8 +27,27 @@ function M.InstanceMenuLine:initialize(args)
 
    self._done_input = false
 
+   for _, mod in ipairs(GLOBAL.loaded_mods) do
+      local mod_name
+      if mod.pretty_name ~= "" then
+         mod_name = mod.pretty_name
+      else
+         mod_name = mod.name
+      end
+
+      table.insert(
+         self._instances,
+         {
+            name = lume.format("[MOD] {1}", {mod_name}),
+            next = mod.first_line,
+            mod = true,
+            mod_name = mod.name
+         }
+      )
+   end
+
    for _, instance in ipairs(self._instances) do
-      if lume.find(TerminalModule.state_variables.decrypted_instances, instance.name) then
+      if instance.mod or lume.find(TerminalModule.state_variables.decrypted_instances, instance.name) then
          local text = lume.format("{1}. {2}", {line_counter, instance.name})
          line_counter = line_counter + 1
 
@@ -34,7 +56,10 @@ function M.InstanceMenuLine:initialize(args)
             {
                text = text,
                text_object = Text.new("", StaticFonts.main_font, StaticFonts.font_size),
-               next = instance.next
+               next = instance.next,
+               -- Only exists for mods
+               mod = instance.mod,
+               mod_name = instance.mod_name
             }
          )
       end
@@ -158,7 +183,30 @@ function M.InstanceMenuLine:next()
             -- If an already known instance was selected, direct to it
             local instance = self._decrypted_lines_texts[num]
             local instance_next = instance.next
+
+            if instance.mod then
+               local data = lume.match(
+                  GLOBAL.loaded_mods,
+                  function(mod) return mod.name == instance.mod_name end
+               )
+               local line_source = data.lines
+
+               -- In case somehow the mod creator decided to use that name
+               local original = line_source["__start"]
+
+               -- Synthesize a custom line here, which wraps the mod start to setup things
+               line_source["__start"] = {
+                  __type = { name = "TerminalCustomLineData" },
+                  class = mod_lines.ModWrapperLine,
+                  data = data
+               }
+               self._next_instance = lines.make_line("__start", line_source)
+
+               -- Restore the original line, erasing the synthesized one.
+               line_source["__start"] = original
+            else
                self._next_instance = lines.make_line(instance_next, self._line_source)
+            end
          else
             self._next_instance = lines.make_line("instances/menu/wrong_number", self._line_source)
          end

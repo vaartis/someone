@@ -32,7 +32,7 @@ to refer to line 3 (as specified in return_to), so execution "returns" to that l
 
 This is particularly useful when you need to have a line executed in multiple places
 and want to return back afterwards without knowing exactly where to return to. So you
-just saving your position and then go back to it.
+just save your position and then go back to it.
 ]]
 
 M.SaveLine = class("SaveLine", lines.TerminalLine)

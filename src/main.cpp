@@ -67,10 +67,10 @@ int main(int argc, char **argv) {
     // Setup the lua path to see luarocks packages
     auto package_path = std::filesystem::path("resources") / "lua" / "share" / "lua" / SOMEONE_LUA_VERSION / "?.lua;";
     package_path += std::filesystem::path("resources") / "lua" / "share" / "lua" / SOMEONE_LUA_VERSION / "?" / "init.lua;";
-    lua["package"]["path"] = std::string(package_path.u8string()) + std::string(lua["package"]["path"]);
+    lua["package"]["path"] = std::string(package_path.string()) + std::string(lua["package"]["path"]);
 
     auto package_cpath = std::filesystem::path("resources") / "lua" / "lib" / "lua" / SOMEONE_LUA_VERSION / "?." SOMEONE_LIB_EXT ";";
-    lua["package"]["cpath"] = std::string(package_cpath.u8string()) + std::string(lua["package"]["cpath"]);
+    lua["package"]["cpath"] = std::string(package_cpath.string()) + std::string(lua["package"]["cpath"]);
 
     #ifdef SOMEONE_TESTING
     // Has to be included as the first thing to cover everything
@@ -85,6 +85,8 @@ int main(int argc, char **argv) {
     TerminalEnv terminal_env(lua);
     WalkingEnv walking_env(lua);
 
+    auto loaded_mods = terminal_env.parser.load_mods(lua);
+
     auto current_state = CurrentState::Terminal;
 
     auto current_state_type = lua.new_enum(
@@ -97,7 +99,7 @@ int main(int argc, char **argv) {
         "set_current_state", [&](CurrentState new_state) { current_state = new_state; },
         // Apparently lua doesn't have a good equivalent
         "isalpha", [](int num) { return std::isalpha(num) != 0; },
-        "story_parser", terminal_env.parser
+        "loaded_mods", loaded_mods
     );
 
 #ifndef NDEBUG

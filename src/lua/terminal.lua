@@ -375,6 +375,9 @@ function M.process_event(event, dt)
                      main_instance_saved_first = first_line_on_screen
                      M.set_first_line_on_screen("instances/menu/1")
                   else
+                     -- Reset the text input in case it was used in the instance menu
+                     lines.reset_after_text_input()
+
                      first_line_on_screen = main_instance_saved_first
                      main_instance_saved_first = nil
                   end

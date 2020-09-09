@@ -39,6 +39,7 @@ build = {
          ["terminal.lines"] = "terminal/lines.lua",
          ["terminal.save_and_return_lines"] = "terminal/save_and_return_lines.lua",
          ["terminal.select_line"] = "terminal/select_line.lua",
+         ["terminal.mod_lines"] = "terminal/mod_lines.lua",
 
          coroutines = "coroutines.lua",
          util = "util.lua",
