@@ -53,7 +53,7 @@ function M.SelectLine:initialize(args)
       error(lume.format("No branch matches in {1}", {self._name}))
    end
 
-   self._next_instance = lines.make_line(selected_next, lines.native_lines[selected_next])
+   self._next_instance = lines.make_line(selected_next, lines.native_lines)
 end
 function M.SelectLine:current_text() end
 function M.SelectLine:should_wait() return false end
