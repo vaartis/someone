@@ -179,21 +179,40 @@ end
 
 M.current_lines_to_draw = {}
 
-function M.draw(dt)
+local scroll_height_offset_subtract = 0
+
+local width_offset, height_offset, rect_height, rect_width, rect, terminal_view
+
+local terminal_initialized = false
+function initialize_terminal()
    -- As the very first thing, draw the terminal background
    local win_size = GLOBAL.drawing_target.size
 
-   local width_offset, height_offset = win_size.x / 100, win_size.y / 100 * 2
-   local rect_height, rect_width = win_size.y / 100 * (80 - 10), win_size.x - (width_offset * 2)
+   width_offset, height_offset = win_size.x / 100, win_size.y / 100 * 2
+   rect_height, rect_width = win_size.y / 100 * (80 - 10), win_size.x - (width_offset * 2)
 
-   local term_max_text_width = lines.max_text_width()
+   terminal_view = View.new()
+   terminal_view:reset(FloatRect.new(width_offset, height_offset, rect_width, rect_height))
+   terminal_view.viewport = FloatRect.new(
+      width_offset / win_size.x, height_offset / win_size.y,
+      rect_width / win_size.x, rect_height / win_size.y
+   )
 
    -- Construct and draw the background rectangle
-   local rect = RectangleShape.new(Vector2f.new(rect_width, rect_height))
+   rect = RectangleShape.new(Vector2f.new(rect_width, rect_height))
    rect.outline_thickness = 2.0
    rect.outline_color = Color.Black
    rect.fill_color = Color.Black
    rect.position = Vector2f.new(width_offset, height_offset)
+end
+
+function M.draw(dt)
+   if not terminal_initialized then
+      terminal_initialized = true
+
+      initialize_terminal()
+   end
+
    GLOBAL.drawing_target:draw(rect)
 
    -- If processing is active, reset and update current lines
@@ -262,13 +281,17 @@ function M.draw(dt)
    end
 
    -- Offset for the first line to start at
-   local first_line_height_offset = height_offset * 2
+   local first_line_height_offset = (height_offset * 2) - scroll_height_offset_subtract
 
    -- Actual offsets that will be used for line positioning
    local line_width_offset, line_height_offset = width_offset * 2, first_line_height_offset
 
    -- The total height of the text to compare it with the terminal rectangle
    local total_text_height = 0
+
+   GLOBAL.drawing_target.view = terminal_view
+
+   local first_height
 
    -- Use the current lines and draw those
    for _, line in pairs(M.current_lines_to_draw) do
@@ -284,7 +307,7 @@ function M.draw(dt)
             total_text_height = total_text_height + this_txt_height + (StaticFonts.font_size / 2)
             line_height_offset = first_line_height_offset + total_text_height;
 
-            GLOBAL.drawing_target:draw(txt);
+            GLOBAL.drawing_target:draw(txt)
          end
          -- Add a bit more after the last line
          total_text_height = total_text_height + StaticFonts.font_size / 2
@@ -302,20 +325,48 @@ function M.draw(dt)
 
          GLOBAL.drawing_target:draw(text)
       end
+
+      -- Save the height of the first line to use it if there's a need to scroll,
+      -- so that the scrolling distance can be adjusted by this size after the line is deleted
+      if line == first_line_on_screen then
+         first_height = total_text_height
+      end
    end
 
-   --[[
-      If there are too many lines to fit into the screen rectangle,
-      remove the currently first line and put the next one it its place.
-      Since this happens every frame, it should work itself out even if there
-      are multiple lines to remove.
-   ]]
-   if total_text_height > rect_height - (height_offset * 2) then
-      local curr_first_line = first_line_on_screen
+   GLOBAL.drawing_target.view = GLOBAL.drawing_target.default_view
 
-      local maybe_next = curr_first_line:next()
-      if maybe_next ~= nil then
-         first_line_on_screen = maybe_next
+   --[[
+      Scroll the screen smoothly, until all the lines are on screen.
+      If some are not, move the text up until the second line is on the place
+      where the first was, and after that remove the first line and adjust the
+      offset. This repeats every frame until all the lines are visible.
+   ]]
+   local scroll_step = 5
+   if total_text_height > rect_height - (height_offset * 2) then
+      local function top(line)
+         local text = line:current_text()
+
+         if type(text) == "table" then
+            -- Return the first one's top
+            return text[1].global_bounds.top
+         elseif text == nil then
+            -- Try getting the size of the next line instead
+            return top(line:next())
+         else
+            -- It's a single line of text
+            return text.global_bounds.top
+         end
+      end
+
+      local second = first_line_on_screen:next()
+      local second_pos = top(second)
+
+      if second_pos + scroll_step > height_offset * 2 then
+         scroll_height_offset_subtract = scroll_height_offset_subtract + scroll_step
+      else
+         first_line_on_screen = second
+
+         scroll_height_offset_subtract = scroll_height_offset_subtract - first_height
       end
    end
 

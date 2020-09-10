@@ -118,7 +118,9 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
     auto render_target_type = lua.new_usertype<sf::RenderTarget>(
         "RenderTarget",
         "draw", [](sf::RenderTarget &target, const sf::Drawable &drawable) { target.draw(drawable); },
-        "size", sol::property(&sf::RenderTarget::getSize)
+        "size", sol::property(&sf::RenderTarget::getSize),
+        "view", sol::property(&sf::RenderTarget::getView, &sf::RenderTarget::setView),
+        "default_view", sol::property(&sf::RenderTarget::getDefaultView)
     );
     auto render_states_type = lua.new_usertype<sf::RenderStates>("RenderStates");
 
@@ -126,6 +128,12 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
         "RenderTexture",
         sol::base_classes, sol::bases<sf::RenderTarget>(),
         "size", sol::property(&sf::RenderTexture::getSize)
+    );
+
+    auto view_type = lua.new_usertype<sf::View>(
+        "View", sol::constructors<sf::View()>(),
+        "reset", &sf::View::reset,
+        "viewport", sol::property(&sf::View::getViewport, &sf::View::setViewport)
     );
 
     auto drawable_type = lua.new_usertype<sf::Drawable>("Drawable");
