@@ -225,10 +225,6 @@ function M.draw(dt)
 
       -- If some line changes the active status, stop processing the lines after it
       while true and M.active do
-         if not line then
-            error(string.format("Line %s does not exist", line._name))
-         end
-
          local should_wait = line:should_wait()
          if should_wait then
             if line._time_since_started_output < time_before_output then
