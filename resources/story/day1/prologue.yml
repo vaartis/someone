@@ -11,7 +11,7 @@ config:
 1:
   char: narra
   text: >-
-    Can you hear me?
+    Hello? Can you hear me?
 
 2:
   responses:
