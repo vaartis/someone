@@ -1,0 +1,12 @@
+[prefab]
+name = "day3/first_puzzle_room"
+removed_entities = [ "dial" ]
+
+[entities.passage_to_walkway]
+prefab = "passage"
+transformable = { position = [ 800, 750 ] }
+
+[entities.passage_to_walkway.passage]
+from = "first_puzzle_room"
+to = "walkway_room"
+player_y = 644

@@ -21,7 +21,7 @@ tags = [ "InteractionText" ]
 [children.interaction_text.drawable]
 kind = "text"
 text = { text = "[E] to", font_size = 24 }
-z = 2
+z = 5
 enabled = false
 
 [children.interaction_text.transformable]

@@ -1,0 +1,81 @@
+[shaders.room_darker]
+n = 1
+ambientLightLevel = 0.5
+
+[entities.background.drawable]
+kind = "sprite"
+texture_asset = "walkway_room"
+z = 0
+
+[entities.railing.drawable]
+kind = "sprite"
+texture_asset = "walkway_railing"
+z = 4
+
+[entities.walls.drawable]
+kind = "sprite"
+texture_asset = "walkway_walls"
+z = 4
+
+[entities.player]
+prefab = "player"
+
+[entities.player.transformable]
+position = [160, 767]
+
+[entities.player.player_movement]
+footstep_sound_asset = "footstep_metal"
+
+[entities.left_wall]
+transformable = { position = [20, 500] }
+collider = { mode = "constant", size = [10, 400] }
+
+[entities.right_wall]
+transformable = { position = [1200, 500] }
+collider = { mode = "constant", size = [10, 400] }
+
+[entities.colder_talk]
+transformable = { position = [300, 550] }
+collider = { mode = "constant", size = [40, 200], trigger = true }
+
+[entities.colder_talk.interaction]
+touch_activated = true
+activatable_callback = { not = { module = "components.interaction", name = "state_variable_equal", args = [ [ "walkway_room", "colder_talk" ], true ] } }
+
+[entities.colder_talk.interaction.callback]
+module = "components.interaction"
+name = "player_talk"
+args = ["It's noticably colder in this room.\nA cold breeze is blowing from above.", [ "walkway_room", "colder_talk" ]]
+
+[entities.look_up_zone]
+transformable = { position = [500, 500] }
+collider = { mode = "constant", size = [300, 250], trigger = true }
+
+[entities.look_up_zone.interaction]
+callback = { module = "components.walkway", name = "look", args = ["up"] }
+action_text = "look up"
+
+[entities.look_down_zone]
+transformable = { position = [500, 500] }
+collider = { mode = "constant", size = [300, 250], trigger = true }
+
+[entities.look_down_zone.interaction]
+callback = { module = "components.walkway", name = "look", args = ["down"] }
+action_text = "look down"
+
+[entities.go_back_passage_from]
+transformable = { position = [160, 591] }
+collider = { mode = "constant", size = [40, 176], trigger = true }
+passage = { to = "first_puzzle_room", player_y = 591 }
+
+[entities.go_back_passage]
+transformable = { position = [40, 550] }
+collider = { mode = "constant", size = [40, 200], trigger = true }
+
+[entities.go_back_passage.passage]
+from = "walkway_room"
+to = "first_puzzle_room"
+
+[entities.go_back_passage.interaction]
+touch_activated = true
+callback = { module = "components.passage", name = "switch_room", self = true }

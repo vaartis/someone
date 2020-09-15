@@ -1,0 +1,6 @@
+[prefab]
+name = "day3/computer_room"
+
+# TODO: change
+[entities.table.interaction]
+activatable_callback = { module = "components.first_puzzle", name = "first_puzzle_solved" }

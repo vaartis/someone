@@ -268,5 +268,7 @@ tech-details-yes-2:
 
 35:
   char: description
+  wait: true
+  script_after: TerminalModule.switch_to_walking("day4/computer_room")
   text: For some time, you see Narra toss and turn, and then finally fall asleep. After some time, you do too.
   next: ""

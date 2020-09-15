@@ -5,6 +5,10 @@ computer_room = "resources/sprites/room/room.png"
 first_puzzle_room = "resources/sprites/room/first_puzzle_room.png"
 first_puzzle_room_wall_overlay = "resources/sprites/room/first_puzzle_room_wall_overlay.png"
 
+walkway_room = "resources/sprites/room/walkway_room/walkway_room.png"
+walkway_railing = "resources/sprites/room/walkway_room/walkway_railing.png"
+walkway_walls = "resources/sprites/room/walkway_room/walkway_walls.png"
+
 table = "resources/sprites/room/table/table.png"
 button = "resources/sprites/room/button/button.png"
 passage = "resources/sprites/room/passage/passage.png"
@@ -18,11 +22,20 @@ dial = "resources/sprites/room/dial/dial.png"
 dial_handle = "resources/sprites/room/dial/dial_handle.png"
 dial_full = "resources/sprites/room/dial/dial_full.png"
 
+look_up_bg = "resources/sprites/room/walkway_room/look_up_bg.png"
+look_up_fan = "resources/sprites/room/walkway_room/look_up_fan.png"
+look_down = "resources/sprites/room/walkway_room/look_down.png"
+
+cold_breath = "resources/sprites/room/walkway_room/cold_breath.png"
+
 mainchar = "resources/sprites/mainchar/mainchar.png"
 
 [sounds]
 button_press = "resources/sounds/button_press.ogg"
+
 footstep = "resources/sounds/footstep.ogg"
+footstep_metal = "resources/sounds/footstep_metal.ogg"
+
 rotation_click = "resources/sounds/rotation_click.ogg"
 
 puzzle_jingle = "resources/sounds/puzzle_jingle/puzzle_jingle.ogg"

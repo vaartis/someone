@@ -1,0 +1,33 @@
+tags = [ "LookCloserImage" ]
+
+[drawable]
+kind = "sprite"
+texture_asset = "look_up_bg"
+z = 0
+layer = "overlay"
+
+[transformable]
+position = [320, 240]
+
+[children.fan.drawable]
+kind = "sprite"
+texture_asset = "look_up_fan"
+z = 1
+layer = "overlay"
+
+[children.fan.transformable]
+position = [309, 247]
+origin = [309, 247]
+rotation = 30
+
+[children.fan.rotation]
+rotation_speed = 0.3
+
+[children.caption.drawable]
+kind = "text"
+text = { text = "The night sky.. it's far away..", font_size = 24 }
+z = 1
+layer = "overlay"
+
+[children.caption.transformable]
+position = [0, 480]

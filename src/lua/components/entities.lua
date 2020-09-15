@@ -10,6 +10,7 @@ local sound_components = require("components.sound")
 
 local first_puzzle = require("components.first_puzzle")
 local dial_puzzle = require("components.dial_puzzle")
+local walkway = require("components.walkway")
 local passage = require("components.passage")
 
 local function load_prefab(prefab_name_or_conf, base_data)
@@ -121,7 +122,7 @@ function M.instantiate_entity(entity_name, entity, parent)
             passage,
             note_components,
             first_puzzle,
-            dial_puzzle
+            walkway,
          }
          local processed = false
          for _, processor in pairs(component_processors) do

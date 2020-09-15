@@ -257,9 +257,51 @@ function M.interaction_callbacks.computer_switch_to_terminal(curr_state)
    return "enabled"
 end
 
+local talking_speed = 0.02
 
+function M.interaction_callbacks.player_talk(_curr_state, phrase, state_var)
+   local engine = util.rooms_mod().engine
 
+   local containing, name = state_variable_ensure_path_up_to(state_var)
+   containing[name] = true
 
+   M.disable_player(engine)
+
+   coroutines.create_coroutine(function ()
+         local interaction_text_drawable = util.first(engine:getEntitiesWithComponent("InteractionTextTag")):get("Drawable")
+
+         local letter = 1
+         local timer = 0
+
+         interaction_text_drawable.enabled = true
+         interaction_text_drawable.drawable.string = ""
+
+         while interaction_text_drawable.drawable.string ~= phrase do
+            if timer > talking_speed then
+               interaction_text_drawable.drawable.string = phrase:sub(1, letter)
+               letter = letter + 1
+               timer = 0
+            end
+
+            timer = timer + coroutine.yield()
+         end
+
+         interaction_text_drawable.drawable.string = interaction_text_drawable.drawable.string ..
+            "\n\n[E] to continue"
+
+         local exited = false
+         while not exited do
+            M.update_seconds_since_last_interaction(coroutine.yield())
+
+            M.if_key_pressed({
+                  [KeyboardKey.E] = function()
+                     exited = true
+                  end
+            }, true)
+         end
+
+         M.enable_player(engine)
+   end)
 end
 
 --- @param fnc_data table Table that contains data about the looked-up function (particularly, the module and the name)
@@ -419,6 +461,51 @@ function M.process_components(new_ent, comp_name, comp, entity_name)
    end
 end
 
+function M.disable_player(engine)
+   if engine.systemRegistry["InteractionSystem"].active then
+      engine:stopSystem("InteractionSystem")
+   end
+   if engine.systemRegistry["PlayerMovementSystem"].active then
+      engine:stopSystem("PlayerMovementSystem")
+
+      util.rooms_mod().find_player():get("Animation").playing = false
+   end
+end
+
+function M.enable_player(engine)
+   if not engine.systemRegistry["InteractionSystem"].active then
+      engine:startSystem("InteractionSystem")
+   end
+   if not engine.systemRegistry["PlayerMovementSystem"].active then
+      engine:startSystem("PlayerMovementSystem")
+   end
+end
+
+function M.update_seconds_since_last_interaction(dt)
+   M.seconds_since_last_interaction = M.seconds_since_last_interaction + dt
+end
+
+--- A map is passed, and if a key from that map is pressed,
+--- the value in the map is called
+function M.if_key_pressed(keyboard_keys, is_down)
+   for _, native_event in pairs(M.event_store.events) do
+      local event = native_event.event
+
+      -- is_down can be used to detect if key is pressed, instead of released.
+      -- Useful for coroutines, in which the release event is hard to catch
+      local needed_event = (is_down and event.type == EventType.KeyPressed) or
+         (not is_down and event.type == EventType.KeyReleased)
+
+      if M.seconds_since_last_interaction > M.seconds_before_next_interaction and needed_event
+      and keyboard_keys[event.key.code] then
+         M.seconds_since_last_interaction = 0
+
+         -- Call the on-key function
+         keyboard_keys[event.key.code]()
+      end
+   end
+end
+
 function M.add_systems(engine)
    engine:addSystem(InteractionSystem())
 end
@@ -450,7 +537,7 @@ function M.add_event(event)
    M.native_event_manager:fireEvent(NativeEvent(event))
 end
 
-function M.update(dt)
+function M.clear_event_store()
    M.event_store:clear()
 end
 
