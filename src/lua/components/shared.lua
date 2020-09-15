@@ -8,7 +8,7 @@ local interaction_components = require("components.interaction")
 
 local DrawableComponent = Component.create("Drawable", {"drawable", "z", "kind", "enabled", "layer"})
 
-local RenderSystem = _G.class("RenderSystem", System)
+local RenderSystem = class("RenderSystem", System)
 function RenderSystem:requires() return { "Drawable" } end
 function RenderSystem:_sort_targets()
    -- Sorts targets according to the Z level.
