@@ -20,7 +20,8 @@ M.seconds_before_next_interaction = 0.3 -- A constant that represents how long t
 
 local InteractionComponent = Component.create(
    "Interaction",
-   {"on_interaction", "is_activatable", "current_state", "state_map", "interaction_sound", "action_text"}
+   {"on_interaction", "is_activatable", "current_state", "state_map", "interaction_sound", "action_text",
+   "touch_activated"}
 )
 
 local InteractionSystem = class("InteractionSystem", System)
@@ -45,16 +46,17 @@ function InteractionSystem:update(dt)
    end
 
    local interactables_touched = {}
-   local any_interactables_touched = false
    for _, obj in pairs(self.targets.objects) do
       local interaction_comp = obj:get("Interaction")
       local physics_world = obj:get("Collider").physics_world
 
       local x, y, w, h = physics_world:getRect(obj)
+
       local cols = physics_world:queryRect(x, y, w, h)
 
       -- If the player is in the rectangle of the sprite, then check if the interaction button is pressed
       if lume.any(cols, function(e) return e:has("PlayerMovement") end) then
+
          if interaction_comp.is_activatable then
             if not interaction_comp.is_activatable(interaction_comp.current_state) then
                goto continue
@@ -72,7 +74,10 @@ function InteractionSystem:update(dt)
       ::continue::
    end
 
-   interaction_text_drawable.enabled = #interactables_touched > 0
+   if interaction_text_drawable then
+      interaction_text_drawable.enabled = #interactables_touched > 0
+   end
+
    if #interactables_touched > 0 then
       local pressed_e, pressed_number
       for _, native_event in pairs(M.event_store.events) do
@@ -126,22 +131,31 @@ function InteractionSystem:update(dt)
             -- If there's only one interactable, just use that one
             local interactable = interactables_touched[1]
 
-            if interactable.action_text then
-               action_name = interactable.action_text
-            else
-               action_name = "interact"
-            end
+            if not interactable.touch_activated then
+               if interactable.action_text then
+                  action_name = interactable.action_text
+               else
+                  action_name = "interact"
+               end
 
-            drawable_string = "[E] to " .. action_name
+               drawable_string = "[E] to " .. action_name
 
-            -- If action was pressed, mark it as the one to execute
-            if pressed_e then
+               -- If action was pressed, mark it as the one to execute
+               if pressed_e then
+                  interaction_to_execute = interactable
+               end
+            elseif interactable.touch_activated and not interactable.was_touch_activated then
+               -- Mark it as executed. In this room instance, it won't be executed anymore
+               interactable.was_touch_activated = true
+               --- Always execute it if it's touched. It will only be executed once.
                interaction_to_execute = interactable
             end
          end
       end
 
-      interaction_text_drawable.drawable.string = drawable_string
+      if drawable_string then
+         interaction_text_drawable.drawable.string = drawable_string
+      end
 
       if interaction_to_execute then
          local interaction_res = interaction_to_execute.on_interaction(interaction_to_execute.current_state)
@@ -395,7 +409,9 @@ function M.process_components(new_ent, comp_name, comp, entity_name)
             comp.initial_state,
             comp.state_map,
             interaction_sound,
-            comp.action_text
+            comp.action_text,
+
+            comp.touch_activated
          )
       )
 

@@ -97,9 +97,12 @@ function M.reset_engine()
 
    local modules = {
       shared_components,
+      -- It is important for the collider system to run _after_ the animation system,
+      -- but _before_ the interaction system, so that the collider can be updated for
+      -- sprite changes as soon as possible
+      collider_components,
       player_components,
       interaction_components,
-      collider_components,
       sound_components,
       note_components,
       first_puzzle,
