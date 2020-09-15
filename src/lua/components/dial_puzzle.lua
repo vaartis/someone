@@ -94,18 +94,14 @@ function DialHandleSystem:update(dt)
 
       local engine = util.rooms_mod().engine
 
-      -- Keep these off
-      engine:stopSystem("InteractionSystem")
-      engine:stopSystem("PlayerMovementSystem")
+      -- Keep the player off
+      interaction_components.disable_player(engine)
 
       local interaction_text_drawable = util.first(self.targets.interaction_text):get("Drawable")
       if not interaction_text_drawable.enabled then
          interaction_text_drawable.enabled = true
          interaction_text_drawable.drawable.string = "[A/D] to rotate, [E] to close"
       end
-
-      interaction_components.seconds_since_last_interaction =
-         interaction_components.seconds_since_last_interaction + dt
 
       local rotation_change = 0
       if not (WalkingModule.state_variables.dial_puzzle.solved) then
@@ -162,29 +158,18 @@ function DialHandleSystem:update(dt)
          rotation_click_sound:play()
       end
 
-      for _, native_event in pairs(interaction_components.event_store.events) do
-         local event = native_event.event
-         if interaction_components.seconds_since_last_interaction > interaction_components.seconds_before_next_interaction and
-         event.type == EventType.KeyReleased then
-            local interacted
+      interaction_components.update_seconds_since_last_interaction(dt)
 
-            if event.key.code == KeyboardKey.E then
-               interacted = true
-
+      interaction_components.if_key_pressed({
+            [KeyboardKey.E] = function()
                -- Save the last rotation value to restore on reopen
                last_rotation = tf.rotation
 
                -- Delete the whole dial
                engine:removeEntity(entity.parent, true)
-               engine:startSystem("InteractionSystem")
-               engine:startSystem("PlayerMovementSystem")
+               interaction_components.enable_player(engine)
             end
-
-            if interacted then
-               interaction_components.seconds_since_last_interaction = 0
-            end
-         end
-      end
+      })
    end
 end
 

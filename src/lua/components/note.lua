@@ -49,38 +49,32 @@ function NoteInteractionSystem:update(dt)
    for _, entity in pairs(self.targets.objects) do
       local drawable = entity:get("Drawable")
 
-      if drawable.enabled then
-         local engine = util.rooms_mod().engine
+      local rooms = util.rooms_mod()
 
-         -- Keep the interaction and movement system disabled
-         engine:stopSystem("InteractionSystem")
-         engine:stopSystem("PlayerMovementSystem")
+      local engine = rooms.engine
 
-         local interaction_text_drawable = util.first(self.targets.interaction_text):get("Drawable")
-         if not interaction_text_drawable.enabled then
-            interaction_text_drawable.enabled = true
-            interaction_text_drawable.drawable.string = "[E] to close the note"
-         end
-
-         -- Lazy-load interaction_components
-         if not interaction_components then
-            interaction_components = require("components.interaction")
-         end
-
-         interaction_components.seconds_since_last_interaction = interaction_components.seconds_since_last_interaction + dt
-
-         for _, native_event in pairs(interaction_components.event_store.events) do
-            local event = native_event.event
-            if interaction_components.seconds_since_last_interaction > interaction_components.seconds_before_next_interaction and
-            event.type == EventType.KeyReleased and event.key.code == KeyboardKey.E then
-               interaction_components.seconds_since_last_interaction = 0
-               -- Delete the note entity and re-enable interactions and movement
-               engine:removeEntity(entity, true)
-               engine:startSystem("InteractionSystem")
-               engine:startSystem("PlayerMovementSystem")
-            end
-         end
+      -- Lazy-load interaction_components
+      if not interaction_components then
+         interaction_components = require("components.interaction")
       end
+
+      -- Keep the player disabled
+      interaction_components.disable_player(engine)
+
+      local interaction_text_drawable = util.first(self.targets.interaction_text):get("Drawable")
+      if not interaction_text_drawable.enabled then
+         interaction_text_drawable.enabled = true
+         interaction_text_drawable.drawable.string = "[E] to close the note"
+      end
+
+      interaction_components.update_seconds_since_last_interaction(dt)
+      interaction_components.if_key_pressed({
+            [KeyboardKey.E] = function()
+               -- Delete the note entity and re-enable the player
+               engine:removeEntity(entity, true)
+               interaction_components.enable_player(engine)
+            end
+      })
    end
 end
 
