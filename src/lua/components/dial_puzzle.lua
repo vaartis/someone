@@ -69,8 +69,6 @@ function M.activatable_callbacks.solved_music()
    end
 end
 
-local DialHandleComponent = Component.create("DialHandleComponent")
-
 local combination_n = 1
 
 local rotation_click_sound
@@ -189,15 +187,6 @@ function DialHandleSystem:update(dt)
             end
          end
       end
-   end
-end
-
-
-function M.process_components(new_ent, comp_name, comp)
-   if comp_name == "dial_handle" then
-      new_ent:add(DialHandleComponent())
-
-      return true
    end
 end
 
