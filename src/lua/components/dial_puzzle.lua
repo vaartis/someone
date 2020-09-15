@@ -98,9 +98,7 @@ function DialHandleSystem:update(dt)
       engine:stopSystem("InteractionSystem")
       engine:stopSystem("PlayerMovementSystem")
 
-      local interaction_text_key = lume.first(lume.keys(self.targets.interaction_text))
-      if not interaction_text_key then error("No interaction text entity found") end
-      local interaction_text_drawable = self.targets.interaction_text[interaction_text_key]:get("Drawable")
+      local interaction_text_drawable = util.first(self.targets.interaction_text):get("Drawable")
       if not interaction_text_drawable.enabled then
          interaction_text_drawable.enabled = true
          interaction_text_drawable.drawable.string = "[A/D] to rotate, [E] to close"

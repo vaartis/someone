@@ -56,4 +56,11 @@ function M.debug_menu_process_state_variable_node(name, data, parent)
    end
 end
 
+-- Get the first element from the table/array
+function M.first(tbl)
+   for _, v in pairs(tbl) do
+      return v
+   end
+end
+
 return M

@@ -31,9 +31,7 @@ function InteractionSystem:requires()
    }
 end
 function InteractionSystem:onStopSystem()
-   local interaction_text_key = lume.first(lume.keys(self.targets.interaction_text))
-   if not interaction_text_key then error("No interaction text entity found") end
-   local interaction_text_drawable = self.targets.interaction_text[interaction_text_key]:get("Drawable")
+   local interaction_text_drawable = util.first(self.targets.interaction_text):get("Drawable")
    interaction_text_drawable.enabled = false
 end
 function InteractionSystem:update(dt)
@@ -41,9 +39,7 @@ function InteractionSystem:update(dt)
    local interaction_text_drawable
 
    if lume.count(self.targets.objects) > 0 then
-      local interaction_text_key = lume.first(lume.keys(self.targets.interaction_text))
-      if not interaction_text_key then error("No interaction text entity found") end
-      interaction_text_drawable = self.targets.interaction_text[interaction_text_key]:get("Drawable")
+      interaction_text_drawable = util.first(self.targets.interaction_text):get("Drawable")
 
       M.seconds_since_last_interaction = M.seconds_since_last_interaction + dt
    end

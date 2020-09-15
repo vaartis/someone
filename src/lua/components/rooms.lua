@@ -169,13 +169,12 @@ function M.load_room(name, switch_namespace)
 end
 
 function M.find_player()
-   local pents = M.engine:getEntitiesWithComponent("PlayerMovement")
-   local player_key = lume.first(lume.keys(pents))
-   if not player_key then
+   local player = util.first(M.engine:getEntitiesWithComponent("PlayerMovement"))
+   if not player then
       error("No player entity found")
    end
 
-   return pents[player_key]
+   return player
 end
 
 return M
