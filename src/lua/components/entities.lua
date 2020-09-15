@@ -92,6 +92,8 @@ function M.instantiate_entity(entity_name, entity, parent)
                   tf_component.local_position = relative_position
                else
                   transformable.position = Vector2f.new(comp.position[1], comp.position[2])
+
+                  tf_component.local_position = Vector2f.new(0, 0)
                end
 
                if comp.origin then transformable.origin = Vector2f.new(comp.origin[1], comp.origin[2]) end
