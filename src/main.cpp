@@ -209,6 +209,11 @@ int main(int argc, char **argv) {
         // After everything has been drawn and processed, run the coroutines
         coroutines_env.run(dt);
 
+        if (current_state == CurrentState::Walking) {
+            // Clear the event store as the very last thing, after the coroutines run
+            walking_env.clear_event_store();
+        }
+
         // Draw what hasn't been drawn yet
         window.draw(targetSprite);
 

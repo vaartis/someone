@@ -10,8 +10,6 @@ local state_variables = {}
 
 local function update(dt)
    rooms.engine:update(dt)
-
-   interaction_components.update(dt)
 end
 
 local function draw()
@@ -34,6 +32,7 @@ return {
 
    update = update, draw = draw, draw_overlay = draw_overlay,
    state_variables = state_variables,
+   clear_event_store = interaction_components.clear_event_store,
 
    debug_menu = debug_menu
 }

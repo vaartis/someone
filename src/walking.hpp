@@ -5,7 +5,8 @@
 
 class WalkingEnv : public LuaModuleEnv {
 private:
-    sol::protected_function update_f, draw_f, draw_overlay_f, add_event_f, room_shaders_f, debug_menu_f;
+    sol::protected_function update_f, draw_f, draw_overlay_f, add_event_f, room_shaders_f, debug_menu_f,
+        clear_event_store_f;
 
     std::vector<std::string> need_screen_size;
     std::map<std::string, sf::Shader> shaders;
@@ -23,6 +24,7 @@ public:
         add_event_f = module["add_event"];
         room_shaders_f = module["room_shaders"];
         debug_menu_f = module["debug_menu"];
+        clear_event_store_f = module["clear_event_store"];
 
         {
             const auto &[pair, _] =
@@ -146,6 +148,10 @@ public:
 
     void debug_menu() {
         call_or_throw(debug_menu_f);
+    }
+
+    void clear_event_store() {
+        call_or_throw(clear_event_store_f);
     }
 
 #ifdef SOMEONE_TESTING
