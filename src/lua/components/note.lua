@@ -75,7 +75,7 @@ function NoteInteractionSystem:update(dt)
             event.type == EventType.KeyReleased and event.key.code == KeyboardKey.E then
                interaction_components.seconds_since_last_interaction = 0
                -- Delete the note entity and re-enable interactions and movement
-               engine:removeEntity(entity)
+               engine:removeEntity(entity, true)
                engine:startSystem("InteractionSystem")
                engine:startSystem("PlayerMovementSystem")
             end
