@@ -36,7 +36,6 @@ PlayerMovementSystem.update = function(self, dt)
             local x, y = physics_world:getRect(entity)
             local expected_new_pos = Vector2f.new(x, y) + pos_diff
 
-
             local _, _, cols, col_count = physics_world:check(
                entity, expected_new_pos.x, expected_new_pos.y,
                function(item, other) if other:get("Collider").trigger then return "cross" else return "slide" end end
@@ -46,6 +45,9 @@ PlayerMovementSystem.update = function(self, dt)
                -- just update the position
                physics_world:update(entity, expected_new_pos.x, expected_new_pos.y)
                player_movement.walking = true
+            else
+               -- Stop player movement is the player hits something tangible
+               player_movement.walking = false
             end
 
             player_movement.look_direction = look_direction
