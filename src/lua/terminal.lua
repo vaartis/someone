@@ -465,7 +465,7 @@ function M.switch_to_walking(room)
    coroutines.create_coroutine(
       coroutines.black_screen_out,
       function()
-         WalkingModule.load_room(room)
+         WalkingModule.load_room(room, true)
          GLOBAL.set_current_state(CurrentState.Walking)
       end
    )

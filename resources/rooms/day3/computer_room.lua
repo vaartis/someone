@@ -1,10 +1,6 @@
 return {
    prefab = { name = "day2/computer_room" },
    entities = {
-      passage = {
-         interaction = { callback = { args = { room = "day3/first_puzzle_room" } } }
-      },
-
       table = {
          interaction = {
             activatable_callback = {

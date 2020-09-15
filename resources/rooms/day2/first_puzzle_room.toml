@@ -50,4 +50,8 @@ sound_player = { sound_asset = "puzzle_jingle", activatable_callback = { module 
 [entities.passage]
 prefab = "passage"
 transformable = { position = [120, 750], scale = [1, 1] }
-interaction = { callback = { args = { room = "day2/computer_room", player_pos = [900, 644] } } }
+
+[entities.passage.passage]
+from = "first_puzzle_room"
+to = "computer_room"
+player_y = 644

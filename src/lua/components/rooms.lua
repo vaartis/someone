@@ -14,25 +14,44 @@ local entities = require("components.entities")
 
 local first_puzzle = require("components.first_puzzle")
 local dial_puzzle = require("components.dial_puzzle")
+local walkway = require("components.walkway")
 
 local M = {}
 
 toml.strict = false
 
+function M.to_full_room_file(name)
+   local without_extension = "resources/rooms/" .. name
+
+   local lua_path = without_extension .. ".lua"
+   local file = io.open(lua_path, "r")
+   if file then
+      file:close()
+      return lua_path, "lua"
+   end
+
+   local toml_path = without_extension .. ".toml"
+   file = io.open(toml_path, "r")
+   if file then
+      file:close()
+      return toml_path, "toml"
+   end
+end
+
 -- Loads the room's toml file, processing parent relationships
 local function load_room_file(name)
-   local without_extension = "resources/rooms/" .. name
+   local path, file_type = M.to_full_room_file(name)
 
    local room_table
 
-   local file = io.open(without_extension .. ".lua", "r")
-   if file then
-      local loaded, err = load(file:read("*all"), without_extension .. ".lua")
+   local file = io.open(path, "r")
+   local contents = file:read("*all")
+   if file_type == "lua" then
+      local loaded, err = load(contents, path)
       if err then error(err) end
       room_table = loaded()
    else
-      file = io.open(without_extension .. ".toml", "r")
-      room_table = toml.parse(file:read("*all"))
+      room_table = toml.parse(contents)
    end
 
    file:close()
@@ -85,7 +104,8 @@ function M.reset_engine()
       note_components,
       first_puzzle,
       dial_puzzle,
-      debug_components
+      debug_components,
+      walkway
    }
 
    for _, module in pairs(modules) do module.add_systems(M.engine) end
@@ -115,9 +135,18 @@ load_assets()
 local _room_shaders = {}
 function M.room_shaders() return _room_shaders end
 
-function M.load_room(name)
+function M.load_room(name, switch_namespace)
    M.reset_engine()
    collider_components.reset_world()
+
+   if switch_namespace then
+      -- If switch_namespace is passed, use the room's namespace as the "current" one
+
+      -- Find the last /
+      local last = name:find("/[^/]+$")
+      -- Use everything that is before it
+      M.current_namespace = name:sub(1, last - 1)
+   end
 
    local room_toml = load_room_file(name)
 

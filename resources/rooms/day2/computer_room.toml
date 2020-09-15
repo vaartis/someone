@@ -10,4 +10,8 @@ activatable_callback = { module = "components.first_puzzle", name = "first_puzzl
 [entities.passage]
 prefab = "passage"
 transformable = { position = [1000, 750] }
-interaction = { callback = { args = { room = "day2/first_puzzle_room" } } }
+
+[entities.passage.passage]
+from = "computer_room"
+to = "first_puzzle_room"
+player_y = 644

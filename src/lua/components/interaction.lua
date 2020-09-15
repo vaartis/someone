@@ -247,17 +247,9 @@ function M.interaction_callbacks.computer_switch_to_terminal(curr_state)
    return "enabled"
 end
 
-function M.interaction_callbacks.switch_room(curr_state, args)
-   local room, player_pos = args.room, args.player_pos
 
-   util.rooms_mod().load_room(room)
 
-   if player_pos then
-      local player = util.rooms_mod().find_player()
 
-      local physics_world = player:get("Collider").physics_world
-      return physics_world:update(player, player_pos[1], player_pos[2])
-   end
 end
 
 --- @param fnc_data table Table that contains data about the looked-up function (particularly, the module and the name)
@@ -298,6 +290,22 @@ function try_get_fnc_from_module(fnc_data, module_field, context)
               module_field = module_field }
          )
       )
+   end
+
+   if fnc_data.self then
+      if not context.entity then
+         error("Tried using self on a callback, but no entity was passed in the context")
+      end
+
+      if fnc_data.args then
+         if lume.isarray(fnc_data.args) then
+            table.insert(fnc_data.args, 1, context.entity)
+         else
+            fnc_data.args.self = context.entity
+         end
+      else
+         fnc_data.args = { context.entity }
+      end
    end
 
    -- If there are args specified, put them after whatever is provided when calling
@@ -365,7 +373,7 @@ function M.process_components(new_ent, comp_name, comp, entity_name)
       local interaction_callback = M.process_interaction(
          comp,
          "callback",
-         { entity_name = entity_name, comp_name = comp_name, needed_for = "interaction" }
+         { entity_name = entity_name, comp_name = comp_name, needed_for = "interaction", entity = new_ent }
       )
 
       local activatable_callback
@@ -373,7 +381,7 @@ function M.process_components(new_ent, comp_name, comp, entity_name)
          activatable_callback = M.process_activatable(
             comp,
             "activatable_callback",
-            { entity_name = entity_name, comp_name = comp_name, needed_for =  "activatable" }
+            { entity_name = entity_name, comp_name = comp_name, needed_for =  "activatable", entity = new_ent }
          )
       end
 
