@@ -19,12 +19,6 @@ end
 M.interaction_callbacks = {}
 
 function M.interaction_callbacks.switch_room(_current_state, ent)
-   if not ent.isInstanceOf then
-      for k, x in pairs(ent) do
-         print(k, v)
-      end
-   end
-
    local passage_comp = ent:get("Passage")
 
    if not rooms then
