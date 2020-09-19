@@ -79,3 +79,8 @@ to = "first_puzzle_room"
 [entities.go_back_passage.interaction]
 touch_activated = true
 callback = { module = "components.passage", name = "switch_room", self = true }
+
+[entities.wind_sound.sound_player]
+sound_asset = "wind"
+loop = true
+position = [0, 8, 0]

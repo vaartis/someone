@@ -42,6 +42,25 @@ std::string to_string(const sf::Color &col) {
 namespace {
 
 template<typename T>
+decltype(auto) register_vector3(sol::state &lua, std::string name) {
+    using VecT = sf::Vector3<T>;
+    using ConstVecRefT = std::add_lvalue_reference_t<std::add_const_t<VecT>>;
+
+    return lua.new_usertype<VecT>(
+        name, sol::constructors<VecT(T, T, T)>(),
+        "x", &VecT::x,
+        "y", &VecT::y,
+        "z", &VecT::z,
+        sol::meta_function::addition, sol::resolve<VecT(ConstVecRefT, ConstVecRefT)>(&sf::operator+),
+        sol::meta_function::subtraction, sol::resolve<VecT(ConstVecRefT, ConstVecRefT)>(&sf::operator-),
+        sol::meta_function::multiplication, sol::overload(
+            sol::resolve<VecT(ConstVecRefT, T)>(&sf::operator*),
+            sol::resolve<VecT(T, ConstVecRefT)>(&sf::operator*)
+        )
+    );
+}
+
+template<typename T>
 decltype(auto) register_vector2(sol::state &lua, std::string name) {
     using VecT = sf::Vector2<T>;
     using ConstVecRefT = std::add_lvalue_reference_t<std::add_const_t<VecT>>;
@@ -78,6 +97,8 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
 
     auto vec2f_type = register_vector2<float>(lua, "Vector2f");
     auto vec2u_type = register_vector2<unsigned int>(lua, "Vector2u");
+
+    auto vec3f_type = register_vector3<float>(lua, "Vector3f");
 
     auto float_rect_type = register_rect<float>(lua, "FloatRect");
     auto int_rect_type = register_rect<int>(lua, "IntRect");
@@ -246,16 +267,13 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
     );
     auto sound_type = lua.new_usertype<sf::Sound>(
         "Sound", sol::constructors<sf::Sound()>(),
-        "volume", sol::property(
-            &sf::Sound::getVolume,
-            &sf::Sound::setVolume
-        ),
-        "buffer", sol::property(
-            &sf::Sound::getBuffer,
-            &sf::Sound::setBuffer
-        ),
+        "volume", sol::property(&sf::Sound::getVolume, &sf::Sound::setVolume),
+        "buffer", sol::property(&sf::Sound::getBuffer, &sf::Sound::setBuffer),
+        "loop", sol::property(&sf::Sound::getLoop, &sf::Sound::setLoop),
+        "position", sol::property(&sf::Sound::getPosition, sol::resolve<void(const sf::Vector3f &)>(&sf::Sound::setPosition)),
         "status", sol::property(&sf::Sound::getStatus),
-        "play", &sf::Sound::play
+        "play", &sf::Sound::play,
+        "stop", &sf::Sound::stop
     );
     auto sound_status_enum = lua.new_enum(
         "SoundStatus",

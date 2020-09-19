@@ -93,6 +93,15 @@ function CustomEngine:stopSystem(name)
 end
 
 function M.reset_engine()
+   if M.engine then
+      for _, system in pairs(M.engine.systemRegistry) do
+         if system.onBeforeResetEngine then
+            -- Give the systems a chance to clean up before the engine is reset
+            system:onBeforeResetEngine()
+         end
+      end
+   end
+
    M.engine = CustomEngine()
 
    local modules = {

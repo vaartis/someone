@@ -40,3 +40,5 @@ rotation_click = "resources/sounds/rotation_click.ogg"
 
 puzzle_jingle = "resources/sounds/puzzle_jingle/puzzle_jingle.ogg"
 dial_jingle = "resources/sounds/dial_jingle/dial_jingle.ogg"
+
+wind = "resources/sounds/wind.ogg"
