@@ -10,8 +10,9 @@ function M.create_coroutine(fnc, ...)
    table.insert(
       coroutines,
       {
-         cor = cor, finish_callback = finish_callback,
-         started = false, args = {...}
+         cor = cor,
+         started = false, args = {...},
+         wait = {}
       }
    )
 
@@ -27,26 +28,52 @@ function M.abandon_coroutine(cor)
    end
 end
 
+--- If there are something for the coroutine to wait on,
+--- return true. Otherwise return false.
+local function need_to_wait(cor)
+   if cor.wait.coroutine then
+      if coroutine.status(cor.wait.coroutine) == "dead" then
+         cor.wait.coroutine = nil
+
+         return false
+      else
+         return true
+      end
+   end
+
+   return false
+end
+
 function M.run(dt)
    local to_remove = { }
    for n, cor in pairs(coroutines) do
-      local _, err
+      if need_to_wait(cor) then goto continue end
+
+      local results
       if not cor.started then
-         _, err = coroutine.resume(cor.cor, table.unpack(cor.args))
+         results = { coroutine.resume(cor.cor, table.unpack(cor.args)) }
 
          cor.started = true
       else
-         _, err = coroutine.resume(cor.cor, dt)
+         results = { coroutine.resume(cor.cor, dt) }
       end
 
-      if err then error(err) end
+      local was_ok, results = results[1], lume.slice(results, 2)
+
+      -- If there was an error, the only result will be the error message
+      if not was_ok then error(results[1]) end
+
+      -- If a function was returned, create a coroutine from it and add it as a
+      -- waiting condition, and pass it all the other arguments returned
+      if type(results[1]) == "function" then
+         cor.wait.coroutine = M.create_coroutine(results[1], table.unpack(lume.slice(results, 2)))
+      end
 
       if coroutine.status(cor.cor) == "dead" then
          table.insert(to_remove, n)
-
-         -- Call the callback
-         if cor.finish_callback then cor.finish_callback() end
       end
+
+      ::continue::
    end
 
    -- Clean up the dead coroutines
