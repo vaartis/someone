@@ -1,6 +1,6 @@
 [prefab]
 name = "day3/first_puzzle_room"
-removed_entities = [ "dial" ]
+removed_entities = [ "dial", "dial_jingle_player" ]
 
 [entities.passage_to_walkway]
 prefab = "passage"
