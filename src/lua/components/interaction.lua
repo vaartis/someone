@@ -252,6 +252,8 @@ function M.interaction_callbacks.computer_switch_to_terminal(curr_state)
       coroutines.black_screen_out,
       function()
          GLOBAL.set_current_state(CurrentState.Terminal)
+      end,
+      function()
          terminal.active = true
       end
    )

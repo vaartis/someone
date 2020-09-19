@@ -1,6 +1,7 @@
 local lume = require("lume")
 
 local util = require("util")
+local coroutines = require("coroutines")
 local rooms
 
 local PassageComponent = Component.create("Passage", {"to", "from", "player_y"})
@@ -81,39 +82,54 @@ function M.interaction_callbacks.switch_room(_current_state, ent)
       end
    end
 
-   rooms.load_room(final_room_name)
+   local player_movement = util.rooms_mod().find_player():get("PlayerMovement")
+   player_movement.active = false
 
-   local passages_in_room = rooms.engine:getEntitiesWithComponent("Passage")
+   coroutines.create_coroutine(
+      coroutines.black_screen_out,
+      function()
+         -- When the screen in blacked out, change the room and put the player
+         -- where needed
 
-   local found_passage
-   for _, ent in pairs(passages_in_room) do
-      local searched_passage_comp = ent:get("Passage")
+         rooms.load_room(final_room_name)
 
-      -- If not player_y is specified, this passage shouldn't be used
-      -- to spawn the player
-      if searched_passage_comp.player_y and searched_passage_comp.to == passage_comp.from then
-         found_passage = ent
-         break
+         local passages_in_room = rooms.engine:getEntitiesWithComponent("Passage")
+
+         local found_passage
+         for _, ent in pairs(passages_in_room) do
+            local searched_passage_comp = ent:get("Passage")
+
+            -- If not player_y is specified, this passage shouldn't be used
+            -- to spawn the player
+            if searched_passage_comp.player_y and searched_passage_comp.to == passage_comp.from then
+               found_passage = ent
+               break
+            end
+         end
+         if not found_passage then
+            error(
+               lume.format(
+                  "Couldn't find a passage from {1} to {2} for passage {3}",
+                  { passage_comp.from, passage_comp.to, ent:get("Name").name }
+               )
+            )
+         end
+
+         local player = rooms.find_player()
+         local physics_world = player:get("Collider").physics_world
+
+         local _, _, player_w, player_h = physics_world:getRect(player)
+         local x, y = physics_world:getRect(found_passage)
+
+         local found_passage_comp = found_passage:get("Passage")
+
+         physics_world:update(player, x, found_passage_comp.player_y)
+      end,
+      function()
+         -- Enable the player back when the room has changed
+         player_movement.active = true
       end
-   end
-   if not found_passage then
-      error(
-         lume.format(
-            "Couldn't find a passage from {1} to {2} for passage {3}",
-            { passage_comp.from, passage_comp.to, ent:get("Name").name }
-         )
-      )
-   end
-
-   local player = rooms.find_player()
-   local physics_world = player:get("Collider").physics_world
-
-   local _, _, player_w, player_h = physics_world:getRect(player)
-   local x, y = physics_world:getRect(found_passage)
-
-   local found_passage_comp = found_passage:get("Passage")
-
-   physics_world:update(player, x, found_passage_comp.player_y)
+   )
 end
 
 return M

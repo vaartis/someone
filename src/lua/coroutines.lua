@@ -53,7 +53,7 @@ function M.run(dt)
    lume.each(to_remove, function(n) table.remove(coroutines, n) end)
 end
 
-function M.black_screen_out(do_after)
+function M.black_screen_out(do_in, do_after)
    local screen_size = GLOBAL.drawing_target.size
    local black_rect = RectangleShape.new(
       Vector2f.new(screen_size.x, screen_size.y)
@@ -63,18 +63,28 @@ function M.black_screen_out(do_after)
    while color.a < 255 do
       -- Need to be careful here, because color wraps around if it overflows
       color.a = color.a + 5
-      black_rect.outline_color = color
       black_rect.fill_color = color
 
       GLOBAL.drawing_target:draw(black_rect)
 
-      if color.a == 255 and do_after then
+      if color.a == 255 and do_in then
          -- On the last iteration, do whatever requested in the end
-         do_after()
+         do_in()
       end
 
       coroutine.yield()
    end
+
+   while color.a > 0 do
+      color.a = color.a - 5
+      black_rect.fill_color = color
+      GLOBAL.drawing_target:draw(black_rect)
+
+      coroutine.yield()
+   end
+
+   -- Do the thing requested after the drawing is done
+   if do_after then do_after() end
 end
 
 return M

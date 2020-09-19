@@ -461,12 +461,18 @@ function M.switch_to_walking(room)
    -- Needs to be done as soon as possible to stop processing lines
    M.active = false
 
+   local player_movement = util.rooms_mod().find_player():get("PlayerMovement")
+   player_movement.active = false
+
    -- Create a coroutine that blackens the screen with time
    coroutines.create_coroutine(
       coroutines.black_screen_out,
       function()
          WalkingModule.load_room(room, true)
          GLOBAL.set_current_state(CurrentState.Walking)
+      end,
+      function()
+         player_movement.active = true
       end
    )
 end
