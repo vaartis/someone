@@ -149,6 +149,8 @@ function InteractionSystem:update(dt)
                interactable.was_touch_activated = true
                --- Always execute it if it's touched. It will only be executed once.
                interaction_to_execute = interactable
+
+               interaction_text_drawable.drawable.string = ""
             end
          end
       end
