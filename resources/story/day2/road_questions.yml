@@ -188,7 +188,7 @@ city-food-1:
     TerminalModule.add_talking_topic("computers")
   text: >-
     Precicely. The food there is made of things gathered there from different places. Since they don't have much of their own food
-    production, they have to get it from all the places around the world, while the rest of the world gets the "techonolgy" pieces from
+    production, they have to get it from all the places around the world, while the rest of the world gets the "technology" pieces from
     them, like computers and phones. As a consequence, you can also get food from other parts of the world there for yourself if you go to
     the city. The milk I had for breakfast, for example, I got from my last trip to the city.
 
@@ -234,5 +234,5 @@ stay-1:
 stay-2:
   responses:
   - text: >-
-      Convinient..
+      Convenient..
     next: hub

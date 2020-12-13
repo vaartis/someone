@@ -132,7 +132,7 @@ bed-if-not-explored-4:
 
 narra-house-end:
   char: description
-  text: "You lie in bed fow a while, until eventually you fall asleep."
+  text: "You lie in bed for a while, until eventually you fall asleep."
   wait: true
   script_after: TerminalModule.switch_to_walking("day2/computer_room")
   next: day2/morning/1
