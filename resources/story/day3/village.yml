@@ -3,7 +3,7 @@ config:
     player:
       color: [255, 255, 255]
     description:
-      color: [127, 0, 255]
+      color: [185, 118, 252]
     narra:
       color: [211, 0, 0]
     maj:

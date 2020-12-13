@@ -7,7 +7,7 @@ config:
     maj:
       color: [135,206,235]
     description:
-      color: [127, 0, 255]
+      color: [185, 118, 252]
   dialogue_between: [narra, maj]
 
 1:
