@@ -9,6 +9,8 @@ walkway_room = "resources/sprites/room/walkway_room/walkway_room.png"
 walkway_railing = "resources/sprites/room/walkway_room/walkway_railing.png"
 walkway_walls = "resources/sprites/room/walkway_room/walkway_walls.png"
 
+status_room = "resources/sprites/room/status_room/status_room.png"
+
 table = "resources/sprites/room/table/table.png"
 button = "resources/sprites/room/button/button.png"
 passage = "resources/sprites/room/passage/passage.png"
@@ -26,7 +28,7 @@ look_up_bg = "resources/sprites/room/walkway_room/look_up_bg.png"
 look_up_fan = "resources/sprites/room/walkway_room/look_up_fan.png"
 look_down = "resources/sprites/room/walkway_room/look_down.png"
 
-cold_breath = "resources/sprites/room/walkway_room/cold_breath.png"
+status_room_computer = "resources/sprites/room/status_room/computer_screen.png"
 
 mainchar = "resources/sprites/mainchar/mainchar.png"
 

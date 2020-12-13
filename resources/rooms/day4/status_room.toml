@@ -1,0 +1,44 @@
+[shaders.room_darker]
+n = 1
+ambientLightLevel = 0.4
+
+[shaders.circle_light]
+n = 2
+point = [877, 656]
+brightness = 0.1
+
+[entities.background.drawable]
+kind = "sprite"
+texture_asset = "status_room"
+z = 0
+
+[entities.player]
+prefab = "player"
+
+[entities.player.transformable]
+position = [300, 811]
+
+[entities.passage]
+prefab = "passage"
+transformable = { position = [ 300, 723 ] }
+
+[entities.passage.passage]
+from = "status_room"
+to = "walkway_room"
+player_y = 644
+
+[entities.left_wall]
+transformable = { position = [95, 500] }
+collider = { mode = "constant", size = [10, 400] }
+
+[entities.right_wall]
+transformable = { position = [960, 500] }
+collider = { mode = "constant", size = [10, 400] }
+
+[entities.computer]
+transformable = { position = [850, 600] }
+collider = { mode = "constant", size = [80, 100], trigger = true }
+
+[entities.computer.interaction]
+callback = { module = "components.look_closer", name = "look", args = ["status_room/computer"] }
+action_text = "look at the screen"

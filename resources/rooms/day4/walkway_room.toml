@@ -31,7 +31,7 @@ transformable = { position = [20, 500] }
 collider = { mode = "constant", size = [10, 400] }
 
 [entities.right_wall]
-transformable = { position = [1200, 500] }
+transformable = { position = [1250, 500] }
 collider = { mode = "constant", size = [10, 400] }
 
 [entities.colder_talk]
@@ -77,6 +77,23 @@ from = "walkway_room"
 to = "first_puzzle_room"
 
 [entities.go_back_passage.interaction]
+touch_activated = true
+callback = { module = "components.passage", name = "switch_room", self = true }
+
+[entities.go_forward_passage_from]
+transformable = { position = [1050, 591] }
+collider = { mode = "constant", size = [40, 176], trigger = true }
+passage = { to = "status_room", player_y = 591 }
+
+[entities.go_forward_passage]
+transformable = { position = [1200, 550] }
+collider = { mode = "constant", size = [40, 200], trigger = true }
+
+[entities.go_forward_passage.passage]
+from = "walkway_room"
+to = "status_room"
+
+[entities.go_forward_passage.interaction]
 touch_activated = true
 callback = { module = "components.passage", name = "switch_room", self = true }
 
