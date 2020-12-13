@@ -166,8 +166,10 @@ bathroom-1:
   wait: true
   script: TerminalModule.state_variables.day2.flat.bathroom = true
   text: >-
-    You open the bathroom door and turn on the light. It blinks a few times at first, and then stays on as it should. The bathroom is mostly
-    the same as Narra's, maybe even a little smaller.
+    You open the bathroom door and turn on the light. It blinks a few times at first, and then stays on as it should.
+    < if state_variables.day1.narra_house_hub.bathroom then  >
+    The bathroom is mostly the same as Narra's, maybe even a little smaller.
+    < end >
 
 bathroom-2:
   char: player
