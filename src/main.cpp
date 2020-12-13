@@ -62,7 +62,8 @@ int main(int argc, char **argv) {
 
     sol::state lua;
     lua.open_libraries(sol::lib::base, sol::lib::table, sol::lib::string, sol::lib::package,
-                       sol::lib::coroutine, sol::lib::math, sol::lib::debug, sol::lib::os, sol::lib::io);
+                       sol::lib::coroutine, sol::lib::math, sol::lib::debug, sol::lib::os, sol::lib::io,
+                       sol::lib::utf8);
 
     // Setup the lua path to see luarocks packages
     auto package_path = std::filesystem::path("resources") / "lua" / "share" / "lua" / SOMEONE_LUA_VERSION / "?.lua;";
