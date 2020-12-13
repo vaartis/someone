@@ -125,7 +125,7 @@ function M.InstanceMenuLine:handle_interaction(event)
    if not lines.inputing_text then lines.inputting_text = true end
 
    if event.type == EventType.TextEntered then
-      local char = string.char(event.text.unicode)
+      local char = utf8.char(event.text.unicode)
 
       -- Because SFML considers backspace and return as inputting text, it has to be handled here
       if char == "\b" then

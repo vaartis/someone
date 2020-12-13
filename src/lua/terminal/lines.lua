@@ -377,7 +377,7 @@ end
 
 function M.VariantInputLine:handle_interaction(event)
    if event.type == EventType.TextEntered then
-      local ch = string.char(event.text.unicode)
+      local ch = utf8.char(event.text.unicode)
 
       -- Convert the character to it's number equivalent
       local chnum = tonumber(ch)
@@ -505,7 +505,7 @@ function M.TextInputLine:handle_interaction(event)
          end
       elseif event.type == EventType.TextEntered then
          if GLOBAL.isalpha(event.text.unicode) and #self._input_text < self._max_length then
-            local char = string.char(event.text.unicode)
+            local char = utf8.char(event.text.unicode)
             self._input_text = self._input_text .. char
             self._letters_output = self._letters_output + 1
 
