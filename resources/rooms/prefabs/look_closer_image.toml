@@ -1,0 +1,20 @@
+tags = [ "LookCloserImage" ]
+
+[drawable]
+kind = "sprite"
+# texture_asset here
+z = 0
+layer = "overlay"
+
+[transformable]
+position = [320, 240]
+
+[children.caption.drawable]
+kind = "text"
+# text here
+text = { font_size = 24 }
+z = 1
+layer = "overlay"
+
+[children.caption.transformable]
+position = [0, 480]

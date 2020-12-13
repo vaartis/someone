@@ -31,6 +31,7 @@ build = {
          ["components.sound"] = "components/sound.lua",
          ["components.note"] = "components/note.lua",
          ["components.passage"] = "components/passage.lua",
+         ["components.look_closer"] = "components/look_closer.lua",
 
          ["components.first_puzzle"] = "components/first_puzzle.lua",
          ["components.dial_puzzle"] = "components/dial_puzzle.lua",

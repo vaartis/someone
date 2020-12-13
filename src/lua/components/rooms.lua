@@ -11,6 +11,7 @@ local sound_components = require("components.sound")
 local note_components = require("components.note")
 local assets = require("components.assets")
 local entities = require("components.entities")
+local look_closer = require("components.look_closer")
 
 local first_puzzle = require("components.first_puzzle")
 local dial_puzzle = require("components.dial_puzzle")
@@ -117,7 +118,8 @@ function M.reset_engine()
       first_puzzle,
       dial_puzzle,
       debug_components,
-      walkway
+      walkway,
+      look_closer
    }
 
    for _, module in pairs(modules) do module.add_systems(M.engine) end

@@ -28,6 +28,11 @@ local function load_prefab(prefab_name_or_conf, base_data)
    local prefab_data = toml.parse(file:read("*all"))
    file:close()
 
+   -- Load prefabs recursively if needed
+   if prefab_data.prefab then
+      prefab_data = load_prefab(prefab_data.prefab, prefab_data)
+   end
+
    base_data = util.deep_merge(prefab_data, base_data)
 
    -- Clear the components requested by removed_components
@@ -73,7 +78,7 @@ function M.instantiate_entity(entity_name, entity, parent)
    local add_collider_actions = {}
 
    for comp_name, comp in pairs(entity) do
-      if comp_name == "transformable"  then
+      if comp_name == "transformable" then
          table.insert(
             add_transformable_actions,
             function()
@@ -140,7 +145,7 @@ function M.instantiate_entity(entity_name, entity, parent)
    end
 
    -- Call all the "after all inserted" actions
-   for _, actions in ipairs({add_transformable_actions,add_collider_actions}) do
+   for _, actions in ipairs({add_transformable_actions, add_collider_actions}) do
       for _, action in pairs(actions) do action() end
    end
 

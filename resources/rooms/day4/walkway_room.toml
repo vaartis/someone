@@ -52,7 +52,7 @@ transformable = { position = [500, 500] }
 collider = { mode = "constant", size = [300, 250], trigger = true }
 
 [entities.look_up_zone.interaction]
-callback = { module = "components.walkway", name = "look", args = ["up"] }
+callback = { module = "components.look_closer", name = "look", args = ["walkway/look_up"] }
 action_text = "look up"
 
 [entities.look_down_zone]
@@ -60,7 +60,7 @@ transformable = { position = [500, 500] }
 collider = { mode = "constant", size = [300, 250], trigger = true }
 
 [entities.look_down_zone.interaction]
-callback = { module = "components.walkway", name = "look", args = ["down"] }
+callback = { module = "components.look_closer", name = "look", args = ["walkway/look_down"] }
 action_text = "look down"
 
 [entities.go_back_passage_from]

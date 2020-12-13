@@ -1,19 +1,7 @@
-tags = [ "LookCloserImage" ]
+prefab = "look_closer_image"
 
 [drawable]
-kind = "sprite"
 texture_asset = "look_down"
-z = 0
-layer = "overlay"
-
-[transformable]
-position = [320, 240]
 
 [children.caption.drawable]
-kind = "text"
-text = { text = "There's nothing there.. Can't even see the bottom..", font_size = 24 }
-z = 1
-layer = "overlay"
-
-[children.caption.transformable]
-position = [0, 480]
+text = { text = "There's nothing there.. can't even see the bottom.." }
