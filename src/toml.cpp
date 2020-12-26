@@ -10,7 +10,7 @@ sol::table parse_toml(sol::this_state lua_, const std::string &content) {
     try {
         root = toml::parse(content);
     } catch (const toml::parse_error &err) {
-        return sol::make_object(lua, std::make_tuple(sol::nil, err.description()));
+        return sol::make_object(lua, std::make_tuple(sol::lua_nil, err.description()));
     }
 
     // Converts the TOML types to lua/C++
@@ -69,7 +69,7 @@ std::string encode_toml(sol::this_state lua_, sol::table table) {
         if (auto maybe_tbl = node.as<std::optional<sol::table>>(); maybe_tbl) {
             sol::table tbl = *maybe_tbl;
 
-            bool is_array = tbl.get_or(0, sol::nil) != sol::nil;
+            bool is_array = tbl.get_or(0, sol::lua_nil) != sol::lua_nil;
             if (is_array) {
                 auto arr = std::make_shared<toml::array>();
 

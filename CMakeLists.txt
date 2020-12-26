@@ -42,11 +42,14 @@ set_target_properties(someone_lib PROPERTIES OUTPUT_NAME "someone")
 if(WIN32)
   add_executable(someone WIN32 ${someone_main})
 
-  target_compile_definitions(someone_lib PUBLIC -DSOMEONE_LIB_EXT="dll")
+  target_compile_definitions(someone_lib PUBLIC SOMEONE_LIB_EXT="dll")
   target_link_options(someone_lib PUBLIC -Wl,--export-all-symbols)
 else()
   if(APPLE)
     add_executable(someone MACOSX_BUNDLE ${someone_main})
+
+    # Silence OpenGL deprecation warnings on MacOS
+    target_compile_definitions(someone PUBLIC GL_SILENCE_DEPRECATION)
 
     set(CMAKE_INSTALL_PREFIX "${CMAKE_BINARY_DIR}")
 
@@ -60,7 +63,7 @@ else()
   endif()
 
   target_link_libraries(someone_lib dl)
-  target_compile_definitions(someone_lib PUBLIC -DSOMEONE_LIB_EXT="so")
+  target_compile_definitions(someone_lib PUBLIC SOMEONE_LIB_EXT="so")
 
   if(APPLE)
     target_link_options(someone_lib PUBLIC -Wl,-export_dynamic)
