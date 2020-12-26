@@ -4,4 +4,4 @@ prefab = "look_closer_image"
 texture_asset = "status_room_computer"
 
 [children.caption.drawable]
-text = { text = "That doesn't look good.." }
+text = { text = "This doesn't look good.." }
