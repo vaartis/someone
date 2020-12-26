@@ -25,7 +25,11 @@ set(CMAKE_CXX_EXTENSIONS FALSE)
 set(someone_src
   "src/fonts.cpp"
   "src/string_utils.cpp"
+
+  "src/usertypes/imgui.cpp"
+  "src/usertypes/sfml.cpp"
   "src/usertypes.cpp"
+
   "src/story_parser.cpp")
 
 set(someone_main
