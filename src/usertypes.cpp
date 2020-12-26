@@ -9,8 +9,7 @@
 #include "story_parser.hpp"
 #include "usertypes.hpp"
 #include "line_data.hpp"
-
-
+#include "toml.hpp"
 
 void register_usertypes(sol::state &lua, StaticFonts &fonts) {
     // Basic SFML types
@@ -34,6 +33,11 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
         "StaticFonts",
         "main_font", sol::var(std::ref(fonts.main_font)),
         "font_size", sol::var(std::ref(fonts.font_size))
+    );
+
+    lua["TOML"] = lua.create_table_with(
+        "parse", &parse_toml,
+        "encode", &encode_toml
     );
 
     // Data

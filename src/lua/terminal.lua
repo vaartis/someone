@@ -1,7 +1,6 @@
 local inspect = require("inspect")
 local lume = require("lume")
 local coroutines = require("coroutines")
-local toml = require("toml")
 local util = require("util")
 
 local instance_menu = require("terminal.instance_menu")
@@ -91,7 +90,7 @@ local function save_game(first_line, last_line)
    end
 
    -- Encode and save the data
-   local toml_encoded = toml.encode(saved_data)
+   local toml_encoded = TOML.encode(saved_data)
    local file, err = io.open("save.toml", "w")
    if err then
       show_info_message("Error while saving: \"" .. err .. "\"")
@@ -112,7 +111,7 @@ local function load_game()
    end
 
    if file then
-      local data, err = toml.parse(file:read("*all"))
+      local data, err = TOML.parse(file:read("*all"))
       if err then
          show_info_message("Error decoding save data: \"" .. err .. "\"")
 

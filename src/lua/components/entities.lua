@@ -1,4 +1,3 @@
-local toml = require("toml")
 local util = require("util")
 
 local shared_components = require("components.shared")
@@ -25,7 +24,7 @@ local function load_prefab(prefab_name_or_conf, base_data)
    end
 
    local file = io.open("resources/rooms/prefabs/" .. tostring(prefab_name) .. ".toml", "r")
-   local prefab_data = toml.parse(file:read("*all"))
+   local prefab_data = TOML.parse(file:read("*all"))
    file:close()
 
    -- Load prefabs recursively if needed

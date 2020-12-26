@@ -1,4 +1,3 @@
-local toml = require("toml")
 local util = require("util")
 local lume = require("lume")
 
@@ -102,7 +101,7 @@ M.interaction_callbacks = {}
 
 function M.interaction_callbacks.read_note(state, note_name)
    local file = io.open("resources/rooms/notes.toml", "r")
-   local notes = toml.parse(file:read("*all"))
+   local notes = TOML.parse(file:read("*all"))
    file:close()
 
    local note = notes[note_name]

@@ -25,3 +25,6 @@
 [submodule "deps/catch2"]
 	path = deps/catch2
 	url = https://github.com/catchorg/Catch2
+[submodule "deps/tomlplusplus"]
+	path = deps/tomlplusplus
+	url = https://github.com/marzer/tomlplusplus/

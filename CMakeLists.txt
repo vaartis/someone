@@ -30,7 +30,8 @@ set(someone_src
   "src/usertypes/sfml.cpp"
   "src/usertypes.cpp"
 
-  "src/story_parser.cpp")
+  "src/story_parser.cpp"
+  "src/toml.cpp")
 
 set(someone_main
   "src/main.cpp")
@@ -110,6 +111,12 @@ add_subdirectory("${PROJECT_SOURCE_DIR}/deps/yaml-cpp")
 target_link_libraries(someone_lib yaml-cpp)
 
 # === yaml-cpp
+
+# === tomlplusplus
+
+target_include_directories(someone_lib PUBLIC "${PROJECT_SOURCE_DIR}/deps/tomlplusplus/include/")
+
+# ===
 
 # === spdlog
 
@@ -258,7 +265,6 @@ endfunction()
 
 install_rocks(
   "lovetoys;lovetoys-0.4.0-2.rockspec;lovetoys"
-  "toml;lua-toml-2.1-0.rockspec;toml.lua"
   "middleclass;middleclass-4.1.2-0.rockspec;middleclass.lua"
 )
 

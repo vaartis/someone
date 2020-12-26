@@ -1,4 +1,3 @@
-local toml = require("toml")
 local lume = require("lume")
 local util = require("util")
 
@@ -18,8 +17,6 @@ local dial_puzzle = require("components.dial_puzzle")
 local walkway = require("components.walkway")
 
 local M = {}
-
-toml.strict = false
 
 function M.to_full_room_file(name)
    local without_extension = "resources/rooms/" .. name
@@ -52,7 +49,7 @@ local function load_room_file(name)
       if err then error(err) end
       room_table = loaded()
    else
-      room_table = toml.parse(contents)
+      room_table = TOML.parse(contents)
    end
 
    file:close()
@@ -127,7 +124,7 @@ end
 
 local function load_assets()
    local file = io.open("resources/rooms/assets.toml", "r")
-   local l_assets = toml.parse(file:read("*all"))
+   local l_assets = TOML.parse(file:read("*all"))
    file:close()
 
    if l_assets.textures then
