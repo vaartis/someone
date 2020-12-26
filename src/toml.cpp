@@ -59,8 +59,6 @@ sol::table parse_toml(sol::this_state lua_, const std::string &content) {
 std::string encode_toml(sol::this_state lua_, sol::table table) {
     sol::state_view lua(lua_);
 
-    toml::table result;
-
     // Converts from lua to toml.
     // Need a pointer because node is an abstract type
     std::function<std::shared_ptr<toml::node>(sol::object &)> convert = [&](sol::object &node) -> std::shared_ptr<toml::node> {
@@ -69,7 +67,8 @@ std::string encode_toml(sol::this_state lua_, sol::table table) {
         if (auto maybe_tbl = node.as<std::optional<sol::table>>(); maybe_tbl) {
             sol::table tbl = *maybe_tbl;
 
-            bool is_array = tbl.get_or(0, sol::lua_nil) != sol::lua_nil;
+            // Size is only defined for arrays
+            bool is_array = tbl.size() > 0;
             if (is_array) {
                 auto arr = std::make_shared<toml::array>();
 
@@ -100,9 +99,11 @@ std::string encode_toml(sol::this_state lua_, sol::table table) {
             std::terminate();
         }
     };
-    result = *convert(table)->as_table();
+    auto result = convert(table);
+    toml::node_view result_view(*result);
 
     std::stringstream ss;
-    ss << result;
+    ss << result_view;
+
     return ss.str();
 }
