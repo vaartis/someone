@@ -45,7 +45,7 @@ activatable_callback = { not = { module = "components.interaction", name = "stat
 [entities.colder_talk.interaction.callback]
 module = "components.interaction"
 name = "player_talk"
-args = ["It's noticably colder in this room.\nA cold breeze is blowing from above.", [ "walkway_room", "colder_talk" ]]
+args = ["It's noticably colder.\nA cold breeze is blowing from above.", [ "walkway_room", "colder_talk" ]]
 
 [entities.look_up_zone]
 transformable = { position = [500, 500] }
