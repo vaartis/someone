@@ -1,14 +1,16 @@
+#include <fstream>
+
 #include "toml.hpp"
 #include "logger.hpp"
 
-sol::table parse_toml(sol::this_state lua_, const std::string &content) {
+sol::table parse_toml(sol::this_state lua_, const std::string &path) {
     sol::state_view lua(lua_);
 
     auto result = lua.create_table();
 
     toml::table root;
     try {
-        root = toml::parse(content);
+        root = toml::parse_file(path);
     } catch (const toml::parse_error &err) {
         return sol::make_object(lua, std::make_tuple(sol::lua_nil, err.description()));
     }
@@ -48,7 +50,7 @@ sol::table parse_toml(sol::this_state lua_, const std::string &content) {
         case node_type::time:
         case node_type::date_time:
         case node_type::none:
-            spdlog::error("Got an unknown TOML type somehwere in {}", content);
+            spdlog::error("Got an unknown TOML type somehwere in {}", path);
             std::terminate();
         }
     };

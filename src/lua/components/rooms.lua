@@ -43,13 +43,14 @@ local function load_room_file(name)
    local room_table
 
    local file = io.open(path, "r")
-   local contents = file:read("*all")
    if file_type == "lua" then
+      local contents = file:read("*all")
+
       local loaded, err = load(contents, path)
       if err then error(err) end
       room_table = loaded()
    else
-      room_table = TOML.parse(contents)
+      room_table = TOML.parse(path)
    end
 
    file:close()
@@ -123,9 +124,7 @@ function M.reset_engine()
 end
 
 local function load_assets()
-   local file = io.open("resources/rooms/assets.toml", "r")
-   local l_assets = TOML.parse(file:read("*all"))
-   file:close()
+   local l_assets = TOML.parse("resources/rooms/assets.toml")
 
    if l_assets.textures then
       for name, path in pairs(l_assets.textures) do

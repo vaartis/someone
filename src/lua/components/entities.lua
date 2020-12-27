@@ -23,9 +23,10 @@ local function load_prefab(prefab_name_or_conf, base_data)
       prefab_name = prefab_name_or_conf
    end
 
-   local file = io.open("resources/rooms/prefabs/" .. tostring(prefab_name) .. ".toml", "r")
-   local prefab_data = TOML.parse(file:read("*all"))
-   file:close()
+   local prefab_data, prefab_err = TOML.parse("resources/rooms/prefabs/" .. tostring(prefab_name) .. ".toml")
+   if not prefab_data then
+      error("Error loading prefab:\n" .. prefab_err)
+   end
 
    -- Load prefabs recursively if needed
    if prefab_data.prefab then

@@ -109,16 +109,15 @@ local function load_game()
    if err then
       show_info_message("Error loading save data: \"" .. err .. "\"")
    end
+   file:close()
 
    if file then
-      local data, err = TOML.parse(file:read("*all"))
+      local data, err = TOML.parse("save.toml")
       if err then
          show_info_message("Error decoding save data: \"" .. err .. "\"")
 
          return
       end
-
-      file:close()
 
       local first_line_name = data["lines"]["first_line"]
       local last_line_name = data["lines"]["last_line"]
