@@ -5,6 +5,7 @@ local lume = require("lume")
 
 local assets = require("components.assets")
 local interaction_components = require("components.interaction")
+local collider_components = require("components.collider")
 
 local DrawableComponent = Component.create("Drawable", {"drawable", "z", "kind", "enabled", "layer"})
 
@@ -239,6 +240,23 @@ end
 function M.add_systems(engine)
    engine:addSystem(RenderSystem())
    engine:addSystem(AnimationSystem())
+end
+
+function M.show_editor(comp_name, comp, ent)
+   if comp_name == "Transformable" then
+      ImGui.Text(comp_name)
+
+      local tf = comp.transformable
+      ImGui.Text(lume.format("X = {1}, Y = {2}", {tf.position.x, tf.position.y}))
+
+      return true
+   elseif comp_name == "Name" then
+      ImGui.Text(comp_name .. " =")
+      ImGui.SameLine()
+      ImGui.Text(comp.name)
+
+      return true
+   end
 end
 
 return M

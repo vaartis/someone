@@ -79,6 +79,9 @@ target_include_directories(someone_lib PUBLIC "src")
 if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
   set(BUILD_SHARED_LIBS FALSE)
   set(YAML_BUILD_SHARED_LIBS FALSE)
+else()
+  file(RELATIVE_PATH SOMEONE_EDITOR_BASE_PATH "${CMAKE_BINARY_DIR}" "${CMAKE_SOURCE_DIR}")
+  target_compile_definitions(someone_lib PUBLIC SOMEONE_EDITOR_BASE_PATH="${SOMEONE_EDITOR_BASE_PATH}")
 endif()
 
 # === SFML

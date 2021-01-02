@@ -1,4 +1,5 @@
 local bump = require("bump")
+local lume = require("lume")
 
 local M = {}
 
@@ -8,9 +9,9 @@ end
 
 local ColliderComponent = Component.create("Collider", { "physics_world", "mode", "trigger"}, { trigger = false })
 
-local ColliderUpdateSystem = class("ColliderUpdateSystem", System)
-function ColliderUpdateSystem:requires() return { "Collider" } end
-function ColliderUpdateSystem:update(dt)
+M.ColliderUpdateSystem = class("ColliderUpdateSystem", System)
+function M.ColliderUpdateSystem:requires() return { "Collider" } end
+function M.ColliderUpdateSystem:update(dt)
    for _, entity in pairs(self.targets) do
       local collider = entity:get("Collider")
 
@@ -19,7 +20,7 @@ function ColliderUpdateSystem:update(dt)
       end
    end
 end
-function ColliderUpdateSystem.update_from_sprite(entity)
+function M.ColliderUpdateSystem.update_from_sprite(entity)
    local sprite_size = entity:get("Drawable").drawable.global_bounds
 
    local tfc = entity:get("Transformable")
@@ -84,7 +85,7 @@ function M.process_collider_component(new_ent, comp, entity_name)
 
       -- Add the collider component and update the collider from the sprite, also adding it to the physics world
       new_ent:add(ColliderComponent(M.physics_world, comp.mode, comp.trigger))
-      ColliderUpdateSystem.update_from_sprite(new_ent)
+      M.ColliderUpdateSystem.update_from_sprite(new_ent)
    elseif comp.mode == "constant" then
       if not (comp.size) then
          error("size is required for a collider with constant mode on " .. tostring(entity_name))
@@ -99,7 +100,50 @@ function M.process_collider_component(new_ent, comp, entity_name)
 end
 
 function M.add_systems(engine)
-   engine:addSystem(ColliderUpdateSystem())
+   engine:addSystem(M.ColliderUpdateSystem())
+end
+
+function M.show_editor(comp_name, comp, ent)
+   if comp_name == "Collider" then
+      ImGui.Text(comp_name)
+
+      local physics_world = comp.physics_world
+
+      if ImGui.BeginCombo("Mode", comp.mode) then
+         if ent:get("Drawable") then
+            if ImGui.Selectable("sprite", comp.mode == "sprite") then
+               comp.mode = "sprite"
+            end
+         end
+         if ImGui.Selectable("constant", comp.mode == "constant") then
+            comp.mode = "constant"
+         end
+
+         ImGui.EndCombo()
+      end
+
+      local x, y, w, h = physics_world:getRect(ent)
+      x, y = table.unpack(ImGui.InputInt2("XY", {x, y}))
+      w, h = table.unpack(ImGui.InputInt2("WH", {w, h}))
+      comp.trigger = ImGui.Checkbox("Trigger", comp.trigger)
+
+      if comp.mode == "constant" then
+         ent:get("Transformable").transformable.position =
+            Vector2f.new(x, y)
+      end
+      if ImGui.Button("Save") then
+         TOML.save_entity_component(ent, "transformable", comp, { position = { x, y } })
+
+         if comp.mode == "constant" then
+            TOML.save_entity_component(ent, "collider", comp, { size = { w, h } })
+         end
+         TOML.save_entity_component(ent, "collider", comp, { trigger = comp.trigger, mode = comp.mode })
+      end
+
+      physics_world:update(ent, x, y, w, h)
+
+      return true
+   end
 end
 
 return M

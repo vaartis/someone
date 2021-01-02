@@ -174,6 +174,10 @@ function M.load_room(name, switch_namespace)
    end
 
    for entity_name, entity in pairs(room_toml.entities) do
+      local entity_location = getmetatable(room_toml)["toml_location"]["entities"][entity_name]
+
+      setmetatable(entity, { toml_location = entity_location })
+
       entities.instantiate_entity(entity_name, entity)
    end
 end

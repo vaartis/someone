@@ -46,7 +46,7 @@ local function debug_menu()
       end
 
       if ImGui.IsMouseDown(ImGuiMouseButton.Left) then
-         if ImGui.IsKeyDown(KeyboardKey.LControl) and not debug_menu_state.selected_moving then
+         if ImGui.IsKeyDown(KeyboardKey.LControl) and not debug_menu_state.selected_moving and ent then
             local x, y, _, _ = physics_world:getRect(ent)
 
             -- Save the different betweent the mouse position and the actual entity position,
@@ -57,6 +57,10 @@ local function debug_menu()
             local x_diff, y_diff = world_pos.x - x, world_pos.y - y
 
             debug_menu_state.selected_moving = { obj = ent, x_diff = x_diff, y_diff = y_diff }
+         end
+
+         if ent then
+            debug_menu_state.selected = ent
          end
       else
          debug_menu_state.selected_moving = nil
@@ -70,6 +74,33 @@ local function debug_menu()
          -- Get the previously acquired diff and subtract it from the mouse position
          local x_diff, y_diff = debug_menu_state.selected_moving.x_diff, debug_menu_state.selected_moving.y_diff
          physics_world:update(debug_menu_state.selected_moving.obj, world_pos.x - x_diff, world_pos.y - y_diff, w, h)
+
+         if not debug_menu_state.selected_moving.obj:get("Drawable") then
+            -- Get the updated position
+            local x, y, _, _ = physics_world:getRect(debug_menu_state.selected_moving.obj)
+
+            debug_menu_state.selected_moving.obj:get("Transformable").transformable.position =
+               Vector2f.new(x, y)
+         end
+      end
+   end
+   if ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left) and not ent then
+      debug_menu_state.selected = nil
+   end
+
+   if debug_menu_state.selected then
+      ImGui.Separator()
+      ImGui.Text("Selected: " .. debug_menu_state.selected:get("Name").name)
+
+      local comps = debug_menu_state.selected:getComponents()
+      local sorted_comps = {}
+      for comp_name, comp in pairs(comps) do
+         table.insert(sorted_comps, { name = comp_name, comp = comp })
+      end
+      table.sort(sorted_comps, function (a, b) return a.name < b.name end)
+
+      for _, comp in ipairs(sorted_comps) do
+         util.entities_mod().show_editor(comp.name, comp.comp, debug_menu_state.selected)
       end
    end
 end

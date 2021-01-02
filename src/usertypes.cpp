@@ -37,7 +37,8 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
 
     lua["TOML"] = lua.create_table_with(
         "parse", &parse_toml,
-        "encode", &encode_toml
+        "encode", &encode_toml,
+        "save_entity_component", &save_entity_component
     );
 
     // Data

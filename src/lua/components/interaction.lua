@@ -15,6 +15,14 @@ lovetoys.initialize({
       globals = true
 })
 
+local lovetoys_create = Component.create
+function Component.create(name, fields, defaults)
+   local result = lovetoys_create(name, fields, defaults)
+   result.__defaults = defaults or {}
+
+   return result
+end
+
 M.seconds_since_last_interaction = 0 -- Time tracked by dt, since last interaction
 M.seconds_before_next_interaction = 0.3 -- A constant that represents how long to wait between interactions
 

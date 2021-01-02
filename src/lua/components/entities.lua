@@ -33,7 +33,9 @@ local function load_prefab(prefab_name_or_conf, base_data)
       prefab_data = load_prefab(prefab_data.prefab, prefab_data)
    end
 
+   local new_metatable = util.deep_merge(getmetatable(base_data), getmetatable(prefab_data))
    base_data = util.deep_merge(prefab_data, base_data)
+   setmetatable(base_data, new_metatable)
 
    -- Clear the components requested by removed_components
    if removed_components then
@@ -140,7 +142,6 @@ function M.instantiate_entity(entity_name, entity, parent)
             error("Unknown component: " .. tostring(comp_name) .. " on " .. tostring(entity_name))
          end
       end
-
       ::continue::
    end
 
@@ -158,7 +159,39 @@ function M.instantiate_entity(entity_name, entity, parent)
 
    new_ent:add(NameComponent(entity_name))
 
+   if getmetatable(entity) then
+      new_ent.__toml_location = getmetatable(entity)["toml_location"]
+   end
+
    return new_ent
+end
+
+function M.show_editor(comp_name, comp, ent)
+   local component_processors = {
+      shared_components,
+      collider_components,
+      -- player_components,
+      -- interaction_components,
+      -- sound_components,
+      -- passage,
+      -- note_components,
+      -- first_puzzle,
+      -- walkway,
+   }
+
+   ImGui.Separator()
+
+   local processed = false
+   for _, processor in pairs(component_processors) do
+      if processor.show_editor(comp_name, comp, ent) then
+         processed = true
+         break
+      end
+   end
+
+   if not processed then
+      ImGui.Text("No editor for component " .. comp_name)
+   end
 end
 
 return M
