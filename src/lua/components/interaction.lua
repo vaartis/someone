@@ -553,4 +553,6 @@ function M.clear_event_store()
    M.event_store:clear()
 end
 
+M.system_run_priority = 3
+
 return M

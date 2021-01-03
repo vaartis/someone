@@ -259,4 +259,6 @@ function M.show_editor(comp_name, comp, ent)
    end
 end
 
+M.system_run_priority = 0
+
 return M

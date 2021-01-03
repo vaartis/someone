@@ -146,4 +146,9 @@ function M.show_editor(comp_name, comp, ent)
    end
 end
 
+-- It is important for the collider system to run _after_ the animation system,
+-- but _before_ the interaction system, so that the collider can be updated for
+-- sprite changes as soon as possible
+M.system_run_priority = 1
+
 return M

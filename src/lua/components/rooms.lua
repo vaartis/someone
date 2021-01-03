@@ -1,20 +1,10 @@
 local lume = require("lume")
 local util = require("util")
 
-local shared_components = require("components.shared")
-local player_components = require("components.player")
 local interaction_components = require("components.interaction")
 local collider_components = require("components.collider")
-local debug_components = require("components.debug")
-local sound_components = require("components.sound")
-local note_components = require("components.note")
 local assets = require("components.assets")
 local entities = require("components.entities")
-local look_closer = require("components.look_closer")
-
-local first_puzzle = require("components.first_puzzle")
-local dial_puzzle = require("components.dial_puzzle")
-local walkway = require("components.walkway")
 
 local M = {}
 
@@ -103,24 +93,11 @@ function M.reset_engine()
 
    M.engine = CustomEngine()
 
-   local modules = {
-      shared_components,
-      -- It is important for the collider system to run _after_ the animation system,
-      -- but _before_ the interaction system, so that the collider can be updated for
-      -- sprite changes as soon as possible
-      collider_components,
-      player_components,
-      interaction_components,
-      sound_components,
-      note_components,
-      first_puzzle,
-      dial_puzzle,
-      debug_components,
-      walkway,
-      look_closer
-   }
-
-   for _, module in pairs(modules) do module.add_systems(M.engine) end
+   for _, module in pairs(entities.all_components) do
+      if module.add_systems then
+         module.add_systems(M.engine)
+      end
+   end
 end
 
 local function load_assets()

@@ -18,7 +18,6 @@ local function draw()
    rooms.engine:draw()
 end
 
-
 local function draw_overlay()
    rooms.engine:draw("overlay")
 end

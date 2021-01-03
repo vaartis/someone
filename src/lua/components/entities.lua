@@ -1,16 +1,41 @@
 local util = require("util")
+local lume = require("lume")
 
 local shared_components = require("components.shared")
-local player_components = require("components.player")
 local collider_components = require("components.collider")
-local note_components = require("components.note")
-local interaction_components
-local sound_components = require("components.sound")
 
-local first_puzzle = require("components.first_puzzle")
-local dial_puzzle = require("components.dial_puzzle")
-local walkway = require("components.walkway")
-local passage = require("components.passage")
+local M = {}
+
+-- Load all components modules and save them
+M.all_components = {}
+do
+   local loaded_rockspec = {}
+   local chunk, err = loadfile(
+      "resources/lua/lib/luarocks/rocks-5.3/someone/0.1-0/someone-0.1-0.rockspec",
+      "t",
+      loaded_rockspec
+   )
+   if err then error(err) end
+   chunk()
+
+   local excluded_components = {"assets", "entities", "rooms"}
+   for name, _ in pairs(loaded_rockspec.build.install.lua) do
+      local maybe_matched = name:match("^components%.(.*)")
+      if maybe_matched and not lume.find(excluded_components, maybe_matched) then
+         local required = require(name)
+         setmetatable(required, {__module_name = name})
+         table.insert(M.all_components, required)
+      end
+   end
+
+   table.sort(
+      M.all_components,
+      function(a, b)
+         return (a.system_run_priority or math.huge) < (b.system_run_priority or math.huge)
+      end
+   )
+end
+
 
 local function load_prefab(prefab_name_or_conf, base_data)
    local prefab_name, removed_components
@@ -33,7 +58,13 @@ local function load_prefab(prefab_name_or_conf, base_data)
       prefab_data = load_prefab(prefab_data.prefab, prefab_data)
    end
 
-   local new_metatable = util.deep_merge(getmetatable(base_data), getmetatable(prefab_data))
+   local new_metatable
+   if getmetatable(base_data) then
+      new_metatable = util.deep_merge(getmetatable(base_data), getmetatable(prefab_data))
+   else
+      new_metatable = getmetatable(prefab_data)
+   end
+
    base_data = util.deep_merge(prefab_data, base_data)
    setmetatable(base_data, new_metatable)
 
@@ -62,16 +93,9 @@ local function make_tag(name)
    return tag_classes[name]
 end
 
-local M = {}
-
 local NameComponent = Component.create("Name", {"name"})
 
 function M.instantiate_entity(entity_name, entity, parent)
-   -- Has to be required from here to avoid recursive dependency
-   if not interaction_components then
-      interaction_components = require("components.interaction")
-   end
-
    local new_ent = Entity(parent)
 
    if entity.prefab then entity = load_prefab(entity.prefab, entity) end
@@ -121,19 +145,9 @@ function M.instantiate_entity(entity_name, entity, parent)
       elseif comp_name == "children" then
          goto continue
       else
-         local component_processors = {
-            shared_components,
-            player_components,
-            interaction_components,
-            sound_components,
-            passage,
-            note_components,
-            first_puzzle,
-            walkway,
-         }
          local processed = false
-         for _, processor in pairs(component_processors) do
-            if processor.process_components(new_ent, comp_name, comp, entity_name) then
+         for _, processor in pairs(M.all_components) do
+            if processor.process_components and processor.process_components(new_ent, comp_name, comp, entity_name) then
                processed = true
                break
             end
@@ -167,23 +181,11 @@ function M.instantiate_entity(entity_name, entity, parent)
 end
 
 function M.show_editor(comp_name, comp, ent)
-   local component_processors = {
-      shared_components,
-      collider_components,
-      -- player_components,
-      -- interaction_components,
-      -- sound_components,
-      -- passage,
-      -- note_components,
-      -- first_puzzle,
-      -- walkway,
-   }
-
    ImGui.Separator()
 
    local processed = false
-   for _, processor in pairs(component_processors) do
-      if processor.show_editor(comp_name, comp, ent) then
+   for _, processor in pairs(M.all_components) do
+      if processor.show_editor and processor.show_editor(comp_name, comp, ent) then
          processed = true
          break
       end
