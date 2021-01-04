@@ -147,7 +147,9 @@ function M.instantiate_entity(entity_name, entity, parent)
       else
          local processed = false
          for _, processor in pairs(M.all_components) do
-            if processor.process_components and processor.process_components(new_ent, comp_name, comp, entity_name) then
+            if processor.components and processor.components[comp_name] then
+               processor.components[comp_name].process_component(new_ent, comp, entity_name)
+
                processed = true
                break
             end

@@ -432,45 +432,45 @@ function M.process_interaction(comp, field, context)
    return try_get_fnc_from_module(got_field, "interaction_callbacks", context)
 end
 
-function M.process_components(new_ent, comp_name, comp, entity_name)
-   if comp_name == "interaction" then
-      local interaction_callback = M.process_interaction(
+M.components = { interaction = { } }
+
+function M.components.interaction.process_component(new_ent, comp, entity_name)
+   local comp_name = "interaction"
+
+   local interaction_callback = M.process_interaction(
+      comp,
+      "callback",
+      { entity_name = entity_name, comp_name = comp_name, needed_for = "interaction", entity = new_ent }
+   )
+
+   local activatable_callback
+   if comp.activatable_callback then
+      activatable_callback = M.process_activatable(
          comp,
-         "callback",
-         { entity_name = entity_name, comp_name = comp_name, needed_for = "interaction", entity = new_ent }
+         "activatable_callback",
+         { entity_name = entity_name, comp_name = comp_name, needed_for =  "activatable", entity = new_ent }
       )
-
-      local activatable_callback
-      if comp.activatable_callback then
-         activatable_callback = M.process_activatable(
-            comp,
-            "activatable_callback",
-            { entity_name = entity_name, comp_name = comp_name, needed_for =  "activatable", entity = new_ent }
-         )
-      end
-
-      local interaction_sound
-      if comp.interaction_sound_asset then
-         interaction_sound = Sound.new()
-         interaction_sound.buffer = assets.assets.sounds[comp.interaction_sound_asset]
-      end
-
-      new_ent:add(
-         InteractionComponent(
-            interaction_callback,
-            activatable_callback,
-
-            comp.initial_state,
-            comp.state_map,
-            interaction_sound,
-            comp.action_text,
-
-            comp.touch_activated
-         )
-      )
-
-      return true
    end
+
+   local interaction_sound
+   if comp.interaction_sound_asset then
+      interaction_sound = Sound.new()
+      interaction_sound.buffer = assets.assets.sounds[comp.interaction_sound_asset]
+   end
+
+   new_ent:add(
+      InteractionComponent(
+         interaction_callback,
+         activatable_callback,
+
+         comp.initial_state,
+         comp.state_map,
+         interaction_sound,
+         comp.action_text,
+
+         comp.touch_activated
+      )
+   )
 end
 
 function M.disable_player(engine)

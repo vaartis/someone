@@ -15,14 +15,10 @@ function RotationSystem:update(dt)
    end
 end
 
-function M.process_components(new_ent, comp_name, comp, entity_name)
-   if comp_name == "rotation" then
-      new_ent:add(
-         RotationComponent(comp.rotation_speed)
-      )
+M.components = { rotation = {} }
 
-      return true
-   end
+function M.components.rotation.process_component(new_ent, comp, entity_name)
+   new_ent:add(RotationComponent(comp.rotation_speed))
 end
 
 function M.add_systems(engine)

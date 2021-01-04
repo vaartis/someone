@@ -79,17 +79,15 @@ end
 
 local M = {}
 
-function M.process_components(new_ent, comp_name, comp, entity_name)
-   if comp_name == "note" then
-      local note_text = Text.new("", StaticFonts.main_font, StaticFonts.font_size)
-      note_text.fill_color = Color.Black
-      local bottom_text = Text.new("", StaticFonts.main_font, StaticFonts.font_size)
-      bottom_text.fill_color = Color.Black
+M.components = { note = { } }
 
-      new_ent:add(NoteComponent(comp.text, comp.bottom_text, note_text, bottom_text))
+function M.components.note.process_component(new_ent, comp, entity_name)
+   local note_text = Text.new("", StaticFonts.main_font, StaticFonts.font_size)
+   note_text.fill_color = Color.Black
+   local bottom_text = Text.new("", StaticFonts.main_font, StaticFonts.font_size)
+   bottom_text.fill_color = Color.Black
 
-      return true
-   end
+   new_ent:add(NoteComponent(comp.text, comp.bottom_text, note_text, bottom_text))
 end
 
 function M.add_systems(engine)

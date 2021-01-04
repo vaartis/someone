@@ -14,12 +14,10 @@ end
 
 local M = {}
 
-function M.process_components(new_ent, comp_name, comp)
-   if comp_name == "first_puzzle_button" then
-      new_ent:add(FirstPuzzleButtonComponent(comp.n))
+M.components = { first_puzzle_button = {} }
 
-      return true
-   end
+function M.components.first_puzzle_button.process_component(new_ent, comp, entity_name)
+   new_ent:add(FirstPuzzleButtonComponent(comp.n))
 end
 
 function M.add_systems(engine)

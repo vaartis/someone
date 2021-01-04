@@ -185,56 +185,60 @@ function M.load_sheet_data(dir_path)
    return animation_frames, slices
 end
 
-function M.process_components(new_ent, comp_name, comp, entity_name)
-   if comp_name == "drawable" then
-      if not (comp.z) then
-         error(lume.format("{1}.{2} requires a {3} value", {entity_name, comp_name, "z"}))
-      end
+M.components = {
+   drawable = {},
+   animation = {},
+   slices = {}
+}
 
-      local drawable
-      if comp.kind == "sprite" then
-         local texture_asset = assets.assets.textures[comp.texture_asset]
-         if not texture_asset then
-            error(lume.format("{1}.{2} requires a texture named {3}", {entity_name, comp_name, comp.texture_asset}))
-         end
+function M.components.drawable.process_component(new_ent, comp, entity_name)
+   local comp_name = "drawable"
 
-         drawable = Sprite.new()
-         drawable.texture = texture_asset
-      elseif comp.kind == "text" then
-         drawable = Text.new(comp.text.text, StaticFonts.main_font, comp.text.font_size or StaticFonts.font_size)
-      else
-         error("Unknown kind of drawable in " .. tostring(entity_name) .. "." .. tostring(comp_name))
-      end
-
-      local enabled = interaction_components.process_activatable(
-         comp,
-         "enabled",
-         { entity_name = entity_name, comp_name = comp_name, needed_for = "enabled" }
-      )
-
-      new_ent:add(
-         DrawableComponent(drawable, comp.z, comp.kind, enabled, comp.layer)
-      )
-      new_ent:add(M.TransformableComponent(drawable))
-
-      return true
-   elseif comp_name == "animation" then
-      local sheet_frames = M.load_sheet_data(comp.sheet)
-
-      local anim = AnimationComponent(sheet_frames)
-      if type(comp.playable) == "boolean" then anim.playable = comp.playable end
-      if type(comp.playing) == "boolean" then anim.playing = comp.playing end
-      anim.current_frame = comp.starting_frame or 1
-
-      new_ent:add(anim)
-
-      return true
-   elseif comp_name == "slices" then
-      local _, slices = M.load_sheet_data(comp.sheet)
-      new_ent:add(SlicesComponent(slices))
-
-      return true
+   if not (comp.z) then
+      error(lume.format("{1}.{2} requires a {3} value", {entity_name, comp_name, "z"}))
    end
+
+   local drawable
+   if comp.kind == "sprite" then
+      local texture_asset = assets.assets.textures[comp.texture_asset]
+      if not texture_asset then
+         error(lume.format("{1}.{2} requires a texture named {3}", {entity_name, comp_name, comp.texture_asset}))
+      end
+
+      drawable = Sprite.new()
+      drawable.texture = texture_asset
+   elseif comp.kind == "text" then
+      drawable = Text.new(comp.text.text, StaticFonts.main_font, comp.text.font_size or StaticFonts.font_size)
+   else
+      error("Unknown kind of drawable in " .. tostring(entity_name) .. "." .. tostring(comp_name))
+   end
+
+   local enabled = interaction_components.process_activatable(
+      comp,
+      "enabled",
+      { entity_name = entity_name, comp_name = comp_name, needed_for = "enabled" }
+   )
+
+   new_ent:add(
+      DrawableComponent(drawable, comp.z, comp.kind, enabled, comp.layer)
+   )
+   new_ent:add(M.TransformableComponent(drawable))
+end
+
+function M.components.animation.process_component(new_ent, comp, entity_name)
+   local sheet_frames = M.load_sheet_data(comp.sheet)
+
+   local anim = AnimationComponent(sheet_frames)
+   if type(comp.playable) == "boolean" then anim.playable = comp.playable end
+   if type(comp.playing) == "boolean" then anim.playing = comp.playing end
+   anim.current_frame = comp.starting_frame or 1
+
+   new_ent:add(anim)
+end
+
+function M.components.slices.process_component(new_ent, comp, entity_name)
+   local _, slices = M.load_sheet_data(comp.sheet)
+   new_ent:add(SlicesComponent(slices))
 end
 
 function M.add_systems(engine)

@@ -69,20 +69,20 @@ end
 
 local M = {}
 
-function M.process_components(new_ent, comp_name, comp)
-   if comp_name == "player_movement" then
-      local sound_buf_asset = assets.assets.sounds[comp.footstep_sound_asset]
-      if not sound_buf_asset then
-         error(lume.format("{1}.{2} requires a sound named {3}", {entity_name, comp_name, comp.footstep_sound_asset}))
-      end
+M.components = { player_movement = {} }
 
-      local sound = Sound.new()
-      sound.buffer = assets.assets.sounds[comp.footstep_sound_asset]
+function M.components.player_movement.process_component(new_ent, comp, entity_name)
+   local comp_name = "player_movement"
 
-      new_ent:add(PlayerMovementComponent(sound))
-
-      return true
+   local sound_buf_asset = assets.assets.sounds[comp.footstep_sound_asset]
+   if not sound_buf_asset then
+      error(lume.format("{1}.{2} requires a sound named {3}", {entity_name, comp_name, comp.footstep_sound_asset}))
    end
+
+   local sound = Sound.new()
+   sound.buffer = assets.assets.sounds[comp.footstep_sound_asset]
+
+   new_ent:add(PlayerMovementComponent(sound))
 end
 
 function M.add_systems(engine)

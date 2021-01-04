@@ -8,12 +8,10 @@ local PassageComponent = Component.create("Passage", {"to", "from", "player_y"})
 
 M = {}
 
-function M.process_components(new_ent, comp_name, comp, entity_name)
-   if comp_name == "passage" then
-      new_ent:add(PassageComponent(comp.to, comp.from, comp.player_y))
+M.components = { passage = {} }
 
-      return true
-   end
+function M.components.passage.process_component(new_ent, comp, entity_name)
+   new_ent:add(PassageComponent(comp.to, comp.from, comp.player_y))
 end
 
 M.interaction_callbacks = {}

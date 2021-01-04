@@ -28,31 +28,31 @@ end
 
 local M = {}
 
-function M.process_components(new_ent, comp_name, comp, entity_name)
-   if comp_name == "sound_player" then
-      if not interaction_components then
-         interaction_components = require("components.interaction")
-      end
+M.components = { sound_player = {} }
 
-      local callback
-      if comp.activatable_callback then
-         callback = interaction_components.process_activatable(
-            comp,
-            "activatable_callback",
-            { entity_name = entity_name, comp_name = comp_name, needed_for = "activatable" }
-         )
-      end
+function M.components.sound_player.process_component(new_ent, comp, entity_name)
+   local comp_name = "sound_player"
 
-      local sound = Sound.new()
-      sound.buffer = assets.assets.sounds[comp.sound_asset]
-      if comp.volume then sound.volume = comp.volume end
-      if comp.loop then sound.loop = comp.loop end
-      if comp.position then sound.position = Vector3f.new(comp.position[1], comp.position[2], comp.position[3]) end
-
-      new_ent:add(SoundPlayerComponent(sound, callback))
-
-      return true
+   if not interaction_components then
+      interaction_components = require("components.interaction")
    end
+
+   local callback
+   if comp.activatable_callback then
+      callback = interaction_components.process_activatable(
+         comp,
+         "activatable_callback",
+         { entity_name = entity_name, comp_name = comp_name, needed_for = "activatable" }
+      )
+   end
+
+   local sound = Sound.new()
+   sound.buffer = assets.assets.sounds[comp.sound_asset]
+   if comp.volume then sound.volume = comp.volume end
+   if comp.loop then sound.loop = comp.loop end
+   if comp.position then sound.position = Vector3f.new(comp.position[1], comp.position[2], comp.position[3]) end
+
+   new_ent:add(SoundPlayerComponent(sound, callback))
 end
 
 function M.add_systems(engine)
