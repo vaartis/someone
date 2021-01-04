@@ -8,42 +8,14 @@ local entities = require("components.entities")
 
 local M = {}
 
-function M.to_full_room_file(name)
-   local without_extension = "resources/rooms/" .. name
-
-   local lua_path = without_extension .. ".lua"
-   local file = io.open(lua_path, "r")
-   if file then
-      file:close()
-      return lua_path, "lua"
-   end
-
-   local toml_path = without_extension .. ".toml"
-   file = io.open(toml_path, "r")
-   if file then
-      file:close()
-      return toml_path, "toml"
-   end
-end
-
 -- Loads the room's toml file, processing parent relationships
 local function load_room_file(name)
-   local path, file_type = M.to_full_room_file(name)
+   local path = "resources/rooms/" .. name .. ".toml"
 
-   local room_table
-
-   local file = io.open(path, "r")
-   if file_type == "lua" then
-      local contents = file:read("*all")
-
-      local loaded, err = load(contents, path)
-      if err then error(err) end
-      room_table = loaded()
-   else
-      room_table = TOML.parse(path)
+   local room_table, err = TOML.parse(path)
+   if not room_table then
+      error(err)
    end
-
-   file:close()
 
    -- If there's a prefab/base room, load it
    if room_table.prefab then
@@ -60,7 +32,10 @@ local function load_room_file(name)
             end
          end
 
+         local base_meta, prefab_meta = getmetatable(room_table), getmetatable(prefab_room)
          room_table = util.deep_merge(prefab_room, room_table)
+
+         setmetatable(room_table, util.deep_merge(prefab_meta, base_meta))
       end
       -- Remove the mention of the prefab
       room_table.prefab = nil

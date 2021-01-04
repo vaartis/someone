@@ -60,7 +60,7 @@ local function load_prefab(prefab_name_or_conf, base_data)
 
    local new_metatable
    if getmetatable(base_data) then
-      new_metatable = util.deep_merge(getmetatable(base_data), getmetatable(prefab_data))
+      new_metatable = util.deep_merge(getmetatable(prefab_data), getmetatable(base_data))
    else
       new_metatable = getmetatable(prefab_data)
    end

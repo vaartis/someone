@@ -1,0 +1,33 @@
+[prefab]
+name = "day2/computer_room"
+
+[entities.table.interaction]
+activatable_callback = { module = "components.interaction", name = "state_variable_equal", args = [ ["dial_puzzle", "solved"], true ] }
+callback = { module = "components.interaction", name = "computer_switch_to_terminal" }
+
+[entities.lamp_placement]
+collider = { mode = "constant", size = [50, 50], trigger = true }
+transformable = { position = [350, 750] }
+
+[entities.lamp_placement.interaction]
+callback = { module = "components.interaction", name = "state_variable_set", args = [ ["first_puzzle_lamp", "put"], true ] }
+action_text = "put the lamp down"
+
+[[entities.lamp_placement.interaction.activatable_callback.and]]
+module = "components.interaction"
+name = "state_variable_equal"
+args = [ ["first_puzzle_lamp", "taken"], true ]
+
+[[entities.lamp_placement.interaction.activatable_callback.and]]
+module = "components.interaction"
+name = "state_variable_equal"
+args = [ ["first_puzzle_lamp", "put"], false ]
+
+[entities.lamp.drawable]
+enabled = { module = "components.interaction", name = "state_variable_equal", args = [ ["first_puzzle_lamp", "put"], true ] }
+kind = "sprite"
+texture_asset = "table_lamp"
+z = 2
+
+[entities.lamp]
+transformable = { position = [230, 750], scale = [-1, 1] }

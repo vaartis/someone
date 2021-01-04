@@ -103,7 +103,7 @@ std::tuple<sol::object, sol::table> convert_to_lua(
 
 }
 
-sol::table parse_toml(sol::this_state lua_, const std::string &path) {
+std::tuple<sol::object, sol::object> parse_toml(sol::this_state lua_, const std::string &path) {
     sol::state_view lua(lua_);
 
     auto result = lua.create_table();
@@ -121,9 +121,12 @@ sol::table parse_toml(sol::this_state lua_, const std::string &path) {
             val.as<sol::table>()[sol::create_if_nil][sol::metatable_key]["toml_location"] = src;
         }
 
-        return val;
+        return {val, sol::lua_nil};
     } catch (const toml::parse_error &err) {
-        return sol::make_object(lua, std::make_tuple(sol::lua_nil, err.description()));
+        std::stringstream ss;
+        ss << err;
+
+        return {sol::lua_nil, sol::make_object(lua, ss.str())};
     }
 }
 

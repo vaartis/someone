@@ -32,7 +32,7 @@ function M.interaction_callbacks.switch_room(_current_state, ent)
          "{1}/{2}", { rooms.current_namespace, passage_comp.to }
       )
 
-      local exists = rooms.to_full_room_file(in_current_namespace)
+      local exists = "resources/rooms/" .. in_current_namespace .. ".toml"
       if exists then
          -- A version of the room in the current namespace exists, load that version
          final_room_name = in_current_namespace
@@ -56,7 +56,7 @@ function M.interaction_callbacks.switch_room(_current_state, ent)
                { without_number, number, passage_comp.to }
             )
 
-            local exists = rooms.to_full_room_file(name_to_use)
+            local exists = "resources/rooms/" .. name_to_use .. ".toml"
             if exists then
                return name_to_use
             elseif number == 0 then
