@@ -180,25 +180,4 @@ function M.instantiate_entity(entity_name, entity, parent)
    return new_ent
 end
 
-function M.show_editor(comp, ent)
-   ImGui.Separator()
-
-   local processed = false
-   for _, processor in pairs(M.all_components) do
-      if processor.components then
-         for _, processor_comp in pairs(processor.components) do
-            if processor_comp.class and processor_comp.show_editor and processor_comp.class == comp.class then
-               processor_comp.show_editor(comp, ent)
-               processed = true
-               break
-            end
-         end
-      end
-   end
-
-   if not processed then
-      ImGui.Text("No editor for component " .. comp.class.name)
-   end
-end
-
 return M

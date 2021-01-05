@@ -100,7 +100,13 @@ function M.debug_menu()
       table.sort(sorted_comps, function (a, b) return a.name < b.name end)
 
       for _, comp in ipairs(sorted_comps) do
-         util.entities_mod().show_editor(comp.name, comp.comp, debug_menu_state.selected)
+         ImGui.Separator()
+
+         if comp.comp.show_editor then
+            comp.comp:show_editor(debug_menu_state.selected)
+         else
+            ImGui.Text("No editor for component " .. comp.name)
+         end
       end
    end
 end

@@ -112,14 +112,14 @@ function M.components.collider.show_editor(comp, ent)
 
    local physics_world = M.physics_world
 
-   if ImGui.BeginCombo("Mode", comp.mode) then
+   if ImGui.BeginCombo("Mode", self.mode) then
       if ent:get("Drawable") then
-         if ImGui.Selectable("sprite", comp.mode == "sprite") then
-            comp.mode = "sprite"
+         if ImGui.Selectable("sprite", self.mode == "sprite") then
+            self.mode = "sprite"
          end
       end
-      if ImGui.Selectable("constant", comp.mode == "constant") then
-         comp.mode = "constant"
+      if ImGui.Selectable("constant", elf.mode == "constant") then
+         self.mode = "constant"
       end
 
       ImGui.EndCombo()
@@ -128,19 +128,19 @@ function M.components.collider.show_editor(comp, ent)
    local x, y, w, h = physics_world:getRect(ent)
    x, y = table.unpack(ImGui.InputInt2("XY", {x, y}))
    w, h = table.unpack(ImGui.InputInt2("WH", {w, h}))
-   comp.trigger = ImGui.Checkbox("Trigger", comp.trigger)
+   self.trigger = ImGui.Checkbox("Trigger", self.trigger)
 
-   if comp.mode == "constant" then
+   if self.mode == "constant" then
       ent:get("Transformable").transformable.position =
          Vector2f.new(x, y)
    end
    if ImGui.Button("Save") then
-      TOML.save_entity_component(ent, "transformable", comp, { position = { x, y } })
+      TOML.save_entity_component(ent, "transformable", self, { position = { x, y } })
 
-      if comp.mode == "constant" then
-         TOML.save_entity_component(ent, "collider", comp, { size = { w, h } })
+      if self.mode == "constant" then
+         TOML.save_entity_component(ent, "collider", self, { size = { w, h } })
       end
-      TOML.save_entity_component(ent, "collider", comp, { trigger = comp.trigger, mode = comp.mode })
+      TOML.save_entity_component(ent, "collider", self, { trigger = self.trigger, mode = self.mode })
    end
 
    physics_world:update(ent, x, y, w, h)

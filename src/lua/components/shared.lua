@@ -251,17 +251,17 @@ function M.add_systems(engine)
    engine:addSystem(AnimationSystem())
 end
 
-function M.components.transformable.show_editor(comp, ent)
+function M.components.transformable.class:show_editor(ent)
    ImGui.Text("Transformable")
 
-   local tf = comp.transformable
+   local tf = self.transformable
    ImGui.Text(lume.format("X = {1}, Y = {2}", {tf.position.x, tf.position.y}))
 end
 
-function M.components.name.show_editor(comp, ent)
+function M.components.name.class:show_editor(ent)
    ImGui.Text("Name" .. " =")
    ImGui.SameLine()
-   ImGui.Text(comp.name)
+   ImGui.Text(self.name)
 end
 
 M.system_run_priority = 0
