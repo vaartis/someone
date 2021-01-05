@@ -4,6 +4,8 @@ local util = require("util")
 local coroutines = require("coroutines")
 local rooms
 
+local collider_components = require("components.collider")
+
 local M = {}
 
 M.components = {
@@ -110,7 +112,7 @@ function M.interaction_callbacks.switch_room(_current_state, ent)
          end
 
          local player = rooms.find_player()
-         local physics_world = player:get("Collider").physics_world
+         local physics_world = collider_components.physics_world
 
          local _, _, player_w, player_h = physics_world:getRect(player)
          local x, y = physics_world:getRect(found_passage)

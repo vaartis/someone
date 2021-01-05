@@ -3,6 +3,7 @@ local path = require("path")
 
 local assets = require("components.assets")
 local shared = require("components.shared")
+local collider_components = require("components.collider")
 
 local x_movement_speed = 4.0
 
@@ -28,7 +29,7 @@ PlayerMovementSystem.update = function(self, dt)
          local tf = entity:get("Transformable")
          local drawable = entity:get("Drawable")
          local animation = entity:get("Animation")
-         local physics_world = entity:get("Collider").physics_world
+         local physics_world = collider_components.physics_world
 
          local pos_diff, look_direction
          if Keyboard.is_key_pressed(KeyboardKey.D) then

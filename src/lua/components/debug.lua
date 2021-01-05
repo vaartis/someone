@@ -5,7 +5,7 @@ local DebugColliderDrawingSystem = class("DebugColliderDrawingSystem", System)
 function DebugColliderDrawingSystem:requires() return { "Collider" } end
 function DebugColliderDrawingSystem:draw()
    for _, entity in pairs(self.targets) do
-      local physics_world = entity:get("Collider").physics_world
+      local physics_world = collider_components.physics_world
 
       local x, y, w, h = physics_world:getRect(entity)
       local shape = RectangleShape.new(Vector2f.new(w, h))

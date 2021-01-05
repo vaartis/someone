@@ -9,7 +9,7 @@ end
 
 M.components = {
    collider = {
-      class = Component.create("Collider", { "physics_world", "mode", "trigger"}, { trigger = false })
+      class = Component.create("Collider", { "mode", "trigger"}, { trigger = false })
    }
 }
 
@@ -30,7 +30,7 @@ function M.ColliderUpdateSystem.update_from_sprite(entity)
    local tfc = entity:get("Transformable")
    local tf = tfc.transformable
 
-   local physics_world = entity:get("Collider").physics_world
+   local physics_world = M.physics_world
 
    if physics_world:hasItem(entity) then
       -- If the item is already in the world, sychronize the position from the
@@ -88,7 +88,7 @@ function M.process_collider_component(new_ent, comp, entity_name)
       end
 
       -- Add the collider component and update the collider from the sprite, also adding it to the physics world
-      new_ent:add(M.components.collider.class(M.physics_world, comp.mode, comp.trigger))
+      new_ent:add(M.components.collider.class(comp.mode, comp.trigger))
       M.ColliderUpdateSystem.update_from_sprite(new_ent)
    elseif comp.mode == "constant" then
       if not (comp.size) then
@@ -97,7 +97,7 @@ function M.process_collider_component(new_ent, comp, entity_name)
       local ph_width, ph_height = comp.size[1], comp.size[2]
 
       M.physics_world:add(new_ent, pos.x, pos.y, ph_width, ph_height)
-      new_ent:add(M.components.collider.class(M.physics_world, comp.mode, comp.trigger))
+      new_ent:add(M.components.collider.class(comp.mode, comp.trigger))
    else
       error("Unknown collider mode " .. tostring(comp.mode) .. " for " .. tostring(entity_name))
    end
@@ -110,7 +110,7 @@ end
 function M.components.collider.show_editor(comp, ent)
    ImGui.Text("Collider")
 
-   local physics_world = comp.physics_world
+   local physics_world = M.physics_world
 
    if ImGui.BeginCombo("Mode", comp.mode) then
       if ent:get("Drawable") then

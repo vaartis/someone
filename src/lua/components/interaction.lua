@@ -21,6 +21,9 @@ function Component.create(name, fields, defaults)
    return result
 end
 
+-- Need to do this afterwards because lovetoys has to initialize first
+local collider_components = require("components.collider")
+
 local M = {}
 
 M.seconds_since_last_interaction = 0 -- Time tracked by dt, since last interaction
@@ -60,7 +63,7 @@ function InteractionSystem:update(dt)
    local interactables_touched = {}
    for _, obj in pairs(self.targets.objects) do
       local interaction_comp = obj:get("Interaction")
-      local physics_world = obj:get("Collider").physics_world
+      local physics_world = collider_components.physics_world
 
       local x, y, w, h = physics_world:getRect(obj)
 
