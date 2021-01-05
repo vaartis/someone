@@ -98,70 +98,57 @@ function M.instantiate_entity(entity_name, entity, parent)
 
    if entity.prefab then entity = load_prefab(entity.prefab, entity) end
 
-   local add_transformable_actions = {}
-   local add_collider_actions = {}
-
+   local entity_components = {}
    for comp_name, comp in pairs(entity) do
-      if comp_name == "transformable" then
-         table.insert(
-            add_transformable_actions,
-            function()
-               if not (new_ent:has("Transformable")) then
-                  -- If there's no transformable component, create and add it
-                  new_ent:add(shared_components.components.transformable.class(Transformable.new()))
-               end
-               local tf_component = new_ent:get("Transformable")
-
-               local transformable = tf_component.transformable
-               if parent then
-                  local parent_tf = parent:get("Transformable").transformable
-                  local relative_position = Vector2f.new(comp.position[1], comp.position[2])
-                  -- Apply the position in relation to the parent position
-                  transformable.position = parent_tf.position + relative_position
-
-                  tf_component.local_position = relative_position
-               else
-                  transformable.position = Vector2f.new(comp.position[1], comp.position[2])
-
-                  tf_component.local_position = Vector2f.new(0, 0)
-               end
-
-               if comp.origin then transformable.origin = Vector2f.new(comp.origin[1], comp.origin[2]) end
-               if comp.scale then transformable.scale = Vector2f.new(comp.scale[1], comp.scale[2]) end
-            end
-         )
-      elseif comp_name == "collider" then
-         table.insert(
-            add_collider_actions,
-            function() collider_components.process_collider_component(new_ent, comp, entity_name) end
-         )
-      elseif comp_name == "tags" then
-         for _, tag in pairs(comp) do
-            -- Add a tag component for each tag
-            new_ent:add(make_tag(tag)())
-         end
-      elseif comp_name == "children" then
-         goto continue
-      else
-         local processed = false
-         for _, processor in pairs(M.all_components) do
-            if processor.components and processor.components[comp_name] then
-               processor.components[comp_name].process_component(new_ent, comp, entity_name)
-
-               processed = true
+      -- Find a processor in the modules
+      local comp_processor
+      for _, processor in pairs(M.all_components) do
+         if processor.components then
+            if processor.components[comp_name] then
+               comp_processor = processor.components[comp_name]
                break
             end
          end
-         if not processed then
+      end
+      if not comp_processor then
+         if comp_name == "tags" then
+            comp_processor = {
+               process_component = function(new_ent, comp, entity_name)
+                  for _, tag in pairs(comp) do
+                     -- Add a tag component for each tag
+                     new_ent:add(make_tag(tag)())
+                  end
+               end
+            }
+         elseif comp_name == "children" then
+            comp_processor = {
+               -- Do nothing
+               process_component = function() end
+            }
+         else
             error("Unknown component: " .. tostring(comp_name) .. " on " .. tostring(entity_name))
          end
       end
-      ::continue::
-   end
 
-   -- Call all the "after all inserted" actions
-   for _, actions in ipairs({add_transformable_actions, add_collider_actions}) do
-      for _, action in pairs(actions) do action() end
+      table.insert(entity_components, { name = comp_name, comp = comp, processor = comp_processor })
+   end
+   -- Sort components by processing priority
+   table.sort(
+      entity_components,
+      function(a, b)
+         return (a.processor.processing_priority or 0) < (b.processor.processing_priority or 0)
+      end
+   )
+
+   for _, comp_data in ipairs(entity_components) do
+      local comp_name, comp, processor = comp_data.name, comp_data.comp, comp_data.processor
+
+      if comp_name == "transformable" then
+         -- Pass parent to transformable processing
+         processor.process_component(new_ent, comp, entity_name, parent)
+      else
+         processor.process_component(new_ent, comp, entity_name)
+      end
    end
 
    util.rooms_mod().engine:addEntity(new_ent)

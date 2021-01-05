@@ -9,7 +9,8 @@ end
 
 M.components = {
    collider = {
-      class = Component.create("Collider", { "mode", "trigger"}, { trigger = false })
+      class = Component.create("Collider", { "mode", "trigger"}, { trigger = false }),
+      processing_priority = 1001
    }
 }
 
@@ -75,7 +76,7 @@ function M.ColliderUpdateSystem.update_from_sprite(entity)
    end
 end
 
-function M.process_collider_component(new_ent, comp, entity_name)
+function M.components.collider.process_component(new_ent, comp, entity_name)
    if not (new_ent:has("Transformable")) then
       error("Transformable is required for a collider on " .. tostring(entity_name))
    end

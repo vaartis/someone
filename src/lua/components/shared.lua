@@ -24,7 +24,9 @@ M.components = {
       class = Component.create("Slices", {"slices"})
    },
    transformable = {
-      class = Component.create("Transformable", {"transformable", "local_position"})
+      class = Component.create("Transformable", {"transformable", "local_position"}),
+      -- Put the priority high so it's last (but before collider)
+      processing_priority = 1000
    },
    name = {
       class = Component.create("Name", {"name"})
@@ -194,6 +196,31 @@ function M.load_sheet_data(dir_path)
    end
 
    return animation_frames, slices
+end
+
+function M.components.transformable.process_component(new_ent, comp, entity_name, parent)
+   if not (new_ent:has("Transformable")) then
+      -- If there's no transformable component, create and add it
+      new_ent:add(M.components.transformable.class(Transformable.new()))
+   end
+   local tf_component = new_ent:get("Transformable")
+
+   local transformable = tf_component.transformable
+   if parent then
+      local parent_tf = parent:get("Transformable").transformable
+      local relative_position = Vector2f.new(comp.position[1], comp.position[2])
+      -- Apply the position in relation to the parent position
+      transformable.position = parent_tf.position + relative_position
+
+      tf_component.local_position = relative_position
+   else
+      transformable.position = Vector2f.new(comp.position[1], comp.position[2])
+
+      tf_component.local_position = Vector2f.new(0, 0)
+   end
+
+   if comp.origin then transformable.origin = Vector2f.new(comp.origin[1], comp.origin[2]) end
+   if comp.scale then transformable.scale = Vector2f.new(comp.scale[1], comp.scale[2]) end
 end
 
 function M.components.drawable.process_component(new_ent, comp, entity_name)
