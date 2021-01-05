@@ -3,7 +3,13 @@ local lume = require("lume")
 
 local interaction_components
 
-local NoteComponent = Component.create("Note", {"text", "bottom_text", "text_object", "bottom_text_object"})
+local M = {}
+
+M.components = {
+   note = {
+      class = Component.create("Note", {"text", "bottom_text", "text_object", "bottom_text_object"})
+   }
+}
 
 local NoteSystem = class("NoteSystem", System)
 function NoteSystem:requires() return { "Slices", "Note", "Transformable" } end
@@ -77,17 +83,13 @@ function NoteInteractionSystem:update(dt)
    end
 end
 
-local M = {}
-
-M.components = { note = { } }
-
 function M.components.note.process_component(new_ent, comp, entity_name)
    local note_text = Text.new("", StaticFonts.main_font, StaticFonts.font_size)
    note_text.fill_color = Color.Black
    local bottom_text = Text.new("", StaticFonts.main_font, StaticFonts.font_size)
    bottom_text.fill_color = Color.Black
 
-   new_ent:add(NoteComponent(comp.text, comp.bottom_text, note_text, bottom_text))
+   new_ent:add(M.components.note.class(comp.text, comp.bottom_text, note_text, bottom_text))
 end
 
 function M.add_systems(engine)

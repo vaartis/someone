@@ -1,6 +1,12 @@
 local lume = require("lume")
 
-local FirstPuzzleButtonComponent = Component.create("FirstPuzzleButton", {"n"})
+local M = {}
+
+M.components = {
+   first_puzzle_button = {
+      class = Component.create("FirstPuzzleButton", {"n"})
+   }
+}
 
 local FirstPuzzleButtonSystem = class("FirstPuzzleButtonSystem", System)
 function FirstPuzzleButtonSystem:requires() return {"FirstPuzzleButton", "Interaction"} end
@@ -12,12 +18,8 @@ function FirstPuzzleButtonSystem:update()
    end
 end
 
-local M = {}
-
-M.components = { first_puzzle_button = {} }
-
 function M.components.first_puzzle_button.process_component(new_ent, comp, entity_name)
-   new_ent:add(FirstPuzzleButtonComponent(comp.n))
+   new_ent:add(M.components.first_puzzle_button.class(comp.n))
 end
 
 function M.add_systems(engine)

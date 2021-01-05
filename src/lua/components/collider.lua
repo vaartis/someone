@@ -7,7 +7,11 @@ function M.reset_world()
    M.physics_world = bump.newWorld()
 end
 
-local ColliderComponent = Component.create("Collider", { "physics_world", "mode", "trigger"}, { trigger = false })
+M.components = {
+   collider = {
+      class = Component.create("Collider", { "physics_world", "mode", "trigger"}, { trigger = false })
+   }
+}
 
 M.ColliderUpdateSystem = class("ColliderUpdateSystem", System)
 function M.ColliderUpdateSystem:requires() return { "Collider" } end
@@ -84,7 +88,7 @@ function M.process_collider_component(new_ent, comp, entity_name)
       end
 
       -- Add the collider component and update the collider from the sprite, also adding it to the physics world
-      new_ent:add(ColliderComponent(M.physics_world, comp.mode, comp.trigger))
+      new_ent:add(M.components.collider.class(M.physics_world, comp.mode, comp.trigger))
       M.ColliderUpdateSystem.update_from_sprite(new_ent)
    elseif comp.mode == "constant" then
       if not (comp.size) then
@@ -93,7 +97,7 @@ function M.process_collider_component(new_ent, comp, entity_name)
       local ph_width, ph_height = comp.size[1], comp.size[2]
 
       M.physics_world:add(new_ent, pos.x, pos.y, ph_width, ph_height)
-      new_ent:add(ColliderComponent(M.physics_world, comp.mode, comp.trigger))
+      new_ent:add(M.components.collider.class(M.physics_world, comp.mode, comp.trigger))
    else
       error("Unknown collider mode " .. tostring(comp.mode) .. " for " .. tostring(entity_name))
    end
@@ -103,47 +107,43 @@ function M.add_systems(engine)
    engine:addSystem(M.ColliderUpdateSystem())
 end
 
-function M.show_editor(comp_name, comp, ent)
-   if comp_name == "Collider" then
-      ImGui.Text(comp_name)
+function M.components.collider.show_editor(comp, ent)
+   ImGui.Text("Collider")
 
-      local physics_world = comp.physics_world
+   local physics_world = comp.physics_world
 
-      if ImGui.BeginCombo("Mode", comp.mode) then
-         if ent:get("Drawable") then
-            if ImGui.Selectable("sprite", comp.mode == "sprite") then
-               comp.mode = "sprite"
-            end
+   if ImGui.BeginCombo("Mode", comp.mode) then
+      if ent:get("Drawable") then
+         if ImGui.Selectable("sprite", comp.mode == "sprite") then
+            comp.mode = "sprite"
          end
-         if ImGui.Selectable("constant", comp.mode == "constant") then
-            comp.mode = "constant"
-         end
-
-         ImGui.EndCombo()
+      end
+      if ImGui.Selectable("constant", comp.mode == "constant") then
+         comp.mode = "constant"
       end
 
-      local x, y, w, h = physics_world:getRect(ent)
-      x, y = table.unpack(ImGui.InputInt2("XY", {x, y}))
-      w, h = table.unpack(ImGui.InputInt2("WH", {w, h}))
-      comp.trigger = ImGui.Checkbox("Trigger", comp.trigger)
+      ImGui.EndCombo()
+   end
+
+   local x, y, w, h = physics_world:getRect(ent)
+   x, y = table.unpack(ImGui.InputInt2("XY", {x, y}))
+   w, h = table.unpack(ImGui.InputInt2("WH", {w, h}))
+   comp.trigger = ImGui.Checkbox("Trigger", comp.trigger)
+
+   if comp.mode == "constant" then
+      ent:get("Transformable").transformable.position =
+         Vector2f.new(x, y)
+   end
+   if ImGui.Button("Save") then
+      TOML.save_entity_component(ent, "transformable", comp, { position = { x, y } })
 
       if comp.mode == "constant" then
-         ent:get("Transformable").transformable.position =
-            Vector2f.new(x, y)
+         TOML.save_entity_component(ent, "collider", comp, { size = { w, h } })
       end
-      if ImGui.Button("Save") then
-         TOML.save_entity_component(ent, "transformable", comp, { position = { x, y } })
-
-         if comp.mode == "constant" then
-            TOML.save_entity_component(ent, "collider", comp, { size = { w, h } })
-         end
-         TOML.save_entity_component(ent, "collider", comp, { trigger = comp.trigger, mode = comp.mode })
-      end
-
-      physics_world:update(ent, x, y, w, h)
-
-      return true
+      TOML.save_entity_component(ent, "collider", comp, { trigger = comp.trigger, mode = comp.mode })
    end
+
+   physics_world:update(ent, x, y, w, h)
 end
 
 -- It is important for the collider system to run _after_ the animation system,

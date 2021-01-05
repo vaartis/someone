@@ -7,7 +7,29 @@ local assets = require("components.assets")
 local interaction_components = require("components.interaction")
 local collider_components = require("components.collider")
 
-local DrawableComponent = Component.create("Drawable", {"drawable", "z", "kind", "enabled", "layer"})
+local M = {}
+
+M.components = {
+   drawable = {
+      class = Component.create("Drawable", {"drawable", "z", "kind", "enabled", "layer"})
+   },
+   animation = {
+      class = Component.create(
+         "Animation",
+         {"frames", "current_frame", "playable", "playing", "time_since_frame_change"},
+         { time_since_frame_change = 0, playable = true, playing = false, current_frame = 1 }
+      )
+   },
+   slices = {
+      class = Component.create("Slices", {"slices"})
+   },
+   transformable = {
+      class = Component.create("Transformable", {"transformable", "local_position"})
+   },
+   name = {
+      class = Component.create("Name", {"name"})
+   }
+}
 
 local RenderSystem = class("RenderSystem", System)
 function RenderSystem:requires() return { "Drawable" } end
@@ -54,10 +76,7 @@ function RenderSystem:draw(layer)
    end
 end
 
-local M = {}
-
-M.TransformableComponent = Component.create("Transformable", {"transformable", "local_position"})
-function M.TransformableComponent:world_position(ent)
+function M.components.transformable.class:world_position(ent)
    if not ent.parent or not ent.parent.id then
       return self.transformable.position
    else
@@ -66,7 +85,7 @@ function M.TransformableComponent:world_position(ent)
       return self.local_position + parent_tf:world_position(ent.parent)
    end
 end
-function M.TransformableComponent:set_world_position(ent, pos)
+function M.components.transformable.class:set_world_position(ent, pos)
    if not ent.parent or not ent.parent.id then
       self.transformable.position = pos
    else
@@ -81,7 +100,7 @@ function M.TransformableComponent:set_world_position(ent, pos)
       child_tf:update_position(child)
    end
 end
-function M.TransformableComponent:set_local_position(ent, pos)
+function M.components.transformable.class:set_local_position(ent, pos)
    if not ent.parent or not ent.parent.id then
       self.transformable.position = pos
    else
@@ -96,7 +115,7 @@ function M.TransformableComponent:set_local_position(ent, pos)
       child_tf:update_position(child)
    end
 end
-function M.TransformableComponent:update_position(ent)
+function M.components.transformable.class:update_position(ent)
    local parent_tf = ent.parent:get("Transformable")
 
    self.transformable.position = self.local_position + parent_tf:world_position(ent.parent)
@@ -106,12 +125,6 @@ function M.TransformableComponent:update_position(ent)
       child_tf:update_position(child)
    end
 end
-
-local AnimationComponent = Component.create(
-   "Animation",
-   {"frames", "current_frame", "playable", "playing", "time_since_frame_change"},
-   { time_since_frame_change = 0, playable = true, playing = false, current_frame = 1 }
-)
 
 local AnimationSystem = class("AnimationSystem", System)
 function AnimationSystem:requires() return { "Drawable", "Animation" } end
@@ -144,8 +157,6 @@ function AnimationSystem:update(dt)
       entity:get("Drawable").drawable.texture_rect = next_frame.rect
    end
 end
-
-local SlicesComponent = Component.create("Slices", {"slices"})
 
 function M.load_sheet_data(dir_path)
    local dir_basename = path.basename(path.remove_dir_end(dir_path))
@@ -185,12 +196,6 @@ function M.load_sheet_data(dir_path)
    return animation_frames, slices
 end
 
-M.components = {
-   drawable = {},
-   animation = {},
-   slices = {}
-}
-
 function M.components.drawable.process_component(new_ent, comp, entity_name)
    local comp_name = "drawable"
 
@@ -220,15 +225,15 @@ function M.components.drawable.process_component(new_ent, comp, entity_name)
    )
 
    new_ent:add(
-      DrawableComponent(drawable, comp.z, comp.kind, enabled, comp.layer)
+      M.components.drawable.class(drawable, comp.z, comp.kind, enabled, comp.layer)
    )
-   new_ent:add(M.TransformableComponent(drawable))
+   new_ent:add(M.components.transformable.class(drawable))
 end
 
 function M.components.animation.process_component(new_ent, comp, entity_name)
    local sheet_frames = M.load_sheet_data(comp.sheet)
 
-   local anim = AnimationComponent(sheet_frames)
+   local anim = M.components.animation.class(sheet_frames)
    if type(comp.playable) == "boolean" then anim.playable = comp.playable end
    if type(comp.playing) == "boolean" then anim.playing = comp.playing end
    anim.current_frame = comp.starting_frame or 1
@@ -238,7 +243,7 @@ end
 
 function M.components.slices.process_component(new_ent, comp, entity_name)
    local _, slices = M.load_sheet_data(comp.sheet)
-   new_ent:add(SlicesComponent(slices))
+   new_ent:add(M.components.slices.class(slices))
 end
 
 function M.add_systems(engine)
@@ -246,21 +251,17 @@ function M.add_systems(engine)
    engine:addSystem(AnimationSystem())
 end
 
-function M.show_editor(comp_name, comp, ent)
-   if comp_name == "Transformable" then
-      ImGui.Text(comp_name)
+function M.components.transformable.show_editor(comp, ent)
+   ImGui.Text("Transformable")
 
-      local tf = comp.transformable
-      ImGui.Text(lume.format("X = {1}, Y = {2}", {tf.position.x, tf.position.y}))
+   local tf = comp.transformable
+   ImGui.Text(lume.format("X = {1}, Y = {2}", {tf.position.x, tf.position.y}))
+end
 
-      return true
-   elseif comp_name == "Name" then
-      ImGui.Text(comp_name .. " =")
-      ImGui.SameLine()
-      ImGui.Text(comp.name)
-
-      return true
-   end
+function M.components.name.show_editor(comp, ent)
+   ImGui.Text("Name" .. " =")
+   ImGui.SameLine()
+   ImGui.Text(comp.name)
 end
 
 M.system_run_priority = 0

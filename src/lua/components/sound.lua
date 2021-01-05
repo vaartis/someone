@@ -1,7 +1,13 @@
 local interaction_components
 local assets = require("components.assets")
 
-local SoundPlayerComponent = Component.create("SoundPlayer", {"sound",  "activate_callback", "played"}, { played = false })
+local M = {}
+
+M.components = {
+   sound_player = {
+      class = Component.create("SoundPlayer", {"sound",  "activate_callback", "played"}, { played = false })
+   }
+}
 
 local SoundPlayerSystem = class("SoundPlayerSystem", System)
 function SoundPlayerSystem:requires() return {"SoundPlayer"} end
@@ -26,10 +32,6 @@ function SoundPlayerSystem:onBeforeResetEngine()
    end
 end
 
-local M = {}
-
-M.components = { sound_player = {} }
-
 function M.components.sound_player.process_component(new_ent, comp, entity_name)
    local comp_name = "sound_player"
 
@@ -52,7 +54,7 @@ function M.components.sound_player.process_component(new_ent, comp, entity_name)
    if comp.loop then sound.loop = comp.loop end
    if comp.position then sound.position = Vector3f.new(comp.position[1], comp.position[2], comp.position[3]) end
 
-   new_ent:add(SoundPlayerComponent(sound, callback))
+   new_ent:add(M.components.sound_player.class(sound, callback))
 end
 
 function M.add_systems(engine)

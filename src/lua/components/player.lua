@@ -6,8 +6,15 @@ local shared = require("components.shared")
 
 local x_movement_speed = 4.0
 
-local PlayerMovementComponent = Component.create(
-   "PlayerMovement", {"step_sound", "walking", "look_direction", "active"}, { walking = false, look_direction = 1, active = true })
+local M = {}
+
+M.components = {
+   player_movement = {
+      class = Component.create(
+         "PlayerMovement", {"step_sound", "walking", "look_direction", "active"}, { walking = false, look_direction = 1, active = true }
+      )
+   }
+}
 
 local PlayerMovementSystem = class("PlayerMovementSystem", System)
 PlayerMovementSystem.requires = function(self)
@@ -67,10 +74,6 @@ PlayerMovementSystem.update = function(self, dt)
    end
 end
 
-local M = {}
-
-M.components = { player_movement = {} }
-
 function M.components.player_movement.process_component(new_ent, comp, entity_name)
    local comp_name = "player_movement"
 
@@ -82,7 +85,7 @@ function M.components.player_movement.process_component(new_ent, comp, entity_na
    local sound = Sound.new()
    sound.buffer = assets.assets.sounds[comp.footstep_sound_asset]
 
-   new_ent:add(PlayerMovementComponent(sound))
+   new_ent:add(M.components.player_movement.class(sound))
 end
 
 function M.add_systems(engine)

@@ -1,6 +1,11 @@
 local M = {}
 
-local RotationComponent = Component.create("Rotation", { "rotation_speed" })
+M.components = {
+   rotation = {
+      class = Component.create("Rotation", { "rotation_speed" })
+   }
+}
+
 local RotationSystem = class("RotationSystem", System)
 function RotationSystem:requires()
    return { "Transformable", "Drawable", "Rotation" }
@@ -15,10 +20,8 @@ function RotationSystem:update(dt)
    end
 end
 
-M.components = { rotation = {} }
-
 function M.components.rotation.process_component(new_ent, comp, entity_name)
-   new_ent:add(RotationComponent(comp.rotation_speed))
+   new_ent:add(M.components.rotation.class(comp.rotation_speed))
 end
 
 function M.add_systems(engine)

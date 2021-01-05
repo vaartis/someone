@@ -4,14 +4,16 @@ local util = require("util")
 local coroutines = require("coroutines")
 local rooms
 
-local PassageComponent = Component.create("Passage", {"to", "from", "player_y"})
+local M = {}
 
-M = {}
-
-M.components = { passage = {} }
+M.components = {
+   passage = {
+      class = Component.create("Passage", {"to", "from", "player_y"})
+   }
+}
 
 function M.components.passage.process_component(new_ent, comp, entity_name)
-   new_ent:add(PassageComponent(comp.to, comp.from, comp.player_y))
+   new_ent:add(M.components.passage.class(comp.to, comp.from, comp.player_y))
 end
 
 M.interaction_callbacks = {}

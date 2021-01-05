@@ -93,8 +93,6 @@ local function make_tag(name)
    return tag_classes[name]
 end
 
-local NameComponent = Component.create("Name", {"name"})
-
 function M.instantiate_entity(entity_name, entity, parent)
    local new_ent = Entity(parent)
 
@@ -110,7 +108,7 @@ function M.instantiate_entity(entity_name, entity, parent)
             function()
                if not (new_ent:has("Transformable")) then
                   -- If there's no transformable component, create and add it
-                  new_ent:add(shared_components.TransformableComponent(Transformable.new()))
+                  new_ent:add(shared_components.components.transformable.class(Transformable.new()))
                end
                local tf_component = new_ent:get("Transformable")
 
@@ -173,7 +171,7 @@ function M.instantiate_entity(entity_name, entity, parent)
       end
    end
 
-   new_ent:add(NameComponent(entity_name))
+   new_ent:add(shared_components.components.name.class(entity_name))
 
    if getmetatable(entity) then
       new_ent.__toml_location = getmetatable(entity)["toml_location"]
@@ -182,19 +180,24 @@ function M.instantiate_entity(entity_name, entity, parent)
    return new_ent
 end
 
-function M.show_editor(comp_name, comp, ent)
+function M.show_editor(comp, ent)
    ImGui.Separator()
 
    local processed = false
    for _, processor in pairs(M.all_components) do
-      if processor.show_editor and processor.show_editor(comp_name, comp, ent) then
-         processed = true
-         break
+      if processor.components then
+         for _, processor_comp in pairs(processor.components) do
+            if processor_comp.class and processor_comp.show_editor and processor_comp.class == comp.class then
+               processor_comp.show_editor(comp, ent)
+               processed = true
+               break
+            end
+         end
       end
    end
 
    if not processed then
-      ImGui.Text("No editor for component " .. comp_name)
+      ImGui.Text("No editor for component " .. comp.class.name)
    end
 end
 

@@ -7,8 +7,6 @@ local util = require("util")
 
 local assets = require("components.assets")
 
-local M = {}
-
 -- Another initialization because the module may be included early
 lovetoys.initialize({
       debug = true,
@@ -23,14 +21,20 @@ function Component.create(name, fields, defaults)
    return result
 end
 
+local M = {}
+
 M.seconds_since_last_interaction = 0 -- Time tracked by dt, since last interaction
 M.seconds_before_next_interaction = 0.3 -- A constant that represents how long to wait between interactions
 
-local InteractionComponent = Component.create(
-   "Interaction",
-   {"on_interaction", "is_activatable", "current_state", "state_map", "interaction_sound", "action_text",
-   "touch_activated"}
-)
+M.components = {
+   interaction = {
+      class = Component.create(
+         "Interaction",
+         {"on_interaction", "is_activatable", "current_state", "state_map", "interaction_sound", "action_text",
+          "touch_activated"}
+      )
+   }
+}
 
 local InteractionSystem = class("InteractionSystem", System)
 function InteractionSystem:requires()
@@ -432,8 +436,6 @@ function M.process_interaction(comp, field, context)
    return try_get_fnc_from_module(got_field, "interaction_callbacks", context)
 end
 
-M.components = { interaction = { } }
-
 function M.components.interaction.process_component(new_ent, comp, entity_name)
    local comp_name = "interaction"
 
@@ -459,7 +461,7 @@ function M.components.interaction.process_component(new_ent, comp, entity_name)
    end
 
    new_ent:add(
-      InteractionComponent(
+      M.components.interaction.class(
          interaction_callback,
          activatable_callback,
 
