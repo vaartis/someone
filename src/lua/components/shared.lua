@@ -282,7 +282,17 @@ function M.components.transformable.class:show_editor(ent)
    ImGui.Text("Transformable")
 
    local tf = self.transformable
-   ImGui.Text(lume.format("X = {1}, Y = {2}", {tf.position.x, tf.position.y}))
+   if ent:get("Collider") then
+      ImGui.Text(lume.format("X = {1}, Y = {2}", {tf.position.x, tf.position.y}))
+   else
+      local x, y = table.unpack(ImGui.InputInt2("XY", {tf.position.x, tf.position.y}))
+      tf.position = Vector2f.new(x, y)
+
+      if ImGui.Button("Save") then
+         print(require("util").deep_equal({x, y}, {0, 0}))
+         TOML.save_entity_component(ent, "transformable", self, { position = { x, y } })
+      end
+   end
 end
 
 function M.components.name.class:show_editor(ent)
