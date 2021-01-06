@@ -101,6 +101,24 @@ std::tuple<sol::object, sol::table> convert_to_lua(
         return {result, result_src};
     };
 
+void rewrite_resource_file(const std::string &path, const std::string &contents) {
+    std::ofstream file_w;
+    file_w.open(path, std::ios::trunc);
+    file_w << contents;
+    file_w.close();
+
+#ifdef SOMEONE_EDITOR_BASE_PATH
+    // If in debug mode also save to the actual source of the resources
+
+    std::filesystem::path editor_path(SOMEONE_EDITOR_BASE_PATH);
+    editor_path /= path;
+
+    file_w.open(editor_path, std::ios::trunc);
+    file_w << contents;
+    file_w.close();
+#endif
+}
+
 }
 
 std::tuple<sol::object, sol::object> parse_toml(sol::this_state lua_, const std::string &path) {
@@ -215,9 +233,110 @@ void save_entity_component(sol::this_state lua_, sol::table entity, const std::s
     if (locations_) {
         auto locations = *locations_;
 
+        // A deep equal function defined in lua, the function can compare tables
+        std::function<bool(sol::object, sol::object)> deep_equal = lua.script("return require('util').deep_equal");
+
+        sol::optional<sol::table> this_location_ = locations[name];
+        if (!this_location_) {
+            // As a special case, if:
+            // 1. the component is transformable
+            // 2. it has a drawable
+            // 3. it's position is 0, 0,
+            // don't actually add this component to the file.
+            // This is probably only the case for the background, but still
+            if (name == "transformable") {
+                auto position_part = parts["position"];
+                // First check for drawable, then
+                // compare position with a table of {0, 0}
+                if (locations["drawable"].get<sol::optional<sol::table>>() && deep_equal(position_part, lua.create_table_with(1, 0, 2, 0))) {
+                    // If position is indeed 0, 0 - exit
+                    return;
+                }
+            }
+
+            sol::table comp_locations = lua.create_table();
+            for (auto [k, v] : locations) {
+                if (v.is<sol::table>() && !v.is<sol::userdata>()) {
+                    comp_locations[k] = v;
+                }
+            }
+
+            // Find the closest-to-bottom node for this entity.
+            // For some reason, std::max_element doesn't work for sol::table,
+            // so just count the good old way
+            const toml::node *last_comp;
+            std::vector<std::string> last_path;
+            uint32_t max_line = 0;
+            for (auto [k, v_] : comp_locations) {
+                sol::table v = v_;
+
+                const auto &file = v["__node_file"].get<const std::string &>();
+                auto path = v["__node_path"].get<std::vector<std::string>>();
+
+                const auto view = find_by_path(file, path);
+                auto line = view.node()->source().end.line;
+
+                if (line > max_line) {
+                    max_line = line;
+                    last_comp = view.node();
+                    last_path = path;
+                }
+            }
+
+            const toml::table *last_tbl = last_comp->as_table();
+
+            // Find the key that is on the lowest line
+            auto last_pair = std::max_element(
+                last_tbl->cbegin(),
+                last_tbl->cend(),
+                [](const auto &a, const auto &b) {
+                    const auto &[_, a_val] = a;
+                    const auto &[_2, b_val] = b;
+                    return a_val.source().end.line < b_val.source().end.line;
+                }
+            );
+            auto [_, last_v] = *last_pair;
+            auto last_pair_src = last_v.source();
+
+            // Table that only contains the path to the component,
+            // so the the TOML encoder will create a table header.
+            // e.g. { entities = { name = { component = {} } } }
+            auto dummy_pathed_table = lua.create_table();
+            auto curr_level = dummy_pathed_table;
+            last_path.pop_back();
+            last_path.push_back(name);
+            for (auto path_elem : last_path) {
+                auto created_level = lua.create_table();
+                curr_level[path_elem] = created_level;
+                curr_level = created_level;
+            }
+            auto generated_table_header = encode_toml(lua_, dummy_pathed_table);
+            // Prepend an additional newline
+            generated_table_header.insert(0, "\n\n");
+
+            std::ifstream toml_file;
+            toml_file.open(*last_pair_src.path);
+            std::string contents((std::istreambuf_iterator<char>(toml_file)), std::istreambuf_iterator<char>());
+
+            auto end = find_in_string(contents, last_pair_src.end);
+            // Replace the newline character with the new table header
+            contents.replace(end, 1, generated_table_header);
+
+            rewrite_resource_file(*last_pair_src.path, contents);
+
+            parse_toml(lua_, *last_pair_src.path);
+
+            this_location_ = lua.create_table_with(
+                "__node_file", *last_pair_src.path,
+                "__node_path", last_path
+            );
+            locations[name] = this_location_;
+        }
+
+        sol::table this_location = *this_location_;
+
         sol::table comp_defaults = comp[sol::metatable_key]["__defaults"];
 
-        sol::table this_location = locations[name];
         for (auto [k, v] : parts) {
             auto source_ = this_location[k].get<sol::optional<sol::table>>();
 
@@ -226,10 +345,10 @@ void save_entity_component(sol::this_state lua_, sol::table entity, const std::s
             if (!source_) {
                 // Check the default values and if the value is the same as the default,
                 // do not create it.
-                if (sol::object comp_default = comp_defaults[k]; comp_default != sol::lua_nil && v == comp_default)
+                if (sol::object comp_default = comp_defaults[k]; comp_default != sol::lua_nil && deep_equal(v, comp_default))
                     continue;
 
-                auto parent_file = this_location["__node_file"].get<const std::string &>();
+                const auto &parent_file = this_location["__node_file"].get<const std::string &>();
                 auto parent_path = this_location["__node_path"].get<std::vector<std::string>>();
 
                 const toml::table *toml_table = find_by_path(
@@ -262,13 +381,15 @@ void save_entity_component(sol::this_state lua_, sol::table entity, const std::s
                             return a_val.source().end.line < b_val.source().end.line;
                         }
                     );
-
-                    auto [_, last_val] = *last_pair;
-                    source = last_val.source();
+                    // If there were no other keys, use the table header
+                    if (last_pair != toml_table->cend()) {
+                        auto [_, last_val] = *last_pair;
+                        source = last_val.source();
+                    } else {
+                        source = toml_table->source();
+                    }
 
                     // Move the output to the beginning of the next line
-                    source.end.line += 1;
-                    source.end.column = 1;
                     source.begin = source.end;
                 }
             } else {
@@ -317,21 +438,7 @@ void save_entity_component(sol::this_state lua_, sol::table entity, const std::s
             auto substr = contents.substr(beginning, end - beginning);
             contents.replace(beginning, end - beginning, edited);
 
-            std::ofstream toml_file_w;
-            toml_file_w.open(*source.path, std::ios::trunc);
-            toml_file_w << contents;
-            toml_file_w.close();
-
-#ifdef SOMEONE_EDITOR_BASE_PATH
-            // If in debug mode also save the edits to the actual source of the resources
-
-            std::filesystem::path editor_path(SOMEONE_EDITOR_BASE_PATH);
-            editor_path /= *source.path;
-
-            toml_file_w.open(editor_path, std::ios::trunc);
-            toml_file_w << contents;
-            toml_file_w.close();
-#endif
+            rewrite_resource_file(*source.path, contents);
 
             // Re-parse the source file, updaint the file_node_map
             const std::string &path = *source.path;

@@ -93,6 +93,55 @@ local function make_tag(name)
    return tag_classes[name]
 end
 
+--- Find a processor and pack all relevant data for `run_comp_processor`.
+--- @param comp table data for component creation
+function M.comp_processor_for_name(comp_name, comp, entity_name)
+   -- Find a processor in the modules
+   local comp_processor
+   for _, processor in pairs(M.all_components) do
+      if processor.components then
+         if processor.components[comp_name] then
+            comp_processor = processor.components[comp_name]
+            break
+         end
+      end
+   end
+   if not comp_processor then
+      if comp_name == "tags" then
+         comp_processor = {
+            process_component = function(new_ent, comp, entity_name)
+               for _, tag in pairs(comp) do
+                  -- Add a tag component for each tag
+                  new_ent:add(make_tag(tag)())
+               end
+            end
+         }
+      elseif comp_name == "children" then
+         comp_processor = {
+            -- Do nothing
+            process_component = function() end
+         }
+      else
+         error("Unknown component: " .. tostring(comp_name) .. " on " .. tostring(entity_name))
+      end
+   end
+
+   return { name = comp_name, comp = comp, processor = comp_processor }
+end
+
+--- Run the processor found with comp_processor_for_name.
+--- @param parent Entity entity parent, only relevant for `transformable`
+function M.run_comp_processor(new_ent, comp_data, entity_name, parent)
+   local comp_name, comp, processor = comp_data.name, comp_data.comp, comp_data.processor
+
+   if comp_name == "transformable" then
+      -- Pass parent to transformable processing
+      processor.process_component(new_ent, comp, entity_name, parent)
+   else
+      processor.process_component(new_ent, comp, entity_name)
+   end
+end
+
 function M.instantiate_entity(entity_name, entity, parent)
    local new_ent = Entity(parent)
 
@@ -100,37 +149,9 @@ function M.instantiate_entity(entity_name, entity, parent)
 
    local entity_components = {}
    for comp_name, comp in pairs(entity) do
-      -- Find a processor in the modules
-      local comp_processor
-      for _, processor in pairs(M.all_components) do
-         if processor.components then
-            if processor.components[comp_name] then
-               comp_processor = processor.components[comp_name]
-               break
-            end
-         end
-      end
-      if not comp_processor then
-         if comp_name == "tags" then
-            comp_processor = {
-               process_component = function(new_ent, comp, entity_name)
-                  for _, tag in pairs(comp) do
-                     -- Add a tag component for each tag
-                     new_ent:add(make_tag(tag)())
-                  end
-               end
-            }
-         elseif comp_name == "children" then
-            comp_processor = {
-               -- Do nothing
-               process_component = function() end
-            }
-         else
-            error("Unknown component: " .. tostring(comp_name) .. " on " .. tostring(entity_name))
-         end
-      end
-
-      table.insert(entity_components, { name = comp_name, comp = comp, processor = comp_processor })
+      -- Find a processor by component name
+      local comp_processor = M.comp_processor_for_name(comp_name, comp, entity_name)
+      table.insert(entity_components, comp_processor)
    end
    -- Sort components by processing priority
    table.sort(
@@ -141,14 +162,7 @@ function M.instantiate_entity(entity_name, entity, parent)
    )
 
    for _, comp_data in ipairs(entity_components) do
-      local comp_name, comp, processor = comp_data.name, comp_data.comp, comp_data.processor
-
-      if comp_name == "transformable" then
-         -- Pass parent to transformable processing
-         processor.process_component(new_ent, comp, entity_name, parent)
-      else
-         processor.process_component(new_ent, comp, entity_name)
-      end
+      M.run_comp_processor(new_ent, comp_data, entity_name, parent)
    end
 
    util.rooms_mod().engine:addEntity(new_ent)

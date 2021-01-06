@@ -10,10 +10,16 @@ void register_imgui_usertypes(sol::state &lua) {
         "Begin", &ImGui::Begin,
         "End", &ImGui::End,
 
-        "InputText", [](const char *label, std::string str) {
-            bool submitted = ImGui::InputText(label, &str, ImGuiInputTextFlags_EnterReturnsTrue);
-            return std::make_tuple(str, submitted);
-        },
+        "InputText", sol::overload(
+            [](const char *label, std::string str) {
+                bool submitted = ImGui::InputText(label, &str, ImGuiInputTextFlags_EnterReturnsTrue);
+                return std::make_tuple(str, submitted);
+            },
+            [](const char *label, std::string str, ImGuiInputTextFlags_ flags) {
+                bool changed = ImGui::InputText(label, &str, flags);
+                return std::make_tuple(str, changed);
+            }
+        ),
         "InputInt", [](const char *label, int num) {
             ImGui::InputInt(label, &num); return num;
         },
@@ -53,7 +59,30 @@ void register_imgui_usertypes(sol::state &lua) {
 
         "BeginCombo", [](const char* label, const char* preview_value) { return ImGui::BeginCombo(label, preview_value); },
         "EndCombo", &ImGui::EndCombo,
-        "Selectable", [](const char* label, bool selected = false) { return ImGui::Selectable(label, selected); }
+        "Selectable", [](const char* label, bool selected = false) { return ImGui::Selectable(label, selected); },
+        "ListBox", [](const char* label, int current_item, std::vector<const char *> items) {
+            int curr_item_ptr = current_item;
+            bool changed = ImGui::ListBox(label, &curr_item_ptr, items.data(), items.size());
+
+            return std::make_tuple(curr_item_ptr, changed);
+        },
+
+        "OpenPopup", &ImGui::OpenPopup,
+        "BeginPopupModal", [](const char *label) { return ImGui::BeginPopupModal(
+                label, nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse
+            );
+        },
+        "BeginPopup", [](const char *label) { return ImGui::BeginPopup(
+                label, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse
+            );
+        },
+        "EndPopup", ImGui::EndPopup,
+        "CloseCurrentPopup", ImGui::CloseCurrentPopup
+    );
+    lua.new_enum(
+        "ImGuiInputTextFlags",
+        "None", ImGuiInputTextFlags_None,
+        "EnterReturnsTrue", ImGuiInputTextFlags_EnterReturnsTrue
     );
     lua.new_enum(
         "ImGuiMouseButton",

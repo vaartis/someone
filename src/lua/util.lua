@@ -1,9 +1,32 @@
--- Calculates the amount of characters to fit into the specified width
+local lume = require("lume")
 
 local M = {}
 
+-- Calculates the amount of characters to fit into the specified width
 function M.rect_max_text_width(rect_width)
    return math.floor(rect_width / (StaticFonts.font_size / 2.0))
+end
+
+function M.deep_equal(t1, t2)
+   local result = true
+
+   if type(t1) == "table" and type(t2) == "table" then
+      if lume.count(t1) == lume.count(t2) then
+         for k, v in pairs(t1) do
+            if type(v) == "table" then
+               result = M.deep_equal(v, t2[k])
+            else
+               result = v == t2[k]
+            end
+         end
+      else
+         result = false
+      end
+   else
+      result = t1 == t2
+   end
+
+   return result
 end
 
 function M.deep_merge(t1, t2)

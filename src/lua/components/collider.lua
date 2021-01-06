@@ -108,7 +108,20 @@ function M.add_systems(engine)
    engine:addSystem(M.ColliderUpdateSystem())
 end
 
-function M.components.collider.show_editor(comp, ent)
+-- Default data when adding from editor
+function M.components.collider.class:default_data(ent)
+   local result = { trigger = false }
+   if ent:get("Drawable") then
+      result.mode = "sprite"
+   else
+      result.mode = "constant"
+      result.size = { 50, 50 }
+   end
+
+   return result
+end
+
+function M.components.collider.class:show_editor(ent)
    ImGui.Text("Collider")
 
    local physics_world = M.physics_world
@@ -119,7 +132,7 @@ function M.components.collider.show_editor(comp, ent)
             self.mode = "sprite"
          end
       end
-      if ImGui.Selectable("constant", elf.mode == "constant") then
+      if ImGui.Selectable("constant", self.mode == "constant") then
          self.mode = "constant"
       end
 

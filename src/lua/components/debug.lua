@@ -1,3 +1,5 @@
+local lume = require("lume")
+
 local util = require("util")
 local collider_components = require("components.collider")
 
@@ -20,15 +22,151 @@ end
 local M = {}
 
 function M.add_systems(engine)
-   -- engine:addSystem(DebugColliderDrawingSystem())
+   engine:addSystem(DebugColliderDrawingSystem())
 end
 
 local debug_menu_state = {
-   selected_moving = { obj = nil, x_diff = nil, y_diff = nil }
+   selected_moving = { obj = nil, x_diff = nil, y_diff = nil },
+   added_component = { index = 1, search = "" },
+   selected_entity_search = { index = 1, search = "" }
 }
 
 function M.debug_menu()
-   util.debug_menu_process_state_variable_node("State variables", state_variables)
+   util.debug_menu_process_state_variable_node("State variables", WalkingModule.state_variables)
+
+   ImGui.Separator()
+
+   if ImGui.Button("Select entity") then
+      ImGui.OpenPopup("Select entity")
+   end
+   if ImGui.BeginPopup("Select entity") then
+      local entities = util.rooms_mod().engine:getRootEntity().children
+
+      local changed
+      debug_menu_state.selected_entity_search.search, changed =
+         ImGui.InputText("Search", debug_menu_state.selected_entity_search.search, ImGuiInputTextFlags.None)
+      if changed then
+         -- Reset the list position on search change
+         debug_menu_state.selected_entity_search.index = 1
+      end
+
+      local entity_tbl = {}
+      for _, ent in pairs(entities) do
+         local name = ent:get("Name").name
+         if string.match(name:lower(), debug_menu_state.selected_entity_search.search:lower()) then
+            table.insert(entity_tbl, { name = name, ent = ent })
+         end
+      end
+      table.sort(entity_tbl, function (a, b) return a.name < b.name end)
+
+      local entity_names = lume.map(entity_tbl, function (e) return e.name end)
+
+      -- Translate the position in the array to plus or minus one
+
+      local new_index, changed = ImGui.ListBox("Entities", debug_menu_state.selected_entity_search.index - 1, entity_names)
+      debug_menu_state.selected_entity_search.index = new_index + 1
+
+      if changed then
+         debug_menu_state.selected = entity_tbl[debug_menu_state.selected_entity_search.index].ent
+
+         ImGui.CloseCurrentPopup()
+      end
+
+      ImGui.EndPopup()
+   end
+   ImGui.SameLine()
+
+   if ImGui.Button("Add entity") then
+      debug_menu_state.creating_entity = { name = "" }
+
+      ImGui.OpenPopup("Add entity")
+   end
+   if ImGui.BeginPopupModal("Add entity") then
+
+      debug_menu_state.creating_entity.name = ImGui.InputText("Name", debug_menu_state.creating_entity.name)
+
+      if ImGui.Button("Add") then
+         ImGui.CloseCurrentPopup()
+      end
+      ImGui.SameLine()
+      if ImGui.Button("Cancel") then ImGui.CloseCurrentPopup() end
+
+      ImGui.EndPopup()
+   end
+   ImGui.SameLine()
+
+   -- Onlhy show when an entity is selected
+   if debug_menu_state.selected and ImGui.Button("Add component") then
+      ImGui.OpenPopup("Add component")
+   end
+   if ImGui.BeginPopupModal("Add component") then
+      local changed
+      debug_menu_state.added_component.search, changed = ImGui.InputText("Search", debug_menu_state.added_component.search, ImGuiInputTextFlags.None)
+      if changed then
+         -- Reset the list position on search change
+         debug_menu_state.added_component.index = 1
+      end
+
+      local selected_ent = debug_menu_state.selected
+
+      local entities_mod = util.entities_mod()
+
+      -- Collect all known components from known modules
+      local all_components = {}
+      for _, mod in ipairs(entities_mod.all_components) do
+         if mod.components then
+            for comp_name, comp_data in pairs(mod.components) do
+               local class_name = comp_data.class.name
+               -- Only collect components that:
+               -- 1. don't already exist on the entity
+               -- 2. have default data
+               -- 3. match lower-cased search
+               if not selected_ent:has(comp_data.class.name)
+                  and comp_data.class.default_data
+                  and string.match(class_name:lower(), debug_menu_state.added_component.search:lower())
+               then
+                  table.insert(all_components, { name = comp_name, comp = comp_data, class_name = class_name })
+               end
+            end
+         end
+      end
+      local all_components_names = lume.map(
+         all_components,
+         function (c) return c.class_name end
+      )
+
+      -- Translate the position in the array to plus or minus one
+      debug_menu_state.added_component.index = ImGui.ListBox(
+         "Components",
+         debug_menu_state.added_component.index - 1,
+         all_components_names
+      ) + 1
+
+      local selected_component = all_components[debug_menu_state.added_component.index]
+      if ImGui.Button("Add") then
+         local selected_ent_name = selected_ent:get("Name").name
+
+         local selected_class = selected_component.comp.class
+         local default_data = selected_class:default_data(selected_ent)
+
+         local processor_data = entities_mod.comp_processor_for_name(
+            selected_component.name,
+            default_data,
+            selected_ent_name
+         )
+         entities_mod.run_comp_processor(
+            selected_ent,
+            processor_data,
+            selected_ent_name
+         )
+
+         ImGui.CloseCurrentPopup()
+      end
+      ImGui.SameLine()
+      if ImGui.Button("Cancel") then ImGui.CloseCurrentPopup() end
+
+      ImGui.EndPopup()
+   end
 
    if not ImGui.IsAnyWindowHovered() and not ImGui.IsAnyItemHovered() then
       -- Need to get the position from the window and not the drawing target,
@@ -83,9 +221,6 @@ function M.debug_menu()
                Vector2f.new(x, y)
          end
       end
-   end
-   if ImGui.IsMouseDoubleClicked(ImGuiMouseButton.Left) and not ent then
-      debug_menu_state.selected = nil
    end
 
    if debug_menu_state.selected then
