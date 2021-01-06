@@ -8,25 +8,21 @@ function M.rect_max_text_width(rect_width)
 end
 
 function M.deep_equal(t1, t2)
-   local result = true
-
    if type(t1) == "table" and type(t2) == "table" then
       if lume.count(t1) == lume.count(t2) then
          for k, v in pairs(t1) do
             if type(v) == "table" then
-               result = M.deep_equal(v, t2[k])
+               if not M.deep_equal(v, t2[k]) then return false end
             else
-               result = v == t2[k]
+               if v ~= t2[k] then return false end
             end
          end
-      else
-         result = false
-      end
+      else return false end
    else
-      result = t1 == t2
+      if t1 ~= t2 then return false end
    end
 
-   return result
+   return true
 end
 
 function M.deep_merge(t1, t2)
