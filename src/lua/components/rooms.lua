@@ -41,7 +41,7 @@ local function load_room_file(name)
       room_table.prefab = nil
    end
 
-   return room_table
+   return room_table, path
 end
 
 local CustomEngine = class("CustomEgine", Engine)
@@ -110,7 +110,9 @@ function M.load_room(name, switch_namespace)
       M.current_namespace = name:sub(1, last - 1)
    end
 
-   local room_toml = load_room_file(name)
+   local room_toml, room_file_path = load_room_file(name)
+   -- Save the current file path, when the editor wants to save a new entity
+   M.current_room_file = room_file_path
 
    if room_toml.shaders then
       _room_shaders = room_toml.shaders

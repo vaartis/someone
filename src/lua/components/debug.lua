@@ -85,7 +85,21 @@ function M.debug_menu()
 
       debug_menu_state.creating_entity.name = ImGui.InputText("Name", debug_menu_state.creating_entity.name)
 
-      if ImGui.Button("Add") then
+      if ImGui.Button("Add")
+         and lume.trim(debug_menu_state.creating_entity.name) ~= ""
+         and not lume.match(
+            util.rooms_mod().engine:getRootEntity().children,
+            -- Ensure there are no same-named entities
+            function (e) return e:get("Name").name == debug_menu_state.creating_entity.name end)
+      then
+         local entities_mod = util.entities_mod()
+
+         debug_menu_state.selected = entities_mod.instantiate_entity(
+            debug_menu_state.creating_entity.name,
+            { }
+         )
+         debug_menu_state.creating_entity.name = ""
+
          ImGui.CloseCurrentPopup()
       end
       ImGui.SameLine()

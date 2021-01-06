@@ -278,6 +278,10 @@ function M.add_systems(engine)
    engine:addSystem(AnimationSystem())
 end
 
+function M.components.transformable.class:default_data(ent)
+   return { position = { 0, 0 } }
+end
+
 function M.components.transformable.class:show_editor(ent)
    ImGui.Text("Transformable")
 
@@ -289,7 +293,6 @@ function M.components.transformable.class:show_editor(ent)
       tf.position = Vector2f.new(x, y)
 
       if ImGui.Button("Save") then
-         print(require("util").deep_equal({x, y}, {0, 0}))
          TOML.save_entity_component(ent, "transformable", self, { position = { x, y } })
       end
    end
