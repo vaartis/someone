@@ -168,16 +168,25 @@ function M.debug_menu()
             default_data,
             selected_ent_name
          )
-         entities_mod.run_comp_processor(
+         local _, err = pcall(
+            entities_mod.run_comp_processor,
+
             selected_ent,
             processor_data,
             selected_ent_name
          )
-
-         ImGui.CloseCurrentPopup()
+         if err then
+            debug_menu_state.added_component.last_error = err
+         else
+            ImGui.CloseCurrentPopup()
+         end
       end
       ImGui.SameLine()
       if ImGui.Button("Cancel") then ImGui.CloseCurrentPopup() end
+
+      if debug_menu_state.added_component.last_error then
+         ImGui.Text(debug_menu_state.added_component.last_error)
+      end
 
       ImGui.EndPopup()
    end
