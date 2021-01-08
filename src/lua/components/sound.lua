@@ -15,7 +15,10 @@ function SoundPlayerSystem:update()
    for _, entity in pairs(self.targets) do
       local sound_comp = entity:get("SoundPlayer")
       if not sound_comp.played then
-         local should_play = (sound_comp.activate_callback and sound_comp.activate_callback()) or true
+         local should_play = true
+         if sound_comp.activate_callback then
+            should_play = sound_comp.activate_callback()
+         end
 
          if should_play then
             sound_comp.sound:play()
