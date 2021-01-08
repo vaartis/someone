@@ -62,7 +62,7 @@ function RenderSystem:draw(layer)
       local drawable = entity:get("Drawable")
 
       local enabled = drawable.enabled
-      if type(enabled) == "function" then
+      if type(enabled) == "function" or (type(enabled) == "table" and getmetatable(enabled).__call) then
          enabled = enabled()
       end
 
@@ -293,7 +293,7 @@ function M.components.transformable.class:show_editor(ent)
       tf.position = Vector2f.new(x, y)
 
       if ImGui.Button("Save") then
-         TOML.save_entity_component(ent, "transformable", self, { position = { x, y } })
+         TOML.save_entity_component(ent, "transformable", self, { "position" }, { position = { x, y } })
       end
    end
 end

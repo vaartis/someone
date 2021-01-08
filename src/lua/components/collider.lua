@@ -148,13 +148,13 @@ function M.components.collider.class:show_editor(ent)
       ent:get("Transformable").transformable.position =
          Vector2f.new(x, y)
    end
-   if ImGui.Button("Save") then
-      TOML.save_entity_component(ent, "transformable", self, { position = { x, y } })
+   if ImGui.Button("Save##collider") then
+      TOML.save_entity_component(ent, "transformable", self, { "position" }, { position = { x, y } })
 
       if self.mode == "constant" then
-         TOML.save_entity_component(ent, "collider", self, { size = { w, h } })
+         TOML.save_entity_component(ent, "collider", self, { "size" }, { size = { w, h } })
       end
-      TOML.save_entity_component(ent, "collider", self, { trigger = self.trigger, mode = self.mode })
+      TOML.save_entity_component(ent, "collider", self, {"trigger", "mode" }, { trigger = self.trigger, mode = self.mode })
    end
 
    physics_world:update(ent, x, y, w, h)

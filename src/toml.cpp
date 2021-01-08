@@ -148,7 +148,7 @@ std::tuple<sol::object, sol::object> parse_toml(sol::this_state lua_, const std:
     }
 }
 
-std::string encode_toml(sol::this_state lua_, sol::object from) {
+std::string encode_toml(sol::this_state lua_, sol::object from, bool inline_tables) {
     sol::state_view lua(lua_);
 
     // Converts from lua to toml.
@@ -171,6 +171,7 @@ std::string encode_toml(sol::this_state lua_, sol::object from) {
                 return arr;
             } else {
                 auto toml_tbl = std::make_shared<toml::table>();
+                toml_tbl->is_inline(inline_tables);
 
                 for (auto [k, v] : tbl) {
                     toml_tbl->insert(k.as<std::string>(), *convert(v));
@@ -206,7 +207,10 @@ std::string encode_toml(sol::this_state lua_, sol::object from) {
     return ss.str();
 }
 
-void save_entity_component(sol::this_state lua_, sol::table entity, const std::string &name, sol::table comp, sol::table parts) {
+void save_entity_component(
+    sol::this_state lua_, sol::table entity, const std::string &name, sol::table comp,
+    sol::table part_names, sol::table part_values
+) {
     sol::state_view lua(lua_);
 
     auto find_in_string = [](std::string str, toml::source_position pos) {
@@ -255,7 +259,7 @@ void save_entity_component(sol::this_state lua_, sol::table entity, const std::s
         // don't actually add this component to the file.
         // This is probably only the case for the background, but still
         if (name == "transformable") {
-            auto position_part = parts["position"];
+            auto position_part = part_values["position"];
             // First check for drawable, then
             // compare position with a table of {0, 0}
             if (locations["drawable"].get<sol::optional<sol::table>>() && deep_equal(position_part, lua.create_table_with(1, 0, 2, 0))) {
@@ -389,11 +393,78 @@ void save_entity_component(sol::this_state lua_, sol::table entity, const std::s
 
     sol::table comp_defaults = comp[sol::metatable_key]["__defaults"];
 
-    for (auto [k, v] : parts) {
+    for (auto [_, k] : part_names) {
+        toml::source_region source;
+
+        sol::optional<sol::object> v_ = part_values[k];
+
+        // If value for the part was nil, it was deleted. If the value is the same as the default,
+        // also delete it
+        if (!v_ || deep_equal(*v_, comp_defaults[k])) {
+            auto deleted_name = k.as<std::string>();
+
+            auto deleted_file = this_location["__node_file"].get<std::string>();
+            auto parent_path = this_location["__node_path"].get<std::vector<std::string>>();
+
+            auto deleted_path(parent_path);
+            deleted_path.push_back(deleted_name);
+
+            auto parent_node = find_by_path(deleted_file, parent_path).as_table();
+            if (parent_node->find(deleted_name) == parent_node->end())
+                // If it doesn't exist, then nothing is to be deleted
+                continue;
+
+            auto deleted_node = find_by_path(deleted_file, deleted_path).node();
+            auto deleted_location = deleted_node->source();
+
+            // For non-inline parent extend the location to capture the whole key
+            if (!parent_node->is_inline()) {
+                deleted_location.begin.column = 1;
+            }
+
+            std::ifstream toml_file;
+            toml_file.open(deleted_file);
+            std::string contents((std::istreambuf_iterator<char>(toml_file)), std::istreambuf_iterator<char>());
+
+            auto beginning = find_in_string(contents, deleted_location.begin), end = find_in_string(contents, deleted_location.end);
+
+            if (parent_node->is_inline()) {
+                // For inline parent, go back until the previous , or {
+
+                // Go back from the initial { of the node if it's a table
+                if (deleted_node->is_table())
+                    beginning--;
+                while (contents[beginning] != ',' && contents[beginning] != '{')
+                    beginning--;
+                if (contents[beginning] == '{')
+                    // Go one character forward to not accidentally remove the {
+                    beginning++;
+            }
+
+            auto amount_to_replace = end - beginning;
+            if (!parent_node->is_inline())
+                amount_to_replace++;
+            // In case of non-inline deletion, also delete the following newline
+            contents.replace(beginning, amount_to_replace, "");
+
+            rewrite_resource_file(deleted_file, contents);
+
+            // Re-parse the source file, update the file_node_map
+            const std::string &path = deleted_file;
+            parse_toml(lua_, deleted_file);
+
+            this_location[deleted_name] = sol::lua_nil;
+
+
+            continue;
+        }
+        // If we got past here, then the value exists
+        auto v = *v_;
+
         auto source_ = this_location[k].get<sol::optional<sol::table>>();
 
         bool is_new = false, to_inline_table = false;
-        toml::source_region source;
+
         if (!source_) {
             // Check the default values and if the value is the same as the default,
             // do not create it.
@@ -451,7 +522,7 @@ void save_entity_component(sol::this_state lua_, sol::table entity, const std::s
             ).node()->source();
         }
 
-        auto edited = encode_toml(lua_, v);
+        auto edited = encode_toml(lua_, v, true);
 
         std::ifstream toml_file;
         toml_file.open(*source.path);
@@ -487,12 +558,11 @@ void save_entity_component(sol::this_state lua_, sol::table entity, const std::s
             }
         }
 
-        auto substr = contents.substr(beginning, end - beginning);
         contents.replace(beginning, end - beginning, edited);
 
         rewrite_resource_file(*source.path, contents);
 
-        // Re-parse the source file, updaint the file_node_map
+        // Re-parse the source file, update the file_node_map
         const std::string &path = *source.path;
         parse_toml(lua_, *source.path);
     }

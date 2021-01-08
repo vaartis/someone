@@ -34,7 +34,8 @@ M.components = {
       class = Component.create(
          "Interaction",
          {"on_interaction", "is_activatable", "current_state", "state_map", "interaction_sound", "action_text",
-          "touch_activated"}
+          "touch_activated"},
+         { touch_activated = false, action_text = "interact" }
       )
    }
 }
@@ -118,14 +119,7 @@ function InteractionSystem:update(dt)
          -- collect the interaction strings and show all of the numbered
          local desc_texts = {}
          for n, interactable in ipairs(interactables_touched) do
-            local action_name
-            if interactable.action_text then
-               action_name = interactable.action_text
-            else
-               action_name = "interact"
-            end
-
-            table.insert(desc_texts, lume.format("{1}. {2}", {n, action_name}))
+            table.insert(desc_texts, lume.format("{1}. {2}", {n, interactable.action_text}))
          end
 
          drawable_string = table.concat(desc_texts, "\n")
@@ -147,13 +141,7 @@ function InteractionSystem:update(dt)
             local interactable = interactables_touched[1]
 
             if not interactable.touch_activated then
-               if interactable.action_text then
-                  action_name = interactable.action_text
-               else
-                  action_name = "interact"
-               end
-
-               drawable_string = "[E] to " .. action_name
+               drawable_string = "[E] to " .. interactable.action_text
 
                -- If action was pressed, mark it as the one to execute
                if pressed_e then
@@ -363,31 +351,37 @@ function try_get_fnc_from_module(fnc_data, module_field, context)
       )
    end
 
+   local args
+   if fnc_data.args then
+      -- Clone the arguments to ensure that functions are called with unmodified arguments when editor changes things
+      args = util.deep_merge({}, fnc_data.args)
+   end
+
    if fnc_data.self then
       if not context.entity then
          error("Tried using self on a callback, but no entity was passed in the context")
       end
 
-      if fnc_data.args then
-         if lume.isarray(fnc_data.args) then
-            table.insert(fnc_data.args, 1, context.entity)
+      if args then
+         if lume.isarray(args) then
+            table.insert(args, 1, context.entity)
          else
-            fnc_data.args.self = context.entity
+            args.self = context.entity
          end
       else
-         fnc_data.args = { context.entity }
+         args = { context.entity }
       end
    end
 
    -- If there are args specified, put them after whatever is provided when calling
-   if fnc_data.args then
-      if lume.isarray(fnc_data.args) then
+   if args then
+      if lume.isarray(args) then
          return function(...)
-            return callback_function(..., table.unpack(fnc_data.args))
+            return callback_function(..., table.unpack(args))
          end
       else
          return function(...)
-            return callback_function(..., fnc_data.args)
+            return callback_function(..., args)
          end
       end
    else
@@ -401,6 +395,7 @@ function M.process_activatable(comp, field, context)
    -- Use true by default if there was no field
    if got_field == nil then return true end
 
+   local result
    if type(got_field) == "table" then
       if got_field["not"] then
          got_field = got_field["not"]
@@ -408,7 +403,7 @@ function M.process_activatable(comp, field, context)
          local fnc = try_get_fnc_from_module(got_field, "activatable_callbacks", context)
 
          -- Invert whatever the function returns
-         return function(...)
+         result = function(...)
             return not fnc(...)
          end
       elseif got_field["and"] then
@@ -417,16 +412,20 @@ function M.process_activatable(comp, field, context)
             table.insert(conds, try_get_fnc_from_module(cnd, "activatable_callbacks", context))
          end
 
-         return function(...)
+         result = function(...)
             local args = { ... }
             return lume.all(conds, function(f) return f(table.unpack(args)) end)
          end
       else
-         return try_get_fnc_from_module(got_field, "activatable_callbacks", context)
+         result = try_get_fnc_from_module(got_field, "activatable_callbacks", context)
       end
    else
-      return got_field
+      result = got_field
    end
+
+   local ret_result = { callback_data = got_field }
+   setmetatable(ret_result, { __call = result })
+   return ret_result
 end
 
 function M.process_interaction(comp, field, context)
@@ -436,7 +435,13 @@ function M.process_interaction(comp, field, context)
       error(context.entity_name .. "." .. context.comp_name .. " does not have the required '" .. field .. "' field")
    end
 
-   return try_get_fnc_from_module(got_field, "interaction_callbacks", context)
+   local result = try_get_fnc_from_module(got_field, "interaction_callbacks", context)
+
+   -- Return a callable table. Don't actually care about storing the function, the only thing that is needed from it is calling,
+   -- and otherwise just storing it in a closure is fine
+   local ret_result = { callback_data = got_field }
+   setmetatable(ret_result, { __call = result })
+   return ret_result
 end
 
 function M.components.interaction.process_component(new_ent, comp, entity_name)
@@ -476,6 +481,268 @@ function M.components.interaction.process_component(new_ent, comp, entity_name)
          comp.touch_activated
       )
    )
+end
+
+function M.components.interaction.class:show_editor(ent)
+   ImGui.Text("Interaction")
+
+   if not self.__editor_state then
+      -- Set up some default editor state
+      self.__editor_state = {
+         callback = util.deep_merge({}, self.on_interaction.callback_data),
+         activatable_enabled = self.is_activatable ~= nil,
+         -- "and" means if the value is not nil
+         activatable_callback = self.is_activatable and self.is_activatable.callback_data
+      }
+   end
+
+   local function show_callback(callback_parent, callback_name, original, module_source, installation_function)
+      local callback = callback_parent[callback_name]
+      if not callback then
+         callback = { module = "", name = "" }
+         callback_parent[callback_name] = callback
+      end
+
+      if callback["and"] then
+      elseif callback["or"] then
+      else
+         local all_components = util.entities_mod().all_components
+         local callback_modules = lume.filter(all_components, function(c) return c[module_source] end)
+
+         if ImGui.BeginCombo("Module", callback.module) then
+            for _, mod in ipairs(callback_modules) do
+               local mod_name = getmetatable(mod).__module_name
+               if ImGui.Selectable(mod_name, mod_name == callback.module) then
+                  callback.module = mod_name
+                  callback.name = ""
+               end
+            end
+
+            ImGui.EndCombo()
+         end
+
+         local selected_module = lume.match(callback_modules, function(c) return getmetatable(c).__module_name == callback.module end)
+         if selected_module and ImGui.BeginCombo("Name", callback.name) then
+            for name, _ in pairs(selected_module[module_source]) do
+               if ImGui.Selectable(name, name == callback.name) then
+                  callback.name = name
+               end
+            end
+
+            ImGui.EndCombo()
+         end
+      end
+
+      local show_table
+      show_table = function(name, parent, table_name, size)
+         local the_table = parent[table_name]
+
+         if ImGui.BeginChild(name, size) then
+            if the_table then
+               for i, arg in pairs(the_table) do
+                  local minus_button = function()
+                     -- Add ID at the end of the button name (invisible in UI)
+                     if ImGui.Button("-##" .. i) then
+                        -- For arrays, use table.remove, for tables set to nil
+                        if #the_table > 0 then
+                           table.remove(the_table, i)
+                        else
+                           the_table[i] = nil
+                        end
+                        if lume.count(the_table) == 0 then
+                           parent[table_name] = nil
+                        end
+
+                        return true
+                     end
+                  end
+
+                  if type(arg) == "string" then
+                     the_table[i] = ImGui.InputText(tostring(i), tostring(arg))
+                  elseif type(arg) == "number" then
+                     the_table[i] =
+                        ImGui.InputFloat(tostring(i), arg)
+                  elseif type(arg) == "table" then
+                     ImGui.Text(tostring(i))
+                     ImGui.SameLine()
+                     -- For tables, show the minus button before the actual content
+                     if minus_button() then break end
+
+                     show_table(name .. i, the_table, i, Vector2f.new(0, 70))
+                  elseif type(arg) == "boolean" then
+                     the_table[i] =
+                        ImGui.Checkbox(tostring(i), arg)
+                  else
+                     ImGui.InputText(tostring(i), "Unsupported type: " .. tostring(arg), ImGuiInputTextFlags.ReadOnly)
+                  end
+
+                  if type(arg) ~= "table" then
+                     -- For non-tables, show the button on the right
+                     ImGui.SameLine()
+                     if minus_button() then break end
+                  end
+               end
+            end
+
+            if ImGui.Button("+") then
+               ImGui.OpenPopup("Select type##" .. name)
+
+               self.__editor_state.new_argument = { }
+               -- If the argument is nil, has no values or is an array, mark it as such
+               if not the_table or lume.count(the_table) == 0 or #the_table > 0 then
+                  self.__editor_state.new_argument.selected_type = "array"
+               else
+                  self.__editor_state.new_argument.selected_type = "table"
+                  self.__editor_state.new_argument.table_key = ""
+               end
+            end
+            if ImGui.BeginPopup("Select type##" .. name) then
+               local inserted_value_type = type(self.__editor_state.new_argument.inserted_value)
+               if ImGui.RadioButton("String", inserted_value_type == "string") then
+                  self.__editor_state.new_argument.inserted_value = ""
+               end
+               ImGui.SameLine()
+               if ImGui.RadioButton("Number", inserted_value_type == "number") then
+                  self.__editor_state.new_argument.inserted_value = 0
+               end
+               ImGui.SameLine()
+               if ImGui.RadioButton("Bool", inserted_value_type == "boolean") then
+                  self.__editor_state.new_argument.inserted_value = true
+               end
+
+
+               if ImGui.RadioButton("Table", inserted_value_type == "table") then
+                  self.__editor_state.new_argument.inserted_value = {}
+               end
+
+               if self.__editor_state.new_argument.inserted_value then
+                  -- In case the argument table had nothing previosly, allow selecting if it's a table or an array
+                  if not the_table or lume.count(the_table) == 0  then
+                     ImGui.Text("Argument container type")
+                     if ImGui.RadioButton("Array##container_type", self.__editor_state.new_argument.selected_type == "array") then
+                        self.__editor_state.new_argument.selected_type = "array"
+                     end
+                     ImGui.SameLine()
+                     if ImGui.RadioButton("Table##container_type", self.__editor_state.new_argument.selected_type == "table") then
+                        self.__editor_state.new_argument.selected_type = "table"
+                        self.__editor_state.new_argument.table_key = ""
+                     end
+                  end
+                  -- For table key, show the field to input the key
+                  if self.__editor_state.new_argument.selected_type == "table" then
+                     self.__editor_state.new_argument.table_key = ImGui.InputText(
+                        "Table key",
+                        self.__editor_state.new_argument.table_key
+                     )
+                  end
+
+                  if ImGui.Button("Add") then
+                     -- In case there were no arguments previosly, create the table
+                     if not the_table then
+                        parent[table_name] = {}
+                        the_table = parent[table_name]
+                     end
+
+                     if self.__editor_state.new_argument.selected_type == "array" then
+                        table.insert(the_table, self.__editor_state.new_argument.inserted_value)
+
+                        ImGui.CloseCurrentPopup()
+                     elseif lume.trim(self.__editor_state.new_argument.table_key) ~= "" then
+                        the_table[self.__editor_state.new_argument.table_key] =
+                           self.__editor_state.new_argument.inserted_value
+
+                        ImGui.CloseCurrentPopup()
+                     end
+                  end
+               end
+
+               ImGui.EndPopup()
+            end
+         end
+         ImGui.EndChild()
+      end
+
+      show_table(callback_name .. " arguments", callback, "args", Vector2f.new(0, 200))
+
+      local install = function()
+         -- Try installing the new callback
+         local is_ok, interaction_callback_or_err = pcall(
+            installation_function,
+            callback_parent,
+            callback_name,
+            { entity_name = ent:get("Name").name, comp_name = "interaction", needed_for = callback_name, entity = ent }
+         )
+         if not is_ok then
+            self.__editor_state.last_error = interaction_callback_or_err
+
+            return false
+         else
+            -- Else reset the error, hiding it
+            self.__editor_state.last_error = nil
+
+            -- And set the new interaction callback
+            self.on_interaction = interaction_callback_or_err
+
+            return true
+         end
+      end
+
+      if ImGui.Button("Install##" .. callback_name) then
+         install()
+      end
+      ImGui.SameLine()
+      if ImGui.Button("Reset##" .. callback_name) then
+         -- Reset to whatever is stored in current interaction data
+         callback_parent[callback_name] = original
+      end
+      ImGui.SameLine()
+      if ImGui.Button("Save##" .. callback_name) then
+         if install() then
+            TOML.save_entity_component(ent, "interaction", self, { callback_name }, { [callback_name] = callback })
+         end
+      end
+   end
+
+   if ImGui.TreeNode("Callback") then
+      show_callback(self.__editor_state, "callback", self.on_interaction.callback_data, "interaction_callbacks", M.process_interaction)
+      ImGui.TreePop()
+   end
+
+   self.__editor_state.activatable_enabled = ImGui.Checkbox("Activatable callback", self.__editor_state.activatable_enabled)
+   if self.__editor_state.activatable_enabled then
+      if ImGui.TreeNode("Activatable callback##treenode") then
+         show_callback(
+            self.__editor_state, "activatable_callback",
+            self.is_activatable and self.is_activatable.callback_data, "activatable_callbacks", M.process_activatable
+         )
+         ImGui.TreePop()
+      end
+   else
+      if ImGui.Button("Remove activatable & Save") then
+         self.is_activatable = nil
+         self.__editor_state.activatable_callback = nil
+
+         TOML.save_entity_component(ent, "interaction", self, {"activatable_callback"}, { activatable_callback = nil })
+      end
+   end
+
+   self.touch_activated = ImGui.Checkbox("Touch activated", self.touch_activated)
+   self.action_text = ImGui.InputText("Action text", self.action_text)
+
+   if ImGui.Button("Save") then
+      if lume.trim(self.action_text) == "" then
+         self.action_text = self.__defaults.action_text
+      end
+
+      TOML.save_entity_component(
+         ent, "interaction", self,
+         { "touch_activated", "action_text" },
+         { touch_activated = self.touch_activated, action_text = self.action_text })
+   end
+
+   if self.__editor_state.last_error then
+      ImGui.TextWrapped(self.__editor_state.last_error)
+   end
 end
 
 function M.disable_player(engine)

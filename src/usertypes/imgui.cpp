@@ -21,7 +21,9 @@ void register_imgui_usertypes(sol::state &lua) {
             }
         ),
         "InputInt", [](const char *label, int num) {
-            ImGui::InputInt(label, &num); return num;
+            int int_ptr = num;
+            ImGui::InputInt(label, &int_ptr);
+            return int_ptr;
         },
         "InputInt2", [](const char *label, std::array<int, 2> num) {
             ImGui::InputInt2(label, num.data()); return sol::as_table(num);
@@ -29,10 +31,20 @@ void register_imgui_usertypes(sol::state &lua) {
         "InputInt4", [](const char *label, std::array<int, 4> num) {
             ImGui::InputInt4(label, num.data()); return sol::as_table(num);
         },
+        "InputFloat", [](const char *label, float num) {
+            float float_ptr = num;
+            ImGui::InputFloat(label, &float_ptr);
+            return float_ptr;
+        },
 
-        "Checkbox", [](const char *label, bool value) { ImGui::Checkbox(label, &value); return value; },
+        "Checkbox", [](const char *label, bool value) {
+            auto changed = ImGui::Checkbox(label, &value);
+            return std::make_pair(value, changed);
+        },
         "Button", [](const char *text) { return ImGui::Button(text); },
+        "RadioButton", sol::resolve<bool(const char*, bool)>(&ImGui::RadioButton),
         "Text", &ImGui::Text,
+        "TextWrapped", &ImGui::TextWrapped,
 
         "BeginGroup", &ImGui::BeginGroup,
         "EndGroup", &ImGui::EndGroup,
@@ -77,12 +89,18 @@ void register_imgui_usertypes(sol::state &lua) {
             );
         },
         "EndPopup", ImGui::EndPopup,
-        "CloseCurrentPopup", ImGui::CloseCurrentPopup
+        "CloseCurrentPopup", ImGui::CloseCurrentPopup,
+
+        "BeginChild", [](const char* str_id, const sf::Vector2f &size) {
+            return ImGui::BeginChild(str_id, ImVec2(size.x, size.y), true);
+        },
+        "EndChild", &ImGui::EndChild
     );
     lua.new_enum(
         "ImGuiInputTextFlags",
         "None", ImGuiInputTextFlags_None,
-        "EnterReturnsTrue", ImGuiInputTextFlags_EnterReturnsTrue
+        "EnterReturnsTrue", ImGuiInputTextFlags_EnterReturnsTrue,
+        "ReadOnly", ImGuiInputTextFlags_ReadOnly
     );
     lua.new_enum(
         "ImGuiMouseButton",
