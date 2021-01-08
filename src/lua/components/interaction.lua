@@ -373,14 +373,18 @@ function try_get_fnc_from_module(fnc_data, module_field, context)
       end
    end
 
-   -- If there are args specified, put them after whatever is provided when calling
+   -- If there are args specified, put them after whatever is provided when calling.
+   -- The functions here use self because of the stupid tandency of lua's __call to pass
+   -- the table as the self parameter without a way to disable this and blocking
+   -- normal argument passing unless a self parameter exists. So, have a dummy self parameter
+   -- and don't use it.
    if args then
       if lume.isarray(args) then
-         return function(...)
+         return function(self, ...)
             return callback_function(..., table.unpack(args))
          end
       else
-         return function(...)
+         return function(self, ...)
             return callback_function(..., args)
          end
       end
@@ -403,8 +407,8 @@ function M.process_activatable(comp, field, context)
          local fnc = try_get_fnc_from_module(got_field, "activatable_callbacks", context)
 
          -- Invert whatever the function returns
-         result = function(...)
-            return not fnc(...)
+         result = function(self, ...)
+            return not fnc(self, ...)
          end
       elseif got_field["and"] then
          local conds = {}
@@ -412,8 +416,8 @@ function M.process_activatable(comp, field, context)
             table.insert(conds, try_get_fnc_from_module(cnd, "activatable_callbacks", context))
          end
 
-         result = function(...)
-            local args = { ... }
+         result = function(self, ...)
+            local args = { self, ... }
             return lume.all(conds, function(f) return f(table.unpack(args)) end)
          end
       else
