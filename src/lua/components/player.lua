@@ -83,9 +83,7 @@ function M.components.player_movement.process_component(new_ent, comp, entity_na
       error(lume.format("{1}.{2} requires a sound named {3}", {entity_name, comp_name, comp.footstep_sound_asset}))
    end
 
-   local sound = Sound.new()
-   sound.buffer = assets.assets.sounds[comp.footstep_sound_asset]
-
+   local sound = assets.create_sound_from_asset(comp.footstep_sound_asset)
    new_ent:add(M.components.player_movement.class(sound))
 end
 

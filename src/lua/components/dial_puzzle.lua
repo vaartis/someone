@@ -127,8 +127,7 @@ function DialHandleSystem:update(dt)
          last_passed_position = position_num
 
          if not rotation_click_sound then
-            rotation_click_sound = Sound.new()
-            rotation_click_sound.buffer = assets.assets.sounds["rotation_click"]
+            rotation_click_sound = assets.create_sound_from_asset("rotation_click")
          end
 
          local combination = WalkingModule.state_variables.dial_puzzle.combination

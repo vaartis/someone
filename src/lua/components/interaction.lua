@@ -468,8 +468,7 @@ function M.components.interaction.process_component(new_ent, comp, entity_name)
 
    local interaction_sound
    if comp.interaction_sound_asset then
-      interaction_sound = Sound.new()
-      interaction_sound.buffer = assets.assets.sounds[comp.interaction_sound_asset]
+      interaction_sound = assets.create_sound_from_asset(comp.interaction_sound_asset)
    end
 
    new_ent:add(
