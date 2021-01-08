@@ -19,13 +19,23 @@ function DebugColliderDrawingSystem:draw()
    end
 end
 
+local debug_menu_state
+local DebugMenuResetSystem = class("DebugMenuResetSystem", System)
+function DebugMenuResetSystem:onBeforeResetEngine()
+   debug_menu_state.selected = nil
+   debug_menu_state.selected_moving = nil
+end
+
 local M = {}
 
 function M.add_systems(engine)
    engine:addSystem(DebugColliderDrawingSystem())
+   -- This doesn't actually do anything except resetting the debug menu data on room unload
+   engine:addSystem(DebugMenuResetSystem())
 end
 
-local debug_menu_state = {
+debug_menu_state = {
+   selected = nil,
    selected_moving = { obj = nil, x_diff = nil, y_diff = nil },
    added_component = { index = 1, search = "" },
    selected_entity_search = { index = 1, search = "" }
