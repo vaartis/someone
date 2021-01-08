@@ -32,6 +32,10 @@ function M.interaction_callbacks.switch_room(_current_state, ent)
       -- If the name is qualified, just use it
       final_room_name = passage_comp.to
    else
+      if rooms.current_namespace == nil then
+         error("rooms.current_namespace is not set! This probably means that rooms.load_room was not asked to set a namespace.")
+      end
+
       local in_current_namespace = lume.format(
          "{1}/{2}", { rooms.current_namespace, passage_comp.to }
       )
