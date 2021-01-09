@@ -168,6 +168,9 @@ function InteractionSystem:update(dt)
          -- If some kind of result was returned, use it as the new state
          if interaction_res ~= nil and interaction_res ~= interaction_to_execute.current_state then
             interaction_to_execute.current_state = interaction_res
+            if interaction_to_execute.__editor_state then
+               interaction_to_execute.__editor_state.current_state = interaction_res
+            end
 
             -- Play the sound if there is one
             if interaction_to_execute.interaction_sound then
@@ -471,19 +474,20 @@ function M.components.interaction.process_component(new_ent, comp, entity_name)
       interaction_sound = assets.create_sound_from_asset(comp.interaction_sound_asset)
    end
 
-   new_ent:add(
-      M.components.interaction.class(
-         interaction_callback,
-         activatable_callback,
+   local class = M.components.interaction.class(
+      interaction_callback,
+      activatable_callback,
 
-         comp.initial_state,
-         comp.state_map,
-         interaction_sound,
-         comp.action_text,
+      comp.initial_state,
+      comp.state_map,
+      interaction_sound,
+      comp.action_text,
 
-         comp.touch_activated
-      )
+      comp.touch_activated
    )
+   class.__initial_state = comp.initial_state
+
+   new_ent:add(class)
 end
 
 function M.components.interaction.class:show_editor(ent)
@@ -495,7 +499,8 @@ function M.components.interaction.class:show_editor(ent)
          callback = util.deep_merge({}, self.on_interaction.callback_data),
          activatable_enabled = self.is_activatable ~= nil,
          -- "and" means if the value is not nil
-         activatable_callback = self.is_activatable and self.is_activatable.callback_data
+         activatable_callback = self.is_activatable and self.is_activatable.callback_data,
+         current_state = self.current_state
       }
    end
 
@@ -754,15 +759,32 @@ function M.components.interaction.class:show_editor(ent)
       ImGui.EndCombo()
    end
 
+   if ImGui.TreeNode("State map") then
+      show_table("State map", self, "state_map", Vector2f.new(0, 70))
+      ImGui.TreePop()
+   end
+
+   self.__initial_state = ImGui.InputText("Initial state", self.__initial_state or "")
+   self.__editor_state.current_state = ImGui.InputText("Current state", self.__editor_state.current_state or "")
+
    if ImGui.Button("Save") then
       if lume.trim(self.action_text) == "" then
          self.action_text = self.__defaults.action_text
       end
+      if lume.trim(self.__initial_state) == "" then
+         self.__initial_state = nil
+      end
+      if lume.trim(self.__editor_state.current_state) == "" then
+         self.__editor_state.current_state = nil
+      end
+      self.current_state = self.__editor_state.current_state
 
       local parts_to_save, part_values = {
-         "touch_activated", "action_text", interaction_sound
+         "touch_activated", "action_text", "interaction_sound_asset",
+         "state_map", "initial_state"
       }, { touch_activated = self.touch_activated, action_text = self.action_text,
-           interaction_sound = self.interaction_sound and getmetatable(self.interaction_sound).__asset_name }
+           interaction_sound_asset = self.interaction_sound and self.interaction_sound.asset_name,
+           state_map = self.state_map, initial_state = self.__initial_state }
 
       if not self.__editor_state.activatable_enabled then
          -- Mark that the part should be deleted
