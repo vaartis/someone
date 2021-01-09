@@ -499,6 +499,149 @@ function M.components.interaction.class:show_editor(ent)
       }
    end
 
+   local show_table
+   show_table = function(name, parent, table_name, size)
+      local the_table = parent[table_name]
+
+      if ImGui.BeginChild(name, size) then
+         if the_table then
+            for i, arg in pairs(the_table) do
+               local minus_button = function()
+                  -- Add ID at the end of the button name (invisible in UI)
+                  if ImGui.Button("-##" .. i) then
+                     -- For arrays, use table.remove, for tables set to nil
+                     if #the_table > 0 then
+                        table.remove(the_table, i)
+                     else
+                        the_table[i] = nil
+                     end
+                     if lume.count(the_table) == 0 then
+                        parent[table_name] = nil
+                     end
+
+                     return true
+                  end
+               end
+
+               if type(arg) == "string" then
+                  the_table[i] = ImGui.InputText(tostring(i), tostring(arg))
+               elseif type(arg) == "number" then
+                  if math.type(arg) == "float" then
+                     the_table[i] =
+                        ImGui.InputFloat(tostring(i), arg)
+                  else
+                     the_table[i] =
+                        ImGui.InputInt(tostring(i), arg)
+                  end
+               elseif type(arg) == "table" then
+                  ImGui.Text(tostring(i))
+                  ImGui.SameLine()
+                  -- For tables, show the minus button before the actual content
+                  if minus_button() then break end
+
+                  show_table(name .. i, the_table, i, Vector2f.new(0, 70))
+               elseif type(arg) == "boolean" then
+                  the_table[i] =
+                     ImGui.Checkbox(tostring(i), arg)
+               else
+                  ImGui.InputText(tostring(i), "Unsupported type: " .. tostring(arg), ImGuiInputTextFlags.ReadOnly)
+               end
+
+               if type(arg) ~= "table" then
+                  -- For non-tables, show the button on the right
+                  ImGui.SameLine()
+                  if minus_button() then break end
+               end
+            end
+         end
+
+         if ImGui.Button("+") then
+            ImGui.OpenPopup("Select type##" .. name)
+
+            self.__editor_state.new_argument = { }
+            -- If the argument is nil, has no values or is an array, mark it as such
+            if not the_table or lume.count(the_table) == 0 or #the_table > 0 then
+               self.__editor_state.new_argument.selected_type = "array"
+            else
+               self.__editor_state.new_argument.selected_type = "table"
+               self.__editor_state.new_argument.table_key = ""
+            end
+         end
+         if ImGui.BeginPopup("Select type##" .. name) then
+            local inserted_value_type = type(self.__editor_state.new_argument.inserted_value)
+            if ImGui.RadioButton("String", inserted_value_type == "string") then
+               self.__editor_state.new_argument.inserted_value = ""
+            end
+            ImGui.SameLine()
+            if ImGui.RadioButton("Bool", inserted_value_type == "boolean") then
+               self.__editor_state.new_argument.inserted_value = true
+            end
+
+            if ImGui.RadioButton(
+               "Integer",
+               inserted_value_type == "number" and math.type(self.__editor_state.new_argument.inserted_value) == "integer"
+            ) then
+               self.__editor_state.new_argument.inserted_value = 0
+            end
+            ImGui.SameLine()
+            if ImGui.RadioButton(
+               "Float",
+               inserted_value_type == "number" and math.type(self.__editor_state.new_argument.inserted_value) == "float"
+            ) then
+               self.__editor_state.new_argument.inserted_value = 0.0
+            end
+
+            if ImGui.RadioButton("Table", inserted_value_type == "table") then
+               self.__editor_state.new_argument.inserted_value = {}
+            end
+
+            if self.__editor_state.new_argument.inserted_value then
+               -- In case the argument table had nothing previosly, allow selecting if it's a table or an array
+               if not the_table or lume.count(the_table) == 0  then
+                  ImGui.Text("Argument container type")
+                  if ImGui.RadioButton("Array##container_type", self.__editor_state.new_argument.selected_type == "array") then
+                     self.__editor_state.new_argument.selected_type = "array"
+                  end
+                  ImGui.SameLine()
+                  if ImGui.RadioButton("Table##container_type", self.__editor_state.new_argument.selected_type == "table") then
+                     self.__editor_state.new_argument.selected_type = "table"
+                     self.__editor_state.new_argument.table_key = ""
+                  end
+               end
+               -- For table key, show the field to input the key
+               if self.__editor_state.new_argument.selected_type == "table" then
+                  self.__editor_state.new_argument.table_key = ImGui.InputText(
+                     "Table key",
+                     self.__editor_state.new_argument.table_key
+                  )
+               end
+
+               if ImGui.Button("Add") then
+                  -- In case there were no arguments previosly, create the table
+                  if not the_table then
+                     parent[table_name] = {}
+                     the_table = parent[table_name]
+                  end
+
+                  if self.__editor_state.new_argument.selected_type == "array" then
+                     table.insert(the_table, self.__editor_state.new_argument.inserted_value)
+
+                     ImGui.CloseCurrentPopup()
+                  elseif lume.trim(self.__editor_state.new_argument.table_key) ~= "" then
+                     the_table[self.__editor_state.new_argument.table_key] =
+                        self.__editor_state.new_argument.inserted_value
+
+                     ImGui.CloseCurrentPopup()
+                  end
+               end
+            end
+
+            ImGui.EndPopup()
+         end
+      end
+      ImGui.EndChild()
+   end
+
    local function show_callback(callback_parent, callback_name, original, module_source, installation_function)
       local callback = callback_parent[callback_name]
       if not callback then
@@ -534,135 +677,6 @@ function M.components.interaction.class:show_editor(ent)
 
             ImGui.EndCombo()
          end
-      end
-
-      local show_table
-      show_table = function(name, parent, table_name, size)
-         local the_table = parent[table_name]
-
-         if ImGui.BeginChild(name, size) then
-            if the_table then
-               for i, arg in pairs(the_table) do
-                  local minus_button = function()
-                     -- Add ID at the end of the button name (invisible in UI)
-                     if ImGui.Button("-##" .. i) then
-                        -- For arrays, use table.remove, for tables set to nil
-                        if #the_table > 0 then
-                           table.remove(the_table, i)
-                        else
-                           the_table[i] = nil
-                        end
-                        if lume.count(the_table) == 0 then
-                           parent[table_name] = nil
-                        end
-
-                        return true
-                     end
-                  end
-
-                  if type(arg) == "string" then
-                     the_table[i] = ImGui.InputText(tostring(i), tostring(arg))
-                  elseif type(arg) == "number" then
-                     the_table[i] =
-                        ImGui.InputFloat(tostring(i), arg)
-                  elseif type(arg) == "table" then
-                     ImGui.Text(tostring(i))
-                     ImGui.SameLine()
-                     -- For tables, show the minus button before the actual content
-                     if minus_button() then break end
-
-                     show_table(name .. i, the_table, i, Vector2f.new(0, 70))
-                  elseif type(arg) == "boolean" then
-                     the_table[i] =
-                        ImGui.Checkbox(tostring(i), arg)
-                  else
-                     ImGui.InputText(tostring(i), "Unsupported type: " .. tostring(arg), ImGuiInputTextFlags.ReadOnly)
-                  end
-
-                  if type(arg) ~= "table" then
-                     -- For non-tables, show the button on the right
-                     ImGui.SameLine()
-                     if minus_button() then break end
-                  end
-               end
-            end
-
-            if ImGui.Button("+") then
-               ImGui.OpenPopup("Select type##" .. name)
-
-               self.__editor_state.new_argument = { }
-               -- If the argument is nil, has no values or is an array, mark it as such
-               if not the_table or lume.count(the_table) == 0 or #the_table > 0 then
-                  self.__editor_state.new_argument.selected_type = "array"
-               else
-                  self.__editor_state.new_argument.selected_type = "table"
-                  self.__editor_state.new_argument.table_key = ""
-               end
-            end
-            if ImGui.BeginPopup("Select type##" .. name) then
-               local inserted_value_type = type(self.__editor_state.new_argument.inserted_value)
-               if ImGui.RadioButton("String", inserted_value_type == "string") then
-                  self.__editor_state.new_argument.inserted_value = ""
-               end
-               ImGui.SameLine()
-               if ImGui.RadioButton("Number", inserted_value_type == "number") then
-                  self.__editor_state.new_argument.inserted_value = 0
-               end
-               ImGui.SameLine()
-               if ImGui.RadioButton("Bool", inserted_value_type == "boolean") then
-                  self.__editor_state.new_argument.inserted_value = true
-               end
-
-
-               if ImGui.RadioButton("Table", inserted_value_type == "table") then
-                  self.__editor_state.new_argument.inserted_value = {}
-               end
-
-               if self.__editor_state.new_argument.inserted_value then
-                  -- In case the argument table had nothing previosly, allow selecting if it's a table or an array
-                  if not the_table or lume.count(the_table) == 0  then
-                     ImGui.Text("Argument container type")
-                     if ImGui.RadioButton("Array##container_type", self.__editor_state.new_argument.selected_type == "array") then
-                        self.__editor_state.new_argument.selected_type = "array"
-                     end
-                     ImGui.SameLine()
-                     if ImGui.RadioButton("Table##container_type", self.__editor_state.new_argument.selected_type == "table") then
-                        self.__editor_state.new_argument.selected_type = "table"
-                        self.__editor_state.new_argument.table_key = ""
-                     end
-                  end
-                  -- For table key, show the field to input the key
-                  if self.__editor_state.new_argument.selected_type == "table" then
-                     self.__editor_state.new_argument.table_key = ImGui.InputText(
-                        "Table key",
-                        self.__editor_state.new_argument.table_key
-                     )
-                  end
-
-                  if ImGui.Button("Add") then
-                     -- In case there were no arguments previosly, create the table
-                     if not the_table then
-                        parent[table_name] = {}
-                        the_table = parent[table_name]
-                     end
-
-                     if self.__editor_state.new_argument.selected_type == "array" then
-                        table.insert(the_table, self.__editor_state.new_argument.inserted_value)
-
-                        ImGui.CloseCurrentPopup()
-                     elseif lume.trim(self.__editor_state.new_argument.table_key) ~= "" then
-                        the_table[self.__editor_state.new_argument.table_key] =
-                           self.__editor_state.new_argument.inserted_value
-
-                        ImGui.CloseCurrentPopup()
-                     end
-                  end
-               end
-
-               ImGui.EndPopup()
-            end
-         end
-         ImGui.EndChild()
       end
 
       show_table(callback_name .. " arguments", callback, "args", Vector2f.new(0, 200))
@@ -720,27 +734,46 @@ function M.components.interaction.class:show_editor(ent)
          )
          ImGui.TreePop()
       end
-   else
-      if ImGui.Button("Remove activatable & Save") then
-         self.is_activatable = nil
-         self.__editor_state.activatable_callback = nil
-
-         TOML.save_entity_component(ent, "interaction", self, {"activatable_callback"}, { activatable_callback = nil })
-      end
    end
 
    self.touch_activated = ImGui.Checkbox("Touch activated", self.touch_activated)
    self.action_text = ImGui.InputText("Action text", self.action_text)
+
+   if ImGui.BeginCombo("Interaction sound", (self.interaction_sound and getmetatable(self.interaction_sound).__asset_name) or "(none)") then
+      -- Special case for no sound
+      if ImGui.Selectable("(none)", not self.interaction_sound) then
+         self.interaction_sound = nil
+      end
+      for _, name in ipairs(assets.list_known_assets("sounds")) do
+         -- not not is to basically a cast to boolean, as Selectable WANTS a boolean
+         if ImGui.Selectable(name, not not (self.interaction_sound and getmetatable(self.interaction_sound).__asset_name == name)) then
+            self.interaction_sound = assets.create_sound_from_asset(name)
+         end
+      end
+
+      ImGui.EndCombo()
+   end
 
    if ImGui.Button("Save") then
       if lume.trim(self.action_text) == "" then
          self.action_text = self.__defaults.action_text
       end
 
-      TOML.save_entity_component(
-         ent, "interaction", self,
-         { "touch_activated", "action_text" },
-         { touch_activated = self.touch_activated, action_text = self.action_text })
+      local parts_to_save, part_values = {
+         "touch_activated", "action_text", interaction_sound
+      }, { touch_activated = self.touch_activated, action_text = self.action_text,
+           interaction_sound = self.interaction_sound and getmetatable(self.interaction_sound).__asset_name }
+
+      if not self.__editor_state.activatable_enabled then
+         -- Mark that the part should be deleted
+         table.insert(parts_to_save, "activatable_callback")
+
+         -- Remove the activatable from the actual component
+         self.is_activatable = nil
+         self.__editor_state.activatable_callback = nil
+      end
+
+      TOML.save_entity_component(ent, "interaction", self, parts_to_save, part_values)
    end
 
    if self.__editor_state.last_error then
