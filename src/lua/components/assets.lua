@@ -33,6 +33,10 @@ function load_from_known_assets(asset_type, key)
    return asset
 end
 
+function M.list_known_assets(asset_type)
+   return lume.keys(known_assets[asset_type])
+end
+
 
 function M.add_to_known_assets(asset_type, key, path)
    known_assets[asset_type][key] = path
@@ -48,5 +52,13 @@ setmetatable(M.assets.sounds, {
     return load_from_known_assets("sounds", key)
   end
 })
+
+function M.create_sound_from_asset(asset_name)
+   local result = { sound = Sound.new(), asset_name = asset_name }
+
+   result.sound.buffer = M.assets.sounds[asset_name]
+
+   return result
+end
 
 return M

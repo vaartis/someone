@@ -69,7 +69,7 @@ PlayerMovementSystem.update = function(self, dt)
          -- Play the step sound every two steps of the animation, which are the moments
          -- when the feet hit the ground
          if player_movement.walking and animation.current_frame % 2 == 0 and player_movement.step_sound.status ~= SoundStatus.Playing then
-            player_movement.step_sound:play()
+            player_movement.step_sound.sound:play()
          end
       end
    end

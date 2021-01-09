@@ -171,7 +171,7 @@ function InteractionSystem:update(dt)
 
             -- Play the sound if there is one
             if interaction_to_execute.interaction_sound then
-               interaction_to_execute.interaction_sound:play()
+               interaction_to_execute.interaction_sound.sound:play()
             end
          end
       end
@@ -739,14 +739,14 @@ function M.components.interaction.class:show_editor(ent)
    self.touch_activated = ImGui.Checkbox("Touch activated", self.touch_activated)
    self.action_text = ImGui.InputText("Action text", self.action_text)
 
-   if ImGui.BeginCombo("Interaction sound", (self.interaction_sound and getmetatable(self.interaction_sound).__asset_name) or "(none)") then
+   if ImGui.BeginCombo("Interaction sound", (self.interaction_sound and self.interaction_sound.asset_name) or "(none)") then
       -- Special case for no sound
       if ImGui.Selectable("(none)", not self.interaction_sound) then
          self.interaction_sound = nil
       end
       for _, name in ipairs(assets.list_known_assets("sounds")) do
          -- not not is to basically a cast to boolean, as Selectable WANTS a boolean
-         if ImGui.Selectable(name, not not (self.interaction_sound and getmetatable(self.interaction_sound).__asset_name == name)) then
+         if ImGui.Selectable(name, not not (self.interaction_sound and self.interaction_sound.asset_name == name)) then
             self.interaction_sound = assets.create_sound_from_asset(name)
          end
       end

@@ -21,7 +21,7 @@ function SoundPlayerSystem:update()
          end
 
          if should_play then
-            sound_comp.sound:play()
+            sound_comp.sound.sound:play()
             sound_comp.played = true
          end
       end
