@@ -78,6 +78,8 @@ void register_imgui_usertypes(sol::state &lua) {
 
             return std::make_tuple(curr_item_ptr, changed);
         },
+        "BeginMenu", &ImGui::BeginMenu,
+        "EndMenu", &ImGui::EndMenu,
 
         "OpenPopup", &ImGui::OpenPopup,
         "BeginPopupModal", [](const char *label) { return ImGui::BeginPopupModal(

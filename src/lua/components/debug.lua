@@ -1,4 +1,6 @@
 local lume = require("lume")
+local fs = require("path.fs")
+local path = require("path")
 
 local util = require("util")
 local collider_components = require("components.collider")
@@ -87,7 +89,7 @@ function M.debug_menu()
    ImGui.SameLine()
 
    if ImGui.Button("Add entity") then
-      debug_menu_state.creating_entity = { name = "" }
+      debug_menu_state.creating_entity = { name = "", prefab = nil }
 
       ImGui.OpenPopup("Add entity")
    end
@@ -95,22 +97,70 @@ function M.debug_menu()
 
       debug_menu_state.creating_entity.name = ImGui.InputText("Name", debug_menu_state.creating_entity.name)
 
-      if ImGui.Button("Add")
-         and lume.trim(debug_menu_state.creating_entity.name) ~= ""
-         and not lume.match(
-            util.rooms_mod().engine:getRootEntity().children,
-            -- Ensure there are no same-named entities
-            function (e) return e:get("Name").name == debug_menu_state.creating_entity.name end)
-      then
-         local entities_mod = util.entities_mod()
+      if ImGui.BeginCombo("Prefab", debug_menu_state.creating_entity.prefab or "(none)") then
+         if ImGui.Selectable("(none)", not debug_menu_state.creating_entity.prefab) then
+            debug_menu_state.creating_entity.prefab = nil
+         end
 
-         debug_menu_state.selected = entities_mod.instantiate_entity(
-            debug_menu_state.creating_entity.name,
-            { }
-         )
-         debug_menu_state.creating_entity.name = ""
+         local prefab_path = "resources/rooms/prefabs/"
 
-         ImGui.CloseCurrentPopup()
+         local list_dir
+         list_dir = function(dir_path)
+            for file in fs.dir(dir_path) do
+               if file == "." or file == ".." then
+                  goto continue
+               end
+
+               local filename_without_ext = path.splitext(file)
+               local fullpath = path.join(dir_path, file)
+
+               if fs.isfile(fullpath) then
+                  local without_prefab_path = path.splitext(fullpath):gsub(prefab_path, "")
+
+                  if ImGui.Selectable(filename_without_ext, debug_menu_state.creating_entity.prefab == without_prefab_path) then
+                     debug_menu_state.creating_entity.prefab = without_prefab_path
+                  end
+               elseif fs.isdir(fullpath) then
+                  if ImGui.BeginMenu(file, true) then
+                     list_dir(fullpath)
+
+                     ImGui.EndMenu()
+                  end
+
+               end
+
+               ::continue::
+            end
+         end
+
+         list_dir(prefab_path)
+
+         ImGui.EndCombo()
+      end
+
+      if ImGui.Button("Add") then
+         local trimmed_name = lume.trim(debug_menu_state.creating_entity.name)
+         if trimmed_name ~= "" then
+            local any_same_named = false
+            for _, ent in pairs(util.rooms_mod().engine:getRootEntity().children) do
+               -- Ensure there are no same-named entities
+               if ent:get("Name").name == trimmed_name then
+                  any_same_named = true
+                  break
+               end
+            end
+
+            if not any_same_named then
+               local entities_mod = util.entities_mod()
+
+               debug_menu_state.selected = entities_mod.instantiate_entity(
+                  trimmed_name,
+                  { prefab = debug_menu_state.creating_entity.prefab }
+               )
+
+               ImGui.CloseCurrentPopup()
+            end
+         end
       end
       ImGui.SameLine()
       if ImGui.Button("Cancel") then ImGui.CloseCurrentPopup() end
