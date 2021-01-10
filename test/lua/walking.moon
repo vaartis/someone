@@ -119,7 +119,7 @@ describe "Callbacks", ->
         { entity_name: "test_ent", comp_name: "test_comp", needed_for: "testing" }
       )
 
-      assert.are.equal found_f, walking_data.interaction_callbacks.test_interaction
+      assert.are.equal getmetatable(found_f).__call, walking_data.interaction_callbacks.test_interaction
   describe "for activation", ->
     it "find functions in modules", ->
       found_f = interaction_components.process_activatable(
@@ -128,7 +128,7 @@ describe "Callbacks", ->
         { entity_name: "test_ent", comp_name: "test_comp", needed_for: "testing" }
       )
 
-      assert.are.equal found_f, walking_data.activatable_callbacks.test_activation
+      assert.are.equal getmetatable(found_f).__call, walking_data.activatable_callbacks.test_activation
 
     it "understand the 'not' operation", ->
       found_f = interaction_components.process_activatable(
@@ -138,5 +138,5 @@ describe "Callbacks", ->
       )
 
       -- The result should be the opposite, since the original function is wrapped to return the negation
-      assert.are_not.equal found_f, walking_data.activatable_callbacks.test_activation
+      assert.are_not.equal getmetatable(found_f).__call, walking_data.activatable_callbacks.test_activation
       assert.is_false found_f(true)
