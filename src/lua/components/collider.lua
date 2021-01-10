@@ -149,7 +149,25 @@ function M.components.collider.class:show_editor(ent)
          Vector2f.new(x, y)
    end
    if ImGui.Button("Save##collider") then
-      TOML.save_entity_component(ent, "transformable", self, { "position" }, { position = { x, y } })
+      local saved_x, saved_y = x, y
+      if self.mode == "sprite" then
+         -- For sprites, adjust the position according to the collider rules
+
+         local tf = ent:get("Transformable").transformable
+
+         -- Move to the origin
+         saved_x, saved_y = math.floor(saved_x + (tf.origin.x * tf.scale.x)), math.floor(saved_y + (tf.origin.y * tf.scale.y))
+
+         -- Adjust for scale
+         local scale_modifier
+         if tf.scale.x > 0 then
+            scale_modifier = 1 - tf.scale.x
+         else
+            scale_modifier = tf.scale.x * -1
+         end
+         saved_x = saved_x + math.floor((w * scale_modifier))
+      end
+      TOML.save_entity_component(ent, "transformable", self, { "position" }, { position = { saved_x, saved_y } })
 
       if self.mode == "constant" then
          TOML.save_entity_component(ent, "collider", self, { "size" }, { size = { w, h } })
