@@ -64,6 +64,7 @@ local function load_prefab(prefab_name_or_conf, base_data)
    else
       new_metatable = getmetatable(prefab_data)
    end
+   new_metatable.toml_location.__node_prefab_file = "resources/rooms/prefabs/" .. tostring(prefab_name) .. ".toml"
 
    base_data = util.deep_merge(prefab_data, base_data)
    setmetatable(base_data, new_metatable)

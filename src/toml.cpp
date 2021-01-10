@@ -207,51 +207,289 @@ std::string encode_toml(sol::this_state lua_, sol::object from, bool inline_tabl
     return ss.str();
 }
 
+uint32_t find_in_string(std::string str, toml::source_position pos) {
+    uint32_t curr_line = 1, curr_pos = 1, res_pos = 1;
+
+    for (auto ch : str) {
+        if (curr_line == pos.line && curr_pos == pos.column)
+            break;
+
+        if (ch == '\n') {
+            curr_line++;
+            curr_pos = 1;
+        } else {
+            curr_pos++;
+        }
+
+        res_pos++;
+    }
+
+    return res_pos - 1;
+}
+
+sol::table create_new_entity_locations(sol::state_view lua, sol::table entity) {
+    // Get the current room file. If the entity has no location, then it's a new entity
+    // that just got added to the room. Usually this information is stored in the entity itself,
+    // but when adding new entities it has to be added from somewhere. This path is set in rooms.load_room
+    std::string current_room_file = lua.script("return require('components.rooms').current_room_file");
+
+    auto result = lua.create_table_with(
+        "__node_file", current_room_file
+    );
+    entity["__toml_location"] = result;
+
+    return result;
+}
+
+void delete_part_from_comp(sol::state_view lua, const std::string &deleted_name, sol::table locations, const std::string &name) {
+    sol::table this_location = locations[name];
+
+    // If it doesn't exist in the component, then nothing is to be deleted
+    if (!this_location[deleted_name].get<sol::optional<sol::object>>())
+        return;
+
+    auto deleted_file = this_location[deleted_name]["__node_file"].get<std::string>();
+    auto deleted_path = this_location[deleted_name]["__node_path"].get<std::vector<std::string>>();
+
+    auto parent_path(deleted_path);
+    parent_path.pop_back();
+
+    auto parent_node = find_by_path(deleted_file, parent_path).as_table();
+    if (parent_node->find(deleted_name) == parent_node->end())
+        // Again, if it doesn't exist in the parent node, then nothing is to be deleted
+        return;
+
+    auto deleted_node = find_by_path(deleted_file, deleted_path).node();
+    auto deleted_location = deleted_node->source();
+
+    // For non-inline parent extend the location to capture the whole key
+    if (!parent_node->is_inline()) {
+        deleted_location.begin.column = 1;
+    }
+
+    std::ifstream toml_file;
+    toml_file.open(deleted_file);
+    std::string contents((std::istreambuf_iterator<char>(toml_file)), std::istreambuf_iterator<char>());
+
+    auto beginning = find_in_string(contents, deleted_location.begin), end = find_in_string(contents, deleted_location.end);
+
+    if (parent_node->is_inline()) {
+        // For inline parent, go back until the previous , or {
+
+        // Go back from the initial { of the node if it's a table
+        if (deleted_node->is_table())
+            beginning--;
+        while (contents[beginning] != ',' && contents[beginning] != '{')
+            beginning--;
+        if (contents[beginning] == '{')
+            // Go one character forward to not accidentally remove the {
+            beginning++;
+    }
+
+    auto amount_to_replace = end - beginning;
+    if (!parent_node->is_inline())
+        amount_to_replace++;
+    // In case of non-inline deletion, also delete the following newline
+    contents.replace(beginning, amount_to_replace, "");
+
+    rewrite_resource_file(deleted_file, contents);
+
+    // Re-parse the source file, update the file_node_map
+    parse_toml(sol::this_state(lua), deleted_file);
+
+    this_location[deleted_name] = sol::lua_nil;
+}
+
+void insert_new_part(
+    sol::state_view lua, sol::table this_location, std::string part_name,
+    toml::source_region *ret_source, bool *ret_to_inline_table
+) {
+    const auto &parent_file = this_location["__node_file"].get<const std::string &>();
+    auto parent_path = this_location["__node_path"].get<std::vector<std::string>>();
+
+    const toml::table *toml_table = find_by_path(
+        parent_file,
+        parent_path
+    ).as_table();
+
+    std::vector<std::string> this_path(parent_path);
+    this_path.push_back(part_name);
+
+    this_location[part_name] = lua.create_table_with(
+        "__node_file", parent_file,
+        "__node_path", this_path
+    );
+
+    bool to_inline_table = toml_table->is_inline();
+
+    toml::source_region source;
+    if (to_inline_table) {
+        source = toml_table->source();
+        source.begin = source.end;
+    } else {
+        // Find the key that is on the lowest line
+        auto last_pair = std::max_element(
+            toml_table->cbegin(),
+            toml_table->cend(),
+            [](const auto &a, const auto &b) {
+                const auto &[_, a_val] = a;
+                const auto &[_2, b_val] = b;
+                return a_val.source().end.line < b_val.source().end.line;
+            }
+        );
+
+        // If there were no other keys, use the table header
+        if (last_pair != toml_table->cend()) {
+            auto [_, last_val] = *last_pair;
+            source = last_val.source();
+        } else {
+            source = toml_table->source();
+        }
+
+        // Move the output to the beginning of the next line
+        source.begin = source.end;
+    }
+
+    *ret_source = source;
+    *ret_to_inline_table = to_inline_table;
+}
+
+std::tuple<const toml::node *, std::vector<std::string>> find_last_comp(sol::state_view lua, sol::table locations) {
+    // Collect all nodes that are actually talbes and not some string or userdata
+    sol::table comp_locations = lua.create_table();
+    for (auto [k, v] : locations) {
+        if (v.is<sol::table>() && !v.is<sol::userdata>()) {
+            comp_locations[k] = v;
+        }
+    }
+
+    sol::optional<std::string> node_prefab_file = locations["__node_prefab_file"];
+
+    // Find the closest-to-bottom node for this entity.
+    // For some reason, std::max_element doesn't work for sol::table,
+    // so just count the good old way
+    const toml::node *last_comp = nullptr;
+    std::vector<std::string> last_path;
+    uint32_t max_line = 0;
+    for (auto [k, v_] : comp_locations) {
+        sol::table v = v_;
+
+        const auto &file = v["__node_file"].get<const std::string &>();
+        auto path = v["__node_path"].get<std::vector<std::string>>();
+
+        // Skip the nodes that are from a prefab
+        if (node_prefab_file && file == *node_prefab_file)
+            continue;
+
+        const auto view = find_by_path(file, path);
+        auto line = view.node()->source().end.line;
+
+        if (line > max_line) {
+            max_line = line;
+            last_comp = view.node();
+
+            last_path = path;
+            // Pop the last element (the component name), as it's not needed
+            last_path.pop_back();
+        }
+    }
+
+    return { last_comp, last_path };
+}
+
+std::reference_wrapper<const toml::node> find_last_source(const toml::table &table) {
+    auto [_, last_node] = *std::max_element(
+        table.begin(),
+        table.cend(),
+        [](const auto &a, const auto &b) {
+            const auto &[_, a_val] = a;
+            const auto &[_2, b_val] = b;
+
+            return a_val.source().end.line < b_val.source().end.line;
+        }
+    );
+
+    return std::reference_wrapper(last_node);
+};
+
+std::tuple<const toml::node *, std::vector<std::string>> create_new_comp_and_entity(sol::table locations, sol::table entity) {
+    // Iterate entities
+    const auto &file_entities = file_node_map[locations["__node_file"].get<std::string>()]["entities"].as_table();
+
+    // Find the last entity in the file
+    auto last_entity = find_last_source(*file_entities);
+
+    // Find the last component of the entity
+    auto last_entity_tbl = last_entity.get().as_table();
+    auto last_node = find_last_source(*last_entity_tbl);
+
+    // Get the name by finding the Name component and getting the name from it
+    sol::protected_function get_f = entity["get"];
+    sol::table name_comp = get_f(entity, "Name");
+    std::string ent_name = name_comp["name"];
+
+    auto last_comp = &last_node.get();
+    // Create a path for this entity.
+    std::vector<std::string> last_path = { "entities", ent_name };
+    locations["__node_path"] = last_path;
+
+    return { last_comp, last_path };
+}
+
 void save_entity_component(
     sol::this_state lua_, sol::table entity, const std::string &name, sol::table comp,
     sol::table part_names, sol::table part_values
 ) {
     sol::state_view lua(lua_);
 
-    auto find_in_string = [](std::string str, toml::source_position pos) {
-        uint32_t curr_line = 1, curr_pos = 1, res_pos = 1;
-
-        for (auto ch : str) {
-            if (curr_line == pos.line && curr_pos == pos.column)
-                break;
-
-            if (ch == '\n') {
-                curr_line++;
-                curr_pos = 1;
-            } else {
-                curr_pos++;
-            }
-
-            res_pos++;
-        }
-
-        return res_pos - 1;
-    };
-
     sol::optional<sol::table> locations_ = entity["__toml_location"];
     if (!locations_) {
-        // Get the current room file. If the entity has no location, then it's a new entity
-        // that just got added to the room. Usually this information is stored in the entity itself,
-        // but when adding new entities it has to be added from somewhere. This path is set in rooms.load_room
-        std::string current_room_file = lua.script("return require('components.rooms').current_room_file");
-
-        locations_ = lua.create_table_with(
-            "__node_file", current_room_file
-        );
-        entity["__toml_location"] = *locations_;
+        locations_ = create_new_entity_locations(lua, entity);
     }
+
     auto locations = *locations_;
+
+    sol::optional<std::string> node_prefab_file = locations["__node_prefab_file"];
 
     // A deep equal function defined in lua, the function can compare tables
     std::function<bool(sol::object, sol::object)> deep_equal = lua.script("return require('util').deep_equal");
 
     sol::optional<sol::table> this_location_ = locations[name];
-    if (!this_location_) {
+
+    bool this_location_only_defined_in_prefab = this_location_ && node_prefab_file
+        // If the node's __node_file points to the prefab, the location is only defined in prefab,
+        // so it needs to be created in the file
+        && (*this_location_)["__node_file"].get<std::string>() == *node_prefab_file;
+
+    std::map<std::string, bool> parts_overriding_prefab;
+    if (node_prefab_file) {
+        auto prefab_file_map = file_node_map[*node_prefab_file];
+
+        for (auto [_, k] : part_names) {
+            sol::optional<sol::object> v_ = part_values[k];
+
+            if (v_) {
+                auto maybe_prefab_comp_node = prefab_file_map[name];
+                if (maybe_prefab_comp_node) {
+                    auto maybe_prefab_comp_value = maybe_prefab_comp_node[k.as<std::string>()];
+                    if (maybe_prefab_comp_value) {
+                        auto [converted_prefab_val, _] = convert_to_lua(lua, *maybe_prefab_comp_value.node());
+
+                        parts_overriding_prefab[k.as<std::string>()] =
+                            !deep_equal(converted_prefab_val, *v_);
+                    }
+                }
+            }
+        }
+    }
+
+    // Count the amount of overriden parts (those that have true as value)
+    auto overriden_parts = std::count_if(
+        parts_overriding_prefab.cbegin(),
+        parts_overriding_prefab.cend(),
+        [](const auto &arg) { return arg.second; }
+    );
+    if (!this_location_ || (this_location_only_defined_in_prefab && overriden_parts > 0)) {
         // As a special case, if:
         // 1. the component is transformable
         // 2. it has a drawable
@@ -268,91 +506,21 @@ void save_entity_component(
             }
         }
 
-        sol::table comp_locations = lua.create_table();
-        for (auto [k, v] : locations) {
-            if (v.is<sol::table>() && !v.is<sol::userdata>()) {
-                comp_locations[k] = v;
-            }
-        }
-
         // Find the closest-to-bottom node for this entity.
         // For some reason, std::max_element doesn't work for sol::table,
         // so just count the good old way
-        const toml::node *last_comp = nullptr;
-        std::vector<std::string> last_path;
-        uint32_t max_line = 0;
-        for (auto [k, v_] : comp_locations) {
-            sol::table v = v_;
-
-            const auto &file = v["__node_file"].get<const std::string &>();
-            auto path = v["__node_path"].get<std::vector<std::string>>();
-
-            const auto view = find_by_path(file, path);
-            auto line = view.node()->source().end.line;
-
-            if (line > max_line) {
-                max_line = line;
-                last_comp = view.node();
-
-                last_path = path;
-                // Pop the last element (the component name), as it's not needed
-                last_path.pop_back();
-            }
-        }
-
-        const auto max_source = [](const toml::table &table) {
-            auto [_, last_node] = *std::max_element(
-                table.begin(),
-                table.cend(),
-                [](const auto &a, const auto &b) {
-                    const auto &[_, a_val] = a;
-                    const auto &[_2, b_val] = b;
-
-                    return a_val.source().end.line < b_val.source().end.line;
-                }
-            );
-
-            return std::reference_wrapper(last_node);
-        };
+        auto [last_comp, last_path] = find_last_comp(lua, locations);
 
         // If there are no other components on this entity, it's a new entity,
         // so just take the position of the last entity in the file and use that
         if (last_comp == nullptr) {
-            // Iterate entities
-            const auto &file_entities = file_node_map[locations["__node_file"].get<std::string>()]["entities"].as_table();
-
-            // Find the last entity in the file
-            auto last_entity = max_source(*file_entities);
-
-            // Find the last component of the entity
-            auto last_entity_tbl = last_entity.get().as_table();
-            auto last_node = max_source(*last_entity_tbl);
-
-            // Get the name by finding the Name component and getting the name from it
-            sol::protected_function get_f = entity["get"];
-            sol::table name_comp = get_f(entity, "Name");
-            std::string ent_name = name_comp["name"];
-
-            last_comp = &last_node.get();
-            // Create a path for this entity.
-            last_path = { "entities", ent_name };
-            locations["__node_path"] = last_path;
+            std::tie(last_comp, last_path) = create_new_comp_and_entity(locations, entity);
         }
 
         const toml::table *last_tbl = last_comp->as_table();
 
         // Find the key that is on the lowest line
-        auto last_pair = std::max_element(
-            last_tbl->cbegin(),
-            last_tbl->cend(),
-            [](const auto &a, const auto &b) {
-                const auto &[_, a_val] = a;
-                const auto &[_2, b_val] = b;
-                return a_val.source().end.line < b_val.source().end.line;
-            }
-        );
-        auto [_, last_v] = *last_pair;
-        auto last_pair_src = last_v.source();
+        auto last_pair_src = find_last_source(*last_tbl).get().source();
 
         // Table that only contains the path to the component,
         // so the the TOML encoder will create a table header.
@@ -398,65 +566,28 @@ void save_entity_component(
 
         sol::optional<sol::object> v_ = part_values[k];
 
+        bool prefab_has_part = parts_overriding_prefab.contains(k.as<std::string>());
+        bool overrides_prefab = prefab_has_part
+            ? parts_overriding_prefab[k.as<std::string>()]
+            : false;
+
+        bool part_only_in_prefab = false;
+        if (auto part_source = this_location[k].get<sol::optional<sol::table>>(); prefab_has_part && part_source) {
+            if ((*part_source)["__node_file"].get<const std::string &>() == *node_prefab_file)
+                part_only_in_prefab = true;
+        }
+
         // If value for the part was nil, it was deleted. If the value is the same as the default,
         // also delete it
-        if (!v_ || deep_equal(*v_, comp_defaults[k])) {
+        if (!v_ || deep_equal(*v_, comp_defaults[k]) || (prefab_has_part && !overrides_prefab && !part_only_in_prefab)) {
             auto deleted_name = k.as<std::string>();
 
-            auto deleted_file = this_location["__node_file"].get<std::string>();
-            auto parent_path = this_location["__node_path"].get<std::vector<std::string>>();
+            if (!overrides_prefab) {
+                // Delete the part from the component
+                delete_part_from_comp(lua, deleted_name, locations, name);
 
-            auto deleted_path(parent_path);
-            deleted_path.push_back(deleted_name);
-
-            auto parent_node = find_by_path(deleted_file, parent_path).as_table();
-            if (parent_node->find(deleted_name) == parent_node->end())
-                // If it doesn't exist, then nothing is to be deleted
                 continue;
-
-            auto deleted_node = find_by_path(deleted_file, deleted_path).node();
-            auto deleted_location = deleted_node->source();
-
-            // For non-inline parent extend the location to capture the whole key
-            if (!parent_node->is_inline()) {
-                deleted_location.begin.column = 1;
             }
-
-            std::ifstream toml_file;
-            toml_file.open(deleted_file);
-            std::string contents((std::istreambuf_iterator<char>(toml_file)), std::istreambuf_iterator<char>());
-
-            auto beginning = find_in_string(contents, deleted_location.begin), end = find_in_string(contents, deleted_location.end);
-
-            if (parent_node->is_inline()) {
-                // For inline parent, go back until the previous , or {
-
-                // Go back from the initial { of the node if it's a table
-                if (deleted_node->is_table())
-                    beginning--;
-                while (contents[beginning] != ',' && contents[beginning] != '{')
-                    beginning--;
-                if (contents[beginning] == '{')
-                    // Go one character forward to not accidentally remove the {
-                    beginning++;
-            }
-
-            auto amount_to_replace = end - beginning;
-            if (!parent_node->is_inline())
-                amount_to_replace++;
-            // In case of non-inline deletion, also delete the following newline
-            contents.replace(beginning, amount_to_replace, "");
-
-            rewrite_resource_file(deleted_file, contents);
-
-            // Re-parse the source file, update the file_node_map
-            const std::string &path = deleted_file;
-            parse_toml(lua_, deleted_file);
-
-            this_location[deleted_name] = sol::lua_nil;
-
-
-            continue;
         }
         // If we got past here, then the value exists
         auto v = *v_;
@@ -465,56 +596,15 @@ void save_entity_component(
 
         bool is_new = false, to_inline_table = false;
 
-        if (!source_) {
-            // Check the default values and if the value is the same as the default,
-            // do not create it.
-            if (sol::object comp_default = comp_defaults[k]; comp_default != sol::lua_nil && deep_equal(v, comp_default))
-                continue;
-
-            const auto &parent_file = this_location["__node_file"].get<const std::string &>();
-            auto parent_path = this_location["__node_path"].get<std::vector<std::string>>();
-
-            const toml::table *toml_table = find_by_path(
-                parent_file,
-                parent_path
-            ).as_table();
-
-            std::vector<std::string> this_path(parent_path);
-            this_path.push_back(k.as<std::string>());
-
-            this_location[k] = lua.create_table_with(
-                "__node_file", parent_file,
-                "__node_path", this_path
-            );
+        if (!source_ || (part_only_in_prefab && overrides_prefab)) {
+            if (!overrides_prefab)
+                // Check the default values and if the value is the same as the default,
+                // do not create it. However if it overrides the prefab value, do create it.
+                if (sol::object comp_default = comp_defaults[k]; comp_default != sol::lua_nil && deep_equal(v, comp_default))
+                    continue;
 
             is_new = true;
-            to_inline_table = toml_table->is_inline();
-
-            if (to_inline_table) {
-                source = toml_table->source();
-                source.begin = source.end;
-            } else {
-                // Find the key that is on the lowest line
-                auto last_pair = std::max_element(
-                    toml_table->cbegin(),
-                    toml_table->cend(),
-                    [](const auto &a, const auto &b) {
-                        const auto &[_, a_val] = a;
-                        const auto &[_2, b_val] = b;
-                        return a_val.source().end.line < b_val.source().end.line;
-                    }
-                );
-                // If there were no other keys, use the table header
-                if (last_pair != toml_table->cend()) {
-                    auto [_, last_val] = *last_pair;
-                    source = last_val.source();
-                } else {
-                    source = toml_table->source();
-                }
-
-                // Move the output to the beginning of the next line
-                source.begin = source.end;
-            }
+            insert_new_part(lua, this_location, k.as<std::string>(), &source, &to_inline_table);
         } else {
             source = find_by_path(
                 (*source_)["__node_file"].get<const std::string &>(),
@@ -565,5 +655,29 @@ void save_entity_component(
         // Re-parse the source file, update the file_node_map
         const std::string &path = *source.path;
         parse_toml(lua_, *source.path);
+    }
+
+    // If this component doesn't have any data anymore - delete it from the file
+    auto this_location_file = (this_location)["__node_file"].get<const std::string &>();
+    auto this_location_tbl = find_by_path(
+        this_location_file,
+        (this_location)["__node_path"].get<const std::vector<std::string> &>()
+    ).as_table();
+    if (this_location_tbl->size() == 0) {
+        std::ifstream toml_file;
+        toml_file.open(this_location_file);
+        std::string contents((std::istreambuf_iterator<char>(toml_file)), std::istreambuf_iterator<char>());
+
+        auto beginning = find_in_string(contents, this_location_tbl->source().begin),
+            end = find_in_string(contents, this_location_tbl->source().end);
+        // Delete the previous newline
+        beginning -= 1;
+        // Delete the following newline
+        end += 1;
+        contents.replace(beginning, end - beginning, "");
+        rewrite_resource_file(this_location_file, contents);
+        parse_toml(sol::this_state(lua), this_location_file);
+
+        locations[name] = sol::lua_nil;
     }
 }
