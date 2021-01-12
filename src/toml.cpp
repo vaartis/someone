@@ -227,18 +227,14 @@ uint32_t find_in_string(std::string str, toml::source_position pos) {
     return res_pos - 1;
 }
 
-sol::table create_new_entity_locations(sol::state_view lua, sol::table entity) {
+void create_new_entity_location(sol::state_view lua, sol::table entity, sol::table result_table) {
     // Get the current room file. If the entity has no location, then it's a new entity
     // that just got added to the room. Usually this information is stored in the entity itself,
     // but when adding new entities it has to be added from somewhere. This path is set in rooms.load_room
     std::string current_room_file = lua.script("return require('components.rooms').current_room_file");
 
-    auto result = lua.create_table_with(
-        "__node_file", current_room_file
-    );
-    entity["__toml_location"] = result;
-
-    return result;
+    result_table["__node_file"] = current_room_file;
+    entity["__toml_location"] = result_table;
 }
 
 void delete_part_from_comp(sol::state_view lua, const std::string &deleted_name, sol::table locations, const std::string &name) {
@@ -357,6 +353,17 @@ void insert_new_part(
 std::tuple<const toml::node *, std::vector<std::string>> find_last_comp(sol::state_view lua, sol::table locations) {
     // Collect all nodes that are actually talbes and not some string or userdata
     sol::table comp_locations = lua.create_table();
+
+    // In case there are no other nodes on the entity, also add the "self" node, in particular
+    // this is applicable to the entity that is made from a prefab and didn't override anything
+    if (locations["__node_path"].get<sol::optional<std::vector<std::string>>>()
+        && locations["__node_file"].get<sol::optional<std::string>>()) {
+        comp_locations["self"] = lua.create_table_with(
+            "__node_file", locations["__node_file"],
+            "__node_path", locations["__node_path"]
+        );
+    }
+
     for (auto [k, v] : locations) {
         if (v.is<sol::table>() && !v.is<sol::userdata>()) {
             comp_locations[k] = v;
@@ -384,13 +391,18 @@ std::tuple<const toml::node *, std::vector<std::string>> find_last_comp(sol::sta
         const auto view = find_by_path(file, path);
         auto line = view.node()->source().end.line;
 
-        if (line > max_line) {
+        // Only count tables as components
+        if (line > max_line && view.is_table()) {
             max_line = line;
             last_comp = view.node();
 
             last_path = path;
-            // Pop the last element (the component name), as it's not needed
-            last_path.pop_back();
+
+            // Pop the last element (the component name), as it's not needed,
+            // except on "self", where there's no component name
+            if (k.as<std::string>() != "self") {
+                last_path.pop_back();
+            }
         }
     }
 
@@ -412,7 +424,7 @@ std::reference_wrapper<const toml::node> find_last_source(const toml::table &tab
     return std::reference_wrapper(last_node);
 };
 
-std::tuple<const toml::node *, std::vector<std::string>> create_new_comp_and_entity(sol::table locations, sol::table entity) {
+std::tuple<const toml::node *, std::vector<std::string>> path_for_new_comp_and_entity(sol::table locations, sol::table entity) {
     // Iterate entities
     const auto &file_entities = file_node_map[locations["__node_file"].get<std::string>()]["entities"].as_table();
 
@@ -436,6 +448,21 @@ std::tuple<const toml::node *, std::vector<std::string>> create_new_comp_and_ent
     return { last_comp, last_path };
 }
 
+bool is_zero_transform_with_drawable(sol::state_view lua, const std::string &name, sol::table part_values, sol::table locations) {
+    std::function<bool(sol::object, sol::object)> deep_equal = lua.script("return require('util').deep_equal");
+
+    if (name == "transformable") {
+        auto position_part = part_values["position"];
+        // First check for drawable, then
+        // compare position with a table of {0, 0}
+        if (locations["drawable"].get<sol::optional<sol::table>>() && deep_equal(position_part, lua.create_table_with(1, 0, 2, 0))) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void save_entity_component(
     sol::this_state lua_, sol::table entity, const std::string &name, sol::table comp,
     sol::table part_names, sol::table part_values
@@ -443,8 +470,10 @@ void save_entity_component(
     sol::state_view lua(lua_);
 
     sol::optional<sol::table> locations_ = entity["__toml_location"];
-    if (!locations_) {
-        locations_ = create_new_entity_locations(lua, entity);
+    if (!locations_ || !(*locations_)["__node_file"].get<sol::optional<std::string>>()) {
+        if (!locations_)
+            locations_ = lua.create_table();
+        create_new_entity_location(lua, entity, *locations_);
     }
 
     auto locations = *locations_;
@@ -490,31 +519,43 @@ void save_entity_component(
         [](const auto &arg) { return arg.second; }
     );
     if (!this_location_ || (this_location_only_defined_in_prefab && overriden_parts > 0)) {
+        // Find the closest-to-bottom node for this entity.
+        auto [last_comp, last_path] = find_last_comp(lua, locations);
+
+        // If there are no other components on this entity, it's a new entity,
+        // so just take the position of the last entity in the file and use that
+        bool is_new_ent = last_comp == nullptr;
+
+        // Do we need to actually output the component? This is only false when the component
+        // is a transformable with position = 0, 0 and has a drawable
+        bool output_component = true;
+
         // As a special case, if:
         // 1. the component is transformable
         // 2. it has a drawable
         // 3. it's position is 0, 0,
         // don't actually add this component to the file.
         // This is probably only the case for the background, but still
-        if (name == "transformable") {
-            auto position_part = part_values["position"];
-            // First check for drawable, then
-            // compare position with a table of {0, 0}
-            if (locations["drawable"].get<sol::optional<sol::table>>() && deep_equal(position_part, lua.create_table_with(1, 0, 2, 0))) {
-                // If position is indeed 0, 0 - exit
-                return;
+        if (is_zero_transform_with_drawable(lua, name, part_values, locations)) {
+            bool has_position = parts_overriding_prefab.contains("position");
+            bool overrides_position = has_position
+                ? parts_overriding_prefab["position"]
+                : false;
+
+            if (!overrides_position) {
+                // If position is indeed 0, 0 - do not output. UNLESS, it overrides the prefab value.
+                // For new entities with a prefab, there is still need to output the header with prefab spec,
+                // so just ask to not output the rest, otherwise if it's not a new entity or doesn't have a prefab just exit
+                if (is_new_ent && node_prefab_file) {
+                    output_component = false;
+                } else {
+                    return;
+                }
             }
         }
 
-        // Find the closest-to-bottom node for this entity.
-        // For some reason, std::max_element doesn't work for sol::table,
-        // so just count the good old way
-        auto [last_comp, last_path] = find_last_comp(lua, locations);
-
-        // If there are no other components on this entity, it's a new entity,
-        // so just take the position of the last entity in the file and use that
-        if (last_comp == nullptr) {
-            std::tie(last_comp, last_path) = create_new_comp_and_entity(locations, entity);
+        if (is_new_ent) {
+            std::tie(last_comp, last_path) = path_for_new_comp_and_entity(locations, entity);
         }
 
         const toml::table *last_tbl = last_comp->as_table();
@@ -529,11 +570,30 @@ void save_entity_component(
         auto curr_level = dummy_pathed_table;
         // Push the component name to the path
         last_path.push_back(name);
+
         for (auto path_elem : last_path) {
+            // When the next level is the component, insert the prefab into the entity
+            if (path_elem == name && is_new_ent) {
+                const std::string prefab_dir = "resources/rooms/prefabs/";
+                auto prefab_dir_pos = node_prefab_file->find(prefab_dir);
+                auto prefab_name_with_ext = node_prefab_file->replace(prefab_dir_pos, prefab_dir.size(), "");
+                auto prefab_name_path = std::filesystem::path(prefab_name_with_ext);
+                prefab_name_path.replace_extension("");
+
+                std::string prefab_name = prefab_name_path.string();
+
+                curr_level["prefab"] = prefab_name;
+
+                // If the component is not to be output, exit the loop now
+                if (!output_component)
+                    break;
+            }
+
             auto created_level = lua.create_table();
             curr_level[path_elem] = created_level;
             curr_level = created_level;
         }
+
         auto generated_table_header = encode_toml(lua_, dummy_pathed_table);
         // Prepend an additional newline
         generated_table_header.insert(0, "\n\n");
@@ -549,6 +609,11 @@ void save_entity_component(
         rewrite_resource_file(*last_pair_src.path, contents);
 
         parse_toml(lua_, *last_pair_src.path);
+
+        // If we got here, then a new entity has a prefab but the component has default values,
+        // so no need to do the rest, exit now
+        if (!output_component)
+            return;
 
         this_location_ = lua.create_table_with(
             "__node_file", *last_pair_src.path,
@@ -579,7 +644,10 @@ void save_entity_component(
 
         // If value for the part was nil, it was deleted. If the value is the same as the default,
         // also delete it
-        if (!v_ || deep_equal(*v_, comp_defaults[k]) || (prefab_has_part && !overrides_prefab && !part_only_in_prefab)) {
+        if (!v_ || deep_equal(*v_, comp_defaults[k])
+            || (prefab_has_part && !overrides_prefab && !part_only_in_prefab)
+            || (!overrides_prefab && is_zero_transform_with_drawable(lua, name, part_values, locations))
+        ) {
             auto deleted_name = k.as<std::string>();
 
             if (!overrides_prefab) {

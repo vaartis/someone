@@ -36,7 +36,6 @@ do
    )
 end
 
-
 local function load_prefab(prefab_name_or_conf, base_data)
    local prefab_name, removed_components
    -- Allow prefab to either be just a name or a table with more info
@@ -58,13 +57,15 @@ local function load_prefab(prefab_name_or_conf, base_data)
       prefab_data = load_prefab(prefab_data.prefab, prefab_data)
    end
 
-   local new_metatable
+   local prefab_metatable = getmetatable(prefab_data)
+   prefab_metatable.toml_location.__node_file = nil
+   prefab_metatable.toml_location.__node_path = nil
+   prefab_metatable.toml_location.__node_prefab_file = "resources/rooms/prefabs/" .. tostring(prefab_name) .. ".toml"
+
+   local new_metatable = prefab_metatable
    if getmetatable(base_data) then
-      new_metatable = util.deep_merge(getmetatable(prefab_data), getmetatable(base_data))
-   else
-      new_metatable = getmetatable(prefab_data)
+      new_metatable = util.deep_merge(new_metatable, getmetatable(base_data))
    end
-   new_metatable.toml_location.__node_prefab_file = "resources/rooms/prefabs/" .. tostring(prefab_name) .. ".toml"
 
    base_data = util.deep_merge(prefab_data, base_data)
    setmetatable(base_data, new_metatable)
@@ -146,7 +147,9 @@ end
 function M.instantiate_entity(entity_name, entity, parent)
    local new_ent = Entity(parent)
 
-   if entity.prefab then entity = load_prefab(entity.prefab, entity) end
+   if entity.prefab then
+      entity = load_prefab(entity.prefab, entity)
+   end
 
    local entity_components = {}
    for comp_name, comp in pairs(entity) do
