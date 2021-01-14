@@ -37,66 +37,49 @@ std::tuple<sol::object, sol::table> convert_to_lua(
         sol::object result;
         sol::table result_src;
 
-        switch (node.type()) {
-        case node_type::table: {
-            auto node_file = *node.as_table()->source().path;
+        node.visit([&](auto&& node) {
+            if constexpr (toml::is_table<decltype(node)>) {
+                auto node_file = *node.source().path;
 
-            auto this_tbl = lua.create_table();
-            auto tbl_src = lua.create_table();
+                auto this_tbl = lua.create_table();
+                auto tbl_src = lua.create_table();
 
-            for (auto [k, v] : *node.as_table()) {
-                auto sub_path = full_path;
-                sub_path.push_back(k);
+                for (auto [k, v] : node) {
+                    auto sub_path = full_path;
+                    sub_path.push_back(k);
 
-                auto [val, src] = convert_to_lua(lua, v, sub_path);
-                if (src == sol::lua_nil)
-                    src = lua.create_table();
-                src["__node_file"] = sol::make_object(lua, node_file);
-                src["__node_path"] = sol::make_object(lua, sub_path);
+                    auto [val, src] = convert_to_lua(lua, v, sub_path);
+                    if (src == sol::lua_nil)
+                        src = lua.create_table();
+                    src["__node_file"] = sol::make_object(lua, node_file);
+                    src["__node_path"] = sol::make_object(lua, sub_path);
 
-                this_tbl[k] = val;
-                tbl_src[k] = src;
+                    this_tbl[k] = val;
+                    tbl_src[k] = src;
+                }
+                tbl_src["__node_file"] = sol::make_object(lua, node_file);
+                tbl_src["__node_path"] = sol::make_object(lua, full_path);
+
+                result = this_tbl;
+                result_src = tbl_src;
+            } else if constexpr (toml::is_array<decltype(node)>) {
+                auto this_arr = lua.create_table();
+
+                for (auto &v : node) {
+                    auto [val, _] = convert_to_lua(lua, v);
+
+                    this_arr.add(val);
+                }
+
+                result = this_arr;
+            } else if constexpr (toml::is_date<decltype(node)> || toml::is_time<decltype(node)>
+                                 || toml::is_date_time<decltype(node)>) {
+                spdlog::error("Got an unknown TOML type somehwere in {}", *node.source().path);
+                std::terminate();
+            } else {
+                result = sol::make_object(lua, *node);
             }
-            tbl_src["__node_file"] = sol::make_object(lua, node_file);
-            tbl_src["__node_path"] = sol::make_object(lua, full_path);
-
-            result = this_tbl;
-            result_src = tbl_src;
-
-            break;
-        }
-        case node_type::array: {
-            auto this_arr = lua.create_table();
-
-            for (auto &v : *node.as_array()) {
-                auto [val, _] = convert_to_lua(lua, v);
-
-                this_arr.add(val);
-            }
-
-            result = this_arr;
-
-            break;
-        }
-        case node_type::string:
-            result = sol::make_object(lua, std::string(*node.as_string()));
-            break;
-        case node_type::integer:
-            result = sol::make_object(lua, **node.as_integer());
-            break;
-        case node_type::floating_point:
-            result = sol::make_object(lua, **node.as_floating_point());
-            break;
-        case node_type::boolean:
-            result = sol::make_object(lua, **node.as_boolean());
-            break;
-        case node_type::date:
-        case node_type::time:
-        case node_type::date_time:
-        case node_type::none:
-            spdlog::error("Got an unknown TOML type somehwere in {}", *node.source().path);
-            std::terminate();
-        }
+        });
 
         return {result, result_src};
     };
