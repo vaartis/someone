@@ -240,6 +240,9 @@ end
 
 M.interaction_callbacks = {}
 
+-- A callback that does nothing, to be the default for the editor
+function M.interaction_callbacks.identity() end
+
 --- Sets the state variable at path to a new value, optionally setting the new state of the interactable
 function M.interaction_callbacks.state_variable_set(_state, variable_path, value, new_state)
    local containing_table, var_name = state_variable_ensure_path_up_to(variable_path)
@@ -488,6 +491,10 @@ function M.components.interaction.process_component(new_ent, comp, entity_name)
    class.__initial_state = comp.initial_state
 
    new_ent:add(class)
+end
+
+function M.components.interaction.class:default_data(ent)
+   return { callback = { module = "components.interaction", name = "identity" } }
 end
 
 function M.components.interaction.class:show_editor(ent)
