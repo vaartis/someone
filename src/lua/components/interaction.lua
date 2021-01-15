@@ -684,6 +684,9 @@ function M.components.interaction.class:show_editor(ent)
          end
       end
 
+
+      callback_parent[callback_name].self = ImGui.Checkbox("Self", callback_parent[callback_name].self or false)
+
       show_table(callback_name .. " arguments", callback, "args", Vector2f.new(0, 200))
 
       local install = function()
@@ -719,6 +722,10 @@ function M.components.interaction.class:show_editor(ent)
       end
       ImGui.SameLine()
       if ImGui.Button("Save##" .. callback_name) then
+         if callback_parent[callback_name].self == false then
+            callback_parent[callback_name].self = nil
+         end
+
          if install() then
             TOML.save_entity_component(ent, "interaction", self, { callback_name }, { [callback_name] = callback })
          end
