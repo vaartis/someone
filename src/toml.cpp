@@ -30,7 +30,9 @@ toml::node_view<const toml::node> find_by_path(const std::string &file, const st
 
 /// Converts the TOML types to lua/C++
 std::tuple<sol::object, sol::table> convert_to_lua(
-    sol::state_view &lua, const toml::node &node, std::vector<std::string> full_path = std::vector<std::string>()
+    sol::state_view &lua, const toml::node &node,
+    bool need_source = true,
+    std::vector<std::string> full_path = std::vector<std::string>()
 ) {
         using namespace toml;
 
@@ -39,7 +41,10 @@ std::tuple<sol::object, sol::table> convert_to_lua(
 
         node.visit([&](auto&& node) {
             if constexpr (toml::is_table<decltype(node)>) {
-                auto node_file = *node.source().path;
+                std::string node_file;
+                if (need_source) {
+                    node_file = *node.source().path;
+                }
 
                 auto this_tbl = lua.create_table();
                 auto tbl_src = lua.create_table();
@@ -48,17 +53,21 @@ std::tuple<sol::object, sol::table> convert_to_lua(
                     auto sub_path = full_path;
                     sub_path.push_back(k);
 
-                    auto [val, src] = convert_to_lua(lua, v, sub_path);
+                    auto [val, src] = convert_to_lua(lua, v, need_source, sub_path);
                     if (src == sol::lua_nil)
                         src = lua.create_table();
-                    src["__node_file"] = sol::make_object(lua, node_file);
-                    src["__node_path"] = sol::make_object(lua, sub_path);
+                    if (need_source) {
+                        src["__node_file"] = sol::make_object(lua, node_file);
+                        src["__node_path"] = sol::make_object(lua, sub_path);
+                    }
 
                     this_tbl[k] = val;
                     tbl_src[k] = src;
                 }
-                tbl_src["__node_file"] = sol::make_object(lua, node_file);
-                tbl_src["__node_path"] = sol::make_object(lua, full_path);
+                if (need_source) {
+                    tbl_src["__node_file"] = sol::make_object(lua, node_file);
+                    tbl_src["__node_path"] = sol::make_object(lua, full_path);
+                }
 
                 result = this_tbl;
                 result_src = tbl_src;
@@ -66,7 +75,7 @@ std::tuple<sol::object, sol::table> convert_to_lua(
                 auto this_arr = lua.create_table();
 
                 for (auto &v : node) {
-                    auto [val, _] = convert_to_lua(lua, v);
+                    auto [val, _] = convert_to_lua(lua, v, need_source);
 
                     this_arr.add(val);
                 }
@@ -485,7 +494,7 @@ void save_entity_component(
                 if (maybe_prefab_comp_node) {
                     auto maybe_prefab_comp_value = maybe_prefab_comp_node[k.as<std::string>()];
                     if (maybe_prefab_comp_value) {
-                        auto [converted_prefab_val, _] = convert_to_lua(lua, *maybe_prefab_comp_value.node());
+                        auto [converted_prefab_val, _] = convert_to_lua(lua, *maybe_prefab_comp_value.node(), false);
 
                         parts_overriding_prefab[k.as<std::string>()] =
                             !deep_equal(converted_prefab_val, *v_);
