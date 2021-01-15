@@ -565,7 +565,7 @@ void save_entity_component(
 
         for (auto path_elem : last_path) {
             // When the next level is the component, insert the prefab into the entity
-            if (path_elem == name && is_new_ent) {
+            if (path_elem == name && is_new_ent && node_prefab_file) {
                 const std::string prefab_dir = "resources/rooms/prefabs/";
                 auto prefab_dir_pos = node_prefab_file->find(prefab_dir);
                 auto prefab_name_with_ext = node_prefab_file->replace(prefab_dir_pos, prefab_dir.size(), "");
