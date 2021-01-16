@@ -459,6 +459,12 @@ void save_entity_component(
     sol::this_state lua_, sol::table entity, const std::string &name, sol::table comp,
     sol::table part_names, sol::table part_values
 ) {
+    if (part_values.size() > 0) {
+        spdlog::error("part_values was an array when saving {} but needs to be a table, this is a bug in editor code, refusing to save!", name);
+
+        return;
+    }
+
     sol::state_view lua(lua_);
 
     sol::optional<sol::table> locations_ = entity["__toml_location"];
