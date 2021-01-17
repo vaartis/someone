@@ -144,6 +144,15 @@ function M.interaction_callbacks.switch_room(_current_state, ent)
    )
 end
 
+function M.components.passage.class:default_data(ent)
+   local physics_world = collider_components.physics_world
+   local _, _, _, player_h = physics_world:getRect(util.rooms_mod().find_player())
+
+   local _, y, _, _ = physics_world:getRect(ent)
+
+   return { from = util.rooms_mod().current_unqualified_room_name, to = "", player_y = math.floor(y + (player_h / 2)) }
+end
+
 function M.components.passage.class:show_editor(ent)
    ImGui.Text("Passage")
 
@@ -174,7 +183,7 @@ function M.components.passage.class:show_editor(ent)
    self.__editor_state.is_player_dest, changed = ImGui.Checkbox("Sets player Y", self.__editor_state.is_player_dest)
    if changed then
       if self.__editor_state.is_player_dest then
-         self.player_y = y + (player_h / 2)
+         self.player_y = math.floor(y + (player_h / 2))
       else
          self.player_y = nil
       end
@@ -190,7 +199,7 @@ function M.components.passage.class:show_editor(ent)
       end
       ImGui.SameLine()
       if ImGui.Button("Bottom") then
-         self.player_y = math.floor(y)
+         self.player_y = math.floor(y + h - player_h)
       end
 
       -- Map coordinates to pixel-coordinates for ImGui
