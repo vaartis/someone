@@ -104,7 +104,8 @@ void register_sfml_usertypes(sol::state &lua, StaticFonts &fonts) {
 
         "Black", sol::var(sf::Color::Black),
         "Red", sol::var(sf::Color::Red),
-        "Yellow", sol::var(sf::Color::Yellow)
+        "Yellow", sol::var(sf::Color::Yellow),
+        "Green", sol::var(sf::Color::Green)
     );
 
     auto tf_type = lua.new_usertype<sf::Transformable>(
@@ -139,7 +140,8 @@ void register_sfml_usertypes(sol::state &lua, StaticFonts &fonts) {
         "size", sol::property(&sf::RenderTarget::getSize),
         "view", sol::property(&sf::RenderTarget::getView, &sf::RenderTarget::setView),
         "default_view", sol::property(&sf::RenderTarget::getDefaultView),
-        "map_pixel_to_coords", [](const sf::RenderTarget &target, const sf::Vector2f& pos) { return target.mapPixelToCoords(sf::Vector2i(pos.x, pos.y)); }
+        "map_pixel_to_coords", [](const sf::RenderTarget &target, const sf::Vector2f& pos) { return target.mapPixelToCoords(sf::Vector2i(pos.x, pos.y)); },
+        "map_coords_to_pixel", [](const sf::RenderTarget &target, const sf::Vector2f& pos) { return sf::Vector2f(target.mapCoordsToPixel(pos)); }
     );
     auto render_states_type = lua.new_usertype<sf::RenderStates>("RenderStates");
 

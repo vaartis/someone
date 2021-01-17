@@ -2,7 +2,7 @@ local lume = require("lume")
 
 local M = {}
 
--- Calculates the amount of characters to fit into the specified width
+-- Calculates the amount of characters to into the specified width
 function M.rect_max_text_width(rect_width)
    return math.floor(rect_width / (StaticFonts.font_size / 2.0))
 end

@@ -144,7 +144,7 @@ function M.run_comp_processor(new_ent, comp_data, entity_name, parent)
    end
 end
 
-function M.instantiate_entity(entity_name, entity, parent)
+function M.instantiate_entity(entity_name, entity, parent, add_to_world)
    local new_ent = Entity(parent)
 
    if entity.prefab then
@@ -169,10 +169,14 @@ function M.instantiate_entity(entity_name, entity, parent)
       M.run_comp_processor(new_ent, comp_data, entity_name, parent)
    end
 
-   util.rooms_mod().engine:addEntity(new_ent)
+
+   if add_to_world == nil or add_to_world then
+      util.rooms_mod().engine:addEntity(new_ent)
+   end
+
    if entity.children then
       for name, data in pairs(entity.children) do
-         M.instantiate_entity(name, data, new_ent)
+         M.instantiate_entity(name, data, new_ent, add_to_world)
       end
    end
 

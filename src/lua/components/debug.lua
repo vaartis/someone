@@ -329,4 +329,38 @@ function M.debug_menu()
    end
 end
 
+--- Loads all entities from the room but doesn't add them to the world.
+--- Probably very expensive, but only used for the editor so should be fine.
+function M.load_entities_from_room(name, with_components)
+   local room_toml = util.rooms_mod().load_room_file(name)
+
+   -- Save current physics world
+   local curr_phys_world = collider_components.physics_world
+   -- Reset world for the previewed entities to insert into.
+   -- This world will then be thrown out, it's only need is to not pollute the
+   -- main one.
+   collider_components.reset_world()
+
+   local ents = {}
+   for entity_name, entity in pairs(room_toml.entities) do
+      -- Don't add the entities to the world
+      local instantiated = util.entities_mod().instantiate_entity(entity_name, entity, nil, false)
+      if with_components then
+         -- Ignore entities that don't have all specified components
+         if lume.any(with_components, function(c_name) return not instantiated:has(c_name) end) then
+            goto continue
+         end
+      end
+
+      table.insert(ents, instantiated)
+
+      ::continue::
+   end
+
+   -- Restore the real physics world
+   collider_components.physics_world = curr_phys_world
+
+   return ents
+end
+
 return M

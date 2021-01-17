@@ -5,6 +5,7 @@ local coroutines = require("coroutines")
 local rooms
 
 local collider_components = require("components.collider")
+local debug_components = require("components.debug")
 
 local M = {}
 
@@ -20,9 +21,7 @@ end
 
 M.interaction_callbacks = {}
 
-function M.interaction_callbacks.switch_room(_current_state, ent)
-   local passage_comp = ent:get("Passage")
-
+local function get_final_room_name(passage_comp)
    if not rooms then
       rooms = util.rooms_mod()
    end
@@ -82,6 +81,38 @@ function M.interaction_callbacks.switch_room(_current_state, ent)
       end
    end
 
+   return final_room_name
+end
+
+local function find_passage(ent, passage_comp, passages_in_room)
+   local found_passage
+   for _, ent in pairs(passages_in_room) do
+      local searched_passage_comp = ent:get("Passage")
+
+      -- If no player_y is specified, this passage shouldn't be used
+      -- to spawn the player
+      if searched_passage_comp.player_y and searched_passage_comp.to == passage_comp.from then
+         found_passage = ent
+         break
+      end
+   end
+   if not found_passage then
+      error(
+         lume.format(
+            "Couldn't find a passage from {1} to {2} for passage {3}",
+            { passage_comp.from, passage_comp.to, ent:get("Name").name }
+         )
+      )
+   end
+
+   return found_passage
+end
+
+function M.interaction_callbacks.switch_room(_current_state, ent)
+   local passage_comp = ent:get("Passage")
+
+   local final_room_name = get_final_room_name(passage_comp)
+
    local player_movement = util.rooms_mod().find_player():get("PlayerMovement")
    player_movement.active = false
 
@@ -94,26 +125,7 @@ function M.interaction_callbacks.switch_room(_current_state, ent)
          rooms.load_room(final_room_name)
 
          local passages_in_room = rooms.engine:getEntitiesWithComponent("Passage")
-
-         local found_passage
-         for _, ent in pairs(passages_in_room) do
-            local searched_passage_comp = ent:get("Passage")
-
-            -- If not player_y is specified, this passage shouldn't be used
-            -- to spawn the player
-            if searched_passage_comp.player_y and searched_passage_comp.to == passage_comp.from then
-               found_passage = ent
-               break
-            end
-         end
-         if not found_passage then
-            error(
-               lume.format(
-                  "Couldn't find a passage from {1} to {2} for passage {3}",
-                  { passage_comp.from, passage_comp.to, ent:get("Name").name }
-               )
-            )
-         end
+         local found_passage = find_passage(ent, passage_comp, passages_in_room)
 
          local player = rooms.find_player()
          local physics_world = collider_components.physics_world
@@ -130,6 +142,109 @@ function M.interaction_callbacks.switch_room(_current_state, ent)
          player_movement.active = true
       end
    )
+end
+
+function M.components.passage.class:show_editor(ent)
+   ImGui.Text("Passage")
+
+   if not self.__editor_state then
+      self.__editor_state = { is_player_dest = self.player_y ~= nil, can_go_from = self.from ~= nil }
+   end
+
+   self.__editor_state.can_go_from, changed = ImGui.Checkbox("Can go from", self.__editor_state.can_go_from)
+   if changed then
+      if self.__editor_state.can_go_from then
+         self.from = util.rooms_mod().current_unqualified_room_name
+      else
+         self.from = nil
+      end
+   end
+
+   if self.__editor_state.can_go_from then
+      self.from = ImGui.InputText("From", self.from)
+   end
+
+   self.to = ImGui.InputText("To", self.to)
+
+   local physics_world = collider_components.physics_world
+   local _, _, _, player_h = physics_world:getRect(util.rooms_mod().find_player())
+
+   local x, y, w, h = physics_world:getRect(ent)
+
+   self.__editor_state.is_player_dest, changed = ImGui.Checkbox("Sets player Y", self.__editor_state.is_player_dest)
+   if changed then
+      if self.__editor_state.is_player_dest then
+         self.player_y = y + (player_h / 2)
+      else
+         self.player_y = nil
+      end
+   end
+
+   if self.__editor_state.is_player_dest then
+      self.player_y = ImGui.InputInt("Player Y", self.player_y)
+      ImGui.Text("Set to")
+      ImGui.SameLine()
+      if ImGui.Button("Bottom + 1/2 player height") then
+         -- Set the default position to be roughly at half player height
+         self.player_y = math.floor(y + (player_h / 2))
+      end
+      ImGui.SameLine()
+      if ImGui.Button("Bottom") then
+         self.player_y = math.floor(y)
+      end
+
+      -- Map coordinates to pixel-coordinates for ImGui
+      local pixel_x = GLOBAL.window:map_coords_to_pixel(Vector2f.new(x, 0)).x
+      local pixel_w = GLOBAL.window:map_coords_to_pixel(Vector2f.new(w, h)).x
+
+      local pixel_player_h = GLOBAL.window:map_coords_to_pixel(Vector2f.new(0, player_h)).y
+      local pixel_player_y = GLOBAL.window:map_coords_to_pixel(Vector2f.new(0, self.player_y)).y + pixel_player_h
+
+      ImGui.AddLine(Vector2f.new(pixel_x, pixel_player_y), Vector2f.new(pixel_x + pixel_w, pixel_player_y), Color.Green, 1)
+   end
+
+   if ImGui.Button("Save##passage") then
+      -- Do additional checks if this is a passage that the player can go through
+      if self.__editor_state.can_go_from then
+         local was_ok, final_name = pcall(get_final_room_name, ent:get("Passage"))
+         if not was_ok then
+            self.__editor_state.last_error = final_name
+
+            goto nosave
+         end
+         -- THIS CAUSES WEIRD THINGS
+         was_ok, to_room_passages = pcall(
+            debug_components.load_entities_from_room,
+            final_name,
+            {"Passage"}
+         )
+
+         if not was_ok then
+            self.__editor_state.last_error = to_room_passages
+
+            goto nosave
+         end
+         was_ok, err = pcall(
+            find_passage,
+            ent, self, to_room_passages
+         )
+         if not was_ok then
+            self.__editor_state.last_error = err
+
+            goto nosave
+         end
+      end
+
+      self.__editor_state.last_error = nil
+
+      TOML.save_entity_component(ent, "passage", self, { "from", "to", "player_y" }, { from = self.from, to = self.to, player_y = self.player_y })
+
+      ::nosave::
+   end
+
+   if self.__editor_state.last_error then
+      ImGui.Text(self.__editor_state.last_error)
+   end
 end
 
 return M

@@ -96,7 +96,17 @@ void register_imgui_usertypes(sol::state &lua) {
         "BeginChild", [](const char* str_id, const sf::Vector2f &size) {
             return ImGui::BeginChild(str_id, ImVec2(size.x, size.y), true);
         },
-        "EndChild", &ImGui::EndChild
+        "EndChild", &ImGui::EndChild,
+
+        "AddLine", [](sf::Vector2f a, sf::Vector2f b, sf::Color color, float thickness) {
+            auto draw_list = ImGui::GetBackgroundDrawList();
+            draw_list->AddLine(
+                ImVec2(a.x, a.y),
+                ImVec2(b.x, b.y),
+                IM_COL32(color.r, color.g, color.b, color.a),
+                thickness
+            );
+        }
     );
     lua.new_enum(
         "ImGuiInputTextFlags",

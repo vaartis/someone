@@ -9,7 +9,7 @@ local entities = require("components.entities")
 local M = {}
 
 -- Loads the room's toml file, processing parent relationships
-local function load_room_file(name)
+function M.load_room_file(name)
    local path = "resources/rooms/" .. name .. ".toml"
 
    local room_table, err = TOML.parse(path)
@@ -21,7 +21,7 @@ local function load_room_file(name)
    if room_table.prefab then
       do
          local prefab = room_table.prefab
-         local prefab_room = load_room_file(prefab.name)
+         local prefab_room = M.load_room_file(prefab.name)
 
          if prefab.removed_entities then
             for k, v in pairs(prefab_room.entities) do
@@ -101,16 +101,17 @@ function M.load_room(name, switch_namespace)
    M.reset_engine()
    collider_components.reset_world()
 
+   -- Find the last /
+   local last = name:find("/[^/]+$")
    if switch_namespace then
       -- If switch_namespace is passed, use the room's namespace as the "current" one
-
-      -- Find the last /
-      local last = name:find("/[^/]+$")
       -- Use everything that is before it
       M.current_namespace = name:sub(1, last - 1)
    end
+   -- Save the name of the room without a namespace
+   M.current_unqualified_room_name = name:sub(last + 1, #name)
 
-   local room_toml, room_file_path = load_room_file(name)
+   local room_toml, room_file_path = M.load_room_file(name)
    -- Save the current file path, when the editor wants to save a new entity
    M.current_room_file = room_file_path
 
