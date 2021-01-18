@@ -232,7 +232,7 @@ function M.components.drawable.process_component(new_ent, comp, entity_name)
 
    local drawable
    if comp.kind == "sprite" then
-      if not assets.assets.textures[comp.texture_asset] then
+      if not assets.assets.textures[comp.texture_asset] and comp.texture_asset ~= "placeholder" then
          error(lume.format("{1}.{2} requires a texture named {3}", {entity_name, comp_name, comp.texture_asset}))
       end
 
@@ -252,7 +252,17 @@ function M.components.drawable.process_component(new_ent, comp, entity_name)
    new_ent:add(
       M.components.drawable.class(drawable, comp.z, comp.kind, enabled, comp.layer)
    )
-   new_ent:add(M.components.transformable.class(drawable))
+   if not (new_ent:has("Transformable")) then
+      -- If there's no transformable component, create and add it
+      new_ent:add(M.components.transformable.class(drawable))
+   else
+      -- When a drawable is added in the editor, a transformable may already exist
+      local tf = new_ent:get("Transformable")
+      local pos = tf.transformable.position
+
+      tf.transformable = drawable
+      tf.transformable.position = pos
+   end
 end
 
 function M.components.animation.process_component(new_ent, comp, entity_name)
@@ -300,6 +310,108 @@ function M.components.name.class:show_editor(ent)
    ImGui.Text("Name" .. " =")
    ImGui.SameLine()
    ImGui.Text(self.name)
+end
+
+function M.components.drawable.class:default_data(ent)
+   return { kind = "sprite", texture_asset = "placeholder", z = 1 }
+end
+
+function M.components.drawable.class:show_editor(ent)
+   ImGui.Text("Drawable")
+
+   local kind
+   if self.drawable.__type.name == "sf::Sprite" then
+      kind = "sprite"
+   elseif self.drawable.__type.name == "sf::Text" then
+      kind = "text"
+   end
+
+   local known_textures = assets.list_known_assets("textures")
+
+   local updated = false
+   local pos = self.drawable.position
+
+   if ImGui.BeginCombo("Kind", kind) then
+      if ImGui.Selectable("sprite", kind == "sprite") then
+         kind = "sprite"
+
+         self.drawable = assets.create_sprite_from_asset("placeholder")
+
+         updated = true
+      end
+
+      -- Animation, Collider are incompatible with text
+      if not ent:has("Animation") and not ent:has("Collider") then
+         if ImGui.Selectable("text", kind == "text") then
+            kind = "text"
+
+            self.drawable = Text.new("", StaticFonts.main_font, StaticFonts.font_size)
+
+            updated = true
+         end
+      end
+
+      ImGui.EndCombo()
+   end
+
+   if kind == "sprite" then
+      if ImGui.BeginCombo("Texture", assets.used_assets[self.drawable]) then
+         for _, name in ipairs(known_textures) do
+            if ImGui.Selectable(name, assets.used_assets[self.drawable] == name) then
+               self.drawable = assets.create_sprite_from_asset(name)
+
+               updated = true
+            end
+         end
+
+         ImGui.EndCombo()
+      end
+   elseif kind == "text" then
+      self.drawable.string = ImGui.InputText("Text", self.drawable.string)
+   end
+
+   if updated then
+      -- Restore the position
+      self.drawable.position = pos
+
+      -- Update transformable
+      ent:get("Transformable").transformable = self.drawable
+   end
+
+   self.z = ImGui.InputInt("Z", self.z)
+
+   if ImGui.Button("Save##drawable") then
+      if not self.__editor_state then
+         self.__editor_state = {}
+      end
+
+      if assets.used_assets[self.drawable] == "placeholder" then
+         self.__editor_state.last_error = "Texture is set to placeholder. It needs to be an actual texture to save."
+
+         goto save_end
+      end
+
+      self.__editor_state.last_error = nil
+
+      local names_to_save = { "kind", "z", "texture_asset", "text" }
+      local data_to_save = { kind = kind, z = self.z }
+      if kind == "sprite" then
+         data_to_save.texture_asset = assets.used_assets[self.drawable]
+      elseif kind == "text" then
+         data_to_save.text = { text = self.drawable.string }
+         if font_size ~= StaticFonts.font_size then
+            data_to_save.text.font_size = self.drawable.character_size
+         end
+      end
+
+      TOML.save_entity_component(ent, "drawable", self, names_to_save, data_to_save)
+
+      ::save_end::
+   end
+
+   if self.__editor_state and self.__editor_state.last_error then
+      ImGui.Text(self.__editor_state.last_error)
+   end
 end
 
 M.system_run_priority = 0

@@ -12,10 +12,13 @@ M.assets = {
   sounds = {}
 }
 
+M.placeholder_texture = Texture.new()
+M.placeholder_texture:load_from_file("resources/sprites/room/placeholder.png")
+
 function load_from_known_assets(asset_type, key)
    local maybe_known_asset_path = known_assets[asset_type][key]
    if not maybe_known_asset_path then
-      error("Trying to load an unknown asset: " .. tostring(key))
+      return nil
    end
 
    local asset
@@ -68,7 +71,11 @@ end
 
 function M.create_sprite_from_asset(asset_name)
    local drawable = Sprite.new()
-   drawable.texture = M.assets.textures[asset_name]
+   if asset_name ~= "placeholder" then
+      drawable.texture = M.assets.textures[asset_name]
+   else
+      drawable.texture = M.placeholder_texture
+   end
 
    M.used_assets[drawable] = asset_name
 
