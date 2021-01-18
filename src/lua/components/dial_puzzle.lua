@@ -154,7 +154,7 @@ function DialHandleSystem:update(dt)
             rotation_click_sound.volume = 30
          end
 
-         rotation_click_sound.sound:play()
+         rotation_click_sound:play()
       end
 
       interaction_components.update_seconds_since_last_interaction(dt)

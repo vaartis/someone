@@ -232,13 +232,11 @@ function M.components.drawable.process_component(new_ent, comp, entity_name)
 
    local drawable
    if comp.kind == "sprite" then
-      local texture_asset = assets.assets.textures[comp.texture_asset]
-      if not texture_asset then
+      if not assets.assets.textures[comp.texture_asset] then
          error(lume.format("{1}.{2} requires a texture named {3}", {entity_name, comp_name, comp.texture_asset}))
       end
 
-      drawable = Sprite.new()
-      drawable.texture = texture_asset
+      drawable = assets.create_sprite_from_asset(comp.texture_asset)
    elseif comp.kind == "text" then
       drawable = Text.new(comp.text.text, StaticFonts.main_font, comp.text.font_size or StaticFonts.font_size)
    else

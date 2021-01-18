@@ -53,12 +53,26 @@ setmetatable(M.assets.sounds, {
   end
 })
 
+M.used_assets = {}
+-- Mark table keys as weak, so they don't prevent GC
+setmetatable(M.used_assets, {__mode = "k"})
+
 function M.create_sound_from_asset(asset_name)
-   local result = { sound = Sound.new(), asset_name = asset_name }
+   local sound = Sound.new()
+   sound.buffer = M.assets.sounds[asset_name]
 
-   result.sound.buffer = M.assets.sounds[asset_name]
+   M.used_assets[sound] = asset_name
 
-   return result
+   return sound
+end
+
+function M.create_sprite_from_asset(asset_name)
+   local drawable = Sprite.new()
+   drawable.texture = M.assets.textures[asset_name]
+
+   M.used_assets[drawable] = asset_name
+
+   return drawable
 end
 
 return M
