@@ -157,49 +157,53 @@ function M.components.passage.class:show_editor(ent)
    ImGui.Text("Passage")
 
    if not self.__editor_state then
-      self.__editor_state = { is_player_dest = self.player_y ~= nil, can_go_from = self.from ~= nil }
+      self.__editor_state = {
+         is_player_dest = self.player_y ~= nil, can_go_from = self.from ~= nil,
+         to = self.to, from = self.from, player_y = self.player_y
+      }
    end
+   local editor_state = self.__editor_state
 
-   self.__editor_state.can_go_from, changed = ImGui.Checkbox("Can go from", self.__editor_state.can_go_from)
+   editor_state.can_go_from, changed = ImGui.Checkbox("Can go from", editor_state.can_go_from)
    if changed then
-      if self.__editor_state.can_go_from then
-         self.from = util.rooms_mod().current_unqualified_room_name
+      if editor_state.can_go_from then
+         editor_state.from = util.rooms_mod().current_unqualified_room_name
       else
-         self.from = nil
+         editor_state.from = nil
       end
    end
 
-   if self.__editor_state.can_go_from then
-      self.from = ImGui.InputText("From", self.from)
+   if editor_state.can_go_from then
+      editor_state.from = ImGui.InputText("From", editor_state.from, ImGuiInputTextFlags.None)
    end
 
-   self.to = ImGui.InputText("To", self.to)
+   editor_state.to = ImGui.InputText("To", editor_state.to, ImGuiInputTextFlags.None)
 
    local physics_world = collider_components.physics_world
    local _, _, _, player_h = physics_world:getRect(util.rooms_mod().find_player())
 
    local x, y, w, h = physics_world:getRect(ent)
 
-   self.__editor_state.is_player_dest, changed = ImGui.Checkbox("Sets player Y", self.__editor_state.is_player_dest)
+   editor_state.is_player_dest, changed = ImGui.Checkbox("Sets player Y", editor_state.is_player_dest)
    if changed then
-      if self.__editor_state.is_player_dest then
-         self.player_y = math.floor(y + (player_h / 2))
+      if editor_state.is_player_dest then
+         editor_state.player_y = math.floor(y + (player_h / 2))
       else
-         self.player_y = nil
+         editor_state.player_y = nil
       end
    end
 
-   if self.__editor_state.is_player_dest then
-      self.player_y = ImGui.InputInt("Player Y", self.player_y)
+   if editor_state.is_player_dest then
+      editor_state.player_y = ImGui.InputInt("Player Y", editor_state.player_y)
       ImGui.Text("Set to")
       ImGui.SameLine()
       if ImGui.Button("Bottom + 1/2 player height") then
          -- Set the default position to be roughly at half player height
-         self.player_y = math.floor(y + (player_h / 2))
+         editor_state.player_y = math.floor(y + (player_h / 2))
       end
       ImGui.SameLine()
       if ImGui.Button("Bottom") then
-         self.player_y = math.floor(y + h - player_h)
+         editor_state.player_y = math.floor(y + h - player_h)
       end
 
       -- Map coordinates to pixel-coordinates for ImGui
@@ -207,52 +211,68 @@ function M.components.passage.class:show_editor(ent)
       local pixel_w = GLOBAL.window:map_coords_to_pixel(Vector2f.new(w, h)).x
 
       local pixel_player_h = GLOBAL.window:map_coords_to_pixel(Vector2f.new(0, player_h)).y
-      local pixel_player_y = GLOBAL.window:map_coords_to_pixel(Vector2f.new(0, self.player_y)).y + pixel_player_h
+      local pixel_player_y = GLOBAL.window:map_coords_to_pixel(Vector2f.new(0, editor_state.player_y)).y + pixel_player_h
 
       ImGui.AddLine(Vector2f.new(pixel_x, pixel_player_y), Vector2f.new(pixel_x + pixel_w, pixel_player_y), Color.Green, 1)
    end
 
-   if ImGui.Button("Save##passage") then
+   local function install()
       -- Do additional checks if this is a passage that the player can go through
-      if self.__editor_state.can_go_from then
-         local was_ok, final_name = pcall(get_final_room_name, ent:get("Passage"))
+      if editor_state.can_go_from then
+         local new_comp_data = { to = editor_state.to, from = editor_state.from, player_y = editor_state.player_y }
+         local was_ok, final_name = pcall(
+            get_final_room_name,
+            new_comp_data
+         )
          if not was_ok then
-            self.__editor_state.last_error = final_name
+            editor_state.last_error = final_name
 
-            goto nosave
+            return false
          end
-         -- THIS CAUSES WEIRD THINGS
+
          was_ok, to_room_passages = pcall(
             debug_components.load_entities_from_room,
             final_name,
             {"Passage"}
          )
-
          if not was_ok then
-            self.__editor_state.last_error = to_room_passages
+            editor_state.last_error = to_room_passages
 
-            goto nosave
+            return false
          end
+
          was_ok, err = pcall(
             find_passage,
-            ent, self, to_room_passages
+            ent, new_comp_data, to_room_passages
          )
          if not was_ok then
-            self.__editor_state.last_error = err
+            editor_state.last_error = err
 
-            goto nosave
+            return false
          end
       end
 
-      self.__editor_state.last_error = nil
+      editor_state.last_error = nil
 
-      TOML.save_entity_component(ent, "passage", self, { "from", "to", "player_y" }, { from = self.from, to = self.to, player_y = self.player_y })
+      self.to = editor_state.to
+      self.from = editor_state.from
+      self.player_y = editor_state.player_y
 
-      ::nosave::
+      return true
    end
 
-   if self.__editor_state.last_error then
-      ImGui.Text(self.__editor_state.last_error)
+   if ImGui.Button("Install##passage") then install() end
+   ImGui.SameLine()
+   if ImGui.Button("Save##passage") then
+      if install() then
+         TOML.save_entity_component(
+            ent, "passage", self, { "from", "to", "player_y" }, { from = self.from, to = self.to, player_y = self.player_y }
+         )
+      end
+   end
+
+   if editor_state.last_error then
+      ImGui.Text(editor_state.last_error)
    end
 end
 
