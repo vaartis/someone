@@ -94,8 +94,25 @@ end
 -- Load the assets.toml file
 load_assets()
 
-local _room_shaders = {}
-function M.room_shaders() return _room_shaders end
+M._room_shaders = {}
+function M.room_shaders() return M._room_shaders or {} end
+
+function M.compile_room_shader_enabled()
+   if M._room_shaders then
+      for name, shader in pairs(M._room_shaders) do
+         setmetatable(
+            M._room_shaders[name],
+            {
+               enabled_compiled = interaction_components.process_activatable(
+                  shader,
+                  "enabled",
+                  { entity_name = "rooms", comp_name = "load_room", needed_for = "shader enabled" }
+               )
+            }
+         )
+      end
+   end
+end
 
 function M.load_room(name, switch_namespace)
    M.reset_engine()
@@ -116,24 +133,22 @@ function M.load_room(name, switch_namespace)
    M.current_room_file = room_file_path
 
    if room_toml.shaders then
-      _room_shaders = room_toml.shaders
-      for _, shader in pairs(_room_shaders) do
-         shader.enabled = interaction_components.process_activatable(
-            shader,
-            "enabled",
-            { entity_name = "rooms", comp_name = "load_room", needed_for = "shader enabled" }
-         )
-      end
+      M._room_shaders = room_toml.shaders
+      setmetatable(M._room_shaders, {toml_location = getmetatable(room_toml)["toml_location"]["shaders"] })
+
+      M.compile_room_shader_enabled()
    else
-      _room_shaders = {}
+      M._room_shaders = nil
    end
 
-   for entity_name, entity in pairs(room_toml.entities) do
-      local entity_location = getmetatable(room_toml)["toml_location"]["entities"][entity_name]
+   if room_toml.entities then
+      for entity_name, entity in pairs(room_toml.entities) do
+         local entity_location = getmetatable(room_toml)["toml_location"]["entities"][entity_name]
 
-      setmetatable(entity, { toml_location = entity_location })
+         setmetatable(entity, { toml_location = entity_location })
 
-      entities.instantiate_entity(entity_name, entity)
+         entities.instantiate_entity(entity_name, entity)
+      end
    end
 end
 

@@ -401,8 +401,8 @@ std::tuple<const toml::node *, std::vector<std::string>> find_last_comp(sol::sta
     return { last_comp, last_path };
 }
 
-std::reference_wrapper<const toml::node> find_last_source(const toml::table &table) {
-    auto [_, last_node] = *std::max_element(
+const toml::node *find_last_source(const toml::table &table) {
+    auto last_node_iter = std::max_element(
         table.begin(),
         table.cend(),
         [](const auto &a, const auto &b) {
@@ -413,7 +413,12 @@ std::reference_wrapper<const toml::node> find_last_source(const toml::table &tab
         }
     );
 
-    return std::reference_wrapper(last_node);
+    if (last_node_iter == table.cend())
+        return nullptr;
+    else {
+        auto [_, last_node] = *last_node_iter;
+        return &last_node;
+    }
 };
 
 std::tuple<const toml::node *, std::vector<std::string>> path_for_new_comp_and_entity(sol::table locations, sol::table entity) {
@@ -424,7 +429,7 @@ std::tuple<const toml::node *, std::vector<std::string>> path_for_new_comp_and_e
     auto last_entity = find_last_source(*file_entities);
 
     // Find the last component of the entity
-    auto last_entity_tbl = last_entity.get().as_table();
+    auto last_entity_tbl = last_entity->as_table();
     auto last_node = find_last_source(*last_entity_tbl);
 
     // Get the name by finding the Name component and getting the name from it
@@ -432,7 +437,7 @@ std::tuple<const toml::node *, std::vector<std::string>> path_for_new_comp_and_e
     sol::table name_comp = get_f(entity, "Name");
     std::string ent_name = name_comp["name"];
 
-    auto last_comp = &last_node.get();
+    auto last_comp = last_node;
     // Create a path for this entity.
     std::vector<std::string> last_path = { "entities", ent_name };
     locations["__node_path"] = last_path;
@@ -559,7 +564,7 @@ void save_entity_component(
         const toml::table *last_tbl = last_comp->as_table();
 
         // Find the key that is on the lowest line
-        auto last_pair_src = find_last_source(*last_tbl).get().source();
+        auto last_pair_src = find_last_source(*last_tbl)->source();
 
         // Table that only contains the path to the component,
         // so the the TOML encoder will create a table header.
@@ -746,4 +751,133 @@ void save_entity_component(
 
         locations[name] = sol::lua_nil;
     }
+}
+
+void create_new_room(const std::string &full_path) {
+    std::filesystem::path file_path(full_path);
+    auto dir_path = file_path.parent_path();
+
+    // Create all parent dirs
+    std::filesystem::create_directories(dir_path);
+
+    std::string new_room_content =
+        R"([entities.player]
+prefab = "player"
+
+[entities.player.transformable]
+position = [500, 500]
+)";
+
+    std::ofstream new_room_file(full_path);
+    new_room_file << new_room_content;
+    new_room_file.close();
+
+#ifdef SOMEONE_EDITOR_BASE_PATH
+    // If in debug mode also save to the actual source of the resources
+
+    std::filesystem::path editor_path(SOMEONE_EDITOR_BASE_PATH);
+    editor_path /= full_path;
+
+    new_room_file.open(editor_path, std::ios::trunc);
+    new_room_file << new_room_content;
+#endif
+}
+
+void save_shaders(sol::this_state lua_, sol::optional<sol::table> shaders_) {
+    sol::state_view lua(lua_);
+
+    std::string current_room_file = lua.script("return require('components.rooms').current_room_file");
+
+    bool is_new = false;
+    toml::source_region source;
+    if (shaders_) {
+        auto shaders = *shaders_;
+
+        sol::optional<sol::table> locations_ = shaders[sol::metatable_key]["toml_location"];
+
+        if (!locations_) {
+            source.path = std::make_shared<std::string>(current_room_file);
+
+            source.begin.column = 1;
+            source.begin.line = 1;
+
+            source.end.column = 1;
+            source.end.line = 1;
+
+            shaders[sol::create_if_nil][sol::metatable_key]["toml_location"] = lua.create_table_with(
+                "__node_file", current_room_file,
+                "__node_path", std::vector<std::string> { "shaders" }
+            );
+            is_new = true;
+        } else {
+            auto shaders_node = find_by_path(
+                (*locations_)["__node_file"].get<const std::string &>(),
+                (*locations_)["__node_path"].get<const std::vector<std::string> &>()
+            );
+
+            auto prev_node = shaders_node.node()->as_table();
+            // Use previous source
+            source = prev_node->source();
+
+            // Find the last shader and use its last position
+            auto last_shader = find_last_source(*prev_node)->as_table();
+            auto last_line = find_last_source(*last_shader);
+            if (last_line != nullptr) {
+                source.end = last_line->source().end;
+            } else {
+                source.end = last_shader->source().end;
+            }
+        }
+    } else {
+        if (auto shaders_node = file_node_map[current_room_file]["shaders"]; shaders_node) {
+            auto prev_node = shaders_node.node()->as_table();
+            // Use previous source
+            source = prev_node->source();
+
+            // Find the last shader and use its last position
+            auto last_shader = find_last_source(*prev_node)->as_table();
+            auto last_line = find_last_source(*last_shader);
+            if (last_line != nullptr) {
+                source.end = last_line->source().end;
+            } else {
+                source.end = last_shader->source().end;
+            }
+        } else {
+            // No shaders passed and file didn't have any
+            return;
+        }
+    }
+
+    std::ifstream toml_file;
+    toml_file.open(*source.path);
+    std::string contents((std::istreambuf_iterator<char>(toml_file)), std::istreambuf_iterator<char>());
+
+    auto beginning = find_in_string(contents, source.begin), end = find_in_string(contents, source.end);
+
+    std::string converted;
+    if (shaders_) {
+        auto result = lua.create_table_with("shaders", *shaders_);
+        converted = encode_toml(lua_, result, false);
+
+        if (is_new) {
+            // Add a newline
+            converted += "\n";
+        } else {
+            // Capture the newline
+            end += 1;
+
+            if (!converted.ends_with("\n")) {
+                converted += "\n";
+            }
+        }
+    } else {
+        converted = "";
+    }
+
+    // Replace the newline character with the new table header.
+    contents.replace(beginning, end - beginning, converted);
+
+    rewrite_resource_file(*source.path, contents);
+
+    parse_toml(lua_, *source.path);
 }

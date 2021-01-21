@@ -74,7 +74,8 @@ public:
         }
         shaders_texture.clear(sf::Color::Transparent);
 
-        auto shaders_data = call_or_throw(room_shaders_f).get<std::map<std::string, std::map<std::string, sol::object>>>();
+        auto shaders_data_obj = call_or_throw(room_shaders_f);
+        auto shaders_data = shaders_data_obj.get<std::map<std::string, std::map<std::string, sol::object>>>();
 
         // Sort the shaders based on the N value, lower going first
         std::vector<std::pair<std::string, std::map<std::string, sol::object>>> sorted_shaders;
@@ -102,28 +103,25 @@ public:
                 }
 
                 bool enabled = true;
+                sol::object enabled_lua = shaders_data_obj.get<sol::table>()[shader_name][sol::metatable_key]["enabled_compiled"];
+                if (enabled_lua.is<sol::protected_function>()) {
+                    // If "enabled" is a function, call it and convert result to bool
+                    auto result_function = enabled_lua.as<sol::protected_function>();
+                    enabled = bool(call_or_throw(result_function));
+                } else {
+                    // Otherwise just convert to bool
+                    enabled = enabled_lua.as<bool>();
+                }
+
+                // If the shader is evaluated as enabled, skip the paramter
+                // and go to the next one, if it's disabled, stop processing and don't run the shader
+                if (!enabled) continue;
 
                 for (auto &param_data : shader_data) {
                     auto [name, value] = param_data;
 
-                    if (name == "enabled") {
-                        if (value.is<sol::protected_function>()) {
-                            // If "enabled" is a function, call it and convert result to bool
-                            auto result_function = value.as<sol::protected_function>();
-                            enabled = bool(call_or_throw(result_function));
-                        } else {
-                            // Otherwise just convert to bool
-                            enabled = bool(value);
-                        }
-
-                        // If the shader is evaluated as enabled, skip the paramter
-                        // and go to the next one, if it's disabled, stop processing paramters
-                        // and don't run the shader
-                        if (enabled) continue; else break;
-                    }
-
-                    // Skip the n field
-                    if (name == "n") continue;
+                    // Skip the n and enabled field
+                    if (name == "n" || name == "enabled") continue;
 
                     if (value.is<float>()) {
                         shader.setUniform(name, value.as<float>());

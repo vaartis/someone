@@ -43,10 +43,252 @@ debug_menu_state = {
    selected_entity_search = { index = 1, search = "" }
 }
 
+function M.show_table(name, parent, table_name, size)
+   local the_table = parent[table_name]
+
+   if ImGui.BeginChild(name, size) then
+      if the_table then
+         for i, arg in pairs(the_table) do
+            local minus_button = function()
+               -- Add ID at the end of the button name (invisible in UI)
+               if ImGui.Button("-##" .. i) then
+                  -- For arrays, use table.remove, for tables set to nil
+                  if #the_table > 0 then
+                     table.remove(the_table, i)
+                  else
+                     the_table[i] = nil
+                  end
+                  if lume.count(the_table) == 0 then
+                     parent[table_name] = nil
+                  end
+
+                  return true
+               end
+            end
+
+            if type(arg) == "string" then
+               the_table[i] = ImGui.InputText(tostring(i), tostring(arg))
+            elseif type(arg) == "number" then
+               if math.type(arg) == "float" then
+                  the_table[i] =
+                     ImGui.InputFloat(tostring(i), arg)
+               else
+                  the_table[i] =
+                     ImGui.InputInt(tostring(i), arg)
+               end
+            elseif type(arg) == "table" then
+               ImGui.Text(tostring(i))
+               ImGui.SameLine()
+               -- For tables, show the minus button before the actual content
+               if minus_button() then break end
+
+               M.show_table(name .. i, the_table, i, Vector2f.new(size.x, size.y / 2))
+            elseif type(arg) == "boolean" then
+               the_table[i] =
+                  ImGui.Checkbox(tostring(i), arg)
+            else
+               ImGui.InputText(tostring(i), "Unsupported type: " .. tostring(arg), ImGuiInputTextFlags.ReadOnly)
+            end
+
+            if type(arg) ~= "table" then
+               -- For non-tables, show the button on the right
+               ImGui.SameLine()
+               if minus_button() then break end
+            end
+         end
+      end
+
+      if ImGui.Button("+") then
+         ImGui.OpenPopup("Select type##" .. name)
+
+         debug_menu_state.new_argument = { }
+         -- If the argument is nil, has no values or is an array, mark it as such
+         if not the_table or lume.count(the_table) == 0 or #the_table > 0 then
+            debug_menu_state.new_argument.selected_type = "array"
+         else
+            debug_menu_state.new_argument.selected_type = "table"
+            debug_menu_state.new_argument.table_key = ""
+         end
+      end
+      if ImGui.BeginPopup("Select type##" .. name) then
+         local inserted_value_type = type(debug_menu_state.new_argument.inserted_value)
+         if ImGui.RadioButton("String", inserted_value_type == "string") then
+            debug_menu_state.new_argument.inserted_value = ""
+         end
+         ImGui.SameLine()
+         if ImGui.RadioButton("Bool", inserted_value_type == "boolean") then
+            debug_menu_state.new_argument.inserted_value = true
+         end
+
+         if ImGui.RadioButton(
+            "Integer",
+            inserted_value_type == "number" and math.type(debug_menu_state.new_argument.inserted_value) == "integer"
+         ) then
+            debug_menu_state.new_argument.inserted_value = 0
+         end
+         ImGui.SameLine()
+         if ImGui.RadioButton(
+            "Float",
+            inserted_value_type == "number" and math.type(debug_menu_state.new_argument.inserted_value) == "float"
+         ) then
+            debug_menu_state.new_argument.inserted_value = 0.0
+         end
+
+         if ImGui.RadioButton("Table", inserted_value_type == "table") then
+            debug_menu_state.new_argument.inserted_value = {}
+         end
+
+         if debug_menu_state.new_argument.inserted_value then
+            -- In case the argument table had nothing previosly, allow selecting if it's a table or an array
+            if not the_table or lume.count(the_table) == 0  then
+               ImGui.Text("Argument container type")
+               if ImGui.RadioButton("Array##container_type", debug_menu_state.new_argument.selected_type == "array") then
+                  debug_menu_state.new_argument.selected_type = "array"
+               end
+               ImGui.SameLine()
+               if ImGui.RadioButton("Table##container_type", debug_menu_state.new_argument.selected_type == "table") then
+                  debug_menu_state.new_argument.selected_type = "table"
+                  debug_menu_state.new_argument.table_key = ""
+               end
+            end
+            -- For table key, show the field to input the key
+            if debug_menu_state.new_argument.selected_type == "table" then
+               debug_menu_state.new_argument.table_key = ImGui.InputText(
+                  "Table key",
+                  debug_menu_state.new_argument.table_key
+               )
+            end
+
+            if ImGui.Button("Add") then
+               -- In case there were no arguments previosly, create the table
+               if not the_table then
+                  parent[table_name] = {}
+                  the_table = parent[table_name]
+               end
+
+               if debug_menu_state.new_argument.selected_type == "array" then
+                  table.insert(the_table, debug_menu_state.new_argument.inserted_value)
+
+                  ImGui.CloseCurrentPopup()
+               elseif lume.trim(debug_menu_state.new_argument.table_key) ~= "" then
+                  the_table[debug_menu_state.new_argument.table_key] =
+                     debug_menu_state.new_argument.inserted_value
+
+                  ImGui.CloseCurrentPopup()
+               end
+            end
+         end
+
+         ImGui.EndPopup()
+      end
+   end
+   ImGui.EndChild()
+end
+
+local function room_debug_menu()
+   local rooms_path = "resources/rooms/"
+   local current_room_file = util.rooms_mod().current_room_file
+   local current_room_without_room_path = path.splitext(current_room_file):gsub(rooms_path, "")
+
+   local open_new_room_popup
+   if ImGui.BeginCombo("Current room", current_room_without_room_path) then
+      local exclude_paths = { "assets.toml", "notes.toml", "prefabs" }
+
+      local list_dir
+      list_dir = function(dir_path)
+         local sorted_dir = lume.array(fs.dir(dir_path))
+         table.sort(sorted_dir)
+
+         for _, file in ipairs(sorted_dir) do
+            if file == "." or file == ".." or lume.find(exclude_paths, file) then
+               goto continue
+            end
+
+            local filename_without_ext = path.splitext(file)
+            local fullpath = path.join(dir_path, file)
+
+            if fs.isfile(fullpath) then
+               local without_room_path = path.splitext(fullpath):gsub(rooms_path, "")
+
+               if ImGui.Selectable(filename_without_ext, current_room_file == fullpath) then
+                  -- Switch the room
+                  util.rooms_mod().load_room(without_room_path, true)
+
+                  return
+               end
+            elseif fs.isdir(fullpath) then
+               if ImGui.BeginMenu(file, true) then
+                  list_dir(fullpath)
+
+                  ImGui.EndMenu()
+               end
+            end
+
+            ::continue::
+         end
+
+         if ImGui.Selectable("New room...", false) then
+            debug_menu_state.creating_room = { name = "", dir_path = path.ensure_dir_end(dir_path) }
+
+            -- Workaround for popups not opening from a menu item
+            open_new_room_popup = true
+         end
+      end
+
+      list_dir(rooms_path)
+
+      ImGui.EndCombo()
+   end
+   if open_new_room_popup then
+      ImGui.OpenPopup("Create new room")
+   end
+
+   if ImGui.BeginPopupModal("Create new room") then
+      ImGui.Text(debug_menu_state.creating_room.dir_path)
+
+      ImGui.SameLine()
+      debug_menu_state.creating_room.name =
+         ImGui.InputText(".toml", debug_menu_state.creating_room.name)
+
+      local full_path = debug_menu_state.creating_room.dir_path .. debug_menu_state.creating_room.name .. ".toml"
+      if ImGui.Button("Create")
+         and lume.trim(debug_menu_state.creating_room.name) ~= ""
+         and not path.exists(full_path)
+      then
+         local without_room_path = path.splitext(full_path):gsub(rooms_path, "")
+         TOML.create_new_room(full_path)
+         util.rooms_mod().load_room(without_room_path, true)
+
+         ImGui.CloseCurrentPopup()
+      end
+      ImGui.SameLine()
+      if ImGui.Button("Cancel") then
+         ImGui.CloseCurrentPopup()
+      end
+
+      ImGui.EndPopup()
+   end
+
+   if ImGui.TreeNode("Shaders") then
+      M.show_table("Shaders", util.rooms_mod(), "_room_shaders", Vector2f.new(500, 200))
+      ImGui.TreePop()
+
+      if ImGui.Button("Save##shaders") then
+         TOML.save_shaders(util.rooms_mod()._room_shaders)
+
+         util.rooms_mod().compile_room_shader_enabled()
+      end
+      ImGui.SameLine()
+      ImGui.Text("\"Enabled\" only changes after saving")
+   end
+end
+
 function M.debug_menu()
    util.debug_menu_process_state_variable_node("State variables", WalkingModule.state_variables)
 
    ImGui.Separator()
+
+   room_debug_menu()
 
    if ImGui.Button("Select entity") then
       ImGui.OpenPopup("Select entity")
