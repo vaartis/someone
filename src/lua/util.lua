@@ -35,6 +35,8 @@ function M.deep_merge(t1, t2)
    for k, _ in pairs(t2) do
       if type(t1[k]) == "table" and type(t2[k]) == "table" then
          result[k] = M.deep_merge(t1[k], t2[k])
+      elseif type(t1[k]) ~= "table" and type(t2[k]) == "table" then
+         result[k] = M.deep_merge({}, t2[k])
       else
          result[k] = t2[k] or t1[k]
       end
