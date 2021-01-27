@@ -84,4 +84,18 @@ function M.first(tbl)
    end
 end
 
+-- Get the value on the path or return a default
+function M.get_or_default(tbl, path, default)
+   local curr = tbl
+   for _, elem in ipairs(path) do
+      if curr[elem] then
+         curr = curr[elem]
+      else
+         return default
+      end
+   end
+
+   return curr
+end
+
 return M

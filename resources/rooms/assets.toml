@@ -1,46 +1,50 @@
+[config]
+textures = { root = "resources/sprites/" }
+sounds = { root = "resources/sounds/" }
+
 [textures]
 
 # Backgrounds
-computer_room = "resources/sprites/room/room.png"
-first_puzzle_room = "resources/sprites/room/first_puzzle_room.png"
-first_puzzle_room_wall_overlay = "resources/sprites/room/first_puzzle_room_wall_overlay.png"
+computer_room = "room/room.png"
+first_puzzle_room = "room/first_puzzle_room.png"
+first_puzzle_room_wall_overlay = "room/first_puzzle_room_wall_overlay.png"
 
-walkway_room = "resources/sprites/room/walkway_room/walkway_room.png"
-walkway_railing = "resources/sprites/room/walkway_room/walkway_railing.png"
-walkway_walls = "resources/sprites/room/walkway_room/walkway_walls.png"
+walkway_room = "room/walkway_room/walkway_room.png"
+walkway_railing = "room/walkway_room/walkway_railing.png"
+walkway_walls = "room/walkway_room/walkway_walls.png"
 
-status_room = "resources/sprites/room/status_room/status_room.png"
+status_room = "room/status_room/status_room.png"
 
-table = "resources/sprites/room/table/table.png"
-button = "resources/sprites/room/button/button.png"
-passage = "resources/sprites/room/passage/passage.png"
+table = "room/table/table.png"
+button = "room/button/button.png"
+passage = "room/passage/passage.png"
 
-first_puzzle_room_table = "resources/sprites/room/first_puzzle_room_table.png"
-table_lamp = "resources/sprites/room/table_lamp.png"
-note = "resources/sprites/room/note/note.png"
-table_note = "resources/sprites/room/table_note.png"
+first_puzzle_room_table = "room/first_puzzle_room_table.png"
+table_lamp = "room/table_lamp.png"
+note = "room/note/note.png"
+table_note = "room/table_note.png"
 
-dial = "resources/sprites/room/dial/dial.png"
-dial_handle = "resources/sprites/room/dial/dial_handle.png"
-dial_full = "resources/sprites/room/dial/dial_full.png"
+dial = "room/dial/dial.png"
+dial_handle = "room/dial/dial_handle.png"
+dial_full = "room/dial/dial_full.png"
 
-look_up_bg = "resources/sprites/room/walkway_room/look_up_bg.png"
-look_up_fan = "resources/sprites/room/walkway_room/look_up_fan.png"
-look_down = "resources/sprites/room/walkway_room/look_down.png"
+look_up_bg = "room/walkway_room/look_up_bg.png"
+look_up_fan = "room/walkway_room/look_up_fan.png"
+look_down = "room/walkway_room/look_down.png"
 
-status_room_computer = "resources/sprites/room/status_room/computer_screen.png"
+status_room_computer = "room/status_room/computer_screen.png"
 
-mainchar = "resources/sprites/mainchar/mainchar.png"
+mainchar = "mainchar/mainchar.png"
 
 [sounds]
-button_press = "resources/sounds/button_press.ogg"
+button_press = "button_press.ogg"
 
-footstep = "resources/sounds/footstep.ogg"
-footstep_metal = "resources/sounds/footstep_metal.ogg"
+footstep = "footstep.ogg"
+footstep_metal = "footstep_metal.ogg"
 
-rotation_click = "resources/sounds/rotation_click.ogg"
+rotation_click = "rotation_click.ogg"
 
-puzzle_jingle = "resources/sounds/puzzle_jingle/puzzle_jingle.ogg"
-dial_jingle = "resources/sounds/dial_jingle/dial_jingle.ogg"
+puzzle_jingle = "puzzle_jingle.ogg"
+dial_jingle = "dial_jingle.ogg"
 
-wind = "resources/sounds/wind.ogg"
+wind = "wind.ogg"

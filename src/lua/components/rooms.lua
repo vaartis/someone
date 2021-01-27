@@ -1,5 +1,6 @@
 local lume = require("lume")
 local util = require("util")
+local path = require("path")
 
 local interaction_components = require("components.interaction")
 local collider_components = require("components.collider")
@@ -78,15 +79,22 @@ end
 local function load_assets()
    local l_assets = TOML.parse("resources/rooms/assets.toml")
 
-   if l_assets.textures then
-      for name, path in pairs(l_assets.textures) do
-         assets.add_to_known_assets("textures", name, path)
-      end
-   end
+   local asset_types = {
+      { name = "textures", default_root = "resources/sprites/"},
+      { name = "sounds", default_root = "resources/sounds/"}
+   }
 
-   if l_assets.sounds then
-      for name, path in pairs(l_assets.sounds) do
-         assets.add_to_known_assets("sounds", name, path)
+   for _, asset_type in ipairs(asset_types) do
+      if l_assets[asset_type.name] then
+         local root = util.get_or_default(
+            l_assets,
+            {"config", asset_type.name, "root"},
+            asset_type.default_root
+         )
+
+         for name, asset_path in pairs(l_assets[asset_type.name]) do
+            assets.add_to_known_assets(asset_type.name, name, path.join(root, asset_path))
+         end
       end
    end
 end
