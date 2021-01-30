@@ -272,6 +272,15 @@ void delete_part_from_comp(sol::state_view lua, const std::string &deleted_name,
         if (contents[beginning] == '{')
             // Go one character forward to not accidentally remove the {
             beginning++;
+
+        while(contents[end] != ',' && contents[end] != '}')
+            end++;
+        if (contents[end] == '}')
+            // Go one character backward to not accidentally remove the }
+            end--;
+        else
+            // Capture the possible comma
+            end++;
     }
 
     auto amount_to_replace = end - beginning;

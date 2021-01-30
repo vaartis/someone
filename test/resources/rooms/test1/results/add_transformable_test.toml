@@ -1,0 +1,11 @@
+[entities.test]
+collider = { trigger = true, mode = "sprite" }
+
+[entities.test.transformable]
+position = [ 100, 100 ]
+test = 1
+
+[entities.test.drawable]
+z = 1
+kind = "sprite"
+texture_asset = "mainchar"

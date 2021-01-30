@@ -79,7 +79,7 @@ target_include_directories(someone_lib PUBLIC "src")
 if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
   set(BUILD_SHARED_LIBS FALSE)
   set(YAML_BUILD_SHARED_LIBS FALSE)
-else()
+elseif(NOT SOMEONE_TESTING)
   file(RELATIVE_PATH SOMEONE_EDITOR_BASE_PATH "${CMAKE_BINARY_DIR}" "${CMAKE_SOURCE_DIR}")
   target_compile_definitions(someone_lib PUBLIC SOMEONE_EDITOR_BASE_PATH="${SOMEONE_EDITOR_BASE_PATH}")
 endif()
@@ -323,7 +323,8 @@ if (SOMEONE_TESTING)
   add_subdirectory("${PROJECT_SOURCE_DIR}/deps/catch2" EXCLUDE_FROM_ALL)
   add_executable(someone_tests
     test/cpp/main.cpp
-    test/cpp/story_parser_test.cpp)
+    test/cpp/story_parser_test.cpp
+    test/cpp/toml_test.cpp)
 
   target_link_libraries(someone_tests Catch2::Catch2 someone_lib)
 
