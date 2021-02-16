@@ -4,6 +4,7 @@ local path = require("path")
 
 local util = require("util")
 local collider_components = require("components.collider")
+local assets = require("components.assets")
 
 local DebugColliderDrawingSystem = class("DebugColliderDrawingSystem", System)
 function DebugColliderDrawingSystem:requires() return { "Collider" } end
@@ -283,7 +284,7 @@ local function room_debug_menu()
    end
 end
 
-function M.debug_menu()
+function rooms_debug_menu()
    util.debug_menu_process_state_variable_node("State variables", WalkingModule.state_variables)
 
    ImGui.Separator()
@@ -568,6 +569,24 @@ function M.debug_menu()
             ImGui.Text("No editor for component " .. comp.name)
          end
       end
+   end
+end
+
+function M.debug_menu()
+   if ImGui.BeginTabBar("Tab bar", ImGuiTabBarFlags.None) then
+
+      if ImGui.BeginTabItem("Rooms") then
+         rooms_debug_menu()
+
+         ImGui.EndTabItem()
+      end
+      if ImGui.BeginTabItem("Assets") then
+         assets.debug_menu()
+
+         ImGui.EndTabItem()
+      end
+
+      ImGui.EndTabBar()
    end
 end
 

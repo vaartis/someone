@@ -49,7 +49,10 @@ void register_imgui_usertypes(sol::state &lua) {
         "BeginGroup", &ImGui::BeginGroup,
         "EndGroup", &ImGui::EndGroup,
 
-        "SameLine", []() { ImGui::SameLine(); },
+        "SameLine", sol::overload(
+            []() { ImGui::SameLine(); },
+            [](float offset, float spacing) { ImGui::SameLine(offset, spacing); }
+        ),
 
         "TreeNode", sol::resolve<bool(const char *)>(&ImGui::TreeNode),
         "TreePop", &ImGui::TreePop,
@@ -106,13 +109,26 @@ void register_imgui_usertypes(sol::state &lua) {
                 IM_COL32(color.r, color.g, color.b, color.a),
                 thickness
             );
-        }
+        },
+
+        "BeginTabBar", &ImGui::BeginTabBar,
+        "EndTabBar", &ImGui::EndTabBar,
+        "BeginTabItem", [](const char *label) {
+            return ImGui::BeginTabItem(label);
+        },
+        "EndTabItem", &ImGui::EndTabItem,
+
+        "SetNextItemWidth", &ImGui::SetNextItemWidth
     );
     lua.new_enum(
         "ImGuiInputTextFlags",
         "None", ImGuiInputTextFlags_None,
         "EnterReturnsTrue", ImGuiInputTextFlags_EnterReturnsTrue,
         "ReadOnly", ImGuiInputTextFlags_ReadOnly
+    );
+    lua.new_enum(
+        "ImGuiTabBarFlags",
+        "None", ImGuiTabBarFlags_None
     );
     lua.new_enum(
         "ImGuiMouseButton",

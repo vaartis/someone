@@ -355,7 +355,7 @@ function M.components.drawable.class:show_editor(ent)
    end
 
    if kind == "sprite" then
-      if ImGui.BeginCombo("Texture", assets.used_assets[self.drawable]) then
+      if ImGui.BeginCombo("Texture", assets.used_assets[self.drawable] or "None") then
          for _, name in ipairs(known_textures) do
             if ImGui.Selectable(name, assets.used_assets[self.drawable] == name) then
                self.drawable = assets.create_sprite_from_asset(name)

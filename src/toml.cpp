@@ -890,3 +890,73 @@ void save_shaders(sol::this_state lua_, sol::optional<sol::table> shaders_) {
 
     parse_toml(lua_, *source.path);
 }
+
+void save_asset(sol::this_state lua_,
+                sol::table asset_data, const std::string &category_key,
+                const sol::optional<std::string> &name_, const sol::optional<std::string> &new_name_, const std::string &path) {
+    sol::state_view lua(lua_);
+
+    sol::table category_locations = asset_data[sol::metatable_key]["toml_location"][category_key];
+
+    auto current_file = category_locations["__node_file"].get<std::string>();
+
+    bool is_new = false;
+
+    toml::source_region used_src;
+    if (name_) {
+        auto &name = *name_;
+        auto current_location = category_locations[name];
+
+        auto current_path = current_location["__node_path"].get<std::vector<std::string>>();
+
+        used_src = find_by_path(current_file, current_path).node()->source();
+        // Replace from the start of the line
+        used_src.begin.column = 1;
+    } else {
+        auto category_path = category_locations["__node_path"].get<std::vector<std::string>>();
+
+        auto last_node = find_last_source(
+            *find_by_path(current_file, category_path).as_table()
+        );
+        used_src = last_node->source();
+        used_src.begin.line++;
+        used_src.begin.column = 1;
+
+        used_src.end = used_src.begin;
+
+        is_new = true;
+    }
+
+    std::ifstream toml_file;
+    toml_file.open(current_file);
+    std::string contents((std::istreambuf_iterator<char>(toml_file)), std::istreambuf_iterator<char>());
+
+    auto beginning = find_in_string(contents, used_src.begin), end = find_in_string(contents, used_src.end);
+
+    std::stringstream ss;
+    if (new_name_) {
+        // Create a key-value pair with the new name
+        toml::table kv_table{{ {*new_name_, path} }};
+        toml::default_formatter formatter(
+            kv_table,
+            // Disable literal strings format flag by overriding it in the formatter
+            toml::format_flags::allow_multi_line_strings | toml::format_flags::allow_value_format_flags
+        );
+
+        ss << formatter;
+        if (is_new)
+            // Add an additional newline for new entries
+            ss << "\n";
+    } else {
+        // If no new name is set, delete the asset. That is, don't add anything to the stringstream,
+        // to replace it with emptiness
+        // Also consume the newline afterwards.
+        end++;
+    }
+
+
+    contents.replace(beginning, end - beginning, ss.str());
+    rewrite_resource_file(current_file, contents);
+
+    parse_toml(lua_, current_file);
+}

@@ -40,7 +40,8 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
         "encode", [](sol::this_state lua_, sol::object obj) { return encode_toml(lua_, obj); },
         "save_entity_component", &save_entity_component,
         "create_new_room", &create_new_room,
-        "save_shaders", &save_shaders
+        "save_shaders", &save_shaders,
+        "save_asset", &save_asset
     );
 
     // Data
