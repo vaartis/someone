@@ -252,13 +252,15 @@ function M.components.passage.class:show_editor(ent)
             ent, new_comp_data, to_room_passages
          )
          if not was_ok then
-            editor_state.last_error = err
-
-            return false
+            -- Don't exit here because this is something that has to happen at least once
+            -- when setting up a passage
+            editor_state.last_error = "Warning: \n" .. err
+         else
+            editor_state.last_error = nil
          end
+      else
+         editor_state.last_error = nil
       end
-
-      editor_state.last_error = nil
 
       self.to = editor_state.to
       self.from = editor_state.from
