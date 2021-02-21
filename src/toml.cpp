@@ -607,8 +607,22 @@ void save_entity_component(
         }
 
         auto generated_table_header = encode_toml(lua_, dummy_pathed_table);
-        // Prepend an additional newline
-        generated_table_header.insert(0, "\n\n");
+
+        int replaced_char_count = 1;
+        if (last_tbl->is_inline()) {
+            // For inline tables, go to a new line
+            last_pair_src.end.line++;
+            last_pair_src.end.column = 1;
+
+            // Don't eat any newlines
+            replaced_char_count = 0;
+
+            // Prepend one additional newline for when the table is added after an inline table
+            generated_table_header.insert(0, "\n");
+        } else {
+            // Prepend two additional newlines for when the table is added after a non-inline table
+            generated_table_header.insert(0, "\n\n");
+        }
 
         std::ifstream toml_file;
         toml_file.open(*last_pair_src.path);
@@ -616,7 +630,7 @@ void save_entity_component(
 
         auto end = find_in_string(contents, last_pair_src.end);
         // Replace the newline character with the new table header
-        contents.replace(end, 1, generated_table_header);
+        contents.replace(end, replaced_char_count, generated_table_header);
 
         rewrite_resource_file(*last_pair_src.path, contents);
 
