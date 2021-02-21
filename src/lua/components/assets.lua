@@ -153,6 +153,7 @@ function M.debug_menu()
       key_debug_menu.search = ImGui.InputText("Search##" .. key, key_debug_menu.search)
 
       local keys = lume.keys(key_assets)
+      table.sort(keys)
       keys = lume.filter(keys, function (k) return k:match(key_debug_menu.search) end)
 
       ImGui.SetNextItemWidth(250)
@@ -241,6 +242,8 @@ function M.debug_menu()
                   M.used_assets[obj] = editing_asset.new_name
                end
             end
+
+            toml_data = TOML.parse("resources/rooms/assets.toml")
          end
 
          if ImGui.Button("Save") then
