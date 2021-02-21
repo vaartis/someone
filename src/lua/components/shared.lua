@@ -327,6 +327,7 @@ function M.components.drawable.class:show_editor(ent)
    end
 
    local known_textures = assets.list_known_assets("textures")
+   table.sort(known_textures)
 
    local updated = false
    local pos = self.drawable.position
