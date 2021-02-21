@@ -143,6 +143,12 @@ function M.interaction_callbacks.switch_room(_current_state, ent)
       end
    )
 end
+debug_components.declare_callback_args(
+   M.interaction_callbacks.switch_room,
+   {},
+   { self = true }
+)
+
 
 function M.components.passage.class:default_data(ent)
    local physics_world = collider_components.physics_world

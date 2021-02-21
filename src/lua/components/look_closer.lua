@@ -1,6 +1,7 @@
 local util = require("util")
 
 local interaction_components
+local debug_components = require("components.debug")
 
 local M = {}
 
@@ -54,5 +55,10 @@ function M.interaction_callbacks.look(_current_state, prefab)
       }
    )
 end
+debug_components.declare_callback_args(
+   M.interaction_callbacks.look,
+   {"string"}
+)
+
 
 return M

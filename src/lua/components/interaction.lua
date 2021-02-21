@@ -357,6 +357,9 @@ function try_get_fnc_from_module(fnc_data, module_field, context)
       )
    end
 
+
+   local declared_args = debug_components.declared_callback_arguments[callback_function]
+
    local args
    if fnc_data.args then
       -- Clone the arguments to ensure that functions are called with unmodified arguments when editor changes things
@@ -388,14 +391,14 @@ function try_get_fnc_from_module(fnc_data, module_field, context)
       if lume.isarray(args) then
          return function(self, ...)
             return callback_function(..., table.unpack(args))
-         end
+         end, declared_args
       else
          return function(self, ...)
             return callback_function(..., args)
-         end
+         end, declared_args
       end
    else
-      return callback_function
+      return callback_function, declared_args
    end
 end
 
@@ -405,12 +408,13 @@ function M.process_activatable(comp, field, context)
    -- Use true by default if there was no field
    if got_field == nil then return true end
 
-   local result
+   local result, declared_args
    if type(got_field) == "table" then
       if got_field["not"] then
          got_field = got_field["not"]
 
-         local fnc = try_get_fnc_from_module(got_field, "activatable_callbacks", context)
+         local fnc
+         fnc, declared_args = try_get_fnc_from_module(got_field, "activatable_callbacks", context)
 
          -- Invert whatever the function returns
          result = function(self, ...)
@@ -419,6 +423,7 @@ function M.process_activatable(comp, field, context)
       elseif got_field["and"] then
          local conds = {}
          for _, cnd in ipairs(got_field["and"]) do
+            -- FIXME: Ignore declared args here for now
             table.insert(conds, try_get_fnc_from_module(cnd, "activatable_callbacks", context))
          end
 
@@ -427,13 +432,13 @@ function M.process_activatable(comp, field, context)
             return lume.all(conds, function(f) return f(table.unpack(args)) end)
          end
       else
-         result = try_get_fnc_from_module(got_field, "activatable_callbacks", context)
+         result, declared_args = try_get_fnc_from_module(got_field, "activatable_callbacks", context)
       end
    else
       return got_field
    end
 
-   local ret_result = { callback_data = got_field }
+   local ret_result = { callback_data = got_field, declared_args = declared_args }
    setmetatable(ret_result, { __call = result })
    return ret_result
 end
@@ -445,11 +450,11 @@ function M.process_interaction(comp, field, context)
       error(context.entity_name .. "." .. context.comp_name .. " does not have the required '" .. field .. "' field")
    end
 
-   local result = try_get_fnc_from_module(got_field, "interaction_callbacks", context)
+   local result, declared_args = try_get_fnc_from_module(got_field, "interaction_callbacks", context)
 
    -- Return a callable table. Don't actually care about storing the function, the only thing that is needed from it is calling,
    -- and otherwise just storing it in a closure is fine
-   local ret_result = { callback_data = got_field }
+   local ret_result = { callback_data = got_field, declared_args = declared_args }
    setmetatable(ret_result, { __call = result })
    return ret_result
 end
@@ -503,10 +508,19 @@ function M.components.interaction.class:show_editor(ent)
    if not self.__editor_state then
       -- Set up some default editor state
       self.__editor_state = {
-         callback = util.deep_merge({}, self.on_interaction.callback_data),
+         callback = util.deep_merge(
+            { declared_args = self.on_interaction.declared_args },
+            self.on_interaction.callback_data
+         ),
+
          activatable_enabled = self.is_activatable ~= nil,
          -- "and" means if the value is not nil
-         activatable_callback = self.is_activatable and self.is_activatable.callback_data,
+         activatable_callback = self.is_activatable and
+            util.deep_merge(
+               { declared_args = self.is_activatable.declared_args },
+               self.is_activatable.callback_data
+            ),
+
          current_state = self.current_state
       }
    end
@@ -541,6 +555,13 @@ function M.components.interaction.class:show_editor(ent)
             for name, _ in pairs(selected_module[module_source]) do
                if ImGui.Selectable(name, name == callback.name) then
                   callback.name = name
+
+                  callback.declared_args =
+                     installation_function(
+                        callback_parent,
+                        callback_name,
+                        { entity_name = ent:get("Name").name, comp_name = "interaction", needed_for = callback_name, entity = ent }
+                     ).declared_args
                end
             end
 
@@ -548,10 +569,37 @@ function M.components.interaction.class:show_editor(ent)
          end
       end
 
+      if callback.declared_args then
+         local self_value = util.get_or_default(callback.declared_args, {"params", "self"}, false)
+         -- Ensure the callback's self value is the same as in spec
+         callback_parent[callback_name].self = self_value
+         -- Don't assign anywhere, essentially read-only
+         ImGui.Checkbox("Self", self_value)
 
-      callback_parent[callback_name].self = ImGui.Checkbox("Self", callback_parent[callback_name].self or false)
+         if lume.count(callback.declared_args.args) > 0 then
+            local height = 0
+            for _, val in pairs(callback.declared_args.args) do
+               if type(val) == "table" or val == "table" then
+                  -- Set height to at least 200 when there's a table
+                  height = 200
+               else
+                  height = height + 50
+               end
+            end
+            height = lume.clamp(height, 0, 500)
 
-      debug_components.show_table(callback_name .. " arguments", callback, "args", Vector2f.new(0, 200))
+            debug_components.show_table_typed(
+               callback_name .. " arguments", callback, "args", Vector2f.new(0, height),
+               callback.declared_args.args
+            )
+         else
+            ImGui.Text("No arguments declared")
+         end
+      else
+         callback_parent[callback_name].self = ImGui.Checkbox("Self", callback_parent[callback_name].self or false)
+
+         debug_components.show_table(callback_name .. " arguments", callback, "args", Vector2f.new(0, 200))
+      end
 
       local install = function()
          -- Try installing the new callback
@@ -561,6 +609,7 @@ function M.components.interaction.class:show_editor(ent)
             callback_name,
             { entity_name = ent:get("Name").name, comp_name = "interaction", needed_for = callback_name, entity = ent }
          )
+
          if not is_ok then
             self.__editor_state.last_error = interaction_callback_or_err
 
@@ -590,8 +639,12 @@ function M.components.interaction.class:show_editor(ent)
             callback_parent[callback_name].self = nil
          end
 
+         -- When saving, remove the declared args property
+         local saved_callback = lume.merge({}, callback)
+         saved_callback.declared_args = nil
+
          if install() then
-            TOML.save_entity_component(ent, "interaction", self, { callback_name }, { [callback_name] = callback })
+            TOML.save_entity_component(ent, "interaction", self, { callback_name }, { [callback_name] = saved_callback })
          end
       end
    end

@@ -44,6 +44,45 @@ debug_menu_state = {
    selected_entity_search = { index = 1, search = "" }
 }
 
+function M.show_table_typed(name, parent, table_name, size, declared_types)
+   local the_table = parent[table_name]
+
+   if ImGui.BeginChild(name, size) then
+      if the_table then
+         for i, arg_type in pairs(declared_types) do
+            local arg = the_table[i]
+
+            if arg_type == "string" then
+               the_table[i] = ImGui.InputText(tostring(i), arg)
+            elseif arg_type == "number" then
+               if math.type(arg) == "float" then
+                  the_table[i] =
+                     ImGui.InputFloat(tostring(i), arg)
+               else
+                  the_table[i] =
+                     ImGui.InputInt(tostring(i), arg)
+               end
+            elseif arg_type == "boolean" then
+               the_table[i] =
+                  ImGui.Checkbox(tostring(i), arg)
+            elseif arg_type == "table" then
+               -- If type == table, the table can be anything
+
+               ImGui.Text(tostring(i))
+               ImGui.SameLine()
+               M.show_table(name .. i, the_table, i, Vector2f.new(size.x, size.y / 2))
+            elseif type(arg_type) == "table" then
+               -- If arg_type itself is a table then it declares types for underlying levels of arguments
+               M.show_callback(name .. i, the_table, i, Vector2f.new(size.x, size.y / 2), arg_type)
+            else
+               ImGui.InputText(tostring(i), "Unsupported type: " .. tostring(arg), ImGuiInputTextFlags.ReadOnly)
+            end
+         end
+      end
+   end
+   ImGui.EndChild()
+end
+
 function M.show_table(name, parent, table_name, size)
    local the_table = parent[table_name]
 
@@ -622,6 +661,13 @@ function M.load_entities_from_room(name, with_components)
    collider_components.physics_world = curr_phys_world
 
    return ents
+end
+
+M.declared_callback_arguments = {}
+setmetatable(M.declared_callback_arguments, {__mode = "k"})
+
+function M.declare_callback_args(fnc, arg_types, params)
+   M.declared_callback_arguments[fnc] = { args = arg_types, params = params }
 end
 
 return M
