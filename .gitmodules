@@ -27,4 +27,4 @@
 	url = https://github.com/catchorg/Catch2
 [submodule "deps/tomlplusplus"]
 	path = deps/tomlplusplus
-	url = https://github.com/marzer/tomlplusplus/
+	url = https://github.com/vaartis/tomlplusplus/
