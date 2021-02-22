@@ -41,44 +41,49 @@ debug_menu_state = {
    selected = nil,
    selected_moving = { obj = nil, x_diff = nil, y_diff = nil },
    added_component = { index = 1, search = "" },
-   selected_entity_search = { index = 1, search = "" }
+   selected_entity_search = { index = 1, search = "" },
+   adding_shader = { name = nil }
 }
 
 function M.show_table_typed(name, parent, table_name, size, declared_types)
+   if not parent[table_name] then
+      parent[table_name] = {}
+   end
+
    local the_table = parent[table_name]
 
    if ImGui.BeginChild(name, size) then
-      if the_table then
-         for i, arg_type in pairs(declared_types) do
-            local arg = the_table[i]
+      for i, arg_type in pairs(declared_types) do
+         local arg = the_table[i]
 
-            if arg_type == "string" then
-               the_table[i] = ImGui.InputText(tostring(i), arg)
-            elseif arg_type == "number" then
-               if math.type(arg) == "float" then
-                  the_table[i] =
-                     ImGui.InputFloat(tostring(i), arg)
-               else
-                  the_table[i] =
-                     ImGui.InputInt(tostring(i), arg)
-               end
-            elseif arg_type == "boolean" then
-               the_table[i] =
-                  ImGui.Checkbox(tostring(i), arg)
-            elseif arg_type == "table" then
-               -- If type == table, the table can be anything
+         if arg_type == "string" then
+            the_table[i] = ImGui.InputText(tostring(i), arg or "")
+         elseif arg_type == "float" then
+            the_table[i] =
+               ImGui.InputFloat(tostring(i), arg or 0.0)
+         elseif arg_type == "integer" then
+            the_table[i] =
+               ImGui.InputInt(tostring(i), arg or 0)
+         elseif arg_type == "boolean" then
+            the_table[i] =
+               ImGui.Checkbox(tostring(i), arg or false)
+         elseif arg_type == "vec2i" then
+            the_table[i] =
+               ImGui.InputInt2(tostring(i), arg or {0, 0})
+         elseif arg_type == "table" then
+            -- If type == table, the table can be anything
 
-               ImGui.Text(tostring(i))
-               ImGui.SameLine()
-               M.show_table(name .. i, the_table, i, Vector2f.new(size.x, size.y / 2))
-            elseif type(arg_type) == "table" then
-               -- If arg_type itself is a table then it declares types for underlying levels of arguments
-               M.show_callback(name .. i, the_table, i, Vector2f.new(size.x, size.y / 2), arg_type)
-            else
-               ImGui.InputText(tostring(i), "Unsupported type: " .. tostring(arg), ImGuiInputTextFlags.ReadOnly)
-            end
+            ImGui.Text(tostring(i))
+            ImGui.SameLine()
+            M.show_table(name .. i, the_table, i, Vector2f.new(size.x, size.y / 2))
+         elseif type(arg_type) == "table" then
+            -- If arg_type itself is a table then it declares types for underlying levels of arguments
+            M.show_table_typed(name .. i, the_table, i, Vector2f.new(size.x, size.y / 2), arg_type)
+         else
+            ImGui.InputText(tostring(i), "Unsupported type: " .. tostring(arg), ImGuiInputTextFlags.ReadOnly)
          end
       end
+
    end
    ImGui.EndChild()
 end
@@ -310,7 +315,62 @@ local function room_debug_menu()
    end
 
    if ImGui.TreeNode("Shaders") then
-      M.show_table("Shaders", util.rooms_mod(), "_room_shaders", Vector2f.new(500, 200))
+      local available_shaders = GLOBAL.available_shaders
+
+      if ImGui.BeginCombo("##add_shader_combo", debug_menu_state.adding_shader.name or "(none)") then
+         for name, shader in pairs(available_shaders) do
+            if not lume.find(lume.keys(util.rooms_mod()._room_shaders), name)
+               and ImGui.Selectable(name, debug_menu_state.adding_shader.name == name)
+            then
+               debug_menu_state.adding_shader.name = name
+            end
+         end
+
+         ImGui.EndCombo()
+      end
+
+      if ImGui.Button("Add##add_shader") and debug_menu_state.adding_shader.name then
+         local name = debug_menu_state.adding_shader.name
+         util.rooms_mod()._room_shaders[name] = {}
+
+         -- Run this once to fill in the default values
+         M.show_table_typed(name, util.rooms_mod()._room_shaders, name, Vector2f.new(0, 0), available_shaders[name].declared_args)
+         -- Set "enabled" to default value
+         util.rooms_mod().compile_room_shader_enabled()
+
+         -- Reset the selection
+         debug_menu_state.adding_shader.name = nil
+      end
+
+      for name, value in pairs(util.rooms_mod()._room_shaders) do
+         local height = 0
+         for _, val in pairs(available_shaders[name].declared_args) do
+            if type(val) == "table" or val == "table" then
+               -- Set height to at least 200 when there's a table
+               height = 200
+            else
+               height = height + 50
+            end
+         end
+         height = lume.clamp(height, 0, 500)
+
+         ImGui.Text(name)
+         ImGui.SameLine()
+         if ImGui.Button("-") then
+            util.rooms_mod()._room_shaders[name] = nil
+
+            break
+         end
+
+         M.show_table_typed(
+            name,
+            util.rooms_mod()._room_shaders,
+            name,
+            Vector2f.new(500, height),
+            available_shaders[name].declared_args
+         )
+      end
+
       ImGui.TreePop()
 
       if ImGui.Button("Save##shaders") then
@@ -318,8 +378,6 @@ local function room_debug_menu()
 
          util.rooms_mod().compile_room_shader_enabled()
       end
-      ImGui.SameLine()
-      ImGui.Text("\"Enabled\" only changes after saving")
    end
 end
 

@@ -1,6 +1,10 @@
 #pragma once
 
 #include <map>
+
+#include "SFML/Graphics.hpp"
+
+#include "logger.hpp"
 #include "lua_module_env.hpp"
 
 class WalkingEnv : public LuaModuleEnv {
@@ -8,8 +12,7 @@ private:
     sol::protected_function update_f, draw_f, draw_overlay_f, add_event_f, room_shaders_f, debug_menu_f,
         clear_event_store_f;
 
-    std::vector<std::string> need_screen_size;
-    std::map<std::string, sf::Shader> shaders;
+    sol::table shaders;
 
     sf::RenderTexture shaders_texture;
     sf::Sprite shaders_sprite;
@@ -26,17 +29,33 @@ public:
         debug_menu_f = module["debug_menu"];
         clear_event_store_f = module["clear_event_store"];
 
+        shaders = lua.create_table();
+        lua["GLOBAL"]["available_shaders"] = shaders;
+
         {
-            const auto &[pair, _] =
-                shaders.emplace(std::piecewise_construct, std::forward_as_tuple("room_darker"), std::forward_as_tuple());
-            pair->second.loadFromFile("resources/shaders/room_darker.frag", sf::Shader::Fragment);
+            auto shader = std::make_unique<sf::Shader>();
+            shader->loadFromFile("resources/shaders/room_darker.frag", sf::Shader::Fragment);
+            shaders["room_darker"] = lua.create_table_with(
+                "shader", std::move(shader),
+                "declared_args", lua.create_table_with(
+                    "n", "integer",
+                    "ambientLightLevel", "float"
+                )
+            );
         }
 
         {
-            const auto &[pair, _] =
-                shaders.emplace(std::piecewise_construct, std::forward_as_tuple("circle_light"), std::forward_as_tuple());
-            pair->second.loadFromFile("resources/shaders/circle_light.frag", sf::Shader::Fragment);
-            need_screen_size.push_back("circle_light");
+            auto shader = std::make_unique<sf::Shader>();
+            shader->loadFromFile("resources/shaders/circle_light.frag", sf::Shader::Fragment);
+            shaders["circle_light"] = lua.create_table_with(
+                "shader", std::move(shader),
+                "declared_args", lua.create_table_with(
+                    "n", "integer",
+                    "brightness", "float",
+                    "point", "vec2i"
+                ),
+                "need_screen_size", true
+            );
         }
     }
 
@@ -91,15 +110,17 @@ public:
         // Then, draw the shaders for the room over the sprite, blending them together
         if (sorted_shaders.size() > 0) {
             for (auto &[shader_name, shader_data] : sorted_shaders) {
-                auto shader_iter = shaders.find(shader_name);
-                if (shader_iter == shaders.end()) {
+                sol::optional<sol::table> shader_tbl_ = shaders[shader_name];
+                if (!shader_tbl_) {
                     continue;
                 }
 
-                auto &shader = shader_iter->second;
+                auto shader_tbl = *shader_tbl_;
+                std::unique_ptr<sf::Shader> &shader = shader_tbl["shader"];
 
-                if (std::find(need_screen_size.begin(), need_screen_size.end(), shader_name) != need_screen_size.end()) {
-                    shader.setUniform("screenSize", sf::Vector2f(target_window.getSize()));
+                if (sol::optional<bool> need_screen_size = shader_tbl["need_screen_size"];
+                    need_screen_size.has_value() && *need_screen_size) {
+                    shader->setUniform("screenSize", sf::Vector2f(target_window.getSize()));
                 }
 
                 bool enabled = true;
@@ -124,13 +145,13 @@ public:
                     if (name == "n" || name == "enabled") continue;
 
                     if (value.is<float>()) {
-                        shader.setUniform(name, value.as<float>());
+                        shader->setUniform(name, value.as<float>());
 
                         continue;
                     } else if (value.is<std::vector<int32_t>>()) {
                         auto vec = value.as<std::vector<int32_t>>();
                         if (vec.size() == 2) {
-                            shader.setUniform(name, sf::Vector2f(vec[0], vec[1]));
+                            shader->setUniform(name, sf::Vector2f(vec[0], vec[1]));
 
                             continue;
                         }
@@ -139,7 +160,7 @@ public:
                     spdlog::error("Parameter {} of unknown type in shader {}", name, shader_name);
                 }
 
-                if (enabled) target_window.draw(shaders_sprite, &shader);
+                if (enabled) target_window.draw(shaders_sprite, shader.get());
             }
         }
     }

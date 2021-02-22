@@ -1,5 +1,7 @@
 #pragma once
 
+#include "sol/sol.hpp"
+
 class LuaModuleEnv {
 protected:
     sol::state &lua;

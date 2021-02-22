@@ -84,11 +84,10 @@ int main(int argc, char **argv) {
 
     CoroutinesEnv coroutines_env(lua);
     TerminalEnv terminal_env(lua);
-    WalkingEnv walking_env(lua);
 
     auto loaded_mods = terminal_env.parser.load_mods(lua);
 
-    auto current_state = CurrentState::Terminal;
+    auto current_state = CurrentState::Walking;
 
     auto current_state_type = lua.new_enum(
         "CurrentState",
@@ -103,6 +102,9 @@ int main(int argc, char **argv) {
         "isalpha", [](int num) { return std::isalpha(num) != 0; },
         "loaded_mods", loaded_mods
     );
+
+    // Initialize the walking env after GLOBAL, because it needs to put things in there
+    WalkingEnv walking_env(lua);
 
 #ifndef NDEBUG
     terminal_env.parser.total_wordcount();

@@ -122,7 +122,7 @@ function M.load_room(name, switch_namespace)
 
       M.compile_room_shader_enabled()
    else
-      M._room_shaders = nil
+      M._room_shaders = {}
    end
 
    if room_toml.entities then
