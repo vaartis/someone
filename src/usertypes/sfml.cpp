@@ -237,7 +237,14 @@ void register_sfml_usertypes(sol::state &lua, StaticFonts &fonts) {
 
     auto keyboard_type = lua.new_usertype<sf::Keyboard>(
         "Keyboard",
-        "is_key_pressed", &sf::Keyboard::isKeyPressed
+        "is_key_pressed", [&](sf::Keyboard::Key key) {
+            // Because SFML doesn't track if the window is focused or not,
+            // this needs to be done manually. Obviously when the window is not focused,
+            // no keys should be registered as pressed
+            return lua["GLOBAL"]["window"].get<sf::RenderWindow>().hasFocus()
+                ? sf::Keyboard::isKeyPressed(key)
+                : false;
+        }
     );
 
     auto key_enum = lua.new_enum(
