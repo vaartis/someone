@@ -230,6 +230,70 @@ function M.show_table(name, parent, table_name, size)
    ImGui.EndChild()
 end
 
+local function shader_debug_menu()
+   local available_shaders = GLOBAL.available_shaders
+
+   if ImGui.BeginCombo("##add_shader_combo", debug_menu_state.adding_shader.name or "(none)") then
+      for name, shader in pairs(available_shaders) do
+         if not lume.find(lume.keys(util.rooms_mod()._room_shaders), name)
+            and ImGui.Selectable(name, debug_menu_state.adding_shader.name == name)
+         then
+            debug_menu_state.adding_shader.name = name
+         end
+      end
+
+      ImGui.EndCombo()
+   end
+
+   if ImGui.Button("Add##add_shader") and debug_menu_state.adding_shader.name then
+      local name = debug_menu_state.adding_shader.name
+      util.rooms_mod()._room_shaders[name] = {}
+
+      -- Run this once to fill in the default values
+      M.show_table_typed(name, util.rooms_mod()._room_shaders, name, Vector2f.new(0, 0), available_shaders[name].declared_args)
+      -- Set "enabled" to default value
+      util.rooms_mod().compile_room_shader_enabled()
+
+      -- Reset the selection
+      debug_menu_state.adding_shader.name = nil
+   end
+
+   for name, value in pairs(util.rooms_mod()._room_shaders) do
+      local height = 0
+      for _, val in pairs(available_shaders[name].declared_args) do
+         if type(val) == "table" or val == "table" then
+            -- Set height to at least 200 when there's a table
+            height = 200
+         else
+            height = height + 50
+         end
+      end
+      height = lume.clamp(height, 0, 500)
+
+      ImGui.Text(name)
+      ImGui.SameLine()
+      if ImGui.Button("-") then
+         util.rooms_mod()._room_shaders[name] = nil
+
+         break
+      end
+
+      M.show_table_typed(
+         name,
+         util.rooms_mod()._room_shaders,
+         name,
+         Vector2f.new(500, height),
+         available_shaders[name].declared_args
+      )
+   end
+
+   if ImGui.Button("Save##shaders") then
+      TOML.save_shaders(util.rooms_mod()._room_shaders)
+
+      util.rooms_mod().compile_room_shader_enabled()
+   end
+end
+
 local function room_debug_menu()
    local rooms_path = "resources/rooms/"
    local current_room_file = util.rooms_mod().current_room_file
@@ -315,69 +379,9 @@ local function room_debug_menu()
    end
 
    if ImGui.TreeNode("Shaders") then
-      local available_shaders = GLOBAL.available_shaders
-
-      if ImGui.BeginCombo("##add_shader_combo", debug_menu_state.adding_shader.name or "(none)") then
-         for name, shader in pairs(available_shaders) do
-            if not lume.find(lume.keys(util.rooms_mod()._room_shaders), name)
-               and ImGui.Selectable(name, debug_menu_state.adding_shader.name == name)
-            then
-               debug_menu_state.adding_shader.name = name
-            end
-         end
-
-         ImGui.EndCombo()
-      end
-
-      if ImGui.Button("Add##add_shader") and debug_menu_state.adding_shader.name then
-         local name = debug_menu_state.adding_shader.name
-         util.rooms_mod()._room_shaders[name] = {}
-
-         -- Run this once to fill in the default values
-         M.show_table_typed(name, util.rooms_mod()._room_shaders, name, Vector2f.new(0, 0), available_shaders[name].declared_args)
-         -- Set "enabled" to default value
-         util.rooms_mod().compile_room_shader_enabled()
-
-         -- Reset the selection
-         debug_menu_state.adding_shader.name = nil
-      end
-
-      for name, value in pairs(util.rooms_mod()._room_shaders) do
-         local height = 0
-         for _, val in pairs(available_shaders[name].declared_args) do
-            if type(val) == "table" or val == "table" then
-               -- Set height to at least 200 when there's a table
-               height = 200
-            else
-               height = height + 50
-            end
-         end
-         height = lume.clamp(height, 0, 500)
-
-         ImGui.Text(name)
-         ImGui.SameLine()
-         if ImGui.Button("-") then
-            util.rooms_mod()._room_shaders[name] = nil
-
-            break
-         end
-
-         M.show_table_typed(
-            name,
-            util.rooms_mod()._room_shaders,
-            name,
-            Vector2f.new(500, height),
-            available_shaders[name].declared_args
-         )
-      end
+      shader_debug_menu()
 
       ImGui.TreePop()
-
-      if ImGui.Button("Save##shaders") then
-         TOML.save_shaders(util.rooms_mod()._room_shaders)
-
-         util.rooms_mod().compile_room_shader_enabled()
-      end
    end
 end
 
