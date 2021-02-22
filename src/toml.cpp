@@ -765,9 +765,9 @@ void save_entity_component(
         auto beginning = find_in_string(contents, this_location_tbl->source().begin),
             end = find_in_string(contents, this_location_tbl->source().end);
         // Delete the previous newline
-        beginning -= 1;
+        beginning--;
         // Delete the following newline
-        end += 1;
+        end++;
         contents.replace(beginning, end - beginning, "");
         rewrite_resource_file(this_location_file, contents);
         parse_toml(sol::this_state(lua), this_location_file);
@@ -806,16 +806,21 @@ position = [500, 500]
 #endif
 }
 
-void save_shaders(sol::this_state lua_, sol::optional<sol::table> shaders_) {
+void save_shaders(sol::this_state lua_, sol::table shaders) {
     sol::state_view lua(lua_);
 
     std::string current_room_file = lua.script("return require('components.rooms').current_room_file");
 
-    bool is_new = false;
-    toml::source_region source;
-    if (shaders_) {
-        auto shaders = *shaders_;
+    auto any_shaders = false;
+    for (auto &[_k, _v] : shaders) {
+        // If there is anything in the shader table, set this to true
+        any_shaders = true;
+        break;
+    }
 
+    bool is_new = false, had_any_before = bool(file_node_map[current_room_file]["shaders"]);
+    toml::source_region source;
+    if (any_shaders) {
         sol::optional<sol::table> locations_ = shaders[sol::metatable_key]["toml_location"];
 
         if (!locations_) {
@@ -878,16 +883,22 @@ void save_shaders(sol::this_state lua_, sol::optional<sol::table> shaders_) {
     auto beginning = find_in_string(contents, source.begin), end = find_in_string(contents, source.end);
 
     std::string converted;
-    if (shaders_) {
-        auto result = lua.create_table_with("shaders", *shaders_);
+    if (any_shaders) {
+        auto result = lua.create_table_with("shaders", shaders);
         converted = encode_toml(lua_, result, false);
 
         if (is_new) {
             // Add a newline
             converted += "\n";
+
+            if (!had_any_before) {
+                // Add an additional newline if there was no shaders before at all,
+                // so there'd be space between the shaders and the entities
+                converted += "\n";
+            }
         } else {
             // Capture the newline
-            end += 1;
+            end++;
 
             if (!converted.ends_with("\n")) {
                 converted += "\n";
@@ -895,6 +906,12 @@ void save_shaders(sol::this_state lua_, sol::optional<sol::table> shaders_) {
         }
     } else {
         converted = "";
+        // Capture the newline
+        end++;
+
+        // Capture the next newlines too
+        while (std::isspace(contents[end]))
+            end++;
     }
 
     // Replace the newline character with the new table header.
