@@ -230,6 +230,70 @@ function M.show_table(name, parent, table_name, size)
    ImGui.EndChild()
 end
 
+function M.select_callback(module_field, callback)
+   local all_components = util.entities_mod().all_components
+   local callback_modules = lume.filter(all_components, function(c) return c[module_field] end)
+
+   if ImGui.BeginCombo("Module", callback.module) then
+      for _, mod in ipairs(callback_modules) do
+         local mod_name = getmetatable(mod).__module_name
+         if ImGui.Selectable(mod_name, mod_name == callback.module) then
+            callback.module = mod_name
+            callback.name = ""
+         end
+      end
+
+      ImGui.EndCombo()
+   end
+
+   local selected_module = lume.match(callback_modules, function(c) return getmetatable(c).__module_name == callback.module end)
+   if selected_module and ImGui.BeginCombo("Name", callback.name) then
+      for name, _ in pairs(selected_module[module_field]) do
+         if ImGui.Selectable(name, name == callback.name) then
+            callback.name = name
+
+            callback.declared_args = M.declared_callback_arguments[selected_module[module_field][name]]
+         end
+      end
+
+      ImGui.EndCombo()
+   end
+end
+
+function M.show_callback_args(callback, callback_name)
+   if callback.declared_args then
+      local self_value = util.get_or_default(callback.declared_args, {"params", "self"}, false)
+      -- Ensure the callback's self value is the same as in spec
+      callback.self = self_value
+      -- Don't assign anywhere, essentially read-only
+      ImGui.Checkbox("Self", self_value)
+
+      if lume.count(callback.declared_args.args) > 0 then
+         local height = 0
+         for _, val in pairs(callback.declared_args.args) do
+            if type(val) == "table" or val == "table" then
+               -- Set height to at least 200 when there's a table
+               height = 200
+            else
+               height = height + 50
+            end
+         end
+         height = lume.clamp(height, 0, 500)
+
+         M.show_table_typed(
+            callback_name .. " arguments", callback, "args", Vector2f.new(0, height),
+            callback.declared_args.args
+         )
+      else
+         ImGui.Text("No arguments declared")
+      end
+   else
+      callback.self = ImGui.Checkbox("Self", callback.self or false)
+
+      M.show_table(callback_name .. " arguments", callback, "args", Vector2f.new(0, 200))
+   end
+end
+
 local function shader_debug_menu()
    local available_shaders = GLOBAL.available_shaders
 
@@ -276,6 +340,30 @@ local function shader_debug_menu()
          util.rooms_mod()._room_shaders[name] = nil
 
          break
+      end
+
+      local activatable_type_name = "(none)"
+      if type(value.enabled) == "table" then
+         activatable_type_name = "activatable"
+      end
+
+      if ImGui.BeginCombo("Enabled condition", activatable_type_name) then
+         if ImGui.Selectable("(none)", not value.enabled) then
+            value.enabled = nil
+         end
+
+         if ImGui.Selectable("activatable", type(value.enabled) == "table") then
+            value.enabled = { module = "", name = "" }
+         end
+
+         ImGui.EndCombo()
+      end
+      if type(value.enabled) == "table" then
+         M.select_callback("activatable_callbacks", value.enabled)
+
+         if value.enabled.name ~= "" then
+            M.show_callback_args(value.enabled, "enabled")
+         end
       end
 
       M.show_table_typed(

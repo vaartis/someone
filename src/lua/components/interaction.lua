@@ -535,71 +535,10 @@ function M.components.interaction.class:show_editor(ent)
       if callback["and"] then
       elseif callback["or"] then
       else
-         local all_components = util.entities_mod().all_components
-         local callback_modules = lume.filter(all_components, function(c) return c[module_source] end)
-
-         if ImGui.BeginCombo("Module", callback.module) then
-            for _, mod in ipairs(callback_modules) do
-               local mod_name = getmetatable(mod).__module_name
-               if ImGui.Selectable(mod_name, mod_name == callback.module) then
-                  callback.module = mod_name
-                  callback.name = ""
-               end
-            end
-
-            ImGui.EndCombo()
-         end
-
-         local selected_module = lume.match(callback_modules, function(c) return getmetatable(c).__module_name == callback.module end)
-         if selected_module and ImGui.BeginCombo("Name", callback.name) then
-            for name, _ in pairs(selected_module[module_source]) do
-               if ImGui.Selectable(name, name == callback.name) then
-                  callback.name = name
-
-                  callback.declared_args =
-                     installation_function(
-                        callback_parent,
-                        callback_name,
-                        { entity_name = ent:get("Name").name, comp_name = "interaction", needed_for = callback_name, entity = ent }
-                     ).declared_args
-               end
-            end
-
-            ImGui.EndCombo()
-         end
+         debug_components.select_callback(module_source, callback)
       end
 
-      if callback.declared_args then
-         local self_value = util.get_or_default(callback.declared_args, {"params", "self"}, false)
-         -- Ensure the callback's self value is the same as in spec
-         callback_parent[callback_name].self = self_value
-         -- Don't assign anywhere, essentially read-only
-         ImGui.Checkbox("Self", self_value)
-
-         if lume.count(callback.declared_args.args) > 0 then
-            local height = 0
-            for _, val in pairs(callback.declared_args.args) do
-               if type(val) == "table" or val == "table" then
-                  -- Set height to at least 200 when there's a table
-                  height = 200
-               else
-                  height = height + 50
-               end
-            end
-            height = lume.clamp(height, 0, 500)
-
-            debug_components.show_table_typed(
-               callback_name .. " arguments", callback, "args", Vector2f.new(0, height),
-               callback.declared_args.args
-            )
-         else
-            ImGui.Text("No arguments declared")
-         end
-      else
-         callback_parent[callback_name].self = ImGui.Checkbox("Self", callback_parent[callback_name].self or false)
-
-         debug_components.show_table(callback_name .. " arguments", callback, "args", Vector2f.new(0, 200))
-      end
+      debug_components.show_callback_args(callback, callback_name)
 
       local install = function()
          -- Try installing the new callback

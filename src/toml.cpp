@@ -140,12 +140,13 @@ std::tuple<sol::object, sol::object> parse_toml(sol::this_state lua_, const std:
     }
 }
 
-std::string encode_toml(sol::this_state lua_, sol::object from, bool inline_tables) {
+std::string encode_toml(sol::this_state lua_, sol::object from, int inline_from_level) {
     sol::state_view lua(lua_);
 
     // Converts from lua to toml.
     // Need a pointer because node is an abstract type
-    std::function<std::shared_ptr<toml::node>(sol::object &)> convert = [&](sol::object &node) -> std::shared_ptr<toml::node> {
+    std::function<std::shared_ptr<toml::node>(sol::object &, int, int)> convert =
+        [&](sol::object &node, int curr_level = 0, int inline_from = 0) -> std::shared_ptr<toml::node> {
         using namespace toml;
 
         if (auto maybe_tbl = node.as<std::optional<sol::table>>(); maybe_tbl) {
@@ -157,16 +158,25 @@ std::string encode_toml(sol::this_state lua_, sol::object from, bool inline_tabl
                 auto arr = std::make_shared<toml::array>();
 
                 for (auto [_, v] : tbl) {
-                    arr->push_back(*convert(v));
+                    arr->push_back(*convert(v, 0, 0));
                 }
 
                 return arr;
             } else {
                 auto toml_tbl = std::make_shared<toml::table>();
-                toml_tbl->is_inline(inline_tables);
+
+                if (inline_from < 0) {
+                    toml_tbl->is_inline(false);
+                } else if (curr_level < inline_from) {
+                    toml_tbl->is_inline(false);
+
+                    curr_level++;
+                } else {
+                    toml_tbl->is_inline(true);
+                }
 
                 for (auto [k, v] : tbl) {
-                    toml_tbl->insert(k.as<std::string>(), *convert(v));
+                    toml_tbl->insert(k.as<std::string>(), *convert(v, curr_level, inline_from));
                 }
 
                 return toml_tbl;
@@ -184,7 +194,7 @@ std::string encode_toml(sol::this_state lua_, sol::object from, bool inline_tabl
             std::terminate();
         }
     };
-    auto result = convert(from);
+    auto result = convert(from, 0, inline_from_level);
     toml::node_view result_view(*result);
 
     std::stringstream ss;
@@ -706,7 +716,7 @@ void save_entity_component(
             ).node()->source();
         }
 
-        auto edited = encode_toml(lua_, v, true);
+        auto edited = encode_toml(lua_, v, 0);
 
         std::ifstream toml_file;
         toml_file.open(*source.path);
@@ -885,7 +895,7 @@ void save_shaders(sol::this_state lua_, sol::table shaders) {
     std::string converted;
     if (any_shaders) {
         auto result = lua.create_table_with("shaders", shaders);
-        converted = encode_toml(lua_, result, false);
+        converted = encode_toml(lua_, result, 3);
 
         if (is_new) {
             // Add a newline

@@ -5,7 +5,7 @@
 #include <sol/sol.hpp>
 
 std::tuple<sol::object, sol::object> parse_toml(sol::this_state lua, const std::string &path);
-std::string encode_toml(sol::this_state lua_, sol::object from, bool inline_tables = false);
+std::string encode_toml(sol::this_state lua_, sol::object from, int inline_from_level = -1);
 void save_entity_component(sol::this_state lua_, sol::table entity, const std::string &name, sol::table comp,
                            sol::table part_names, sol::table part_values);
 void create_new_room(const std::string &full_path);
