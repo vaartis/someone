@@ -55,13 +55,13 @@ TEST_CASE("TOML", "[toml]") {
         );
 
         SECTION("Inline table") {
-            auto result = encode_toml(this_lua, lua_obj, true);
+            auto result = encode_toml(this_lua, lua_obj, 0);
             REQUIRE(result ==
                     R"({ array = [ "test", "test 2" ], bool = true, float = 413.0, int = 413, string = "test", table = { test = 1 } })"
             );
         }
         SECTION("Non-inline table") {
-            auto result = encode_toml(this_lua, lua_obj, false);
+            auto result = encode_toml(this_lua, lua_obj, -1);
             REQUIRE(result == R"(array = [ "test", "test 2" ]
 bool = true
 float = 413.0
