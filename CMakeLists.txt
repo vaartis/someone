@@ -300,13 +300,28 @@ if (SOMEONE_TESTING)
 
   # Lua tests
 
+  file(GLOB_RECURSE LUA_TEST_FILES
+    LIST_DIRECTORIES FALSE
+    RELATIVE "${PROJECT_SOURCE_DIR}/test/lua/"
+    CONFIGURE_DEPENDS
+    "${PROJECT_SOURCE_DIR}/test/lua/*.moon")
+  # Add the output test dir to the paths
+  list(TRANSFORM LUA_TEST_FILES
+    PREPEND "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/test/"
+    OUTPUT_VARIABLE OUTPUT_LUA_TEST_FILES)
+  # Add the input test dir to the paths again
+  list(TRANSFORM LUA_TEST_FILES
+    PREPEND "${PROJECT_SOURCE_DIR}/test/lua/"
+    OUTPUT_VARIABLE INPUT_LUA_TEST_FILES)
+
+  set(LUA_TEST_ROCKSPEC "someone-test-0.1-0.rockspec")
+
   add_custom_command(
-    OUTPUT "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/test/walking.moon"
-    DEPENDS ${LAST_ROCK_TARGET} "${PROJECT_SOURCE_DIR}/test/lua/**"
-    COMMAND ${LUAROCKS_COMMAND} make someone-test-0.1-0.rockspec
-    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/test/lua"
-    )
-  add_custom_target(lua-test-build DEPENDS "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/test/walking.moon")
+    OUTPUT ${OUTPUT_LUA_TEST_FILES}
+    DEPENDS ${LAST_ROCK_TARGET} ${INPUT_LUA_TEST_FILES} "${PROJECT_SOURCE_DIR}/test/lua/${LUA_TEST_ROCKSPEC}"
+    COMMAND ${LUAROCKS_COMMAND} make ${LUA_TEST_ROCKSPEC}
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/test/lua")
+  add_custom_target(lua-test-build DEPENDS ${OUTPUT_LUA_TEST_FILES})
 
   add_custom_command(
     OUTPUT "${PROJECT_BINARY_DIR}/.luacov"
