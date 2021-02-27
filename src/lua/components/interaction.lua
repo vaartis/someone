@@ -423,8 +423,13 @@ function M.process_activatable(comp, field, context)
       elseif got_field["and"] then
          local conds = {}
          for _, cnd in ipairs(got_field["and"]) do
+            -- When calling a function with something that returns more than one
+            -- value, apparently all the values are passed as arguments. That is not
+            -- what is supposed to happen in this case, so a variable is needed to
+            -- ignore the second returned value
+            local fnc = try_get_fnc_from_module(cnd, "activatable_callbacks", context)
             -- FIXME: Ignore declared args here for now
-            table.insert(conds, try_get_fnc_from_module(cnd, "activatable_callbacks", context))
+            table.insert(conds, fnc)
          end
 
          result = function(self, ...)
