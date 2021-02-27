@@ -1,5 +1,3 @@
-require("busted.runner")()
-
 interaction_components = require("components.interaction")
 rooms = require("components.rooms")
 entities = require("components.entities")

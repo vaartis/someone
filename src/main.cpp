@@ -19,6 +19,10 @@
 #include "walking.hpp"
 #include "coroutines.hpp"
 
+#ifdef SOMEONE_TESTING
+#include "lua_testing.hpp"
+#endif
+
 enum class CurrentState {
     Terminal,
     Walking
@@ -111,11 +115,7 @@ int main(int argc, char **argv) {
 #endif
 
 #ifdef SOMEONE_TESTING
-    for (int i = 1; i < argc; i++) {
-        lua[sol::create_if_nil]["arg"][i] = std::string(argv[i]);
-    }
-
-    walking_env.run_tests();
+    run_lua_tests(lua);
 
     return 0;
 #endif

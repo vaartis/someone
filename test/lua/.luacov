@@ -1,6 +1,6 @@
 return {
    include = {
-      "walking", "terminal", "util.moon$", "components%/.+"
+      "lua/%d%.%d/util$", "walking", "terminal", "util.moon$", "components%/.+"
    },
    exclude = { "test" },
    runreport = true

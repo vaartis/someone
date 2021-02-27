@@ -16,8 +16,9 @@ build = {
    modules = {},
    install = {
       lua = {
-         ["test.walking"] = "walking.moon",
-         ["test.walking_data"] = "walking_data.moon"
+         ["test.walking_test"] = "walking_test.moon",
+         ["test.walking_data"] = "walking_data.moon",
+         ["test.util_test"] = "util_test.moon"
       }
    }
 }

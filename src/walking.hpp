@@ -172,17 +172,4 @@ public:
     void clear_event_store() {
         call_or_throw(clear_event_store_f);
     }
-
-#ifdef SOMEONE_TESTING
-    void run_tests() {
-        lua[sol::create_if_nil]["TESTING"]["WALKING"] = lua.create_table_with(
-            "update", [&](float dt) { update(dt); },
-            "draw", [&]() { draw(); },
-            "add_event", [&](sf::Event event) { add_event(event); }
-        );
-
-        // This runs the tests
-        lua.script("require('test.walking')");
-    }
-#endif
 };
