@@ -32,7 +32,7 @@ end
 local M = {}
 
 function M.add_systems(engine)
-   engine:addSystem(DebugColliderDrawingSystem())
+   -- engine:addSystem(DebugColliderDrawingSystem())
    -- This doesn't actually do anything except resetting the debug menu data on room unload
    engine:addSystem(DebugMenuResetSystem())
 end

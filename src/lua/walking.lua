@@ -8,7 +8,7 @@ local debug_components = require("components.debug")
 local state_variables = {}
 
 -- Load the room
---rooms.load_room("day3/first_puzzle_room")
+rooms.load_room("day1/computer_room")
 
 local function update(dt)
    rooms.engine:update(dt)

@@ -91,7 +91,7 @@ int main(int argc, char **argv) {
 
     auto loaded_mods = terminal_env.parser.load_mods(lua);
 
-    auto current_state = CurrentState::Walking;
+    auto current_state = CurrentState::Terminal;
 
     auto current_state_type = lua.new_enum(
         "CurrentState",
