@@ -171,6 +171,11 @@
        and want to return back afterwards without knowing exactly where to return to. So you
        just save your position and then go back to it.
 
+** "Walking mode" modding
+   One can create pretty much any custom 2D game with the things provided by the "walking mode" system, with which the aforementione mode in the
+   main game is implemented. The API is quite vast, so, for now, one should look into the ~resources/mods/example/~ directory, which contains an
+   example arkanoid implementation done in the engine.
+
 * An example mod
   A simple example mod could be structured like this:
 
