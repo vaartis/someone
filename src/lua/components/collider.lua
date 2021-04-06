@@ -104,9 +104,9 @@ function M.components.collider.process_component(new_ent, comp, entity_name)
    end
 end
 
-function M.add_systems(engine)
-   engine:addSystem(M.ColliderUpdateSystem())
-end
+M.systems = {
+   M.ColliderUpdateSystem
+}
 
 -- Default data when adding from editor
 function M.components.collider.class:default_data(ent)

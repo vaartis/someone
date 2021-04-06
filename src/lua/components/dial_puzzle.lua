@@ -172,8 +172,8 @@ function DialHandleSystem:update(dt)
    end
 end
 
-function M.add_systems(engine)
-   engine:addSystem(DialHandleSystem())
-end
+M.systems = {
+   DialHandleSystem
+}
 
 return M

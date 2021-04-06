@@ -40,9 +40,9 @@ function LookCloserSystem:update(dt)
    end
 end
 
-function M.add_systems(engine)
-   engine:addSystem(LookCloserSystem())
-end
+M.systems = {
+   LookCloserSystem
+}
 
 M.interaction_callbacks = {}
 function M.interaction_callbacks.look(_current_state, prefab)

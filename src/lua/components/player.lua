@@ -87,8 +87,8 @@ function M.components.player_movement.process_component(new_ent, comp, entity_na
    new_ent:add(M.components.player_movement.class(sound))
 end
 
-function M.add_systems(engine)
-   engine:addSystem(PlayerMovementSystem())
-end
+M.systems = {
+   PlayerMovementSystem
+}
 
 return M

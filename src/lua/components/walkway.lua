@@ -24,8 +24,8 @@ function M.components.rotation.process_component(new_ent, comp, entity_name)
    new_ent:add(M.components.rotation.class(comp.rotation_speed))
 end
 
-function M.add_systems(engine)
-   engine:addSystem(RotationSystem())
-end
+M.systems = {
+   RotationSystem
+}
 
 return M

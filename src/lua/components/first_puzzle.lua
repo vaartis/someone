@@ -22,9 +22,9 @@ function M.components.first_puzzle_button.process_component(new_ent, comp, entit
    new_ent:add(M.components.first_puzzle_button.class(comp.n))
 end
 
-function M.add_systems(engine)
-   engine:addSystem(FirstPuzzleButtonSystem())
-end
+M.systems = {
+   FirstPuzzleButtonSystem
+}
 
 M.interaction_callbacks = {}
 

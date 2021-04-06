@@ -281,10 +281,10 @@ function M.components.slices.process_component(new_ent, comp, entity_name)
    new_ent:add(M.components.slices.class(slices))
 end
 
-function M.add_systems(engine)
-   engine:addSystem(RenderSystem())
-   engine:addSystem(AnimationSystem())
-end
+M.systems = {
+   RenderSystem,
+   AnimationSystem
+}
 
 function M.components.transformable.class:default_data(ent)
    return { position = { 0, 0 } }

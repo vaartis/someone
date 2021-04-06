@@ -92,10 +92,10 @@ function M.components.note.process_component(new_ent, comp, entity_name)
    new_ent:add(M.components.note.class(comp.text, comp.bottom_text, note_text, bottom_text))
 end
 
-function M.add_systems(engine)
-   engine:addSystem(NoteSystem())
-   engine:addSystem(NoteInteractionSystem())
-end
+M.systems = {
+   NoteSystem,
+   NoteInteractionSystem
+}
 
 M.interaction_callbacks = {}
 

@@ -716,9 +716,9 @@ function M.if_key_pressed(keyboard_keys, is_down)
    end
 end
 
-function M.add_systems(engine)
-   engine:addSystem(InteractionSystem())
-end
+M.systems = {
+   InteractionSystem
+}
 
 local NativeEvent = class("NativeEvent")
 function NativeEvent:initialize(event)

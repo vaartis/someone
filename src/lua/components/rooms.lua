@@ -69,8 +69,10 @@ function M.reset_engine()
    M.engine = CustomEngine()
 
    for _, module in pairs(entities.all_components) do
-      if module.add_systems then
-         module.add_systems(M.engine)
+      if module.systems then
+         for _, sys_class in ipairs(module.systems) do
+            M.engine:addSystem(sys_class())
+         end
       end
    end
 end

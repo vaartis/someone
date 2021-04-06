@@ -59,8 +59,8 @@ function M.components.sound_player.process_component(new_ent, comp, entity_name)
    new_ent:add(M.components.sound_player.class(sound, callback))
 end
 
-function M.add_systems(engine)
-   engine:addSystem(SoundPlayerSystem())
-end
+M.systems = {
+   SoundPlayerSystem
+}
 
 return M
