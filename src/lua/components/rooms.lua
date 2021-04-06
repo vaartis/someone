@@ -10,7 +10,14 @@ local M = {}
 
 -- Loads the room's toml file, processing parent relationships
 function M.load_room_file(name)
-   local path = "resources/rooms/" .. name .. ".toml"
+   local path_root
+   if _G.mod then
+      path_root = lume.format("resources/mods/{1}/resources/rooms/", {getmetatable(_G.mod).name})
+   else
+      path_root = "resources/rooms/"
+   end
+
+   local path = path_root .. name .. ".toml"
 
    local room_table, err = TOML.parse(path)
    if not room_table then
@@ -105,7 +112,7 @@ function M.load_room(name, switch_namespace)
    collider_components.reset_world()
 
    -- Find the last /
-   local last = name:find("/[^/]+$")
+   local last = name:find("/[^/]+$") or 0
    if switch_namespace then
       -- If switch_namespace is passed, use the room's namespace as the "current" one
       -- Use everything that is before it

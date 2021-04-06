@@ -51,7 +51,8 @@ decltype(auto) register_vector3(sol::state &lua, std::string name) {
         sol::meta_function::multiplication, sol::overload(
             sol::resolve<VecT(ConstVecRefT, T)>(&sf::operator*),
             sol::resolve<VecT(T, ConstVecRefT)>(&sf::operator*)
-        )
+        ),
+        sol::meta_function::division, sol::resolve<VecT(ConstVecRefT, T)>(&sf::operator/)
     );
 }
 
@@ -69,7 +70,8 @@ decltype(auto) register_vector2(sol::state &lua, std::string name) {
         sol::meta_function::multiplication, sol::overload(
             sol::resolve<VecT(ConstVecRefT, T)>(&sf::operator*),
             sol::resolve<VecT(T, ConstVecRefT)>(&sf::operator*)
-        )
+        ),
+        sol::meta_function::division, sol::resolve<VecT(ConstVecRefT, T)>(&sf::operator/)
     );
 }
 
@@ -211,7 +213,8 @@ void register_sfml_usertypes(sol::state &lua, StaticFonts &fonts) {
         sol::base_classes, sol::bases<sf::Drawable, sf::Transformable>(),
         "texture", sol::property(&sf::Sprite::getTexture, [](sf::Sprite &sprite, const sf::Texture &texture) { sprite.setTexture(texture); }),
         "texture_rect", sol::property(&sf::Sprite::getTextureRect, &sf::Sprite::setTextureRect),
-        "global_bounds", sol::property(&sf::Sprite::getGlobalBounds)
+        "global_bounds", sol::property(&sf::Sprite::getGlobalBounds),
+        "color", sol::property(&sf::Sprite::getColor, &sf::Sprite::setColor)
     );
 
     auto event_type = lua.new_usertype<sf::Event>(

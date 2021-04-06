@@ -1,7 +1,10 @@
 local class = require("middleclass")
 local lume = require("lume")
+local path = require("path")
 
+local util = require("util")
 local lines = require("terminal.lines")
+local assets = require("components.assets")
 
 local M = {}
 
@@ -21,6 +24,20 @@ function M.ModExitLine:initialize()
    self._script_after = function()
       -- Execute the original script first
       if original_script then original_script() end
+
+      assets.unload_known_mod_assets()
+
+      for _, module in pairs(_G.mod) do
+         -- Update all_modules to remove mod lua files
+         lume.remove(util.entities_mod().all_components, _G.mod)
+
+         -- Stop the systems if there were any
+         if module.systems then
+            for _, sys in ipairs(module.systems) do
+               util.rooms_mod().engine:stopSystem(sys.name)
+            end
+         end
+      end
 
       if _G.mod then _G.mod = nil end
    end
@@ -44,6 +61,13 @@ function M.ModWrapperLine:initialize(data)
 
    if data.lua_files then
       _G.mod = {}
+      -- Save the mod name for later use by other things
+      setmetatable(_G.mod, { name = data.name })
+
+      -- Load the assets now if there are any
+      if path.exists(lume.format("resources/mods/{1}/resources/rooms/assets.toml", {data.name})) then
+         assets.load_assets()
+      end
 
       local function traverse_into_namespace(namespace, into)
          for name, value in pairs(namespace) do
@@ -55,11 +79,18 @@ function M.ModWrapperLine:initialize(data)
                if err then error(err) end
 
                into[name] = loaded()
+               setmetatable(into[name], {__module_name = "mod." .. name})
+               -- Update all_modules with mod lua files
+               table.insert(
+                  util.entities_mod().all_components,
+                  into[name]
+               )
             end
          end
       end
 
       traverse_into_namespace(data.lua_files, _G.mod)
+
    end
 
    self._next_instance = lines.make_line(data.first_line, self._line_source)

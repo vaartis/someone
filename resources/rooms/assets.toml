@@ -1,6 +1,6 @@
 [config]
-textures = { root = "resources/sprites/" }
-sounds = { root = "resources/sounds/" }
+textures = { root = "sprites/" }
+sounds = { root = "sounds/" }
 
 [textures]
 

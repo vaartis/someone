@@ -1,0 +1,15 @@
+config:
+  chars:
+    test:
+      color: [255, 255, 255]
+
+1:
+  char: test
+  text: Starting arkanoid
+  wait: true
+  script_after: TerminalModule.switch_to_walking("arkanoid")
+
+2:
+  char: test
+  custom:
+    terminal.mod_lines.ModExitLine:

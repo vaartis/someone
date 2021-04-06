@@ -25,6 +25,10 @@ function M.ColliderUpdateSystem:update(dt)
       end
    end
 end
+function M.ColliderUpdateSystem:onRemoveEntity(entity)
+   -- Remove the entity from the physics world too
+   M.physics_world:remove(entity)
+end
 function M.ColliderUpdateSystem.update_from_sprite(entity)
    local sprite_size = entity:get("Drawable").drawable.global_bounds
 

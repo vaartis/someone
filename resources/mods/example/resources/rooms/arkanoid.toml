@@ -1,0 +1,61 @@
+[entities.pad]
+tags = [ "ArkanoidPad" ]
+
+[entities.pad.drawable]
+kind = "sprite"
+texture_asset = "mod.pad"
+z = 1
+
+[entities.pad.transformable]
+position = [640, 950]
+
+[entities.pad.collider]
+mode = "sprite"
+
+[entities.left_wall.collider]
+mode = "constant"
+size = [10, 1020]
+
+[entities.left_wall.transformable]
+position = [1270, 0]
+
+[entities.right_wall.collider]
+mode = "constant"
+size = [10, 1020]
+
+[entities.right_wall.transformable]
+position = [0, 0]
+
+[entities.top_wall.collider]
+mode = "constant"
+size = [1260, 10]
+
+[entities.top_wall.transformable]
+position = [10, 0]
+
+[entities.ball]
+tags = [ "ArkanoidBall" ]
+
+[entities.ball.drawable]
+kind = "sprite"
+texture_asset = "mod.ball"
+z = 1
+
+[entities.ball.collider]
+mode = "sprite"
+
+[entities.ball.transformable]
+position = [ 640, 480 ]
+
+[entities.ball.arkanoid_data]
+
+[entities.score]
+tags = [ "ArkanoidScore" ]
+
+[entities.score.drawable]
+kind = "text"
+text = { text = "Score: 0", font_size = 24 }
+z = 2
+
+[entities.score.transformable]
+position = [0, 0]

@@ -279,24 +279,61 @@ function M.debug_menu()
 end
 
 function M.load_assets()
-   local l_assets = TOML.parse("resources/rooms/assets.toml")
+   local resources_root
+   if not _G.mod then
+      resources_root = "resources/"
+   else
+      resources_root = "resources/mods/" .. getmetatable(_G.mod).name .. "/resources/"
+   end
+
+   local l_assets, err = TOML.parse(resources_root .. "rooms/assets.toml")
+   if err then
+      error(err)
+   end
+
    toml_data = l_assets
 
    local asset_types = {
-      { name = "textures", default_root = "resources/sprites/"},
-      { name = "sounds", default_root = "resources/sounds/"}
+      { name = "textures", default_root = "sprites/"},
+      { name = "sounds", default_root = "sounds/"}
    }
 
    for _, asset_type in ipairs(asset_types) do
       if l_assets[asset_type.name] then
-         local root = util.get_or_default(
-            l_assets,
-            {"config", asset_type.name, "root"},
-            asset_type.default_root
+         -- Actual root is determined by the value of resources_root,
+         -- under which all resources reside, plus the value of per-resource
+         -- root
+         local root = lume.format(
+            "{1}/{2}",
+            {
+               resources_root,
+               util.get_or_default(
+                  l_assets,
+                  {"config", asset_type.name, "root"},
+                  asset_type.default_root
+               )
+            }
          )
 
          for name, asset_path in pairs(l_assets[asset_type.name]) do
+            -- Prefix asset name with "mod." for mods
+            if _G.mod then
+               name = "mod." .. name
+            end
+
             add_to_known_assets(asset_type.name, name, path.join(root, asset_path))
+         end
+      end
+   end
+end
+
+function M.unload_known_mod_assets()
+   for cat_name, category in pairs(known_assets) do
+      for asset_name, _ in pairs(category) do
+         -- Clear references to mod assets
+         if asset_name:match("^mod%.(.*)") then
+            category[asset_name] = nil
+            rawset(M.assets[cat_name], asset_name, nil)
          end
       end
    end
