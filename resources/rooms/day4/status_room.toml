@@ -40,5 +40,21 @@ transformable = { position = [850, 600] }
 collider = { mode = "constant", size = [80, 100], trigger = true }
 
 [entities.computer.interaction]
-callback = { module = "components.look_closer", name = "look", args = ["status_room/computer"] }
+callback = { module = "components.look_closer", name = "look", args = { prefab = "status_room/computer" } }
 action_text = "look at the screen"
+
+[entities.ladder.transformable]
+position = [ 418, 568 ]
+
+[entities.ladder.collider]
+size = [ 100, 200 ]
+mode = "constant"
+trigger = true
+
+[entities.ladder.passage]
+from = "status_room"
+to = "food_room"
+player_y = 644
+
+[entities.ladder.interaction]
+callback = { module = "components.passage", name = "switch_room", self = true }

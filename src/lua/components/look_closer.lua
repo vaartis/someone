@@ -5,9 +5,33 @@ local debug_components = require("components.debug")
 
 local M = {}
 
+M.components = {
+   look_closer_image = {
+      class = Component.create("LookCloserImage", {"on_close_callback"})
+   }
+}
+
+function M.components.look_closer_image.process_component(new_ent, comp, entity_name)
+   local maybe_callback
+   if comp.on_close_callback then
+      -- Lazy-load interaction_components
+      if not interaction_components then
+         interaction_components = require("components.interaction")
+      end
+
+      maybe_callback = interaction_components.process_interaction(
+         comp,
+         "on_close_callback",
+         { entity_name = entity_name, comp_name = "look_closer_image", needed_for = "on_close_callback", entity = new_ent }
+      )
+   end
+
+   new_ent:add(M.components.look_closer_image.class(maybe_callback))
+end
+
 local LookCloserSystem = class("LookCloserSystem", System)
 function LookCloserSystem:requires()
-   return { "LookCloserImageTag" }
+   return { "LookCloserImage" }
 end
 
 function LookCloserSystem:update(dt)
@@ -32,6 +56,11 @@ function LookCloserSystem:update(dt)
 
       interaction_components.if_key_pressed({
             [KeyboardKey.E] = function()
+               local look_closer_comp = entity:get("LookCloserImage")
+               if look_closer_comp.on_close_callback then
+                  look_closer_comp.on_close_callback()
+               end
+
                -- Delete the entity and re-enable interactions and movement
                engine:removeEntity(entity, true)
                interaction_components.enable_player(engine)
@@ -45,19 +74,19 @@ M.systems = {
 }
 
 M.interaction_callbacks = {}
-function M.interaction_callbacks.look(_current_state, prefab)
+function M.interaction_callbacks.look(_current_state, args)
    local entities = util.entities_mod()
 
    entities.instantiate_entity(
       "look_closer",
       {
-         prefab = prefab
+         prefab = args.prefab
       }
    )
 end
 debug_components.declare_callback_args(
    M.interaction_callbacks.look,
-   {"string"}
+   {prefab = "string"}
 )
 
 

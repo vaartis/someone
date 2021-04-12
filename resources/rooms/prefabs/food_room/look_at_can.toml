@@ -1,0 +1,10 @@
+prefab = "look_closer_image"
+
+[drawable]
+texture_asset = "food_room_look_at_can"
+
+[children.caption.drawable]
+text = { text = "I feel like I haven't eaten in a long time. Better take these with me.." }
+
+[look_closer_image]
+on_close_callback = { module = "components.interaction", name = "state_variable_set", args = [ ["food_room", "peach_can_taken"], true ] }

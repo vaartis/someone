@@ -15,6 +15,9 @@ walkway_walls = "room/walkway_room/walkway_walls.png"
 
 status_room = "room/status_room/status_room.png"
 
+food_room = "room/food_room/food_room.png"
+food_room_taken_can = "room/food_room/food_room_taken_can.png"
+
 table = "room/table/table.png"
 button = "room/button/button.png"
 passage = "room/passage/passage.png"
@@ -35,6 +38,7 @@ look_down = "room/walkway_room/look_down.png"
 status_room_computer = "room/status_room/computer_screen.png"
 
 mainchar = "mainchar/mainchar.png"
+food_room_look_at_can = "room/food_room/food_room_look_at_can.png"
 
 [sounds]
 button_press = "button_press.ogg"

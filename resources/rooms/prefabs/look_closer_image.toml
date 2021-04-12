@@ -1,5 +1,3 @@
-tags = [ "LookCloserImage" ]
-
 [drawable]
 kind = "sprite"
 # texture_asset here
@@ -18,3 +16,5 @@ layer = "overlay"
 
 [children.caption.transformable]
 position = [0, 480]
+
+[look_closer_image]

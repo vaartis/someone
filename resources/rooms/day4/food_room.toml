@@ -1,0 +1,53 @@
+[shaders.room_darker]
+ambientLightLevel = 0.4
+n = 1
+
+[entities.player]
+prefab = "player"
+
+[entities.player.transformable]
+position = [ 244, 826 ]
+
+[entities.taken_can.drawable]
+kind = "sprite"
+z = 2
+texture_asset = "food_room_taken_can"
+enabled = { not = { module = "components.interaction", name = "state_variable_equal", args = [ ["food_room", "peach_can_taken"], true ] } }
+
+[entities.background.drawable]
+kind = "sprite"
+z = 1
+texture_asset = "food_room"
+
+[entities.ladder_passage.transformable]
+position = [ 209, 600 ]
+
+[entities.ladder_passage.collider]
+size = [ 80, 200 ]
+trigger = true
+mode = "constant"
+
+[entities.ladder_passage.passage]
+from = "food_room"
+to = "status_room"
+player_y = 650
+
+[entities.ladder_passage.interaction]
+callback = { module = "components.passage", name = "switch_room", self = true }
+action_text = "climb up"
+
+[entities.look_at_can.transformable]
+position = [ 480, 627 ]
+
+[entities.look_at_can.collider]
+size = [ 50, 50 ]
+trigger = true
+mode = "constant"
+
+[entities.look_at_can.interaction]
+callback = { args = { prefab = "food_room/look_at_can" }, module = "components.look_closer", name = "look" }
+action_text = "look at canned peaches"
+activatable_callback = { not = { module = "components.interaction", name = "state_variable_equal", args = [ ["food_room", "peach_can_taken"], true ] } }
+
+[entities.left_wall.transformable]
+position = [ 0, 0 ]
