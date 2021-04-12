@@ -586,6 +586,11 @@ function M.debug_menu()
    end
 
    util.debug_menu_process_state_variable_node("State variables", M.state_variables)
+
+   ImGui.Separator()
+   if ImGui.Button("Switch to walking") then
+      M.switch_to_walking("day1/computer_room")
+   end
 end
 
 return M
