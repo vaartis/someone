@@ -187,7 +187,7 @@ function M.debug_menu()
          editing_asset.new_name = ImGui.InputText("Name", editing_asset.new_name)
          if ImGui.Button(editing_asset.path or "None") then
             key_debug_menu.selected_dir = path.dirname(
-               path.join(toml_data.config[key].root, editing_asset.path)
+               path.join(M.resources_root(), toml_data.config[key].root, editing_asset.path)
             )
 
             ImGui.OpenPopup("Select asset file##" .. key)
@@ -197,7 +197,7 @@ function M.debug_menu()
             local new_path = key_debug_menu.selected_path
             key_debug_menu.selected_path = nil
 
-            new_path = new_path:gsub(toml_data.config[key].root, "")
+            new_path = new_path:gsub(path.join(M.resources_root(), toml_data.config[key].root), "")
             editing_asset.path = new_path
          end
 
@@ -218,7 +218,7 @@ function M.debug_menu()
                add_to_known_assets(
                   key,
                   editing_asset.new_name,
-                  path.join(toml_data.config[key].root, editing_asset.path)
+                  path.join(M.resources_root(), toml_data.config[key].root, editing_asset.path)
                )
             end
             -- Go through all the used assets and replace the old ones with the new ones
@@ -278,13 +278,16 @@ function M.debug_menu()
    list_toml_assets("sounds")
 end
 
-function M.load_assets()
-   local resources_root
+function M.resources_root()
    if not _G.mod then
-      resources_root = "resources/"
+      return "resources/"
    else
-      resources_root = "resources/mods/" .. getmetatable(_G.mod).name .. "/resources/"
+      return "resources/mods/" .. getmetatable(_G.mod).name .. "/resources/"
    end
+end
+
+function M.load_assets()
+   local resources_root = M.resources_root()
 
    local l_assets, err = TOML.parse(resources_root .. "rooms/assets.toml")
    if err then
