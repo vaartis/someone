@@ -433,23 +433,13 @@ std::tuple<const toml::node *, std::vector<std::string>> find_last_comp(sol::sta
 }
 
 const toml::node *find_last_source(const toml::table &table) {
-    auto last_node_iter = std::max_element(
-        table.begin(),
-        table.cend(),
-        [](const auto &a, const auto &b) {
-            const auto &[_, a_val] = a;
-            const auto &[_2, b_val] = b;
-
-            return a_val.source().end.line < b_val.source().end.line;
-        }
-    );
-
-    if (last_node_iter == table.cend())
-        return nullptr;
-    else {
-        auto [_, last_node] = *last_node_iter;
-        return &last_node;
+    const toml::node *max_src_node = nullptr;
+    for (auto &[_, v] : table) {
+        if (max_src_node == nullptr || max_src_node->source().end.line < v.source().end.line)
+            max_src_node = &v;
     }
+
+    return max_src_node;
 };
 
 std::tuple<const toml::node *, std::vector<std::string>> path_for_new_comp_and_entity(sol::table locations, sol::table entity) {
@@ -553,7 +543,7 @@ void save_entity_component(
         [](const auto &arg) { return arg.second; }
     );
     if (!this_location_ || (this_location_only_defined_in_prefab && overriden_parts > 0)) {
-        // Find the closest-to-bottom node for this entity.
+        // Find the closest-to-bottom component for this entity.
         auto [last_comp, last_path] = find_last_comp(lua, locations);
 
         // If there are no other components on this entity, it's a new entity,
