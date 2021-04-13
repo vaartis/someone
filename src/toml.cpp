@@ -362,22 +362,34 @@ void insert_new_part(
 }
 
 std::tuple<const toml::node *, std::vector<std::string>> find_last_comp(sol::state_view lua, sol::table locations) {
-    // Collect all nodes that are actually talbes and not some string or userdata
     sol::table comp_locations = lua.create_table();
 
-    // In case there are no other nodes on the entity, also add the "self" node, in particular
-    // this is applicable to the entity that is made from a prefab and didn't override anything
-    if (locations["__node_path"].get<sol::optional<std::vector<std::string>>>()
-        && locations["__node_file"].get<sol::optional<std::string>>()) {
-        comp_locations["self"] = lua.create_table_with(
-            "__node_file", locations["__node_file"],
-            "__node_path", locations["__node_path"]
-        );
-    }
-
+    int location_count = 0;
+    // Collect all nodes that are actually tables and not some string or userdata
     for (auto [k, v] : locations) {
         if (v.is<sol::table>() && !v.is<sol::userdata>()) {
             comp_locations[k] = v;
+            location_count++;
+        }
+    }
+
+    if (location_count == 0) {
+        // In case there are no other nodes on the entity, add the "self" node, in particular
+        // this is applicable to the entity that is made from a prefab and didn't override anything.
+        //
+        // However, the "self" node is only valid when no components exist.
+        // If such a node does not exist in a file, but its source is retreived from code,
+        // it will point to some other node that actually exists which DOES NOT WORK and breaks things.
+        //
+        // So, only create the "self" node in case there are no other nodes but
+        // the entity exists in the file: therefore it is guaranteed that the
+        // node will be pointing to an entity node with no components.
+        if (locations["__node_path"].get<sol::optional<std::vector<std::string>>>()
+            && locations["__node_file"].get<sol::optional<std::string>>()) {
+            comp_locations["self"] = lua.create_table_with(
+                "__node_file", locations["__node_file"],
+                "__node_path", locations["__node_path"]
+            );
         }
     }
 
