@@ -280,16 +280,16 @@ end
 
 function M.resources_root()
    if not _G.mod then
-      return "resources/"
+      return "resources"
    else
-      return "resources/mods/" .. getmetatable(_G.mod).name .. "/resources/"
+      return "resources/mods/" .. getmetatable(_G.mod).name .. "/resources"
    end
 end
 
 function M.load_assets()
    local resources_root = M.resources_root()
 
-   local l_assets, err = TOML.parse(resources_root .. "rooms/assets.toml")
+   local l_assets, err = TOML.parse(path.join(resources_root, "rooms/assets.toml"))
    if err then
       error(err)
    end
@@ -306,16 +306,13 @@ function M.load_assets()
          -- Actual root is determined by the value of resources_root,
          -- under which all resources reside, plus the value of per-resource
          -- root
-         local root = lume.format(
-            "{1}/{2}",
-            {
-               resources_root,
-               util.get_or_default(
-                  l_assets,
-                  {"config", asset_type.name, "root"},
-                  asset_type.default_root
-               )
-            }
+         local root = path.join(
+            resources_root,
+            util.get_or_default(
+               l_assets,
+               {"config", asset_type.name, "root"},
+               asset_type.default_root
+            )
          )
 
          for name, asset_path in pairs(l_assets[asset_type.name]) do

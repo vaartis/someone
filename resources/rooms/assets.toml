@@ -48,7 +48,7 @@ footstep_metal = "footstep_metal.ogg"
 
 rotation_click = "rotation_click.ogg"
 
-puzzle_jingle = "puzzle_jingle.ogg"
-dial_jingle = "dial_jingle.ogg"
+puzzle_jingle = "puzzle_jingle/puzzle_jingle.ogg"
+dial_jingle = "dial_jingle/dial_jingle.ogg"
 
 wind = "wind.ogg"
