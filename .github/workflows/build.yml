@@ -2,7 +2,6 @@ name: Build
 
 on:
   push:
-    branches: [ master ]
   release:
     types: [ published ]
 
@@ -22,7 +21,7 @@ jobs:
         sudo ./llvm.sh 11
 
         sudo apt-get update && sudo apt-get install -y build-essential cmake xorg-dev libgl-dev\
-             libudev-dev libopenal-dev libvorbis-dev libflac-dev libreadline-dev libncurses-dev xvfb
+             libudev-dev libasound2-dev libpulse-dev libreadline-dev libncurses-dev xvfb
 
     # Uncomment to allow SSH access into the environment for debugging
     #- name: Setup tmate session
@@ -64,7 +63,7 @@ jobs:
         sudo ./llvm.sh 11
 
         sudo apt-get update && sudo apt-get install -y build-essential cmake xorg-dev libgl-dev\
-             libudev-dev libopenal-dev libvorbis-dev libflac-dev libreadline-dev libncurses-dev
+             libudev-dev libasound2-dev libpulse-dev libreadline-dev libncurses-dev xvfb
 
     - name: Build
       run: |
@@ -130,7 +129,7 @@ jobs:
         mkdir -p /d/someone-x86_64/someone-${{github.sha}}-x86_64/
         cp -r someone.exe resources\
               deps/lua/src/lua/src/lua53.dll /mingw64/bin/{libstdc++-6.dll,libgcc_s_seh-1.dll,libwinpthread-1.dll}\
-              ../deps/sfml/extlibs/bin/x64/openal32.dll /d/someone-x86_64/someone-${{github.sha}}-x86_64
+              /d/someone-x86_64/someone-${{github.sha}}-x86_64
 
     - name: Download butler
       if: ${{ github.event_name == 'release' }}
@@ -171,7 +170,7 @@ jobs:
         mkdir -p /d/someone-i686/someone-${{github.sha}}-i686/
         cp -r someone.exe resources\
               deps/lua/src/lua/src/lua53.dll /mingw32/bin/{libstdc++-6.dll,libgcc_s_dw2-1.dll,libwinpthread-1.dll}\
-              ../deps/sfml/extlibs/bin/x86/openal32.dll /d/someone-i686/someone-${{github.sha}}-i686
+              /d/someone-i686/someone-${{github.sha}}-i686
 
     - name: Upload the i686 release to itch.io
       shell: msys2 {0}
