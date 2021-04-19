@@ -88,51 +88,83 @@ endif()
 
 # SDL / SDL_mixer
 
-# SDL_mixer needs SDL. Turn everything except audio off
-
 include(ExternalProject)
 ExternalProject_Add(SDL
-  URL "https://github.com/libsdl-org/SDL/archive/refs/tags/release-2.0.14.zip"
+  #URL "https://github.com/libsdl-org/SDL/archive/refs/tags/release-2.0.14.zip"
+  GIT_REPOSITORY "https://github.com/libsdl-org/SDL"
+  GIT_TAG de6d290
+  # Keeps the project from rebuilding every time
+  UPDATE_DISCONNECTED TRUE
 
-  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>/install
-  -DSDL_RENDER=OFF -DSDL_VIDEO=OFF -DSDL_EVENTS=OFF -DSDL_ATOMIC=OFF
-  -DSDL_SENSOR=OFF -DSDL_LOCALE=OFF -DSDL_HAPTIC=OFF -DSDL_POWER=OFF
+  CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR>/install
+  --disable-shared
+  BUILD_COMMAND make
+  INSTALL_COMMAND make install
   PREFIX "${PROJECT_BINARY_DIR}/deps/SDL/")
 target_link_libraries(someone_lib "${PROJECT_BINARY_DIR}/deps/SDL/install/lib/libSDL2.a")
 target_include_directories(someone_lib PUBLIC "${PROJECT_BINARY_DIR}/deps/SDL/install/include/SDL2/")
-message("${PROJECT_BINARY_DIR}/deps/SDL/install/include/SDL2/")
 
+if(WIN32)
+  set(${SDL2MAIN_LDFLAGS} -L${PROJECT_BINARY_DIR}deps/SDL/install/lib/\ -lSDL2main)
+  target_link_libraries(someone_lib dinput8 dxguid dxerr8 user32 gdi32 winmm imm32 ole32 oleaut32 shell32 setupapi version uuid)
+elseif(APPLE)
+  target_link_libraries(someone_lib "-framework CoreAudio" "-framework AudioToolbox" "-weak_framework CoreHaptics" "-weak_framework GameController"
+    "-framework ForceFeedback" "-framework CoreVideo" "-framework Cocoa" "-framework Carbon" "-framework IOKit" "-weak_framework QuartzCore" "-weak_framework Metal"
+    iconv)
+endif()
+set(SDL_MIXER_SRC "${PROJECT_BINARY_DIR}/deps/SDL_mixer/src/SDL_mixer")
 ExternalProject_Add(SDL_mixer
    URL "https://github.com/libsdl-org/SDL_mixer/archive/refs/tags/release-2.0.4.zip"
    BUILD_IN_SOURCE true
 
-   CONFIGURE_COMMAND cd external/libogg-1.3.2/ && ./configure --disable-shared --enable-static
-   COMMAND cd external/libvorbis-1.3.5/ && ./configure --disable-shared --enable-static
-   COMMAND ./configure --disable-music-cmd --disable-music-mod
-   --disable-music-midi --disable-music-flac --disable-music-mp3-mpg123 --disable-music-opus --disable-music-ogg-shared --disable-shared
-   --with-sdl-prefix=${PROJECT_BINARY_DIR}/deps/SDL/install
+   CONFIGURE_COMMAND
+   ./configure
+   CFLAGS=-I${SDL_MIXER_SRC}/external/libvorbis-1.3.5/include/\ -I${SDL_MIXER_SRC}/external/libogg-1.3.2/include
+   LDFLAGS=-L${SDL_MIXER_SRC}/external/libvorbis-1.3.5/lib/.libs\ -L${SDL_MIXER_SRC}/external/libogg-1.3.2/src/.libs\ -lvorbis\ -lvorbisfile\ -logg\ ${SDL2MAIN_LDFLAGS}
 
-   BUILD_COMMAND make CC=${CMAKE_C_COMPILER} CFLAGS=${CMAKE_C_FLAGS}
-   COMMAND cd external/libogg-1.3.2/ && make CC=${CMAKE_C_COMPILER} CFLAGS=${CMAKE_C_FLAGS}
-   COMMAND cd external/libvorbis-1.3.5/ && make CC=${CMAKE_C_COMPILER} CFLAGS=${CMAKE_C_FLAGS}
+   CC=${CMAKE_C_COMPILER}
+   --disable-music-cmd --disable-music-mod
+   --disable-music-midi --disable-music-flac --disable-music-mp3-mpg123 --disable-music-opus --disable-music-ogg-shared --disable-shared
+   --with-sdl-prefix=${PROJECT_BINARY_DIR}/deps/SDL/install --disable-sdltest
+
+   BUILD_COMMAND make
    INSTALL_COMMAND ""
    PREFIX "${PROJECT_BINARY_DIR}/deps/SDL_mixer/")
-set(SDL_MIXER_SRC "${PROJECT_BINARY_DIR}/deps/SDL_mixer/src/SDL_mixer")
+ ExternalProject_Add_Step(SDL_mixer build-ogg
+   WORKING_DIRECTORY "<SOURCE_DIR>"
+   DEPENDEES patch
+   COMMAND cd external/libogg-1.3.2/
+   && ./configure CC=${CMAKE_C_COMPILER} --disable-shared --enable-static && make)
+ ExternalProject_Add_Step(SDL_mixer build-vorbis
+   WORKING_DIRECTORY "<SOURCE_DIR>"
+   COMMAND cd external/libvorbis-1.3.5/ &&
+   ./configure CC=${CMAKE_C_COMPILER}
+   OGG_CFLAGS=-I${SDL_MIXER_SRC}/external/libogg-1.3.2/include/
+   OGG_LIBS=-L${SDL_MIXER_SRC}/external/libogg-1.3.2/src/.libs/\ -logg
+   --disable-shared --enable-static
+   --with-ogg-includes=${SDL_MIXER_SRC}/external/libogg-1.3.2/include
+   --with-ogg-libraries=${SDL_MIXER_SRC}/external/libogg-1.3.2/src/.libs/
+   && make
+
+   DEPENDEES build-ogg
+   DEPENDERS configure)
+
 target_link_libraries(someone_lib
   "${SDL_MIXER_SRC}/build/.libs/libSDL2_mixer.a"
   "${SDL_MIXER_SRC}/external/libvorbis-1.3.5/lib/.libs/libvorbisfile.a"
   "${SDL_MIXER_SRC}/external/libvorbis-1.3.5/lib/.libs/libvorbisenc.a"
   "${SDL_MIXER_SRC}/external/libvorbis-1.3.5/lib/.libs/libvorbis.a"
-    "${SDL_MIXER_SRC}/external/libogg-1.3.2/src/.libs/libogg.a")
+  "${SDL_MIXER_SRC}/external/libogg-1.3.2/src/.libs/libogg.a")
 target_include_directories(someone_lib PUBLIC "${SDL_MIXER_SRC}")
 add_dependencies(SDL_mixer SDL)
 add_dependencies(someone_lib SDL_mixer)
 
 # === SFML
 
+set(SFML_BUILD_AUDIO FALSE)
 add_subdirectory("${PROJECT_SOURCE_DIR}/deps/sfml" EXCLUDE_FROM_ALL)
 target_link_libraries(someone_lib sfml-graphics)
-set_target_properties(sfml-graphics sfml-audio PROPERTIES CXX_STANDARD 14)
+set_target_properties(sfml-graphics PROPERTIES CXX_STANDARD 14)
 
 # ===
 
