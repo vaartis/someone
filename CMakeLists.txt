@@ -17,7 +17,7 @@ if(SOMEONE_TESTING)
   add_link_options(-O0 -g -fprofile-instr-generate -fcoverage-mapping)
 endif()
 
-project(someone CXX)
+project(someone CXX C)
 
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_EXTENSIONS FALSE)
@@ -31,7 +31,9 @@ set(someone_src
   "src/usertypes.cpp"
 
   "src/story_parser.cpp"
-  "src/toml.cpp")
+  "src/toml.cpp"
+
+  "src/sound.cpp")
 
 set(someone_main
   "src/main.cpp")
@@ -84,10 +86,52 @@ elseif(NOT SOMEONE_TESTING)
   target_compile_definitions(someone_lib PUBLIC SOMEONE_EDITOR_BASE_PATH="${SOMEONE_EDITOR_BASE_PATH}")
 endif()
 
+# SDL / SDL_mixer
+
+# SDL_mixer needs SDL. Turn everything except audio off
+
+include(ExternalProject)
+ExternalProject_Add(SDL
+  URL "https://github.com/libsdl-org/SDL/archive/refs/tags/release-2.0.14.zip"
+
+  CMAKE_ARGS -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>/install
+  -DSDL_RENDER=OFF -DSDL_VIDEO=OFF -DSDL_EVENTS=OFF -DSDL_ATOMIC=OFF
+  -DSDL_SENSOR=OFF -DSDL_LOCALE=OFF -DSDL_HAPTIC=OFF -DSDL_POWER=OFF
+  PREFIX "${PROJECT_BINARY_DIR}/deps/SDL/")
+target_link_libraries(someone_lib "${PROJECT_BINARY_DIR}/deps/SDL/install/lib/libSDL2.a")
+target_include_directories(someone_lib PUBLIC "${PROJECT_BINARY_DIR}/deps/SDL/install/include/SDL2/")
+message("${PROJECT_BINARY_DIR}/deps/SDL/install/include/SDL2/")
+
+ExternalProject_Add(SDL_mixer
+   URL "https://github.com/libsdl-org/SDL_mixer/archive/refs/tags/release-2.0.4.zip"
+   BUILD_IN_SOURCE true
+
+   CONFIGURE_COMMAND cd external/libogg-1.3.2/ && ./configure --disable-shared --enable-static
+   COMMAND cd external/libvorbis-1.3.5/ && ./configure --disable-shared --enable-static
+   COMMAND ./configure --disable-music-cmd --disable-music-mod
+   --disable-music-midi --disable-music-flac --disable-music-mp3-mpg123 --disable-music-opus --disable-music-ogg-shared --disable-shared
+   --with-sdl-prefix=${PROJECT_BINARY_DIR}/deps/SDL/install
+
+   BUILD_COMMAND make CC=${CMAKE_C_COMPILER} CFLAGS=${CMAKE_C_FLAGS}
+   COMMAND cd external/libogg-1.3.2/ && make CC=${CMAKE_C_COMPILER} CFLAGS=${CMAKE_C_FLAGS}
+   COMMAND cd external/libvorbis-1.3.5/ && make CC=${CMAKE_C_COMPILER} CFLAGS=${CMAKE_C_FLAGS}
+   INSTALL_COMMAND ""
+   PREFIX "${PROJECT_BINARY_DIR}/deps/SDL_mixer/")
+set(SDL_MIXER_SRC "${PROJECT_BINARY_DIR}/deps/SDL_mixer/src/SDL_mixer")
+target_link_libraries(someone_lib
+  "${SDL_MIXER_SRC}/build/.libs/libSDL2_mixer.a"
+  "${SDL_MIXER_SRC}/external/libvorbis-1.3.5/lib/.libs/libvorbisfile.a"
+  "${SDL_MIXER_SRC}/external/libvorbis-1.3.5/lib/.libs/libvorbisenc.a"
+  "${SDL_MIXER_SRC}/external/libvorbis-1.3.5/lib/.libs/libvorbis.a"
+    "${SDL_MIXER_SRC}/external/libogg-1.3.2/src/.libs/libogg.a")
+target_include_directories(someone_lib PUBLIC "${SDL_MIXER_SRC}")
+add_dependencies(SDL_mixer SDL)
+add_dependencies(someone_lib SDL_mixer)
+
 # === SFML
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/deps/sfml" EXCLUDE_FROM_ALL)
-target_link_libraries(someone_lib sfml-graphics sfml-audio)
+target_link_libraries(someone_lib sfml-graphics)
 set_target_properties(sfml-graphics sfml-audio PROPERTIES CXX_STANDARD 14)
 
 # ===
@@ -141,7 +185,6 @@ target_link_libraries(someone_lib sol2)
 
 # === Building lua
 # TODO: might need to be built as C++: https://sol2.readthedocs.io/en/latest/errors.html#destructors-and-safety
-include(ExternalProject)
 
 if(WIN32)
   set(LUA_PLATFORM mingw)
@@ -160,7 +203,6 @@ ExternalProject_Add(lua
    INSTALL_COMMAND ""
    PREFIX "${PROJECT_BINARY_DIR}/deps/lua/"
 )
-ExternalProject_Get_property(lua SOURCE_DIR)
 
 set(LUA_SRC "${PROJECT_BINARY_DIR}/deps/lua/src/lua/src/")
 

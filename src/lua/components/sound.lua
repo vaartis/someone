@@ -54,7 +54,7 @@ function M.components.sound_player.process_component(new_ent, comp, entity_name)
    local sound = assets.create_sound_from_asset(comp.sound_asset)
    if comp.volume then sound.volume = comp.volume end
    if comp.loop then sound.loop = comp.loop end
-   if comp.position then sound.position = Vector3f.new(comp.position[1], comp.position[2], comp.position[3]) end
+   if comp.position then sound:set_position(comp.position.angle, comp.position.distance) end
 
    new_ent:add(M.components.sound_player.class(sound, callback))
 end

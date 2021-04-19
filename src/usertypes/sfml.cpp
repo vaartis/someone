@@ -1,12 +1,11 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Event.hpp>
-#include <SFML/Audio/Sound.hpp>
-#include <SFML/Audio/SoundBuffer.hpp>
 
 #include "sol/sol.hpp"
 #include <fmt/format.h>
 
 #include "usertypes.hpp"
+#include "sound.hpp"
 
 // Custom to_string implementations for lua usage
 
@@ -271,22 +270,27 @@ void register_sfml_usertypes(sol::state &lua, StaticFonts &fonts) {
         "TextEntered", sf::Event::TextEntered
     );
 
-    auto sound_buf_type = lua.new_usertype<sf::SoundBuffer>(
-        "SoundBuffer", sol::constructors<sf::SoundBuffer()>(),
-        "load_from_file", &sf::SoundBuffer::loadFromFile
+    // Not SFML, but mimicks the interface
+
+    auto sound_buf_type = lua.new_usertype<someone::SoundBuffer>(
+        "SoundBuffer", sol::constructors<someone::SoundBuffer()>(),
+        "load_from_file", &someone::SoundBuffer::loadFromFile
     );
-    auto sound_type = lua.new_usertype<sf::Sound>(
-        "Sound", sol::constructors<sf::Sound()>(),
-        "volume", sol::property(&sf::Sound::getVolume, &sf::Sound::setVolume),
-        "buffer", sol::property(&sf::Sound::getBuffer, &sf::Sound::setBuffer),
-        "loop", sol::property(&sf::Sound::getLoop, &sf::Sound::setLoop),
-        "position", sol::property(&sf::Sound::getPosition, sol::resolve<void(const sf::Vector3f &)>(&sf::Sound::setPosition)),
-        "status", sol::property(&sf::Sound::getStatus),
-        "play", &sf::Sound::play,
-        "stop", &sf::Sound::stop
+
+    auto sound_type = lua.new_usertype<someone::Sound>(
+        "Sound", sol::constructors<someone::Sound()>(),
+        "buffer", &someone::Sound::buffer,
+        "play", &someone::Sound::play,
+        "stop", &someone::Sound::stop,
+        "status", sol::property(&someone::Sound::status),
+        "volume", sol::property(&someone::Sound::getVolume, &someone::Sound::setVolume),
+        "loop", &someone::Sound::loop,
+        "set_position", &someone::Sound::setPosition
     );
+
     auto sound_status_enum = lua.new_enum(
         "SoundStatus",
-        "Playing", sf::Sound::Status::Playing
+        "Playing", someone::Sound::Status::Playing,
+        "Stopped", someone::Sound::Status::Stopped
     );
 }
