@@ -86,32 +86,56 @@ elseif(NOT SOMEONE_TESTING)
   target_compile_definitions(someone_lib PUBLIC SOMEONE_EDITOR_BASE_PATH="${SOMEONE_EDITOR_BASE_PATH}")
 endif()
 
-# SDL / SDL_mixer
+# SDL
 
-include(ExternalProject)
-ExternalProject_Add(SDL
-  #URL "https://github.com/libsdl-org/SDL/archive/refs/tags/release-2.0.14.zip"
+# SDL is built before everything else at configure time, because sdl2-config is needed to get
+# all the platform libraries it uses, and these can only be added at configure time
+
+include(FetchContent)
+
+FetchContent_Declare(SDL_content
   GIT_REPOSITORY "https://github.com/libsdl-org/SDL"
   GIT_TAG de6d290
-  # Keeps the project from rebuilding every time
-  UPDATE_DISCONNECTED TRUE
-
-  CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=<INSTALL_DIR>/install
-  --disable-shared
-  BUILD_COMMAND make
-  INSTALL_COMMAND make install
   PREFIX "${PROJECT_BINARY_DIR}/deps/SDL/")
-target_link_libraries(someone_lib "${PROJECT_BINARY_DIR}/deps/SDL/install/lib/libSDL2.a")
-target_include_directories(someone_lib PUBLIC "${PROJECT_BINARY_DIR}/deps/SDL/install/include/SDL2/")
+FetchContent_GetProperties(SDL_content)
 
-if(WIN32)
-  set(${SDL2MAIN_LDFLAGS} -L${PROJECT_BINARY_DIR}deps/SDL/install/lib/\ -lSDL2main)
-  target_link_libraries(someone_lib dinput8 dxguid dxerr8 user32 gdi32 winmm imm32 ole32 oleaut32 shell32 setupapi version uuid)
-elseif(APPLE)
-  target_link_libraries(someone_lib "-framework CoreAudio" "-framework AudioToolbox" "-weak_framework CoreHaptics" "-weak_framework GameController"
-    "-framework ForceFeedback" "-framework CoreVideo" "-framework Cocoa" "-framework Carbon" "-framework IOKit" "-weak_framework QuartzCore" "-weak_framework Metal"
-    iconv)
+set(SDL_CONFIG "${PROJECT_BINARY_DIR}/deps/SDL/bin/sdl2-config")
+if(NOT EXISTS ${SDL_CONFIG})
+  message(STATUS "Building SDL")
+  FetchContent_Populate(SDL_content)
+
+  execute_process(
+    COMMAND ${sdl_content_SOURCE_DIR}/configure
+    --prefix=${PROJECT_BINARY_DIR}/deps/SDL/
+    --disable-video --disable-video-vulkan --disable-video-dummy
+    --disable-render --disable-events
+    --disable-joystick --disable-haptic --disable-sensor
+    --disable-power --disable-filesystem --disable-cpuinfo
+    --disable-threads --disable-timers --disable-atomic
+    --disable-shared
+
+    WORKING_DIRECTORY ${sdl_content_SOURCE_DIR}
+    COMMAND_ERROR_IS_FATAL ANY)
+  execute_process(
+    COMMAND make -j${Nproc} install
+    WORKING_DIRECTORY ${sdl_content_SOURCE_DIR}
+    COMMAND_ERROR_IS_FATAL ANY)
 endif()
+execute_process(COMMAND ${SDL_CONFIG} --static-libs
+  OUTPUT_VARIABLE SDL_LDFLAGS
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+  COMMAND_ERROR_IS_FATAL ANY)
+execute_process(COMMAND ${SDL_CONFIG} --cflags
+  OUTPUT_VARIABLE SDL_CFLAGS
+  OUTPUT_STRIP_TRAILING_WHITESPACE
+  COMMAND_ERROR_IS_FATAL ANY)
+target_link_libraries(someone_lib "${SDL_LDFLAGS}")
+target_compile_options(someone_lib PUBLIC "SHELL:${SDL_CFLAGS}")
+
+# SDL_mixer
+
+include(ExternalProject)
+
 set(SDL_MIXER_SRC "${PROJECT_BINARY_DIR}/deps/SDL_mixer/src/SDL_mixer")
 ExternalProject_Add(SDL_mixer
    URL "https://github.com/libsdl-org/SDL_mixer/archive/refs/tags/release-2.0.4.zip"
@@ -125,7 +149,7 @@ ExternalProject_Add(SDL_mixer
    CC=${CMAKE_C_COMPILER}
    --disable-music-cmd --disable-music-mod
    --disable-music-midi --disable-music-flac --disable-music-mp3-mpg123 --disable-music-opus --disable-music-ogg-shared --disable-shared
-   --with-sdl-prefix=${PROJECT_BINARY_DIR}/deps/SDL/install --disable-sdltest
+   --with-sdl-prefix=${PROJECT_BINARY_DIR}/deps/SDL --disable-sdltest
 
    BUILD_COMMAND make
    INSTALL_COMMAND ""
@@ -156,7 +180,6 @@ target_link_libraries(someone_lib
   "${SDL_MIXER_SRC}/external/libvorbis-1.3.5/lib/.libs/libvorbis.a"
   "${SDL_MIXER_SRC}/external/libogg-1.3.2/src/.libs/libogg.a")
 target_include_directories(someone_lib PUBLIC "${SDL_MIXER_SRC}")
-add_dependencies(SDL_mixer SDL)
 add_dependencies(someone_lib SDL_mixer)
 
 # === SFML
