@@ -185,6 +185,7 @@ add_dependencies(someone_lib SDL_mixer)
 # === SFML
 
 set(SFML_BUILD_AUDIO FALSE)
+set(SFML_BUILD_NETWORK FALSE)
 add_subdirectory("${PROJECT_SOURCE_DIR}/deps/sfml" EXCLUDE_FROM_ALL)
 target_link_libraries(someone_lib sfml-graphics)
 set_target_properties(sfml-graphics PROPERTIES CXX_STANDARD 14)
