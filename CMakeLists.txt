@@ -105,27 +105,27 @@ if(NOT EXISTS ${SDL_CONFIG})
   FetchContent_Populate(SDL_content)
 
   execute_process(
-    COMMAND ${sdl_content_SOURCE_DIR}/configure
-    --prefix=${PROJECT_BINARY_DIR}/deps/SDL/
-    --disable-video --disable-video-vulkan --disable-video-dummy
-    --disable-render --disable-events
-    --disable-joystick --disable-haptic --disable-sensor
-    --disable-power --disable-filesystem --disable-cpuinfo
-    --disable-threads --disable-timers --disable-atomic
-    --disable-shared
+    COMMAND sh -c "${sdl_content_SOURCE_DIR}/configure\
+    --prefix=${PROJECT_BINARY_DIR}/deps/SDL/\
+    --disable-video --disable-video-vulkan --disable-video-dummy\
+    --disable-render --disable-events\
+    --disable-joystick --disable-haptic --disable-sensor\
+    --disable-power --disable-filesystem --disable-cpuinfo\
+    --disable-threads --disable-timers --disable-atomic\
+    --disable-shared"
 
-    WORKING_DIRECTORY ${sdl_content_SOURCE_DIR}
+    WORKING_DIRECTORY ${sdl_content_BINARY_DIR}
     COMMAND_ERROR_IS_FATAL ANY)
   execute_process(
-    COMMAND make -j${Nproc} install
-    WORKING_DIRECTORY ${sdl_content_SOURCE_DIR}
+    COMMAND sh -c "make -j${Nproc} install"
+    WORKING_DIRECTORY ${sdl_content_BINARY_DIR}
     COMMAND_ERROR_IS_FATAL ANY)
 endif()
-execute_process(COMMAND ${SDL_CONFIG} --static-libs
+execute_process(COMMAND sh -c "${SDL_CONFIG} --static-libs"
   OUTPUT_VARIABLE SDL_LDFLAGS
   OUTPUT_STRIP_TRAILING_WHITESPACE
   COMMAND_ERROR_IS_FATAL ANY)
-execute_process(COMMAND ${SDL_CONFIG} --cflags
+execute_process(COMMAND sh -c "${SDL_CONFIG} --cflags"
   OUTPUT_VARIABLE SDL_CFLAGS
   OUTPUT_STRIP_TRAILING_WHITESPACE
   COMMAND_ERROR_IS_FATAL ANY)
