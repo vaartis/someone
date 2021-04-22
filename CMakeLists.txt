@@ -307,10 +307,7 @@ add_custom_target(luarocks DEPENDS ${LUAROCKS_BIN})
 
 # === Copying lua sources
 
-# Temporary (?) fix for lovetoys luarocks package being broken
-
-set(LUAROCKS_COMMAND ${LUAROCKS_BIN} --tree=${PROJECT_BINARY_DIR}/resources/lua)
-
+set(LUAROCKS_COMMAND ${LUAROCKS_BIN} --lua-dir=${LUA_SRC} --tree=${PROJECT_BINARY_DIR}/resources/lua)
 
 # A function with a variable amount of arguments to sequentially bulild rocks from rockspecs
 # (as luarocks doesn't seem to work when trying to build multiple rocks in parallel), it
