@@ -10,7 +10,7 @@
 class WalkingEnv : public LuaModuleEnv {
 private:
     sol::protected_function update_f, draw_f, draw_overlay_f, add_event_f, room_shaders_f, debug_menu_f,
-        clear_event_store_f;
+        clear_event_store_f, load_room_f;
 
     sol::table shaders;
 
@@ -28,6 +28,7 @@ public:
         room_shaders_f = module["room_shaders"];
         debug_menu_f = module["debug_menu"];
         clear_event_store_f = module["clear_event_store"];
+        load_room_f = module["load_room"];
 
         shaders = lua.create_table();
         lua["GLOBAL"]["available_shaders"] = shaders;
@@ -171,5 +172,9 @@ public:
 
     void clear_event_store() {
         call_or_throw(clear_event_store_f);
+    }
+
+    void load_room(const std::string &name, bool switch_namespace) {
+        call_or_throw(load_room_f, name, switch_namespace);
     }
 };

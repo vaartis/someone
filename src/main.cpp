@@ -9,6 +9,8 @@
 
 #include "sol/sol.hpp"
 
+#include "args.hxx"
+
 #include "logger.hpp"
 #include "string_utils.hpp"
 #include "fonts.hpp"
@@ -29,6 +31,24 @@ enum class CurrentState {
 };
 
 int main(int argc, char **argv) {
+    args::ArgumentParser arg_parser("Someone - engine options");
+    arg_parser.helpParams.width = 100;
+    arg_parser.helpParams.showProglineOptions = false;
+
+    args::HelpFlag help(arg_parser, "help", "Display this help message", {'h', "help"});
+    args::ValueFlag<std::string> load_mod(arg_parser, "mod name", "Start a mod instead of the main game", {'l', "load-mod"});
+    try {
+        arg_parser.ParseCLI(argc, argv);
+    } catch (const args::Help&) {
+        std::cout << arg_parser;
+        return 0;
+    } catch (const args::Error &e) {
+        std::cerr << e.what() << std::endl;
+        std::cerr << arg_parser;
+
+        return 1;
+    }
+
     // Change cwd to where the program is
     std::filesystem::current_path(std::filesystem::path(argv[0]).parent_path());
 
@@ -102,6 +122,7 @@ int main(int argc, char **argv) {
         "drawing_target", &target,
         "window", &window,
         "set_current_state", [&](CurrentState new_state) { current_state = new_state; },
+        "get_current_state", [&]() { return current_state; },
         // Apparently lua doesn't have a good equivalent
         "isalpha", [](int num) { return std::isalpha(num) != 0; },
         "loaded_mods", loaded_mods
@@ -119,6 +140,33 @@ int main(int argc, char **argv) {
 
     return 0;
 #endif
+
+    if (load_mod) {
+        auto mod_name = args::get(load_mod);
+
+        std::optional<ModData *> loaded_mod;
+        for (auto &[_k, v_] : loaded_mods) {
+            auto v = v_.as<ModData *>();
+            if (v->name == mod_name)
+                loaded_mod = v;
+        }
+        if (!loaded_mod) {
+            spdlog::error("Mod {} not found, exiting", mod_name);
+            return 1;
+        }
+
+        auto first_room = loaded_mod.value()->first_room;
+        if (first_room != "") {
+            current_state = CurrentState::Walking;
+        }
+
+        // Load the mod now, because state needs to be set to walking (if needed) before that
+        terminal_env.load_mod(mod_name);
+
+        if (first_room != "") {
+            walking_env.load_room(first_room, true);
+        }
+    }
 
     bool debug_menu = false;
 

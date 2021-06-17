@@ -8,7 +8,7 @@ private:
     sol::table lines;
 
     sol::protected_function set_lines_f, set_first_line_f, draw_f, process_event_f, update_event_timer_f,
-        debug_menu_f;
+        debug_menu_f, load_mod_f;
 public:
     StoryParser parser;
 
@@ -17,6 +17,9 @@ public:
     }
 
     void set_first_line(std::string &&line) {
+        call_or_throw(set_first_line_f, line);
+    }
+    void set_first_line(sol::table line) {
         call_or_throw(set_first_line_f, line);
     }
 
@@ -36,6 +39,12 @@ public:
         call_or_throw(debug_menu_f);
     }
 
+    void load_mod(std::string &name) {
+        sol::table mod_line = load_mod_f(name);
+
+        set_first_line(mod_line);
+    }
+
     TerminalEnv(sol::state &lua) : lines(lua.create_table()), LuaModuleEnv(lua), parser(StoryParser(lines, lua)) {
         // This both defines a global for the module and returns it
         module = lua.require_script("TerminalModule", "return require('terminal')");
@@ -46,6 +55,8 @@ public:
         process_event_f = module["process_event"];
         update_event_timer_f = module["update_event_timer"];
         debug_menu_f = module["debug_menu"];
+
+        load_mod_f = lua.script("return require('terminal.instance_menu').InstanceMenuLine.load_mod");
 
         // Parse the lines from the prologue file and going forward from it
         parser.parse("day1/prologue");

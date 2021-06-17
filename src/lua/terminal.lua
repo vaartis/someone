@@ -168,8 +168,10 @@ function M.set_first_line_on_screen(name)
    -- Reset like after text input
    lines.reset_after_text_input()
 
-   if lines.native_lines[name] then
+   if type(name) == "string" and lines.native_lines[name] then
       first_line_on_screen = lines.make_line(name, lines.native_lines)
+   elseif type(name) == "table" then
+      first_line_on_screen = name
    else
       print("Line " .. name .. " not found")
    end

@@ -143,6 +143,13 @@ target_link_libraries(someone_lib spdlog)
 
 # ===
 
+# === args
+
+add_subdirectory("${PROJECT_SOURCE_DIR}/deps/args" EXCLUDE_FROM_ALL)
+target_link_libraries(someone_lib args)
+
+# ===
+
 # === sol2
 
 target_compile_definitions(someone_lib PUBLIC SOL_ALL_SAFETIES_ON=1)

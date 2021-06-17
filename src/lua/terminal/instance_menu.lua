@@ -156,6 +156,31 @@ function M.InstanceMenuLine:handle_interaction(event)
    end
 end
 
+function M.InstanceMenuLine.load_mod(name)
+   local data = lume.match(
+      GLOBAL.loaded_mods,
+      function(mod) return mod.name == name end
+   )
+   local line_source = data.lines
+
+   -- In case somehow the mod creator decided to use that name
+   local original = line_source["__start"]
+
+   -- Synthesize a custom line here, which wraps the mod start to setup things
+   line_source["__start"] = {
+      __type = { name = "TerminalCustomLineData" },
+      class = mod_lines.ModWrapperLine,
+      data = data
+   }
+
+   local result = lines.make_line("__start", line_source)
+
+   -- Restore the original line, erasing the synthesized one.
+   line_source["__start"] = original
+
+   return result
+end
+
 function M.InstanceMenuLine:next()
    if not self._next_instance then
       local password = self._password_input_text.text:sub(self._password_input_text.initial_length + 1, -1)
@@ -185,25 +210,7 @@ function M.InstanceMenuLine:next()
             local instance_next = instance.next
 
             if instance.mod then
-               local data = lume.match(
-                  GLOBAL.loaded_mods,
-                  function(mod) return mod.name == instance.mod_name end
-               )
-               local line_source = data.lines
-
-               -- In case somehow the mod creator decided to use that name
-               local original = line_source["__start"]
-
-               -- Synthesize a custom line here, which wraps the mod start to setup things
-               line_source["__start"] = {
-                  __type = { name = "TerminalCustomLineData" },
-                  class = mod_lines.ModWrapperLine,
-                  data = data
-               }
-               self._next_instance = lines.make_line("__start", line_source)
-
-               -- Restore the original line, erasing the synthesized one.
-               line_source["__start"] = original
+               self._next_instance = M.InstanceMenuLine.load_mod(instance.mod_name)
             else
                self._next_instance = lines.make_line(instance_next, self._line_source)
             end

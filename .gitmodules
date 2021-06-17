@@ -28,3 +28,6 @@
 [submodule "deps/tomlplusplus"]
 	path = deps/tomlplusplus
 	url = https://github.com/vaartis/tomlplusplus/
+[submodule "deps/args"]
+	path = deps/args
+	url = https://github.com/taywee/args

@@ -26,7 +26,8 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
         "pretty_name", &ModData::pretty_name,
         "lua_files", &ModData::lua_files,
         "lines", &ModData::lines,
-        "first_line", &ModData::first_line
+        "first_line", &ModData::first_line,
+        "first_room", &ModData::first_room
     );
 
     auto static_fonts_type = lua.new_usertype<StaticFonts>(

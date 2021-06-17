@@ -93,10 +93,28 @@ function M.ModWrapperLine:initialize(data)
 
    end
 
-   self._next_instance = lines.make_line(data.first_line, self._line_source)
+   if data.first_room ~= "" and GLOBAL.get_current_state() ~= CurrentState.Walking then
+      TerminalModule.switch_to_walking(data.first_room)
+   end
+
+   self._data = data
 end
 function M.ModWrapperLine:current_text() end
 function M.ModWrapperLine:should_wait() return false end
-function M.ModWrapperLine:next() return self._next_instance end
+function M.ModWrapperLine:next()
+   if not self._next_instance then
+      if self._data.first_line ~= "" then
+         self._next_instance = lines.make_line(self._data.first_line, self._line_source)
+      elseif self._data.first_room ~= "" then
+         self._data.lines["__end"] = {
+            __type = { name = "TerminalCustomLineData" },
+            class = M.ModExitLine,
+         }
+         self._next_instance = lines.make_line("__end", self._data.lines)
+      end
+   end
+
+   return self._next_instance
+end
 
 return M

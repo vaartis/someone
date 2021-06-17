@@ -529,25 +529,35 @@ sol::table StoryParser::load_mods(sol::state &lua) {
 
     YAML::Node root_node = YAML::LoadFile(mod_yml.string());
 
-    auto entrypoint = root_node["entrypoint"].as<std::string>();
-    auto last_slash = entrypoint.rfind('/');
-    if (last_slash == std::string::npos) {
-      spdlog::warn("No separator found in {} mod entrypoint, skipping", name_string);
+    ModData mod_data = {
+        .name = name_string,
+        .lua_files = lua.create_table(),
+        .lines = lua.create_table(),
+        .parser = StoryParser(mod_data.lines, lua),
+    };
 
-      continue;
+    if (root_node["entrypoint"]) {
+        auto entrypoint = root_node["entrypoint"].as<std::string>();
+        auto last_slash = entrypoint.rfind('/');
+        if (last_slash == std::string::npos) {
+            spdlog::warn("No separator found in {} mod entrypoint, skipping", name_string);
+
+            continue;
+        }
+
+        auto entrypoint_file = entrypoint.substr(0, last_slash);
+        auto entrypoint_line = entrypoint.substr(last_slash + 1, entrypoint.size());
+
+        mod_data.first_line = fmt::format("{}/{}", entrypoint_file, entrypoint_line);
+        mod_data.parser.parse(entrypoint_file, mods_path / name);
+    } else if (root_node["entrypoint_walking"]) {
+        mod_data.first_room = root_node["entrypoint_walking"].as<std::string>();
+    } else {
+        spdlog::error("Neither entrypoint, nor entrypoint_walking found for mod {}, skipping", name_string);
+
+        continue;
     }
 
-    auto entrypoint_file = entrypoint.substr(0, last_slash);
-    auto entrypoint_line = entrypoint.substr(last_slash + 1, entrypoint.size());
-
-    ModData mod_data = {
-      .name = name_string,
-      .first_line = fmt::format("{}/{}", entrypoint_file, entrypoint_line),
-      .lua_files = lua.create_table(),
-      .lines = lua.create_table(),
-      .parser = StoryParser(mod_data.lines, lua),
-    };
-    mod_data.parser.parse(entrypoint_file, mods_path / name);
 
     if (auto pretty_name_node = root_node["pretty_name"]; pretty_name_node)
       mod_data.pretty_name = pretty_name_node.as<std::string>();

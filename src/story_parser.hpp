@@ -33,6 +33,7 @@ struct ModData {
     std::string name;
     std::string pretty_name;
     std::string first_line;
+    std::string first_room;
     sol::table lua_files;
     sol::table lines;
     StoryParser parser;
