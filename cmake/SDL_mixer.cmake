@@ -6,6 +6,14 @@ file(MAKE_DIRECTORY
   "${SDL_INSTALL}/include/SDL2"
   "${SDL_INSTALL}/lib")
 
+if (NOT WIN32)
+   set(SDL2_DISABLED
+   --disable-video --disable-video-vulkan --disable-video-dummy
+   --disable-render --disable-events
+   --disable-joystick --disable-haptic --disable-sensor
+   --disable-power)
+endif()
+
 ExternalProject_Add(SDL
   #URL "https://github.com/libsdl-org/SDL/archive/refs/tags/release-2.0.14.zip"
   GIT_REPOSITORY "https://github.com/libsdl-org/SDL"
@@ -14,11 +22,7 @@ ExternalProject_Add(SDL
   UPDATE_COMMAND ""
 
   CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=${SDL_INSTALL}
-  --disable-video --disable-video-vulkan --disable-video-dummy
-  --disable-render --disable-events
-  --disable-joystick --disable-haptic --disable-sensor
-  --disable-power
-  --disable-shared
+  ${SDL2_DISABLED} --disable-shared
 
   BUILD_COMMAND make
   INSTALL_COMMAND make install
@@ -48,38 +52,41 @@ add_dependencies(SDL2::SDL2_main SDL2::SDL2)
 
 set(SDL_MIXER_SRC "${PROJECT_BINARY_DIR}/deps/SDL_mixer/src/SDL_mixer")
 set(SDL_MIXER_INSTALL "${PROJECT_BINARY_DIR}/deps/SDL_mixer/install")
+
 ExternalProject_Add(SDL_mixer
    URL "https://github.com/libsdl-org/SDL_mixer/archive/refs/tags/release-2.0.4.zip"
    BUILD_IN_SOURCE true
 
    CONFIGURE_COMMAND
-   ./configure
-   PKG_CONFIG_PATH=${SDL_MIXER_INSTALL}/lib/pkgconfig:${SDL_INSTALL}/lib/pkgconfig
-   CC=${CMAKE_C_COMPILER}
-   --prefix=${SDL_MIXER_INSTALL}
-   --disable-music-cmd --disable-music-mod
-   --disable-music-midi --disable-music-flac --disable-music-mp3-mpg123 --disable-music-opus --disable-music-ogg-shared --disable-shared
+   cmake -E env
+   PKG_CONFIG_PATH=${SDL_INSTALL}/lib/pkgconfig
+
+   sh -c "./configure \
+   CC=${CMAKE_C_COMPILER} \
+   CFLAGS=-I${SDL_MIXER_INSTALL}/include \
+   LDFLAGS=-L${SDL_MIXER_INSTALL}/lib \
+   --prefix=${SDL_MIXER_INSTALL} \
+   --disable-music-cmd --disable-music-mod \
+   --disable-music-midi --disable-music-flac --disable-music-mp3-mpg123 --disable-music-opus --disable-music-ogg-shared --disable-shared"
 
    BUILD_COMMAND make
    INSTALL_COMMAND make install
    PREFIX "${PROJECT_BINARY_DIR}/deps/SDL_mixer/")
 ExternalProject_Add_Step(SDL_mixer build-ogg
-  WORKING_DIRECTORY "<SOURCE_DIR>"
   DEPENDEES patch
-  COMMAND cd external/libogg-1.3.2/
-  && ./configure CC=${CMAKE_C_COMPILER} --disable-shared --enable-static --prefix=${SDL_MIXER_INSTALL}
-  && make install)
+  WORKING_DIRECTORY <SOURCE_DIR>/external/libogg-1.3.2/
+  COMMAND ./configure CC=${CMAKE_C_COMPILER} --disable-shared --enable-static --prefix=${SDL_MIXER_INSTALL}
+  COMMAND make install)
 ExternalProject_Add_Step(SDL_mixer build-vorbis
-  WORKING_DIRECTORY "<SOURCE_DIR>"
-  COMMAND cd external/libvorbis-1.3.5/ &&
-  cmake -E env
+  WORKING_DIRECTORY <SOURCE_DIR>/external/libvorbis-1.3.5/
+  COMMAND cmake -E env
   PKG_CONFIG_PATH=${SDL_MIXER_INSTALL}/lib/pkgconfig/
 
-  ./configure
-  CC=${CMAKE_C_COMPILER}
-  --disable-shared --enable-static
-  --prefix=${SDL_MIXER_INSTALL}
-  && make install
+  sh -c "./configure \
+  CC=${CMAKE_C_COMPILER} \
+  --disable-shared --enable-static \
+  --prefix=${SDL_MIXER_INSTALL}"
+  COMMAND make install
 
   DEPENDEES build-ogg
   DEPENDERS configure)
