@@ -186,7 +186,7 @@ archived-2:
   - text: I promise.
     next: 23
   - text: I'll try.
-    next: "instances/menu/exit"
+    next: instances/menu/exit
   script_after: |
     TerminalModule.state_variables.explored_instances.hunger = true
 

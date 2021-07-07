@@ -534,13 +534,15 @@ M.state_variables = {
    -- Explored instances
    explored_instances = {
       hunger = false,
+      forest = false,
    },
    talks = {
       narra = {
          found_lamp = false,
          -- Instances the player talked about
          instances = {
-            hunger = false
+            hunger = false,
+            forest = false
          }
       },
       maj = {

@@ -1,5 +1,6 @@
 local util = require("util")
 local lume = require("lume")
+local debug_components = require("components.debug")
 
 local interaction_components
 
@@ -120,5 +121,6 @@ function M.interaction_callbacks.read_note(state, note_name)
       }
    )
 end
+debug_components.declare_callback_args( M.interaction_callbacks.read_note, {"string"})
 
 return M

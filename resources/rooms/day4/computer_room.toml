@@ -1,6 +1,12 @@
 [prefab]
 name = "day3/computer_room"
 
-# TODO: change
-[entities.table.interaction]
-activatable_callback = { module = "components.first_puzzle", name = "first_puzzle_solved" }
+[[entities.table.interaction.activatable_callback.and]]
+module = "components.interaction"
+name = "state_variable_equal"
+args = [ ["food_room", "peach_can_taken"], true ]
+
+[[entities.table.interaction.activatable_callback.and]]
+module = "components.interaction"
+name = "state_variable_equal"
+args = [ ["status_room", "way_up_checked"], true ]

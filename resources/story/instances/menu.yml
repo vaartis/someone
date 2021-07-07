@@ -33,6 +33,9 @@ config:
       - name: Famine
         password: aqualung
         next: !line-name "instances/hunger/1"
+      - name: Forest
+        password: velvetgreen
+        next: !line-name "instances/forest/1"
 
 wrong_password:
   char: err_text

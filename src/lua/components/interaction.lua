@@ -275,8 +275,10 @@ local talking_speed = 0.02
 function M.interaction_callbacks.player_talk(_curr_state, phrase, state_var)
    local engine = util.rooms_mod().engine
 
-   local containing, name = state_variable_ensure_path_up_to(state_var)
-   containing[name] = true
+   if state_var then
+      local containing, name = state_variable_ensure_path_up_to(state_var)
+      containing[name] = true
+   end
 
    M.disable_player(engine)
 

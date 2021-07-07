@@ -57,4 +57,29 @@ to = "food_room"
 player_y = 644
 
 [entities.ladder.interaction]
+action_text = "go down"
 callback = { module = "components.passage", name = "switch_room", self = true }
+
+[entities.ladder_up.transformable]
+position = [ 418, 568 ]
+
+[entities.ladder_up.collider]
+size = [ 100, 200 ]
+mode = "constant"
+trigger = true
+
+[entities.ladder_up.interaction]
+action_text = "go up"
+callback = { module = "components.status_room", name = "check_way_up", args = [ "Seems like the way up is blocked by something" ] }
+
+[entities.box_note.transformable]
+position = [ 851, 672 ]
+
+[entities.box_note.collider]
+size = [ 50, 50 ]
+trigger = true
+mode = "constant"
+
+[entities.box_note.interaction]
+callback = { args = [ "no_crafting_iteration" ], module = "components.note", name = "read_note" }
+action_text = "read the note"

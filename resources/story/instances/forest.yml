@@ -1,0 +1,125 @@
+config:
+  chars:
+    narra:
+      color: [211, 0, 0]
+    player:
+      color: [255, 255, 255]
+    description:
+      color: [185, 118, 252]
+  dialogue_between: [narra, player]
+
+1:
+  char: description
+  text: >-
+    You find yourself in the same grey room. You see Narra walking around the room, not paying any attention to you, or perhaps not noticing
+    you at all. After a few seconds she finally notices you and stops.
+
+2:
+  char: narra
+  text: >-
+    Hey. Haven't seen anybody here in a while. Any idea where they went?
+
+3:
+  char: player
+  responses:
+  - text: Not sure..
+    next: notsure-1
+  - text: I think I have some idea
+    condition: return require("lume").any(TerminalModule.state_variables.explored_instances)
+    next: someidea-1
+  - text: "Yes, I've already told you.."
+    condition: return TerminalModule.state_variables.explored_instances.forest
+    next: already-1
+
+notsure-1:
+  char: narra
+  text: Well, tell me something at least, will ya?
+  next: 4
+
+someidea-1:
+  char: narra
+  text: Well, I'm listening.
+  next: 4
+
+already-1:
+  char: narra
+  text: What do you mean..?
+
+already-2:
+  responses:
+  - text: >-
+      I already told you, but you forgot. When we talked last time, you asked me to not be angry about it. You really don't remember, do you?
+
+already-3:
+  text: >-
+    Not a thing, this is the first time I see you. But, you know.. I'd like to know more about this situation.
+  next: 4
+
+4:
+  char: player
+  responses:
+  - text: >-
+      This note I found was talking something about archiving and not going anywhere.. I guess this "archiving" thing is why you're in this
+      room.. Should probably mention that your world isn't exactly as it seems, though maybe you'd figured it out already. I won't go into
+      details, but the main point is: it's simulated, not real, except for you, I suppose. And it has been archived, and replaced with a
+      new one, maybe even more than one.
+
+5:
+  text: >-
+    Not real, you say.. Yeah, probably. No way all this beauty could have been destroyed like that in the real world, right? Did they
+    destroy it because they thought it wouldn't "go anywhere"? I don't even know what to say. Couldn't we just keep enjoying our lives?  Not
+    all things have to "go somewhere". Everything was so simple, just strolling around, sleeping under the trees, keeping each other warm at
+    night..
+
+6:
+  responses:
+  - text: How long did you enjoy this life?
+
+7:
+  text: >-
+    I don't know.. Many days. We had no need to track time, and really, we couldn't. Never even thought about this, we didn't even have any
+    way to preserve the information besides remembering it.
+
+8:
+  responses:
+  - text: >-
+      Didn't have any way of preserving it? I think the note mentioned that.. That's probably what they meant by not "going anywhere". You
+      didn't have any motivation of doing anything, or inventing anything.. Not that there's anything wrong with that, it's how you lived
+      all your life.. Doesn't explain why they'd just destroy everything like that, though. But this is probably not the first time this
+      happened to a world like yours.
+
+9:
+  text: >-
+    Now, of course, this room isn't a beautiful forest, but really, I haven't been doing much either way, I can still move around a bit..
+    No tree to sleep under, and no sun or moon to know whether it's day or night, but with time I sort of got over it. It's a bit lonely here,
+    but I can just sleep all day if I want.. Now, you go and figure out why they did this, all right?
+
+10:
+  responses:
+  - text: >-
+      Of course. Though.. I don't think you'll remember all these things I've told you.. It says here "read-only", so you'll probably just
+      forget about me when I leave.
+
+11:
+  text: >-
+    A shame, but really, we've got all the time in the world. Please don't be angry at me not remembering you and just explain this stuff
+    again, OK?
+
+12:
+  responses:
+  - text: "Yes, of course."
+  - text: "I suppose I'll have to explain it again next time."
+  - text: "Of course I won't be angry. I already told you."
+    condition: return TerminalModule.state_variables.explored_instances.forest
+
+13:
+  text: >-
+    Thank you, and goodbye.
+
+14:
+  char: description
+  text: She says that, and then sits down on the floor, leaning on the wall.
+  wait: true
+  next: instances/menu/exit
+  script_after: |
+    TerminalModule.state_variables.explored_instances.forest = true

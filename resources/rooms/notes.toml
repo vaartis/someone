@@ -1,10 +1,29 @@
 [hunger_iteration]
 text = """
-That last iteration wasn't a good idea at all. They turned violent on each other fighting for resources.. Really, all these things I come up
+That last iteration wasn't a good idea at all. They turned violent on each other and started fighting.. Really, all these things I come up
 with aren't working out well. Maybe it's good the way it is already. I'll leave some things that shouldn't hurt anyone in, but
 the rest is going into the trash."""
 bottom_text = """
 passwd: aqualung
+
+ctrl z switch instance
+"""
+
+[no_crafting_iteration]
+text = """
+Never thought I'd need a table here too, but times change, and I'm all out of tables..
+Well, not like I can do anything about it now. Good thing I have all these boxes from all the food I packed,
+now that it's all in storage I can use them as a stand. Good job, me.
+
+Now that I think about it, maybe I'm not the only one who needs a table.. Of course they need tables!
+And something to make tables with.. And houses to put tables into..
+
+I better get to work on this, and archive the previous one. Sure, it looks OK for now, but they won't get anywhere without this.
+The base should be simple, but then I need to somehow allow them to make anything they want..
+Right, brilliant idea, no sense in hard-coding it all, just let them do it themselves.."""
+
+bottom_text = """
+passwd: velvetgreen
 
 ctrl z switch instance
 """
