@@ -324,8 +324,8 @@ int main(int argc, char **argv) {
     return 0;
 #endif
 
-    if (load_mod) {
-        auto mod_name = args::get(load_mod);
+    if (true) {
+        std::string mod_name = "wtktotf";
 
         std::optional<ModData *> loaded_mod;
         for (auto &[_k, v_] : loaded_mods) {
