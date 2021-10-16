@@ -85,6 +85,8 @@ else()
 endif()
 target_include_directories(someone_lib PUBLIC "${CMAKE_SOURCE_DIR}/src/web_stubs/")
 
+set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "wtktotf")
+
 target_link_libraries(someone someone_lib)
 
 target_include_directories(someone_lib PUBLIC "src")
