@@ -108,11 +108,11 @@ jobs:
         cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang-14 -DCMAKE_CXX_COMPILER=clang++-14
         make -j $(nproc)
 
-    - name: Copy the release to /someone/someone-${{github.sha}}/
+    - name: Copy the release to /someone/wtktotf-${{github.sha}}/
       run: |
-        sudo mkdir -p /someone/someone-${{github.sha}}/
+        sudo mkdir -p /someone/wtktotf-${{github.sha}}/
         cd $GITHUB_WORKSPACE/_build/
-        sudo cp -r someone resources/ /someone/someone-${{github.sha}}/
+        sudo cp -r someone resources/ /someone/wtktotf-${{github.sha}}/
 
     - name: Delete old artifacts
       uses: c-hive/gha-remove-artifacts@v1.1.0
@@ -123,7 +123,7 @@ jobs:
     - name: Upload the release artifact
       uses: actions/upload-artifact@v2
       with:
-        name: "someone-${{github.sha}}-linux"
+        name: "wtktotf-${{github.sha}}-linux"
         path: "/someone/"
 
     - name: Upload release to itch.io
@@ -160,16 +160,16 @@ jobs:
         cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -G Unix\ Makefiles
         make -j $(nproc)
 
-    - name: Copy the x86_64 release to /d/someone/someone-${{github.sha}}-x86_64/
+    - name: Copy the x86_64 release to /d/someone/wtktotf-${{github.sha}}-x86_64/
       shell: msys2 {0}
       run: |
         cd ${GITHUB_WORKSPACE}/_build
-        mkdir -p /d/someone-x86_64/someone-${{github.sha}}-x86_64/
+        mkdir -p /d/wtktotf-x86_64/wtktotf-${{github.sha}}-x86_64/
         cp -r someone.exe resources\
               deps/lua/src/lua/src/lua53.dll /mingw64/bin/{libbrotlicommon.dll,libbrotlidec.dll,libbz2-1.dll,libfreetype-6.dll,\
         libgcc_s_seh-1.dll,libglib-2.0-0.dll,libgraphite2.dll,libharfbuzz-0.dll,libiconv-2.dll,libintl-8.dll,libpcre-1.dll,\
         libpng16-16.dll,libstdc++-6.dll,libwinpthread-1.dll,zlib1.dll}\
-              /d/someone-x86_64/someone-${{github.sha}}-x86_64
+              /d/wtktotf-x86_64/wtktotf-${{github.sha}}-x86_64
 
     - name: Download butler
       if: ${{ github.event_name == 'release' }}
@@ -183,15 +183,15 @@ jobs:
       env:
         BUTLER_API_KEY: ${{ secrets.BUTLER_CREDENTIALS }}
         CHANNEL: windows-x86_64
-        RELDIR: "D:\\someone-x86_64"
+        RELDIR: "D:\\wtktotf-x86_64"
       run: |
         ./butler push ${RELDIR} vaartis/someone:${CHANNEL} --userversion ${GITHUB_REF:10}
 
     - name: Upload the x86_64 release artifact
       uses: actions/upload-artifact@v2
       with:
-        name: "someone-${{github.sha}}-windows-x86_64"
-        path: "D:\\someone-x86_64"
+        name: "wtktotf-${{github.sha}}-windows-x86_64"
+        path: "D:\\wtktotf-x86_64"
 
     - name: Build i686
       env:
@@ -203,16 +203,16 @@ jobs:
         cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -G Unix\ Makefiles
         make -j $(nproc)
 
-    - name: Copy the i686 release to /d/someone/someone-${{github.sha}}-i686/
+    - name: Copy the i686 release to /d/someone/wtktotf-${{github.sha}}-i686/
       shell: msys2 {0}
       run: |
         cd ${GITHUB_WORKSPACE}/_build
-        mkdir -p /d/someone-i686/someone-${{github.sha}}-i686/
+        mkdir -p /d/wtktotf-i686/wtktotf-${{github.sha}}-i686/
         cp -r someone.exe resources\
               deps/lua/src/lua/src/lua53.dll /mingw32/bin/{libbrotlicommon.dll,libbrotlidec.dll,libbz2-1.dll,libfreetype-6.dll,\
         libgcc_s_dw2-1.dll,libglib-2.0-0.dll,libgraphite2.dll,libharfbuzz-0.dll,libiconv-2.dll,libintl-8.dll,libpcre-1.dll,\
         libpng16-16.dll,libstdc++-6.dll,libwinpthread-1.dll,zlib1.dll}\
-              /d/someone-i686/someone-${{github.sha}}-i686
+              /d/wtktotf-i686/wtktotf-${{github.sha}}-i686
 
     - name: Upload the i686 release to itch.io
       shell: msys2 {0}
@@ -220,15 +220,15 @@ jobs:
       env:
         BUTLER_API_KEY: ${{ secrets.BUTLER_CREDENTIALS }}
         CHANNEL: windows-i686
-        RELDIR: "D:\\someone-i686"
+        RELDIR: "D:\\wtktotf-i686"
       run: |
         ./butler push ${RELDIR} vaartis/someone:${CHANNEL} --userversion ${GITHUB_REF:10}
 
     - name: Upload the i686 release artifact
       uses: actions/upload-artifact@v2
       with:
-        name: "someone-${{github.sha}}-windows-i686"
-        path: "D:\\someone-i686"
+        name: "wtktotf-${{github.sha}}-windows-i686"
+        path: "D:\\wtktotf-i686"
 
   build-macos:
     runs-on: macos-10.15
@@ -243,11 +243,11 @@ jobs:
         cmake .. -DCMAKE_BUILD_TYPE=Release
         make -j $(nproc) install
 
-    - name: Copy the release to /Users/runner/someone/someone-${{github.sha}}/
+    - name: Copy the release to /Users/runner/someone/wtktotf-${{github.sha}}/
       run: |
-        sudo mkdir -p /Users/runner/someone/someone-${{github.sha}}/
+        sudo mkdir -p /Users/runner/someone/wtktotf-${{github.sha}}/
         cd $GITHUB_WORKSPACE/_build/
-        sudo cp -r someone.app /Users/runner/someone/someone-${{github.sha}}/
+        sudo cp -r someone.app /Users/runner/someone/wtktotf-${{github.sha}}/
 
     - name: Upload release to itch.io
       if: ${{ github.event_name == 'release' }}
@@ -263,5 +263,5 @@ jobs:
     - name: Upload the release artifact
       uses: actions/upload-artifact@v2
       with:
-        name: "someone-${{github.sha}}-macos"
+        name: "wtktotf-${{github.sha}}-macos"
         path: "/Users/runner/someone"
