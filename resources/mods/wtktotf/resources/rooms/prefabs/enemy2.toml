@@ -1,0 +1,35 @@
+tags = [ "Enemy" ]
+
+[drawable]
+kind = "sprite"
+texture_asset = "mod.enemy2"
+z = 4
+
+[transformable]
+scale = [2.5, 2.5]
+
+[collider]
+mode = "sprite"
+
+[animation]
+sheet = "resources/sprites/enemy2/"
+playing = true
+
+[children.hit]
+tags = [ "EnemyHit" ]
+
+[children.hit.hit_data]
+
+[children.hit.drawable]
+enabled = false
+kind = "sprite"
+texture_asset = "mod.enemy2_hit"
+z = 4
+
+[children.hit.transformable]
+position = [0, 0]
+scale = [2.5, 2.5]
+
+[children.hit.animation]
+sheet = "resources/sprites/enemy2/"
+playing = true

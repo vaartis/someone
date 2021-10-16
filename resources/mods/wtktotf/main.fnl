@@ -150,11 +150,17 @@
                   :transformable { :position [ 1280 756 ] } } }])
 
 (local possible-enemies
-       [{
+       [
+        {
          :name "enemy1"
          :entity {
                   :prefab "enemy1"
-                  :transformable { :position [ 1280 665 ] } }} ])
+                  :transformable { :position [ 1280 665 ] } }}
+        {
+         :name "enemy2"
+         :entity {
+                  :prefab "enemy2"
+                  :transformable { :position [ 1280 696 ] } }}])
 
 (local EnemySpawnerSytem (class "EnemySpawnerSystem" System))
 (fn EnemySpawnerSytem.requires []
@@ -198,7 +204,7 @@
             ;; Enemy velocity is not set yet
             (when (not hit-data.velocity)
               (math.randomseed (os.time))
-              (set hit-data.velocity (Vector2f.new (lume.random -1 1) (lume.random 0.3 0.8)))
+              (set hit-data.velocity (Vector2f.new (lume.random 0.6 1) (lume.random 0.3 0.8)))
               ;; Normalize direction vector
               (let [velocity hit-data.velocity
                     vec-len (+ (* velocity.x velocity.x) (* velocity.y velocity.y))]

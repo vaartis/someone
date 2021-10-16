@@ -1,0 +1,45 @@
+{ "frames": {
+   "1": {
+    "frame": { "x": 0, "y": 0, "w": 100, "h": 68 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 100, "h": 68 },
+    "sourceSize": { "w": 100, "h": 68 },
+    "duration": 200
+   },
+   "2": {
+    "frame": { "x": 0, "y": 68, "w": 100, "h": 68 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 100, "h": 68 },
+    "sourceSize": { "w": 100, "h": 68 },
+    "duration": 200
+   },
+   "3": {
+    "frame": { "x": 0, "y": 136, "w": 100, "h": 68 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 100, "h": 68 },
+    "sourceSize": { "w": 100, "h": 68 },
+    "duration": 200
+   },
+   "4": {
+    "frame": { "x": 0, "y": 204, "w": 100, "h": 68 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 100, "h": 68 },
+    "sourceSize": { "w": 100, "h": 68 },
+    "duration": 200
+   }
+ },
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.2.29-dev",
+  "image": "enemy2.png",
+  "format": "RGBA8888",
+  "size": { "w": 100, "h": 272 },
+  "scale": "1",
+  "frameTags": [
+  ]
+ }
+}

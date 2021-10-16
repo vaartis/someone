@@ -11,3 +11,6 @@ enemy1_hit = "enemy1_hit/enemy1_hit.png"
 
 obstacle1 = "obstacle1/obstacle1.png"
 obstacle2 = "obstacle2/obstacle2.png"
+
+enemy2 = "enemy2/enemy2.png"
+enemy2_hit = "enemy2_hit/enemy2_hit.png"
