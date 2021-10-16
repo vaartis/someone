@@ -1,0 +1,37 @@
+{ "frames": {
+   "1": {
+    "frame": { "x": 0, "y": 0, "w": 71, "h": 102 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 71, "h": 102 },
+    "sourceSize": { "w": 71, "h": 102 },
+    "duration": 300
+   },
+   "2": {
+    "frame": { "x": 0, "y": 102, "w": 71, "h": 102 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 71, "h": 102 },
+    "sourceSize": { "w": 71, "h": 102 },
+    "duration": 300
+   },
+   "3": {
+    "frame": { "x": 0, "y": 204, "w": 71, "h": 102 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 71, "h": 102 },
+    "sourceSize": { "w": 71, "h": 102 },
+    "duration": 300
+   }
+ },
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.2.29-dev",
+  "image": "enemy1_hit.png",
+  "format": "RGBA8888",
+  "size": { "w": 71, "h": 306 },
+  "scale": "1",
+  "frameTags": [
+  ]
+ }
+}

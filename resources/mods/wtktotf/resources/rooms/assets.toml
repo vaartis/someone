@@ -1,0 +1,13 @@
+[textures]
+background = "background/Background.png"
+paralax1 = "background/Paralax1.png"
+paralax2 = "background/Paralax2.png"
+
+scooter = "scooter/scooter.png"
+scooter_attack = "scooter_attack/scooter_attack.png"
+
+enemy1 = "enemy1/enemy1.png"
+enemy1_hit = "enemy1_hit/enemy1_hit.png"
+
+obstacle1 = "obstacle1/obstacle1.png"
+obstacle2 = "obstacle2/obstacle2.png"

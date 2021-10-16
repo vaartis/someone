@@ -1,0 +1,4 @@
+pretty_name: WtKTotF
+entrypoint_walking: wtktotf
+lua:
+  main: "main.fnl"

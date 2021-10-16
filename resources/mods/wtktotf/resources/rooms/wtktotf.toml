@@ -1,0 +1,98 @@
+# Background
+
+[entities.background.drawable]
+kind = "sprite"
+texture_asset = "mod.background"
+z = 1
+
+[entities.paralax1.drawable]
+kind = "sprite"
+texture_asset = "mod.paralax1"
+z = 2
+
+[entities.paralax1.paralax]
+speed = 10
+
+[entities.paralax12.drawable]
+kind = "sprite"
+texture_asset = "mod.paralax1"
+z = 2
+
+[entities.paralax12.transformable]
+position = [1280, 0]
+
+[entities.paralax12.paralax]
+speed = 10
+
+[entities.paralax2.drawable]
+kind = "sprite"
+texture_asset = "mod.paralax2"
+z = 3
+
+[entities.paralax2.paralax]
+speed = 0.3
+
+[entities.paralax22.drawable]
+kind = "sprite"
+texture_asset = "mod.paralax2"
+z = 3
+
+[entities.paralax22.transformable]
+position = [1280, 0]
+
+[entities.paralax22.paralax]
+speed = 0.3
+
+# Player
+
+[entities.player]
+tags = [ "Player" ]
+
+[entities.player.player_data]
+
+[entities.player.drawable]
+kind = "sprite"
+texture_asset = "mod.scooter"
+z = 4
+
+[entities.player.transformable]
+position = [ 0, 570 ]
+scale = [1.5, 1.5]
+
+[entities.player.collider]
+mode = "sprite"
+
+[entities.player.animation]
+sheet = "resources/sprites/scooter/"
+playing = true
+
+[entities.player.attack_data]
+
+[entities.player.children.player_attack]
+tags = [ "PlayerAttack" ]
+
+[entities.player.children.player_attack.drawable]
+kind = "sprite"
+texture_asset = "mod.scooter_attack"
+z = 4
+
+[entities.player.children.player_attack.transformable]
+position = [ 0, 0 ]
+scale = [1.5, 1.5]
+
+[entities.player.children.player_attack.animation]
+enabled = false
+sheet = "resources/sprites/scooter_attack/"
+playing = false
+loop = false
+
+[entities.score]
+tags = [ "ScoreText" ]
+
+[entities.score.drawable]
+kind = "text"
+text = { text = "0 meters", font_size = 32 }
+z = 5
+
+[entities.score.transformable]
+position = [ 0, 0 ]

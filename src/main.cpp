@@ -266,6 +266,14 @@ int main(int argc, char **argv) {
     auto package_cpath = std::filesystem::path("resources") / "lua" / "lib" / "lua" / SOMEONE_LUA_VERSION / "?." SOMEONE_LIB_EXT ";";
     lua["package"]["cpath"] = std::string(package_cpath.string()) + std::string(lua["package"]["cpath"]);
 
+    // Add fennel
+    {
+        sol::table fennel = lua.script("return require('fennel')");
+        sol::table loaders = lua["package"]["searchers"];
+        loaders.add(fennel["loader"]);
+    }
+
+
     #ifdef SOMEONE_TESTING
     // Has to be included as the first thing to cover everything
     lua.script("require('luacov')");

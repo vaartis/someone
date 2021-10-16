@@ -171,6 +171,10 @@ function M.load_sheet_json(dir_path)
       json_path = lume.format("resources/mods/{1}/{2}", { getmetatable(_G.mod).name, json_path })
    end
 
+   if _G.mod then
+      json_path = lume.format("resources/mods/{1}/{2}", { getmetatable(_G.mod).name, json_path })
+   end
+
    local file = io.open(json_path, "r")
    local sprite_json = json.decode(file:read("*all"))
    file:close()

@@ -1,0 +1,9 @@
+tags = [ "LostText" ]
+
+[drawable]
+kind = "text"
+text = { text = "You lost!\nPress R to restart", font_size = 48 }
+z = 5
+
+[transformable]
+position = [600, 400]

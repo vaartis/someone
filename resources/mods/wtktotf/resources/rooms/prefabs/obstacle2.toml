@@ -1,0 +1,9 @@
+tags = [ "Obstacle" ]
+
+[drawable]
+kind = "sprite"
+texture_asset = "mod.obstacle2"
+z = 4
+
+[collider]
+mode = "sprite"
