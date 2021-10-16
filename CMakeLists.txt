@@ -63,9 +63,9 @@ else()
 
     install(CODE "
     include(BundleUtilities)
-    fixup_bundle(\"${CMAKE_BINARY_DIR}/someone.app\" \"\" \"\")
+    fixup_bundle(\"${CMAKE_BINARY_DIR}/wtktotf.app\" \"\" \"\")
     " COMPONENT Runtime)
-    install(DIRECTORY "${CMAKE_BINARY_DIR}/resources" DESTINATION "${CMAKE_INSTALL_PREFIX}/someone.app/Contents/MacOS")
+    install(DIRECTORY "${CMAKE_BINARY_DIR}/resources" DESTINATION "${CMAKE_INSTALL_PREFIX}/wtktotf.app/Contents/MacOS")
   else()
     add_executable(someone ${someone_main})
   endif()
@@ -409,7 +409,7 @@ if (SOMEONE_TESTING)
 
   add_custom_target(lua-test
     DEPENDS someone lua-test-build lua-test-copy-luacov
-    COMMAND ./someone)
+    COMMAND ./wtktotf)
 
   # C++ tests
 

@@ -112,7 +112,7 @@ jobs:
       run: |
         sudo mkdir -p /someone/wtktotf-${{github.sha}}/
         cd $GITHUB_WORKSPACE/_build/
-        sudo cp -r someone resources/ /someone/wtktotf-${{github.sha}}/
+        sudo cp -r wtktotf resources/ /someone/wtktotf-${{github.sha}}/
 
     - name: Delete old artifacts
       uses: c-hive/gha-remove-artifacts@v1.1.0
@@ -165,7 +165,7 @@ jobs:
       run: |
         cd ${GITHUB_WORKSPACE}/_build
         mkdir -p /d/wtktotf-x86_64/wtktotf-${{github.sha}}-x86_64/
-        cp -r someone.exe resources\
+        cp -r wtktotf.exe resources\
               deps/lua/src/lua/src/lua53.dll /mingw64/bin/{libbrotlicommon.dll,libbrotlidec.dll,libbz2-1.dll,libfreetype-6.dll,\
         libgcc_s_seh-1.dll,libglib-2.0-0.dll,libgraphite2.dll,libharfbuzz-0.dll,libiconv-2.dll,libintl-8.dll,libpcre-1.dll,\
         libpng16-16.dll,libstdc++-6.dll,libwinpthread-1.dll,zlib1.dll}\
@@ -208,7 +208,7 @@ jobs:
       run: |
         cd ${GITHUB_WORKSPACE}/_build
         mkdir -p /d/wtktotf-i686/wtktotf-${{github.sha}}-i686/
-        cp -r someone.exe resources\
+        cp -r wtkotf.exe resources\
               deps/lua/src/lua/src/lua53.dll /mingw32/bin/{libbrotlicommon.dll,libbrotlidec.dll,libbz2-1.dll,libfreetype-6.dll,\
         libgcc_s_dw2-1.dll,libglib-2.0-0.dll,libgraphite2.dll,libharfbuzz-0.dll,libiconv-2.dll,libintl-8.dll,libpcre-1.dll,\
         libpng16-16.dll,libstdc++-6.dll,libwinpthread-1.dll,zlib1.dll}\
@@ -247,7 +247,7 @@ jobs:
       run: |
         sudo mkdir -p /Users/runner/someone/wtktotf-${{github.sha}}/
         cd $GITHUB_WORKSPACE/_build/
-        sudo cp -r someone.app /Users/runner/someone/wtktotf-${{github.sha}}/
+        sudo cp -r wtktotf.app /Users/runner/someone/wtktotf-${{github.sha}}/
 
     - name: Upload release to itch.io
       if: ${{ github.event_name == 'release' }}
