@@ -142,7 +142,7 @@
          :name "obstacle1"
          :entity {
                   :prefab "obstacle1"
-                  :transformable { :position [ 1280 715 ] } } }
+                  :transformable { :position [ 1280 718 ] } } }
         {
          :name "obstacle2"
          :entity {
