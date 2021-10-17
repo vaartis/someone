@@ -5,7 +5,7 @@
 
 (local M {})
 
-(local is-debug true)
+(local is-debug false)
 
 (set
  M.components
