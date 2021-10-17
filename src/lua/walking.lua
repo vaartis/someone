@@ -6,7 +6,7 @@ local interaction_components = require("components.interaction")
 local debug_components = require("components.debug")
 
 -- Load the room
-rooms.load_room("day1/computer_room")
+-- rooms.load_room("day1/computer_room")
 
 local function update(dt)
    rooms.engine:update(dt)
