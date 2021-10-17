@@ -14,3 +14,6 @@ obstacle2 = "obstacle2/obstacle2.png"
 
 enemy2 = "enemy2/enemy2.png"
 enemy2_hit = "enemy2_hit/enemy2_hit.png"
+
+[sounds]
+gamejam1 = "gamejam-01.ogg"

@@ -1,6 +1,7 @@
 (local lume (require "lume"))
 (local util (require "util"))
 (local collider-components (require "components.collider"))
+(local assets (require "components.assets"))
 
 (local M {})
 
@@ -348,5 +349,12 @@
 (set M.systems [
                 ParalaxSystem AttackDataSystem EnemySpawnerSytem EnemyHitSystem AttackSystem ObstacleSystem JumpSystem
                 LostSystem ScoreSystem])
+
+
+;; Make the sound always play
+(let [sound (assets.create_sound_from_asset "mod.gamejam1")]
+  (doto sound
+    (tset :loop true)
+    (: :play)))
 
 M
