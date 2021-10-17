@@ -168,7 +168,12 @@
          :name "enemy2"
          :entity {
                   :prefab "enemy2"
-                  :transformable { :position [ 1280 696 ] } }}])
+                  :transformable { :position [ 1280 696 ] } }}
+        {
+         :name "enemy3"
+         :entity {
+                  :prefab "enemy3"
+                  :transformable { :position [ 1280 700 ] } }}])
 
 (local EnemySpawnerSytem (class "EnemySpawnerSystem" System))
 (fn EnemySpawnerSytem.requires []

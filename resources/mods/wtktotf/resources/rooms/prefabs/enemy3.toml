@@ -1,0 +1,31 @@
+tags = [ "Enemy" ]
+
+[drawable]
+kind = "sprite"
+texture_asset = "mod.enemy3"
+z = 4
+
+[transformable]
+scale = [3, 3]
+
+[collider]
+mode = "sprite"
+
+[animation]
+sheet = "resources/sprites/enemy3/"
+playing = true
+
+[children.hit]
+tags = [ "EnemyHit" ]
+
+[children.hit.hit_data]
+
+[children.hit.drawable]
+enabled = false
+kind = "sprite"
+texture_asset = "mod.enemy3_hit"
+z = 4
+
+[children.hit.transformable]
+position = [0, 0]
+scale = [3, 3]
