@@ -193,14 +193,17 @@
             {: name : entity} (lume.randomchoice possible-spawners)]
         (entities.instantiate_entity name entity)))))
 
-(fn when-lost [player-ent]
-  (let [player-data (player-ent:get "PlayerData")
+(fn when-lost [collision]
+  (let [player-ent collision.other
+        player-data (player-ent:get "PlayerData")
         player-animation (player-ent:get "Animation")
         player-drawable (player-ent:get "Drawable")
 
         player-lost (lume.match player-ent.children (fn [child] (child:get "PlayerLostTag")))
         player-lost-animation (player-lost:get "Animation")
-        player-lost-drawable (player-lost:get "Drawable")]
+        player-lost-drawable (player-lost:get "Drawable")
+
+        {:x touch-x :y touch-y} collision.touch]
     ;; Disable main animation & sprite
     (set player-animation.playing false)
     (set player-drawable.enabled false)
@@ -208,6 +211,11 @@
     ;; Enable lost animation
     (set player-lost-drawable.enabled true)
     (set player-lost-animation.playing true)
+
+    ;; Spawn an explosion
+    (let [entities (util.entities_mod)]
+      (entities.instantiate_entity "explosion" { :prefab "explosion"
+                                                 :transformable { :position [ touch-x touch-y ]} }))
 
     (set player-data.lost true)))
 
@@ -256,7 +264,8 @@
                   (_ _ cols len) (physics-world:move enemy-ent (- x 10) y (fn [ent] "touch"))]
               (when (> len 0)
                 ;; Hit the player
-                (let [player-ent (. (util.first cols) :other)
+                (let [collision (util.first cols)
+                      player-ent collision.other
                       player-data (player-ent:get "PlayerData")
 
                       enemy-animation (enemy-ent:get "Animation")]
@@ -266,7 +275,7 @@
                       ;; Touched for too long, lose
                       (do
                         ;; Disable player animation
-                        (when-lost player-ent)
+                        (when-lost collision)
                         ;; Disable enemy animation
                         (set enemy-animation.playing false)))))))))))
 
@@ -284,8 +293,7 @@
       (let [(x y w h) (physics-world:getRect entity)
             (_ _ cols len) (physics-world:move entity (- x 10) y (fn [ent] "touch"))]
         (when (> len 0)
-          (let [player (. (util.first cols) :other)]
-            (when-lost player)))
+          (when-lost (util.first cols)))
 
         (when (< x -300)
           (let [rooms (util.rooms_mod)]
@@ -377,9 +385,19 @@
 
         (set text-drawable.drawable.string (lume.format "{1} meters" [player-data.score]))))))
 
+(local ExplosionSystem (class "ExplosionSystem" System))
+(fn ExplosionSystem.requires [] ["ExplosionTag"])
+(fn ExplosionSystem.update [self dt]
+  (each [_ ent (pairs self.targets)]
+    (let [animation (ent:get "Animation")]
+      (when (and (not animation.playing) (= animation.current_frame (length animation.frames)))
+        ;; Animation finished, destroy the explosion
+        (let [rooms (util.rooms_mod)]
+          (rooms.engine:removeEntity ent))))))
+
 (set M.systems [
                 ParalaxSystem AttackDataSystem EnemySpawnerSytem EnemyHitSystem AttackSystem ObstacleSystem JumpSystem
-                LostSystem ScoreSystem])
+                LostSystem ScoreSystem ExplosionSystem ])
 
 
 ;; Make the sound always play

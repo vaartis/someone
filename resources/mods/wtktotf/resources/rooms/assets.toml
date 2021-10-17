@@ -20,5 +20,7 @@ enemy2_hit = "enemy2_hit/enemy2_hit.png"
 enemy3 = "enemy3/enemy3.png"
 enemy3_hit = "enemy3_hit/enemy3_hit.png"
 
+explosion = "explosion/explosion.png"
+
 [sounds]
 gamejam1 = "gamejam-01.ogg"

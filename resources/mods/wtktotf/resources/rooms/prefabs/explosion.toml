@@ -1,0 +1,15 @@
+tags = [ "Explosion" ]
+
+[drawable]
+kind = "sprite"
+texture_asset = "mod.explosion"
+z = 5
+
+[transformable]
+scale = [2, 2]
+origin = [50, 44]
+
+[animation]
+sheet = "resources/sprites/explosion/"
+playing = true
+loop = false

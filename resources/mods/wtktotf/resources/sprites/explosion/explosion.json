@@ -1,0 +1,59 @@
+{ "frames": {
+   "1": {
+    "frame": { "x": 0, "y": 0, "w": 101, "h": 88 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 101, "h": 88 },
+    "sourceSize": { "w": 101, "h": 88 },
+    "duration": 200
+   },
+   "2": {
+    "frame": { "x": 0, "y": 88, "w": 101, "h": 88 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 101, "h": 88 },
+    "sourceSize": { "w": 101, "h": 88 },
+    "duration": 200
+   },
+   "3": {
+    "frame": { "x": 0, "y": 176, "w": 101, "h": 88 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 101, "h": 88 },
+    "sourceSize": { "w": 101, "h": 88 },
+    "duration": 200
+   },
+   "4": {
+    "frame": { "x": 0, "y": 264, "w": 101, "h": 88 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 101, "h": 88 },
+    "sourceSize": { "w": 101, "h": 88 },
+    "duration": 200
+   },
+   "5": {
+    "frame": { "x": 0, "y": 352, "w": 101, "h": 88 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 101, "h": 88 },
+    "sourceSize": { "w": 101, "h": 88 },
+    "duration": 200
+   },
+   "6": {
+    "frame": { "x": 0, "y": 440, "w": 101, "h": 88 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 101, "h": 88 },
+    "sourceSize": { "w": 101, "h": 88 },
+    "duration": 200
+   }
+ },
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.2.29-dev",
+  "image": "explosion.png",
+  "format": "RGBA8888",
+  "size": { "w": 101, "h": 528 },
+  "scale": "1"
+ }
+}
