@@ -70,10 +70,13 @@ playing = true
 
 [entities.player.attack_data]
 
+# Player attack
+
 [entities.player.children.player_attack]
 tags = [ "PlayerAttack" ]
 
 [entities.player.children.player_attack.drawable]
+enabled = false
 kind = "sprite"
 texture_asset = "mod.scooter_attack"
 z = 4
@@ -87,6 +90,29 @@ enabled = false
 sheet = "resources/sprites/scooter_attack/"
 playing = false
 loop = false
+
+# Player lost
+
+[entities.player.children.player_lost]
+tags = [ "PlayerLost" ]
+
+[entities.player.children.player_lost.drawable]
+enabled = false
+kind = "sprite"
+texture_asset = "mod.scooter_lost"
+z = 4
+
+[entities.player.children.player_lost.transformable]
+position = [ 0, 0 ]
+scale = [1.5, 1.5]
+
+[entities.player.children.player_lost.animation]
+enabled = false
+sheet = "resources/sprites/scooter_lost/"
+playing = false
+loop = true
+
+# Score
 
 [entities.score]
 tags = [ "ScoreText" ]

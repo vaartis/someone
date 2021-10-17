@@ -6,6 +6,7 @@ paralax2 = "background/Paralax2.png"
 
 scooter = "scooter/scooter.png"
 scooter_attack = "scooter_attack/scooter_attack.png"
+scooter_lost = "scooter_lost/scooter_lost.png"
 
 enemy1 = "enemy1/enemy1.png"
 enemy1_hit = "enemy1_hit/enemy1_hit.png"

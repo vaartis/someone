@@ -190,8 +190,20 @@
 
 (fn when-lost [player-ent]
   (let [player-data (player-ent:get "PlayerData")
-        player-animation (player-ent:get "Animation")]
+        player-animation (player-ent:get "Animation")
+        player-drawable (player-ent:get "Drawable")
+
+        player-lost (lume.match player-ent.children (fn [child] (child:get "PlayerLostTag")))
+        player-lost-animation (player-lost:get "Animation")
+        player-lost-drawable (player-lost:get "Drawable")]
+    ;; Disable main animation & sprite
     (set player-animation.playing false)
+    (set player-drawable.enabled false)
+
+    ;; Enable lost animation
+    (set player-lost-drawable.enabled true)
+    (set player-lost-animation.playing true)
+
     (set player-data.lost true)))
 
 (local EnemyHitSystem (class "EnemyHitSystem" System))
