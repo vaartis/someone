@@ -10,7 +10,7 @@
 (set
  M.components
  {
-  :paralax { :class (Component.create "Paralax" ["speed"]) }
+  :paralax { :class (Component.create "Paralax" ["speed" "variants"]) }
   :attack_data { :class (Component.create "AttackData" ["time-since-last-attack"] { :time-since-last-attack 0 }) }
   :hit_data { :class (Component.create "HitData" ["velocity"]) }
   :player_data { :class (Component.create "PlayerData" ["lost" "jump-velocity" "frames-touching" "score" "since-last-score"]
@@ -19,7 +19,7 @@
   })
 
 (fn M.components.paralax.process_component [new-ent comp entity-name]
-  (new-ent:add (M.components.paralax.class comp.speed)))
+  (new-ent:add (M.components.paralax.class comp.speed comp.variants)))
 
 (fn M.components.attack_data.process_component [new-ent comp entity-name]
   (new-ent:add (M.components.attack_data.class)))
@@ -56,7 +56,14 @@
 
       (let [screen-size GLOBAL.drawing_target.size.x]
         (when (< tf.position.x (- drawable.global_bounds.width))
-          (set tf.position.x drawable.global_bounds.width))))))
+          ;; When outside of the screen, move back
+          (set tf.position.x drawable.global_bounds.width)
+
+          (when paralax.variants
+            ;; Choose a random new texture
+            (math.randomseed (os.time))
+            (set drawable.texture
+                 (. assets.assets.textures (lume.randomchoice paralax.variants)))))))))
 
 (local AttackDataSystem (class "AttackDataSystem" System))
 (fn AttackDataSystem.requires [] ["AttackData"])

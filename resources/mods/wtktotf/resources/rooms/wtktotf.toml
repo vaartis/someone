@@ -11,6 +11,7 @@ texture_asset = "mod.paralax1"
 z = 2
 
 [entities.paralax1.paralax]
+variants = [ "mod.paralax1", "mod.paralax1_1" ]
 speed = 10
 
 [entities.paralax12.drawable]
@@ -22,6 +23,7 @@ z = 2
 position = [1280, 0]
 
 [entities.paralax12.paralax]
+variants = [ "mod.paralax1", "mod.paralax1_1" ]
 speed = 10
 
 [entities.paralax2.drawable]

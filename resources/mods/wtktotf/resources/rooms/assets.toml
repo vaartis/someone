@@ -1,6 +1,7 @@
 [textures]
 background = "background/Background.png"
 paralax1 = "background/Paralax1.png"
+paralax1_1 = "background/Paralax1_1.png"
 paralax2 = "background/Paralax2.png"
 
 scooter = "scooter/scooter.png"
