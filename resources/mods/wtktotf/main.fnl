@@ -10,12 +10,12 @@
 (set
  M.components
  {
-  :paralax { :class (Component.create "Paralax" ["speed" "variants"]) }
-  :attack_data { :class (Component.create "AttackData" ["time-since-last-attack"] { :time-since-last-attack 0 }) }
+  :paralax { :class (Component.create "Paralax" ["speed"]) }
+  :attack_data { :class (Component.create "AttackData" ["time-since-last-attack"] { :time-since-last-attack 1 }) }
   :hit_data { :class (Component.create "HitData" ["velocity"]) }
-  :player_data { :class (Component.create "PlayerData" ["lost" "jump-velocity" "frames-touching" "score" "since-last-score"]
+  :player_data { :class (Component.create "PlayerData" ["lost" "jump-velocity" "frames-touching" "score" "since-last-score" "since-last-mute"]
                                           { :lost false :jump-velocity 0 :frames-touching 0
-                                           :score 0 :since-last-score 0} ) }
+                                           :score 0 :since-last-score 0 :since-last-mute 1} ) }
   })
 
 (fn M.components.paralax.process_component [new-ent comp entity-name]
@@ -304,6 +304,13 @@
         max-velocity 8
         gravity 0.1]
 
+    ;; Mute/Unmute
+    (when (and (Keyboard.is_key_pressed KeyboardKey.M) (> player-data.since-last-mute 1))
+      (set player-data.since-last-mute 0)
+      (set M.music.volume
+           (if (= M.music.volume 0) 100 0)))
+    (set player-data.since-last-mute (+ player-data.since-last-mute dt))
+
     (when (and (not is-attacking)
                (= player-data.jump-velocity 0)
                (Keyboard.is_key_pressed KeyboardKey.Z)
@@ -374,6 +381,7 @@
 (let [sound (assets.create_sound_from_asset "mod.gamejam1")]
   (doto sound
     (tset :loop true)
-    (: :play)))
+    (: :play))
+  (set M.music sound))
 
 M
