@@ -120,6 +120,9 @@
                         enemy-hit-ent (lume.match enemy-ent.children (fn [child] (child:get "EnemyHitTag")))
                         enemy-hit-drawable (enemy-hit-ent:get "Drawable")]
                     (let [rooms (util.rooms_mod)]
+                      ;; Play the hit sound
+                      (M.sound-effects.hit:play)
+
                       ;; Reset touching
                       (reset-touch)
 
@@ -217,7 +220,9 @@
     ;; Spawn an explosion
     (let [entities (util.entities_mod)]
       (entities.instantiate_entity "explosion" { :prefab "explosion"
-                                                 :transformable { :position [ touch-x touch-y ]} }))
+                                                :transformable { :position [ touch-x touch-y ]} }))
+    ;; Play the explosion sound
+    (M.sound-effects.explosion:play)
 
     (set player-data.lost true)))
 
@@ -325,6 +330,9 @@
                  (> player-data.score 5)
                  (Keyboard.is_key_pressed KeyboardKey.Z)
                  (not (did-lose)))
+        ;; Play the jump sound
+        (M.sound-effects.jump:play)
+
         (set player-data.jump-velocity max-velocity))
 
       (when (not (= player-data.jump-velocity 0))
@@ -336,6 +344,9 @@
             (physics-world:move enemy enemy-x (- enemy-y player-data.jump-velocity)))))
 
       (when (> (- y player-data.jump-velocity) 570)
+        ;; Play the landing sound
+        (M.sound-effects.landing:play)
+
         (set player-data.jump-velocity 0)
         (physics-world:move player-ent x 570))
 
@@ -452,6 +463,11 @@
     (tset :loop true)
     (tset :volume M.music-settings.volume)
     (: :play))
-  (set M.music sound))
+  (set M.music sound)
+
+  (set M.sound-effects {:explosion (assets.create_sound_from_asset "mod.explosion")
+                        :jump (assets.create_sound_from_asset "mod.jump")
+                        :hit (assets.create_sound_from_asset "mod.hit")
+                        :landing (assets.create_sound_from_asset "mod.landing")}))
 
 M

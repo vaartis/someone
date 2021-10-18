@@ -24,3 +24,7 @@ explosion = "explosion/explosion.png"
 
 [sounds]
 gamejam1 = "gamejam-01.ogg"
+explosion = "explosion.ogg"
+jump = "jump.ogg"
+landing = "landing.ogg"
+hit = "hit.ogg"
