@@ -234,7 +234,7 @@ int main(int argc, char **argv) {
     uint8_t current_window_size = 0;
 
     const auto &default_size = window_sizes[current_window_size];
-    sf::RenderWindow window(sf::VideoMode(default_size.x, default_size.y), "Someone");
+    sf::RenderWindow window(sf::VideoMode(default_size.x, default_size.y), "WtKTotF");
     window.setPosition(sf::Vector2i(0, 0));
 
     ImGui::CreateContext();
