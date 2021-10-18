@@ -1,0 +1,66 @@
+# Background
+
+[entities.background.drawable]
+kind = "sprite"
+texture_asset = "mod.background"
+z = 1
+
+[entities.paralax1.drawable]
+kind = "sprite"
+texture_asset = "mod.paralax1"
+z = 2
+
+[entities.paralax2.drawable]
+kind = "sprite"
+texture_asset = "mod.paralax2"
+z = 3
+
+[entities.paralax2.paralax]
+speed = 0.3
+
+# Player sprite
+
+# Player
+
+[entities.player.drawable]
+kind = "sprite"
+texture_asset = "mod.scooter"
+z = 4
+
+[entities.player.transformable]
+position = [ 0, 570 ]
+scale = [1.5, 1.5]
+
+[entities.player.collider]
+mode = "sprite"
+
+[entities.player.animation]
+sheet = "resources/sprites/scooter/"
+playing = false
+
+# Menu text
+
+[entities.menu_text]
+tags = [ "Menu" ]
+
+[entities.menu_text.drawable]
+kind = "text"
+text = { text = "WtKTotF", font_size = 64 }
+z = 5
+
+[entities.menu_text.transformable]
+position = [100, 100]
+
+[entities.menu_text2.drawable]
+kind = "text"
+text = { text = """Z to jump
+X to hit enemies with your guitar
+M to mute/unmute the music
+Q/E to reduce/increase volume
+F1 to make the window smaller/bigger
+
+Z to start!""", font_size = 48 }
+z = 5
+
+[entities.menu_text2.transformable]
+position = [100, 180]

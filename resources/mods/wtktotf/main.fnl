@@ -7,16 +7,21 @@
 
 (local is-debug false)
 
+(set M.music-settings
+     {:since-last-mute 1
+      :since-last-change 0.2
+      :saved-volume 30
+      :volume 30})
+
 (set
  M.components
  {
-  :paralax { :class (Component.create "Paralax" ["speed"]) }
-  :attack_data { :class (Component.create "AttackData" ["time-since-last-attack"] { :time-since-last-attack 1 }) }
-  :hit_data { :class (Component.create "HitData" ["velocity"]) }
-  :player_data { :class (Component.create "PlayerData" ["lost" "jump-velocity" "frames-touching" "score" "since-last-score" "since-last-mute"]
-                                          { :lost false :jump-velocity 0 :frames-touching 0
-                                           :score 0 :since-last-score 0 :since-last-mute 1} ) }
-  })
+  :paralax {:class (Component.create "Paralax" ["speed" "variants"])}
+  :attack_data {:class (Component.create "AttackData" ["time-since-last-attack"] {:time-since-last-attack 1})}
+  :hit_data {:class (Component.create "HitData" ["velocity"])}
+  :player_data {:class (Component.create "PlayerData" ["lost" "jump-velocity" "frames-touching" "score" "since-last-score"]
+                                         {:lost false :jump-velocity 0 :frames-touching 0
+                                          :score 0 :since-last-score 0})}})
 
 (fn M.components.paralax.process_component [new-ent comp entity-name]
   (new-ent:add (M.components.paralax.class comp.speed comp.variants)))
@@ -32,15 +37,16 @@
 
 (fn did-lose []
   (let [rooms (util.rooms_mod)
-        player (util.first (rooms.engine:getEntitiesWithComponent "PlayerData"))
-        data (player:get "PlayerData")]
-    data.lost))
+        player (util.first (rooms.engine:getEntitiesWithComponent "PlayerData"))]
+    (when player
+      (let [data (player:get "PlayerData")]
+        data.lost))))
 
 (fn reset-touch []
-  (let [rooms (util.rooms_mod)
-        player (util.first (rooms.engine:getEntitiesWithComponent "PlayerData"))
-        data (player:get "PlayerData")]
-    (set data.frames-touching 0)))
+  (let [rooms (util.rooms_mod)]
+    (each [_ player (pairs (rooms.engine:getEntitiesWithComponent "PlayerData"))]
+      (let [data (player:get "PlayerData")]
+        (set data.frames-touching 0)))))
 
 (local ParalaxSystem (class "ParalaxSystem" System))
 (fn ParalaxSystem.requires [] ["Paralax"])
@@ -76,74 +82,74 @@
 (fn AttackSystem.requires []
   { :player ["PlayerTag" "AttackData"] :player-attack ["PlayerAttackTag"]})
 (fn AttackSystem.draw [self]
-  (let [player (util.first self.targets.player)
-        attack (util.first self.targets.player-attack)
+  (each [_ player (pairs self.targets.player)]
+    (let [attack (util.first self.targets.player-attack)
 
-        player-drawable (player:get "Drawable")
-        attack-drawable (attack:get "Drawable")
-        attack-animation (attack:get "Animation")
+          player-drawable (player:get "Drawable")
+          attack-drawable (attack:get "Drawable")
+          attack-animation (attack:get "Animation")
 
-        attacking attack-animation.playing
+          attacking attack-animation.playing
 
-        attack-data (player:get "AttackData")
-        can-attack-already (> attack-data.time-since-last-attack 1)]
+          attack-data (player:get "AttackData")
+          can-attack-already (> attack-data.time-since-last-attack 1)]
 
-    (when attack-animation.playing
-      (let [curr-frame (. attack-animation.frames attack-animation.current_frame)
-            curr-frame-tags curr-frame.tags]
-        (when (and curr-frame-tags (lume.find curr-frame-tags "damage"))
-          ;; Damage frames
+      (when attack-animation.playing
+        (let [curr-frame (. attack-animation.frames attack-animation.current_frame)
+              curr-frame-tags curr-frame.tags]
+          (when (and curr-frame-tags (lume.find curr-frame-tags "damage"))
+            ;; Damage frames
 
-          (let [physics-world collider-components.physics_world
-                (x y w h) (physics-world:getRect player)
-                (check-x check-y) (values (+ x w 10) (+ y (/ h 2)))
-                (check-w check-h) (values 70 70)]
-            (when is-debug
-              (let [shape (RectangleShape.new (Vector2f.new check-w check-h))]
-                (doto shape
-                  (tset :outline_thickness 3.0)
-                  (tset :outline_color Color.Red)
-                  (tset :fill_color Color.Red)
-                  (tset :position (Vector2f.new check-x check-y))
+            (let [physics-world collider-components.physics_world
+                  (x y w h) (physics-world:getRect player)
+                  (check-x check-y) (values (+ x w 10) (+ y (/ h 2)))
+                  (check-w check-h) (values 70 70)]
+              (when is-debug
+                (let [shape (RectangleShape.new (Vector2f.new check-w check-h))]
+                  (doto shape
+                    (tset :outline_thickness 3.0)
+                    (tset :outline_color Color.Red)
+                    (tset :fill_color Color.Red)
+                    (tset :position (Vector2f.new check-x check-y))
 
-                  (GLOBAL.drawing_target:draw))))
+                    (GLOBAL.drawing_target:draw))))
 
-            (let [(items len) (physics-world:queryRect check-x check-y check-w check-h (fn [ent] (ent:get "EnemyTag")))]
-              (when (> len 0)
-                (let [enemy-ent (util.first items)
-                      enemy-hit-ent (lume.match enemy-ent.children (fn [child] (child:get "EnemyHitTag")))
-                      enemy-hit-drawable (enemy-hit-ent:get "Drawable")]
-                  (let [rooms (util.rooms_mod)]
-                    ;; Reset touching
-                    (reset-touch)
+              (let [(items len) (physics-world:queryRect check-x check-y check-w check-h (fn [ent] (ent:get "EnemyTag")))]
+                (when (> len 0)
+                  (let [enemy-ent (util.first items)
+                        enemy-hit-ent (lume.match enemy-ent.children (fn [child] (child:get "EnemyHitTag")))
+                        enemy-hit-drawable (enemy-hit-ent:get "Drawable")]
+                    (let [rooms (util.rooms_mod)]
+                      ;; Reset touching
+                      (reset-touch)
 
-                    ;; Delete the enemy itself
-                    (rooms.engine:removeEntity enemy-ent))
+                      ;; Delete the enemy itself
+                      (rooms.engine:removeEntity enemy-ent))
 
-                  (set enemy-hit-drawable.enabled true))))))))
+                    (set enemy-hit-drawable.enabled true))))))))
 
-    (if (and (Keyboard.is_key_pressed KeyboardKey.X) (not attacking) can-attack-already (not (did-lose)))
-        (do
-          (set attack-data.time-since-last-attack 0)
+      (if (and (Keyboard.is_key_pressed KeyboardKey.X) (not attacking) can-attack-already (not (did-lose)))
+          (do
+            (set attack-data.time-since-last-attack 0)
 
-          ;; Enable attack animation
-          (set attack-drawable.enabled true)
-          ;; Disable main sprite
-          (set player-drawable.enabled false)
-          ;; Start the animation
-          (set attack-animation.playing true))
+            ;; Enable attack animation
+            (set attack-drawable.enabled true)
+            ;; Disable main sprite
+            (set player-drawable.enabled false)
+            ;; Start the animation
+            (set attack-animation.playing true))
 
-        (= attack-animation.current_frame (length attack-animation.frames))
-        (do
-          ;; Disable animation
-          (set attack-animation.playing false)
-          ;; Reset the frame
-          (set attack-animation.current_frame 1)
+          (= attack-animation.current_frame (length attack-animation.frames))
+          (do
+            ;; Disable animation
+            (set attack-animation.playing false)
+            ;; Reset the frame
+            (set attack-animation.current_frame 1)
 
-          ;; Disable attack drawable
-          (set attack-drawable.enabled false)
-          ;; Enable the player drawable again
-          (set player-drawable.enabled true)))))
+            ;; Disable attack drawable
+            (set attack-drawable.enabled false)
+            ;; Enable the player drawable again
+            (set player-drawable.enabled true))))))
 
 (local possible-obstacles
        [{
@@ -159,39 +165,35 @@
 
 (local possible-enemies
        [
-        {
-         :name "enemy1"
-         :entity {
-                  :prefab "enemy1"
-                  :transformable { :position [ 1280 665 ] } }}
-        {
-         :name "enemy2"
-         :entity {
-                  :prefab "enemy2"
+        {:name "enemy1"
+         :entity {:prefab "enemy1"
+                  :transformable {:position [ 1280 665 ]} }}
+        {:name "enemy2"
+         :entity {:prefab "enemy2"
                   :transformable { :position [ 1280 696 ] } }}
-        {
-         :name "enemy3"
-         :entity {
-                  :prefab "enemy3"
+        {:name "enemy3"
+         :entity {:prefab "enemy3"
                   :transformable { :position [ 1280 700 ] } }}])
 
 (local EnemySpawnerSytem (class "EnemySpawnerSystem" System))
 (fn EnemySpawnerSytem.requires []
-  { :enemy ["EnemyTag"] :enemy-hit [ "EnemyHitTag" ] :obstacle ["ObstacleTag"] })
+  {:enemy ["EnemyTag"] :enemy-hit [ "EnemyHitTag" ] :obstacle ["ObstacleTag"]
+   :spawner ["SpawnerTag"]})
 (fn EnemySpawnerSytem.update [self dt]
   (when (did-lose)
     (lua :return))
 
-  (let [enemy-ent (util.first self.targets.enemy)
-        enemy-ent-hit (util.first self.targets.enemy-hit)
-        obstacle-ent (util.first self.targets.obstacle)]
-    ;; When there are no enemies/obstacles, spawn one
-    (when (and (not enemy-ent) (not enemy-ent-hit) (not obstacle-ent))
-      (math.randomseed (os.time))
-      (let [entities (util.entities_mod)
-            possible-spawners (lume.randomchoice [ possible-enemies possible-obstacles ])
-            {: name : entity} (lume.randomchoice possible-spawners)]
-        (entities.instantiate_entity name entity)))))
+  (each [_ _ (pairs self.targets.spawner)]
+    (let [enemy-ent (util.first self.targets.enemy)
+          enemy-ent-hit (util.first self.targets.enemy-hit)
+          obstacle-ent (util.first self.targets.obstacle)]
+      ;; When there are no enemies/obstacles, spawn one
+      (when (and (not enemy-ent) (not enemy-ent-hit) (not obstacle-ent))
+        (math.randomseed (os.time))
+        (let [entities (util.entities_mod)
+              possible-spawners (lume.randomchoice [ possible-enemies possible-obstacles ])
+              {: name : entity} (lume.randomchoice possible-spawners)]
+          (entities.instantiate_entity name entity))))))
 
 (fn when-lost [collision]
   (let [player-ent collision.other
@@ -304,54 +306,49 @@
 (fn JumpSystem.requires []
   { :player ["PlayerTag"] :player-attack ["PlayerAttackTag"] :enemy ["EnemyTag"] })
 (fn JumpSystem.update [self dt]
-  (let [player-ent (util.first self.targets.player)
-        player-attack-ent (util.first self.targets.player-attack)
+  (each [_ player-ent (pairs self.targets.player)]
+    (let [player-attack-ent (util.first self.targets.player-attack)
 
-        player-data (player-ent:get "PlayerData")
-        player-attack-animation (player-attack-ent:get "Animation")
-        is-attacking player-attack-animation.playing
+          player-data (player-ent:get "PlayerData")
+          player-attack-animation (player-attack-ent:get "Animation")
+          is-attacking player-attack-animation.playing
 
-        physics-world collider-components.physics_world
-        (x y w h) (physics-world:getRect player-ent)
+          physics-world collider-components.physics_world
+          (x y w h) (physics-world:getRect player-ent)
 
-        max-velocity 8
-        gravity 0.1]
+          max-velocity 8
+          gravity 0.1]
 
-    ;; Mute/Unmute
-    (when (and (Keyboard.is_key_pressed KeyboardKey.M) (> player-data.since-last-mute 1))
-      (set player-data.since-last-mute 0)
-      (set M.music.volume
-           (if (= M.music.volume 0) 100 0)))
-    (set player-data.since-last-mute (+ player-data.since-last-mute dt))
+      (when (and (not is-attacking)
+                 (= player-data.jump-velocity 0)
+                 ;; Make sure the player doesn't jump at the very start, right after the Z press in the menu
+                 (> player-data.score 5)
+                 (Keyboard.is_key_pressed KeyboardKey.Z)
+                 (not (did-lose)))
+        (set player-data.jump-velocity max-velocity))
 
-    (when (and (not is-attacking)
-               (= player-data.jump-velocity 0)
-               (Keyboard.is_key_pressed KeyboardKey.Z)
-               (not (did-lose)))
-      (set player-data.jump-velocity max-velocity))
+      (when (not (= player-data.jump-velocity 0))
+        (set player-data.jump-velocity (- player-data.jump-velocity gravity))
 
-    (when (not (= player-data.jump-velocity 0))
-      (set player-data.jump-velocity (- player-data.jump-velocity gravity))
+        (physics-world:move player-ent x (- y player-data.jump-velocity))
+        (each [_ enemy (pairs self.targets.enemy)]
+          (let [(enemy-x enemy-y _ _) (physics-world:getRect enemy)]
+            (physics-world:move enemy enemy-x (- enemy-y player-data.jump-velocity)))))
 
-      (physics-world:move player-ent x (- y player-data.jump-velocity))
+      (when (> (- y player-data.jump-velocity) 570)
+        (set player-data.jump-velocity 0)
+        (physics-world:move player-ent x 570))
+
       (each [_ enemy (pairs self.targets.enemy)]
-        (let [(enemy-x enemy-y _ _) (physics-world:getRect enemy)]
-          (physics-world:move enemy enemy-x (- enemy-y player-data.jump-velocity)))))
+        (let [name (. (enemy:get "Name") :name)
+              initial-data (lume.match possible-enemies
+                                       (fn [enemy]
+                                         (= enemy.name name)))
+              ground-y (. initial-data.entity.transformable.position 2)
 
-    (when (> (- y player-data.jump-velocity) 570)
-      (set player-data.jump-velocity 0)
-      (physics-world:move player-ent x 570))
-
-    (each [_ enemy (pairs self.targets.enemy)]
-      (let [name (. (enemy:get "Name") :name)
-            initial-data (lume.match possible-enemies
-                                     (fn [enemy]
-                                       (= enemy.name name)))
-            ground-y (. initial-data.entity.transformable.position 2)
-
-            (enemy-x enemy-y _ _) (physics-world:getRect enemy)]
-        (when (> (- enemy-y player-data.jump-velocity) ground-y)
-          (physics-world:move enemy enemy-x ground-y))))))
+              (enemy-x enemy-y _ _) (physics-world:getRect enemy)]
+          (when (> (- enemy-y player-data.jump-velocity) ground-y)
+            (physics-world:move enemy enemy-x ground-y)))))))
 
 (local LostSystem (class "LostSystem" System))
 (fn LostSystem.requires [] [ "LostTextTag" ])
@@ -362,7 +359,7 @@
           ;; Handle the restarting
           (when (Keyboard.is_key_pressed KeyboardKey.R)
             (let [rooms (util.rooms_mod)]
-              (rooms.load_room "wtktotf")))
+              (rooms.load_room "wtktotf_menu")))
 
           ;; Spawn the text
           (let [entities (util.entities_mod)]
@@ -371,19 +368,19 @@
 (local ScoreSystem (class "ScoreSystem" System))
 (fn ScoreSystem.requires [] { :text ["ScoreTextTag"] :player ["PlayerData"] })
 (fn ScoreSystem.update [self dt]
-  (let [player (util.first self.targets.player)
-        text (util.first self.targets.text)
+  (each [_ player (pairs self.targets.player)]
+    (let [text (util.first self.targets.text)
 
-        player-data (player:get "PlayerData")
-        text-drawable (text:get "Drawable")]
-    (when (not (did-lose))
-      (set player-data.since-last-score (+ player-data.since-last-score dt))
+          player-data (player:get "PlayerData")
+          text-drawable (text:get "Drawable")]
+      (when (not (did-lose))
+        (set player-data.since-last-score (+ player-data.since-last-score dt))
 
-      (when (> player-data.since-last-score 0.1)
-        (set player-data.since-last-score 0)
-        (set player-data.score (+ player-data.score 1))
+        (when (> player-data.since-last-score 0.1)
+          (set player-data.since-last-score 0)
+          (set player-data.score (+ player-data.score 1))
 
-        (set text-drawable.drawable.string (lume.format "{1} meters" [player-data.score]))))))
+          (set text-drawable.drawable.string (lume.format "{1} meters" [player-data.score])))))))
 
 (local ExplosionSystem (class "ExplosionSystem" System))
 (fn ExplosionSystem.requires [] ["ExplosionTag"])
@@ -395,15 +392,65 @@
         (let [rooms (util.rooms_mod)]
           (rooms.engine:removeEntity ent))))))
 
+(local VolumeControlSystem (class "VolumeControlSystem" System))
+(fn VolumeControlSystem.requires [] [])
+(fn VolumeControlSystem.update [self dt]
+  (set M.music-settings.since-last-mute (+ M.music-settings.since-last-mute dt))
+  (set M.music-settings.since-last-change (+ M.music-settings.since-last-change dt))
+
+  (var volume-changed false)
+
+  ;; Mute/Unmute
+  (when (and (Keyboard.is_key_pressed KeyboardKey.M) (> M.music-settings.since-last-mute 1))
+    (set M.music-settings.volume
+         (if (= M.music-settings.volume 0) M.music-settings.saved-volume 0))
+
+    (set volume-changed true))
+
+  ;; Volume control
+  (if (and (Keyboard.is_key_pressed KeyboardKey.Q) (> M.music-settings.since-last-change 0.2))
+      (do
+        (set M.music-settings.volume (lume.clamp (- M.music-settings.volume 10) 0 100))
+        (set M.music-settings.saved-volume M.music-settings.volume)
+
+        (set volume-changed true))
+
+      (and (Keyboard.is_key_pressed KeyboardKey.E) (> M.music-settings.since-last-change 0.2))
+      (do
+        (set M.music-settings.volume (lume.clamp (+ M.music-settings.volume 10) 0 100))
+        (set M.music-settings.saved-volume M.music-settings.volume)
+
+        (set volume-changed true)))
+  (when volume-changed
+    (set M.music-settings.since-last-mute 0)
+    (set M.music-settings.since-last-change 0)
+
+    (set M.music.volume M.music-settings.volume)
+
+    ;; Actually defined in terminal.lua as global..
+    (show_info_message (lume.format "Volume {1}%" [M.music-settings.volume])
+                       {:font_size 48 :font_color (Color.new 255 255 255 0)})))
+
+
+(local MenuSystem (class "MenuSystem" System))
+(fn MenuSystem.requires [] ["MenuTag"])
+(fn MenuSystem.update [self dt]
+  (each [_ _ (pairs self.targets)]
+    ;; Start the game
+    (when (and (Keyboard.is_key_pressed KeyboardKey.Z))
+      (let [rooms (util.rooms_mod)]
+        (rooms.load_room "wtktotf")))))
+
 (set M.systems [
                 ParalaxSystem AttackDataSystem EnemySpawnerSytem EnemyHitSystem AttackSystem ObstacleSystem JumpSystem
-                LostSystem ScoreSystem ExplosionSystem ])
+                LostSystem ScoreSystem ExplosionSystem VolumeControlSystem MenuSystem ])
 
 
 ;; Make the sound always play
 (let [sound (assets.create_sound_from_asset "mod.gamejam1")]
   (doto sound
     (tset :loop true)
+    (tset :volume M.music-settings.volume)
     (: :play))
   (set M.music sound))
 
