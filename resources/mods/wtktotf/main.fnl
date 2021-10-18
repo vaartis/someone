@@ -11,7 +11,9 @@
      {:since-last-mute 1
       :since-last-change 0.2
       :saved-volume 30
-      :volume 30})
+      :volume 30
+
+      :sfx-volume 100})
 
 (set
  M.components
@@ -410,6 +412,7 @@
   (set M.music-settings.since-last-change (+ M.music-settings.since-last-change dt))
 
   (var volume-changed false)
+  (var sfx-volume-changed false)
 
   ;; Mute/Unmute
   (when (and (Keyboard.is_key_pressed KeyboardKey.M) (> M.music-settings.since-last-mute 1))
@@ -418,29 +421,61 @@
 
     (set volume-changed true))
 
-  ;; Volume control
-  (if (and (Keyboard.is_key_pressed KeyboardKey.Q) (> M.music-settings.since-last-change 0.2))
-      (do
-        (set M.music-settings.volume (lume.clamp (- M.music-settings.volume 10) 0 100))
-        (set M.music-settings.saved-volume M.music-settings.volume)
+  (if
+   ;; SFX volume up
+   (and (Keyboard.is_key_pressed KeyboardKey.Q) (Keyboard.is_key_pressed KeyboardKey.LShift)
+        (> M.music-settings.since-last-change 0.2))
+   (do
+     (set M.music-settings.sfx-volume (lume.clamp (- M.music-settings.sfx-volume 10) 0 100))
 
-        (set volume-changed true))
+     (set sfx-volume-changed true))
+   ;; SFX volume down
+   (and (Keyboard.is_key_pressed KeyboardKey.E) (Keyboard.is_key_pressed KeyboardKey.LShift)
+        (> M.music-settings.since-last-change 0.2))
+   (do
+     (set M.music-settings.sfx-volume (lume.clamp (+ M.music-settings.sfx-volume 10) 0 100))
 
-      (and (Keyboard.is_key_pressed KeyboardKey.E) (> M.music-settings.since-last-change 0.2))
-      (do
-        (set M.music-settings.volume (lume.clamp (+ M.music-settings.volume 10) 0 100))
-        (set M.music-settings.saved-volume M.music-settings.volume)
+     (set sfx-volume-changed true))
 
-        (set volume-changed true)))
-  (when volume-changed
+   ;; Volume up
+   (and (Keyboard.is_key_pressed KeyboardKey.Q) (> M.music-settings.since-last-change 0.2))
+   (do
+     (set M.music-settings.volume (lume.clamp (- M.music-settings.volume 10) 0 100))
+     (set M.music-settings.saved-volume M.music-settings.volume)
+
+     (set volume-changed true))
+   ;; Volume down
+   (and (Keyboard.is_key_pressed KeyboardKey.E) (> M.music-settings.since-last-change 0.2))
+   (do
+     (set M.music-settings.volume (lume.clamp (+ M.music-settings.volume 10) 0 100))
+     (set M.music-settings.saved-volume M.music-settings.volume)
+
+     (set volume-changed true)))
+
+  (when (or volume-changed sfx-volume-changed)
     (set M.music-settings.since-last-mute 0)
     (set M.music-settings.since-last-change 0)
 
-    (set M.music.volume M.music-settings.volume)
+    (if
+     volume-changed
+     (set M.music.volume M.music-settings.volume)
+
+     sfx-volume-changed
+     (do
+       (each [_ effect (pairs M.sound-effects)]
+         (tset effect :volume M.music-settings.sfx-volume))
+       ;; Play an example
+       (M.sound-effects.hit:play)))
 
     ;; Actually defined in terminal.lua as global..
-    (show_info_message (lume.format "Volume {1}%" [M.music-settings.volume])
-                       {:font_size 48 :font_color (Color.new 255 255 255 0)})))
+    (show_info_message
+     (if
+      volume-changed
+      (lume.format "Volume {1}%" [M.music-settings.volume])
+
+      sfx-volume-changed
+      (lume.format "SFX volume {1}%" [M.music-settings.sfx-volume]))
+     {:font_size 48 :font_color (Color.new 255 255 255 0)})))
 
 
 (local MenuSystem (class "MenuSystem" System))

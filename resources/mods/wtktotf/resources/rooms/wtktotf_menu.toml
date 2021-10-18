@@ -56,7 +56,8 @@ kind = "text"
 text = { text = """Z to jump
 X to hit enemies with your guitar
 M to mute/unmute the music
-Q/E to reduce/increase volume
+Q/E to reduce/increase volume,
+     hold Shift to change SFX volume
 F1 to make the window smaller/bigger
 
 Z to start!""", font_size = 48 }
