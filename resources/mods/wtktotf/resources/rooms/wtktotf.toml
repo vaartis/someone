@@ -119,8 +119,8 @@ tags = [ "ScoreText" ]
 
 [entities.score.drawable]
 kind = "text"
-text = { text = "0 meters", font_size = 32 }
+text = { text = "0 meters", font_size = 48 }
 z = 5
 
 [entities.score.transformable]
-position = [ 0, 0 ]
+position = [ 20, 10 ]
