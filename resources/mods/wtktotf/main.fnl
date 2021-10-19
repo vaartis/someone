@@ -195,10 +195,13 @@
       ;; When there are no enemies/obstacles, spawn one
       (when (and (not enemy-ent) (not enemy-ent-hit) (not obstacle-ent))
         (math.randomseed (os.time))
-        (let [entities (util.entities_mod)
-              possible-spawners (lume.randomchoice [ possible-enemies possible-obstacles ])
-              {: name : entity} (lume.randomchoice possible-spawners)]
-          (entities.instantiate_entity name entity))))))
+
+        ;; 50% chance to not spawn anything this frame
+        (when (< (lume.random) 0.5)
+          (let [entities (util.entities_mod)
+                possible-spawners (lume.randomchoice [ possible-enemies possible-obstacles ])
+                {: name : entity} (lume.randomchoice possible-spawners)]
+            (entities.instantiate_entity name entity)))))))
 
 (fn when-lost [collision]
   (let [player-ent collision.other
