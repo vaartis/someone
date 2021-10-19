@@ -166,7 +166,7 @@
          :name "obstacle2"
          :entity {
                   :prefab "obstacle2"
-                  :transformable { :position [ 1280 756 ] } } }])
+                  :transformable { :position [ 1280 757 ] } } }])
 
 (local possible-enemies
        [
