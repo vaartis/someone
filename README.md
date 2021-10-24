@@ -6,3 +6,5 @@
 The code is distributed under the [GNU GPL 3](LICENSE) license, the assets are distributed under the [CC-BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/) license.
 
 For modding documentation refer to [this file](resources/mods/modding.org).
+
+This branch is for [WtKTotF](https://vaartis.itch.io/wtktotf/), the actual jam code is in [the mods directory](resources/mods/wtktotf).
