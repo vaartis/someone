@@ -3,6 +3,7 @@
 #include <SFML/Audio/Sound.hpp>
 #include <SFML/Audio/SoundBuffer.hpp>
 
+#include <numeric>
 #include "sol/sol.hpp"
 #include <fmt/format.h>
 

@@ -1,6 +1,7 @@
 #include "imgui.h"
 #include "misc/cpp/imgui_stdlib.h"
 
+#include <numeric>
 #include <sol/sol.hpp>
 
 #include "usertypes.hpp"

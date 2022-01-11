@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/Window/Event.hpp>
 
+#include <numeric>
 #include "sol/sol.hpp"
 #include <fmt/format.h>
 
