@@ -8,6 +8,10 @@
 #include "usertypes.hpp"
 #include "sound.hpp"
 
+#ifdef SOMEONE_APPLE
+#include "keyboard.hpp"
+#endif
+
 // Custom to_string implementations for lua usage
 
 namespace sf {
@@ -241,12 +245,16 @@ void register_sfml_usertypes(sol::state &lua, StaticFonts &fonts) {
     auto keyboard_type = lua.new_usertype<sf::Keyboard>(
         "Keyboard",
         "is_key_pressed", [&](sf::Keyboard::Key key) {
+#ifdef SOMEONE_APPLE
+            return someone::KeypressTracker::is_key_pressed(key);
+#else
             // Because SFML doesn't track if the window is focused or not,
             // this needs to be done manually. Obviously when the window is not focused,
             // no keys should be registered as pressed
             return lua["GLOBAL"]["window"].get<sf::RenderWindow>().hasFocus()
                 ? sf::Keyboard::isKeyPressed(key)
                 : false;
+#endif
         }
     );
 
@@ -260,7 +268,12 @@ void register_sfml_usertypes(sol::state &lua, StaticFonts &fonts) {
         "S", sf::Keyboard::S,
         "L", sf::Keyboard::L,
         "Z", sf::Keyboard::Z,
+        "X", sf::Keyboard::X,
+        "R", sf::Keyboard::R,
+        "M", sf::Keyboard::M,
+        "Q", sf::Keyboard::Q,
         "LControl", sf::Keyboard::LControl,
+        "LShift", sf::Keyboard::LShift,
         "Return", sf::Keyboard::Return,
         "Backspace", sf::Keyboard::Backspace
     );

@@ -69,6 +69,7 @@ else()
 
   if(APPLE)
     target_link_options(someone_lib PUBLIC -Wl,-export_dynamic)
+    target_compile_definitions(someone_lib PUBLIC SOMEONE_APPLE)
   else()
     target_link_options(someone_lib PUBLIC -Wl,-E)
   endif()
@@ -295,9 +296,14 @@ install_rocks(
   "middleclass;middleclass-4.1.2-0.rockspec;middleclass.lua"
 )
 
+file(GLOB_RECURSE LUA_SRC_FILES
+  LIST_DIRECTORIES FALSE
+  RELATIVE "${PROJECT_SOURCE_DIR}"
+  CONFIGURE_DEPENDS
+  "${PROJECT_SOURCE_DIR}/src/lua/*")
 add_custom_command(
   OUTPUT "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/walking.lua"
-  DEPENDS ${LAST_ROCK_TARGET} "${PROJECT_SOURCE_DIR}/src/lua/**"
+  DEPENDS ${LAST_ROCK_TARGET} ${LUA_SRC_FILES}
   COMMAND ${LUAROCKS_COMMAND} make someone-0.1-0.rockspec
   WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/src/lua"
 )

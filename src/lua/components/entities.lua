@@ -3,6 +3,7 @@ local lume = require("lume")
 
 local shared_components = require("components.shared")
 local collider_components = require("components.collider")
+local assets = require("components.assets")
 
 local M = {}
 
@@ -47,7 +48,8 @@ local function load_prefab(prefab_name_or_conf, base_data)
       prefab_name = prefab_name_or_conf
    end
 
-   local prefab_data, prefab_err = TOML.parse("resources/rooms/prefabs/" .. tostring(prefab_name) .. ".toml")
+
+   local prefab_data, prefab_err = TOML.parse(assets.resources_root() .. "/rooms/prefabs/" .. tostring(prefab_name) .. ".toml")
    if not prefab_data then
       error("Error loading prefab:\n" .. prefab_err)
    end
@@ -60,7 +62,7 @@ local function load_prefab(prefab_name_or_conf, base_data)
    local prefab_metatable = getmetatable(prefab_data)
    prefab_metatable.toml_location.__node_file = nil
    prefab_metatable.toml_location.__node_path = nil
-   prefab_metatable.toml_location.__node_prefab_file = "resources/rooms/prefabs/" .. tostring(prefab_name) .. ".toml"
+   prefab_metatable.toml_location.__node_prefab_file = assets.resources_root() .. "/rooms/prefabs/" .. tostring(prefab_name) .. ".toml"
 
    local new_metatable = prefab_metatable
    if getmetatable(base_data) then
@@ -147,6 +149,7 @@ end
 function M.instantiate_entity(entity_name, entity, parent, add_to_world)
    local new_ent = Entity(parent)
 
+   local original_entity_toml = entity
    if entity.prefab then
       entity = load_prefab(entity.prefab, entity)
    end
@@ -168,7 +171,10 @@ function M.instantiate_entity(entity_name, entity, parent, add_to_world)
    for _, comp_data in ipairs(entity_components) do
       M.run_comp_processor(new_ent, comp_data, entity_name, parent)
    end
-
+   -- TODO: somehow make the proper. Animations need to update the rect once just before the entity is actually drawn
+   if new_ent:has("Animation") then
+      shared_components.components.animation.class._update_rect(new_ent)
+   end
 
    if add_to_world == nil or add_to_world then
       util.rooms_mod().engine:addEntity(new_ent)
@@ -185,6 +191,7 @@ function M.instantiate_entity(entity_name, entity, parent, add_to_world)
    if getmetatable(entity) then
       new_ent.__toml_location = getmetatable(entity)["toml_location"]
    end
+   new_ent.__original_toml = original_entity_toml
 
    return new_ent
 end

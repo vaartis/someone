@@ -25,6 +25,10 @@
 #include "lua_testing.hpp"
 #endif
 
+#ifdef SOMEONE_APPLE
+#include "keyboard.hpp"
+#endif
+
 enum class CurrentState {
     Terminal,
     Walking
@@ -187,6 +191,11 @@ int main(int argc, char **argv) {
 
         sf::Event event;
         while (window.pollEvent(event)) {
+#ifdef SOMEONE_APPLE
+            // Track keyboard manually
+            someone::KeypressTracker::processEvent(event);
+#endif
+
             switch (event.type) {
             case sf::Event::Closed:
                 window.close();

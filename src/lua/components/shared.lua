@@ -16,8 +16,8 @@ M.components = {
    animation = {
       class = Component.create(
          "Animation",
-         {"frames", "current_frame", "playable", "playing", "time_since_frame_change"},
-         { time_since_frame_change = 0, playable = true, playing = false, current_frame = 1 }
+         {"frames", "current_frame", "playable", "playing", "time_since_frame_change", "loop"},
+         { time_since_frame_change = 0, playable = true, playing = false, current_frame = 1, loop = true }
       )
    },
    slices = {
@@ -142,27 +142,27 @@ function AnimationSystem:update(dt)
 
             if anim_comp.current_frame + 1 <= #anim_comp.frames then
                anim_comp.current_frame = anim_comp.current_frame + 1
-            else
+            elseif anim_comp.loop then
                anim_comp.current_frame = 1
+            else
+               anim_comp.playing = false
             end
          end
-      elseif anim_comp.playable and not anim_comp.playing then
+      elseif anim_comp.playable and not anim_comp.playing and anim_comp.loop then
          anim_comp.current_frame = 1
       end
 
-      local next_frame = anim_comp.frames[anim_comp.current_frame]
-      if not next_frame then
-         local name = entity:get("Name").name
-         error(lume.format("Can't find animation frame {1} for entity {2}", {anim_comp.current_frame, name}))
-      end
-
-      entity:get("Drawable").drawable.texture_rect = next_frame.rect
+      M.components.animation.class._update_rect(entity)
    end
 end
 
 function M.load_sheet_data(dir_path)
    local dir_basename = path.basename(path.remove_dir_end(dir_path))
    local json_path = tostring(path.join(dir_path, dir_basename)) .. ".json"
+
+   if _G.mod then
+      json_path = lume.format("resources/mods/{1}/{2}", { getmetatable(_G.mod).name, json_path })
+   end
 
    local file = io.open(json_path, "r")
    local sprite_json = json.decode(file:read("*all"))
@@ -176,12 +176,25 @@ function M.load_sheet_data(dir_path)
       -- For this to work, the format in sprite export has to be set to {frame1}
       local frame_num = tonumber(fname)
 
+      local tags
+      if sprite_json.meta.frameTags then
+         for _, tag in ipairs(sprite_json.meta.frameTags) do
+            if frame_num >= tag["from"] and frame_num <= tag["to"] then
+               if not tags then
+                  tags = {}
+               end
+               table.insert(tags, tag.name)
+            end
+         end
+      end
+
       animation_frames[frame_num] = {
          -- Translate duration to seconds
          duration = frame["duration"] / 1000,
          rect = IntRect.new(
             frame_f["x"], frame_f["y"], frame_f["w"], frame_f["h"]
-         )
+         ),
+         tags = tags
       }
    end
 
@@ -265,12 +278,25 @@ function M.components.drawable.process_component(new_ent, comp, entity_name)
    end
 end
 
+function M.components.animation.class._update_rect(entity)
+   local anim_comp = entity:get("Animation")
+
+   local next_frame = anim_comp.frames[anim_comp.current_frame]
+   if not next_frame then
+      local name = entity:get("Name").name
+      error(lume.format("Can't find animation frame {1} for entity {2}", {anim_comp.current_frame, name}))
+   end
+
+   entity:get("Drawable").drawable.texture_rect = next_frame.rect
+end
+
 function M.components.animation.process_component(new_ent, comp, entity_name)
    local sheet_frames = M.load_sheet_data(comp.sheet)
 
    local anim = M.components.animation.class(sheet_frames)
    if type(comp.playable) == "boolean" then anim.playable = comp.playable end
    if type(comp.playing) == "boolean" then anim.playing = comp.playing end
+   if type(comp.loop) == "boolean" then anim.loop = comp.loop end
    anim.current_frame = comp.starting_frame or 1
 
    new_ent:add(anim)

@@ -75,10 +75,26 @@ function M.ModWrapperLine:initialize(data)
                into[name] = {}
                traverse_into_namespace(value, into[name])
             else
-               loaded, err = loadfile(lume.format("resources/mods/{1}/{2}", {data.name, value}))
-               if err then error(err) end
+               local mod_filename = lume.format("resources/mods/{1}/{2}", {data.name, value})
+               if path.extension(mod_filename) == ".fnl" then
+                  local fennel = require("fennel")
+                  debug.traceback = fennel.traceback
 
-               into[name] = loaded()
+                  loaded = fennel.dofile(mod_filename)
+               else
+                  loaded, err = loadfile(mod_filename)
+               end
+
+               if not loaded then
+                  error(err)
+               end
+
+               if type("loaded") == "function" then
+                  into[name] = loaded()
+               else
+                  into[name] = loaded
+               end
+
                setmetatable(into[name], {__module_name = "mod." .. name})
                -- Update all_modules with mod lua files
                table.insert(

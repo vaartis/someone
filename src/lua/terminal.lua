@@ -14,21 +14,28 @@ local current_environment_name, current_environment_texture, current_environment
 local M = {}
 
 local info_message_coro
-function show_info_message(message)
+function show_info_message(message, params)
    if info_message_coro then
       coroutines.abandon_coroutine(info_message_coro)
       info_message_coro = nil
    end
 
+   local font_size = StaticFonts.font_size
+   local font_color = Color.new(0, 0, 0, 0)
+   if params then
+      if params.font_size then font_size = params.font_size end
+      if params.font_color then font_color = params.font_color end
+   end
+
    info_message_coro =
       coroutines.create_coroutine(
          function()
-            local current_color = Color.new(0, 0, 0, 0)
-            local text = Text.new(message, StaticFonts.main_font, StaticFonts.font_size)
+            local current_color = font_color
+            local text = Text.new(message, StaticFonts.main_font, font_size)
 
             local win_size = GLOBAL.drawing_target.size
             local text_size = text.global_bounds
-            local text_pos = Vector2f.new(win_size.x - 10 - text_size.width, win_size.y - 10 - text_size.height)
+            local text_pos = Vector2f.new(win_size.x - 10 - text_size.width, win_size.y - 20 - text_size.height)
             text.position = text_pos
 
             -- Show the text

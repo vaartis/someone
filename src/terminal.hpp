@@ -40,7 +40,7 @@ public:
     }
 
     void load_mod(std::string &name) {
-        sol::table mod_line = load_mod_f(name);
+        sol::object mod_line = call_or_throw(load_mod_f, name);
 
         set_first_line(mod_line);
     }
