@@ -474,7 +474,7 @@ local function room_debug_menu()
 end
 
 function rooms_debug_menu()
-   util.debug_menu_process_state_variable_node("State variables", WalkingModule.state_variables)
+   util.debug_menu_process_state_variable_node("State variables", TerminalModule.state_variables.walking)
 
    ImGui.Separator()
 

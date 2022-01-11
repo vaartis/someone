@@ -73,8 +73,8 @@
      I'm < if state_variables.ok then > ok < else > not ok < end >
      #+END_SRC
      The template lines have a limited environment available to them: they're allowed use everything in ~TerminalModule~ without qualification
-     (that is, you must not use the name TerminalModule, but instead just use the name of the needed thing directly), ~walking_state_variables~,
-     which is a reference to ~WalkingModule.walking_state_variables~ and ~lume~ which is [[https://github.com/rxi/lume][a lua library of helpful functions]].
+     (that is, you must not use the name TerminalModule, but instead just use the name of the needed thing directly)
+     and ~lume~ which is [[https://github.com/rxi/lume][a lua library of helpful functions]].
    - ~wait~ :: A boolean value (~true/false~) specifying whether the execution should pause and wait for player input before outputting the next line.
      This is only useful with an ~Output line~. Use this when there are many non-interactive lines and you want to give the player time to read
      them before continuing.

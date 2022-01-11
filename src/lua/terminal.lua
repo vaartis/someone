@@ -84,7 +84,6 @@ local function save_game(first_line, last_line)
    local saved_data = {
       lines = { first_line = first_line._name, last_line = last_line._name },
       variables = M.state_variables,
-      walking_variables = WalkingModule.state_variables,
       environment = { name = current_environment_name },
    }
    for _, line in pairs(lines_to_save) do
@@ -148,10 +147,6 @@ local function load_game()
       first_line_on_screen = first_line
 
       M.state_variables = util.deep_merge(M.state_variables, data["variables"])
-
-      if data["walking_variables"] then
-         WalkingModule.state_variables = util.deep_merge(WalkingModule.state_variables, data["walking_variables"])
-      end
 
       if data.environment then
          M.set_environment_image(data.environment.name)
@@ -536,6 +531,9 @@ M.state_variables = {
          found_on = nil
       },
    },
+   day4 = {
+      currently_talking_with_maj = false
+   },
    -- Instances that were decrypted
    decrypted_instances = {},
    -- Explored instances
@@ -550,7 +548,10 @@ M.state_variables = {
          instances = {
             hunger = false,
             forest = false
-         }
+         },
+         -- Day 4
+         found_food = false,
+         way_up_checked = false
       },
       maj = {
          tea = false,
@@ -562,7 +563,30 @@ M.state_variables = {
          instances = false
       }
    },
-   talking_topics = {}
+   talking_topics = {},
+   walking = {
+      first_puzzle = {
+         first = "wrong",
+         second = "wrong",
+         third = "wrong",
+         solved = false
+      },
+      first_puzzle_lamp = {
+         taken = false,
+         put = false,
+      },
+      dial_puzzle = {
+         solved = false,
+         music_played = false,
+         combination = {}
+      },
+      food_room = {
+         peach_can_taken = false
+      },
+      status_room = {
+         way_up_checked = false
+      }
+   }
 }
 
 function M.talking_topic_known(topic)

@@ -194,7 +194,7 @@ end
 --- returning the table to place the variable into and the name at which
 --- the variable should be assigned
 local function state_variable_ensure_path_up_to(variable_path)
-   local containing_table = WalkingModule.state_variables
+   local containing_table = TerminalModule.state_variables.walking
    for n, var_name in ipairs(variable_path) do
       if n == #variable_path then
          -- If the current value is the last one, return the containing table

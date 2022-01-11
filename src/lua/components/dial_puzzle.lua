@@ -12,9 +12,8 @@ local position_rotations = {
 local M = {}
 
 local function ensure_state_init()
-   if not WalkingModule.state_variables.dial_puzzle then
-      local puzzle_state = { solved = false, music_played = false, combination = {} }
-
+   local puzzle_state = TerminalModule.state_variables.walking.dial_puzzle
+   if #puzzle_state.combination == 0 then
       -- Update the random seed so that the numbers are actually random
       math.randomseed(os.time())
 
@@ -35,8 +34,6 @@ local function ensure_state_init()
             end
          until not should_regenerate
       end
-
-      WalkingModule.state_variables.dial_puzzle = puzzle_state
    end
 end
 
@@ -53,14 +50,14 @@ M.activatable_callbacks = {}
 function M.activatable_callbacks.puzzle_solved()
    ensure_state_init()
 
-   return WalkingModule.state_variables.dial_puzzle.solved
+   return TerminalModule.state_variables.walking.dial_puzzle.solved
 end
 
 function M.activatable_callbacks.solved_music()
    ensure_state_init()
 
-   if WalkingModule.state_variables.dial_puzzle then
-      local state = WalkingModule.state_variables.dial_puzzle
+   if TerminalModule.state_variables.walking.dial_puzzle then
+      local state = TerminalModule.state_variables.walking.dial_puzzle
       if M.activatable_callbacks.puzzle_solved() and not state.music_played then
          state.music_played = true
 
@@ -104,7 +101,7 @@ function DialHandleSystem:update(dt)
       end
 
       local rotation_change = 0
-      if not (WalkingModule.state_variables.dial_puzzle.solved) then
+      if not (TerminalModule.state_variables.walking.dial_puzzle.solved) then
          if Keyboard.is_key_pressed(KeyboardKey.D) then
             rotation_change = 1
          elseif Keyboard.is_key_pressed(KeyboardKey.A) then
@@ -130,7 +127,7 @@ function DialHandleSystem:update(dt)
             rotation_click_sound = assets.create_sound_from_asset("rotation_click")
          end
 
-         local combination = WalkingModule.state_variables.dial_puzzle.combination
+         local combination = TerminalModule.state_variables.walking.dial_puzzle.combination
          if position_num == combination[combination_n] then
             -- When approached from a different side, count as the correct value
             if rotation_change ~= last_side then
@@ -143,7 +140,7 @@ function DialHandleSystem:update(dt)
                   combination_n = combination_n + 1
                else
                   -- Otherwise, the puzzle is solved
-                  WalkingModule.state_variables.dial_puzzle.solved = true
+                  TerminalModule.state_variables.walking.dial_puzzle.solved = true
                end
             else
                -- If approached from the same side, reset

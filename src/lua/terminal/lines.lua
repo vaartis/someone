@@ -27,7 +27,6 @@ local function insert_variables(name, str)
       render_env = lume.merge(
          TerminalModule,
          {
-            walking_state_variables = WalkingModule.state_variables,
             lume = lume,
          }
       )
@@ -532,6 +531,9 @@ end
 -- A function to create lines from their name and the native line data
 function M.make_line(name, line_source)
    local line = line_source[name]
+   if not line then
+      error("Could not find line " .. name)
+   end
 
    local tp = line.__type.name
 

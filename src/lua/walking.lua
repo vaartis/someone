@@ -5,8 +5,6 @@ local rooms = require("components.rooms")
 local interaction_components = require("components.interaction")
 local debug_components = require("components.debug")
 
-local state_variables = {}
-
 -- Load the room
 rooms.load_room("day1/computer_room")
 
@@ -28,7 +26,6 @@ return {
    add_event = interaction_components.add_event,
 
    update = update, draw = draw, draw_overlay = draw_overlay,
-   state_variables = state_variables,
    clear_event_store = interaction_components.clear_event_store,
 
    debug_menu = debug_components.debug_menu
