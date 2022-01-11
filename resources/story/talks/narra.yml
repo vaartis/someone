@@ -4,6 +4,8 @@ config:
       color: [211, 0, 0]
     player:
       color: [255, 255, 255]
+    maj:
+      color: [135, 206, 235]
     description:
       color: [185, 118, 252]
   dialogue_between: [player, narra]
@@ -18,9 +20,7 @@ hub:
   responses:
   - text: I found a lamp and put it on my table.
     condition: |-
-      -- Cast to boolean
-      return not not (WalkingModule.state_variables.first_puzzle_lamp and WalkingModule.state_variables.first_puzzle_lamp.put and
-        not TerminalModule.state_variables.talks.narra.found_lamp)
+      return TerminalModule.state_variables.walking.first_puzzle_lamp.put and not TerminalModule.state_variables.talks.narra.found_lamp
     next: lamp-1
   - text: >-
         < if not lume.any(state_variables.talks.narra.instances) then >
@@ -33,13 +33,21 @@ hub:
         -- If not all instances are already talked about
         return lume.any(TerminalModule.state_variables.explored_instances) and not lume.all(TerminalModule.state_variables.talks.narra.instances)
     next: instances-hub-1
+  - text: I found some food.
+    condition: |
+      return TerminalModule.state_variables.walking.food_room.peach_can_taken and not TerminalModule.state_variables.talks.narra.found_food
+    next: some-food-1
+  - text: I saw a ladder going up somewhere, but the hatch was closed.
+    condition: |
+      return TerminalModule.state_variables.walking.status_room.way_up_checked and not TerminalModule.state_variables.talks.narra.way_up_checked
+    next: way-up-1
   - text: Nothing.
     next: return
 
 lamp-1:
   char: narra
   text: >-
-      A lamp? That's good. Gonna make your life a little brighter, haha.
+      A lamp? That's good. Gonna make your life a little brighter.
 
 lamp-2:
   script_after: |
@@ -72,6 +80,124 @@ a-bit-brighter-2:
   - text: >-
       Yeah. I'm not very strong..
     next: talk-about
+
+some-food-1:
+  char: narra
+  text: >-
+    What, you haven't eaten anything in.. 3 days now?
+
+some-food-2:
+  responses:
+  - text: It seems that the time doesn't work the same way for me as it does for you. It hasn't been 3 days for me.
+
+some-food-3:
+  custom:
+    terminal.select_line.SelectLine:
+    - condition: return TerminalModule.state_variables.day4.currently_talking_with_maj
+      next: !line-name some-food-maj-4
+    - next: !line-name some-food-4
+
+some-food-maj-4:
+  char: maj
+  text: >-
+    So it's faster here.. I guess that must have something to do with us being here in the computer.
+  next: some-food-4
+
+some-food-4:
+  char: narra
+  text: >-
+    That's weird.. I won't pretend I understand how this is supposed to work, but I guess it's good that you haven't actually been starving for 3 days.
+
+some-food-5:
+  responses:
+  - text: >-      
+      Yeah, I'm actually eating right now. It's a can of peaches, there's actually a fair amount of different canned foods here.
+      Tastes alright, probably not as good as fresh ones, though.
+
+some-food-6:
+  text: >-
+    So, where'd you get them? I had the impresssion there weren't too many places to store food.
+
+some-food-7:
+  responses:
+  - text: >-
+      There were a few new rooms I found today, one of them was just full of canned foods. A big room with a lot of shelves filled with
+      cans. Noticably, a fair amount of shelves was empty.
+
+some-food-8:
+  text: Must've been whoever was living here before..
+  script: TerminalModule.state_variables.talks.narra.found_food = true
+  next: talk-about
+
+way-up-1:
+  char: narra
+  script: TerminalModule.state_variables.talks.narra.way_up_checked = true
+  text: So, any idea how high it goes?
+
+way-up-2:
+  responses:
+  - text: >-
+      The room's ceiling wasn't too high, but who knows how high it actually goes. On the way there I passed over
+      a bridge and the sky above was visible, it seemed pretty far away. And below, well.. it'd be a long fall.
+
+way-up-3:
+  responses:
+  - text: Seems like I'm pretty far underground.
+  - text: Seems like I'm in a very tall building of sorts.
+
+way-up-3:
+  char: narra
+  text: Hmm.. Anything else you noticed on the way there?
+
+way-up-4:
+  responses:
+  - text: It was snowing outside. And when I was passing over the bridge, the air felt a lot colder.
+
+way-up-5:
+  text: >-
+    Might be a clue on your location, if you know anything about your outside world at least.
+
+way-up-6:
+  responses:
+  - text: Maybe I'm somewhere in the cold mountains.
+    next: snow-1
+  - text: Might just be winter.
+    next: snow-1
+  - text: Could be that it's not even snow, I couldn't see it up close.
+    next: not-snow-1
+
+not-snow-1:  
+  custom:
+    terminal.select_line.SelectLine:
+    - condition: return TerminalModule.state_variables.day4.currently_talking_with_maj
+      next: !line-name not-snow-maj-1
+    - next: !line-name not-snow-narra-1
+
+not-snow-maj-1:
+  char: maj
+  text: That'd be stange.. You said it's cold, so it's probably snow. Well, at least that would make sense.
+
+not-snow-maj-2:
+  char: player
+  responses:
+  - text: Right.
+    next: talk-about
+  - text: I'll get to see if you're right at some point, I hope.
+    next: talk-about
+
+not-snow-narra-1:
+  char: narra
+  text: Huh, didn't even think about that.. May be. Guess you'll have to check sometime.
+  next: talk-about
+
+snow-1:
+  char: narra
+  text: Hopefully you'll get to know about that at some point.
+
+snow-2:
+  char: player
+  text: Yeah.
+  next: talk-about
 
 return:
   char: player

@@ -1,0 +1,44 @@
+config:
+  chars:
+    player:
+      color: [255, 255, 255]
+    description:
+      color: [185, 118, 252]
+    narra:
+      color: [211, 0, 0]
+    maj:
+      color: [135, 206, 235]
+
+1:
+  char: description
+  text: >-
+    Once again, the morning comes around and you find yourself in bed alone, Narra obviously getting up earlier.
+
+2:
+  char: description
+  text: >-
+    When you get up and go to the kitchen, to your surprise you don't find Narra there, nor in the living room.
+
+3:
+  char: description
+  text: >-
+    After you come back to the kitchen, you notice, looking out of the window, that she's outside talking with Maj.
+    You go outside to join them, Narra waves at you, as she notices you approaching.
+
+4:
+  char: narra
+  text: >-
+    Hey, <= state_variables.input_variables.p >. I'll spare you the "slept well?" joke this time, so let's her out what you got tonight.
+
+5:
+  char: player
+  script: TerminalModule.state_variables.day4.currently_talking_with_maj = true
+  custom:
+    terminal.save_and_return_lines.SaveLine:
+      next: !line-name talks/narra/talk-about
+      return_to: !line-name 6
+
+6:
+  char: narra
+  script: TerminalModule.state_variables.day4.currently_talking_with_maj = false
+  text: Continue here
