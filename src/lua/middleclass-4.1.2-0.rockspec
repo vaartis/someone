@@ -1,7 +1,8 @@
 package = "middleclass"
 version = "4.1.2-0"
 source = {
-  url = "git://github.com/vaartis/middleclass"
+  url = "git+https://github.com/vaartis/middleclass",
+  branch = "master"
 }
 description = {
    summary = "A simple OOP library for Lua",

@@ -3,11 +3,9 @@ version = "0.1-0"
 
 dependencies = {
    "inspect==3.1.1",
-   "lume==2.3.0",
    "luafilesystem==1.8.0",
    "lua-path==0.3.1",
    "lunajson==1.2.2",
-   "bump==3.1.7",
    "liluat==1.2.0"
 }
 

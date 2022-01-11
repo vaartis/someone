@@ -289,6 +289,8 @@ function(install_rocks)
 endfunction()
 
 install_rocks(
+  "lume;lume-2.3.0-0.rockspec;lume.lua"
+  "bump;bump-3.1.7-1.rockspec;bump.lua"
   "lovetoys;lovetoys-0.4.0-2.rockspec;lovetoys"
   "middleclass;middleclass-4.1.2-0.rockspec;middleclass.lua"
 )
