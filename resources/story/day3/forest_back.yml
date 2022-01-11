@@ -6,9 +6,9 @@ config:
       color: [185, 118, 252]
     narra:
       color: [211, 0, 0]
-    kipi:
+    kiki:
       color: [0, 121, 100]
-  dialogue_between: [narra, kipi]
+  dialogue_between: [narra, kiki]
 
 1:
   char: description
@@ -59,7 +59,7 @@ config:
   - text: It's true. Though things out here are not very impressive.
 
 10:
-  char: kipi
+  char: kiki
   text: >-
     Not very impressive?
 
@@ -71,7 +71,7 @@ config:
       that have appeared but they're not much different from this one.
 
 12:
-  char: kipi
+  char: kiki
   wait: true
   text: >-
     That does sounds like no good.. And Narra said you can help us?
@@ -114,7 +114,7 @@ config:
 
 17:
   wait: true
-  char: kipi
+  char: kiki
   text: What? Other worlds?
 
 18:
@@ -142,8 +142,8 @@ config:
   - text: Sorry, I can't do anything to help right now.
 
 22:
-  char: kipi
-  script_after: TerminalModule.state_variables.talks.kipi.instances = true
+  char: kiki
+  script_after: TerminalModule.state_variables.talks.kiki.instances = true
   text: >-
     I see.. I need some time to think about all of this..
 
@@ -153,7 +153,7 @@ config:
   text: For a few minutes, you walk in silence.
 
 24:
-  char: kipi
+  char: kiki
   wait: true
   text: So.. Maj is at home, right?
 
@@ -178,6 +178,6 @@ config:
   char: description
   wait: true
   text: >-
-    The rest of they way is spent in silence. Kipi's face shows she is thinking about something. When you reach the village,
-    all of you head to Maj's house. Kipi knocks on the door.
+    The rest of they way is spent in silence. Kiki's face shows she is thinking about something. When you reach the village,
+    all of you head to Maj's house. Kiki knocks on the door.
   next: day3/evening/1

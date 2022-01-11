@@ -6,12 +6,12 @@ config:
       color: [185, 118, 252]
     narra:
       color: [211, 0, 0]
-    kipi:
+    kiki:
       color: [0, 121, 100]
     maj:
       color: [135,206,235]
 
-  dialogue_between: [kipi, maj]
+  dialogue_between: [kiki, maj]
 
 1:
   char: maj
@@ -21,16 +21,16 @@ config:
   char: description
   wait: true
   text: >-
-      You all come in, unsurprisingly finding Maj in the same spot as yesterday. He is visibly surprised when he sees Kipi.
+      You all come in, unsurprisingly finding Maj in the same spot as yesterday. He is visibly surprised when he sees Kiki.
       Everyone sits at the table with Maj, as he closes his laptop.
 
 3:
   char: maj
   wait: true
-  text: "hello everyone!! kipi, great to see you! <= state_variables.input_variables.p > did something and helped you too?"
+  text: "hello everyone!! kiki, great to see you! <= state_variables.input_variables.p > did something and helped you too?"
 
 4:
-  char: kipi
+  char: kiki
   wait: true
   text: >-
     I'm inclined to believe that's what happened. That's what Narra told me and, well.. that seems to be the case indeed. I woke up in the
@@ -40,11 +40,11 @@ config:
   char: narra
   wait: true
   text: >-
-    We went searching into the forest and.. well, we were lucky, I guess. Though Kipi would've gone home by herself already, probably.
+    We went searching into the forest and.. well, we were lucky, I guess. Though Kiki would've gone home by herself already, probably.
     We had some time to catch up on the way back. I told her the whole story.
 
 6:
-  char: kipi
+  char: kiki
   wait: true
   text: >-
     It's still hard to believe but I think I'm over it now.
@@ -121,7 +121,7 @@ config:
     most things didn't handle that well. i'm honestly surprised things didn't break down completely somehow.
 
 17:
-  char: kipi
+  char: kiki
   wait: true
   text: And there I was thinking computers were the most reliable thing ever.
 
@@ -179,7 +179,7 @@ tech-details-yes-2:
     next: 20
 
 20:
-  char: kipi
+  char: kiki
   text: >-
     While we're at it.. What were you guys doing when.. it happened? I think I kind of missed everything.. I remember the news about the
     walls appearing and then I just kinda went on with my day, then they said the walls are growing closer and that's when I began
@@ -192,7 +192,7 @@ tech-details-yes-2:
   - text: Oh, so that house with a bunch of plants is where you live?
 
 22:
-  char: kipi
+  char: kiki
   wait: true
   text: Yeah. That's the one. I see you took some time to look around.
 
@@ -212,7 +212,7 @@ tech-details-yes-2:
     to experience again, and I wouldn't wish that for anyone.
 
 25:
-  char: kipi
+  char: kiki
   wait: true
   text: >-
     Your experience certainly differs a lot from ours..
@@ -224,7 +224,7 @@ tech-details-yes-2:
     Indeed it does. On that note, it's getting late again.. I hope you guys wouldn't mind we go home now?
 
 27:
-  char: kipi
+  char: kiki
   wait: true
   text: >-
     Not at all, I think getting a bit of sleep wouldn't hurt at all actually. With all these things to process, I need some rest.
@@ -243,7 +243,7 @@ tech-details-yes-2:
   char: description
   wait: true
   text: >-
-      You, Narra and Kipi all leave the house. Kipi wishes you both goodnight again and you go home.
+      You, Narra and Kiki all leave the house. Kiki wishes you both goodnight again and you go home.
       After a bath, Narra gets into bed, and so do you.
 
 31:

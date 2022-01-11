@@ -6,7 +6,7 @@ config:
       color: [185, 118, 252]
     narra:
       color: [211, 0, 0]
-    kipi:
+    kiki:
       color: [0, 121, 100]
   dialogue_between: [player, narra]
 
@@ -308,7 +308,7 @@ found-3:
     Narra starts running, you follow her.
 
 found-4:
-  char: kipi
+  char: kiki
   text: Oh, you scared me!
 
 found-5:
@@ -318,19 +318,19 @@ found-5:
     As you both run closer, the person stands up.
 
 found-6:
-  char: kipi
+  char: kiki
   text: >-
     Well, Hello!
 
 found-7:
   char: narra
-  text: Hi Kipi!
+  text: Hi Kiki!
 
 found-8:
   char: description
   wait: true
   text: >-
-    Now that you are actually up close and she's standing up, you see that Kipi is about the same
+    Now that you are actually up close and she's standing up, you see that Kiki is about the same
     height as Narra, has long brown hair, and looks quite a bit older than Narra or Maj.
 
 found-9:
@@ -340,7 +340,7 @@ found-9:
     What are you doing out here?
 
 found-10:
-  char: kipi
+  char: kiki
   wait: true
   text: >-
     Everything disappeared, and then I woke up on that same old place where we all did, I'm sure you remember it. It
@@ -369,22 +369,22 @@ spot-sitting-2:
   text: Hey!
 
 spot-sitting-3:
-  char: kipi
+  char: kiki
   text: Huh?
 
 spot-sitting-4:
   char: narra
-  text: Kipi, are you ok?!
+  text: Kiki, are you ok?!
 
 spot-sitting-5:
   char: description
   wait: true
   text: >-
-    As you approach, you see Kipi is about the same height as Narra, has long brown hair, and looks quite a bit older
+    As you approach, you see Kiki is about the same height as Narra, has long brown hair, and looks quite a bit older
     than Narra or Maj.
 
 spot-sitting-6:
-  char: kipi
+  char: kiki
   wait: true
   text: >-
     I.. I just woke up here.. Everything went black and then.. I was here..
@@ -396,7 +396,7 @@ spot-sitting-7:
 
 spot-sitting-8:
   char: description
-  text: Narra gives Kipi a hand to get up.
+  text: Narra gives Kiki a hand to get up.
   script_after: TerminalModule.state_variables.day3.forest_search.found_on = "spot-sitting"
   wait: true
   next: spot-thanks
@@ -421,15 +421,15 @@ spot-lying-3:
     older than Narra or Maj, her eyes are closed. Narra drops on her knees and starts shaking her.
 
 spot-lying-4:
-  char: kipi
+  char: kiki
   text: I..
 
 spot-lying-5:
   char: narra
-  text: Kipi? Are you okay??
+  text: Kiki? Are you okay??
 
 spot-lying-6:
-  char: kipi
+  char: kiki
   text: What.. happened..
 
 spot-lying-7:
@@ -442,7 +442,7 @@ spot-lying-8:
   text: Can you remember anything?
 
 spot-lying-9:
-  char: kipi
+  char: kiki
   wait: true
   text: >-
     Everything went black, and the next thing I remember is you shaking me..
@@ -458,7 +458,7 @@ spot-lying-11:
   next: spot-thanks
 
 spot-thanks:
-  char: kipi
+  char: kiki
   text: Thank you.
   wait: true
   next: day3/forest_back/1

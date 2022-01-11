@@ -551,7 +551,7 @@ M.state_variables = {
          instances = false,
          visited_before = false
       },
-      kipi = {
+      kiki = {
          instances = false
       }
    },
