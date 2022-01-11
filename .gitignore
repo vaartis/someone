@@ -1,6 +1,6 @@
 /_build
 
 # Autocompletion data
-/.clangd
 /.ccls-cache
+/.cache
 /compile_commands.json
