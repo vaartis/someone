@@ -222,7 +222,7 @@ instances-hub-2:
           local lume = require("lume")
           return not lume.any(TerminalModule.state_variables.talks.narra.instances)
       next: !line-name another-me-1
-    - next: !line-name instance-hub-2
+    - next: !line-name instances-hub-3
 
 another-me-1:
   char: player
@@ -248,10 +248,14 @@ another-me-4:
 
 another-me-5:
   responses:
-  - text: We can certainly try to help.. I can talk to her, but it seems she can't remember any of it after I leave.
+  - text: >-
+      We can certainly try to help.. I can talk to her, but it seems she can't remember any of it after I leave. I found
+      how to get there from a note, maybe there are more notes like that one.
 
 another-me-6:
-  text: Can you tell me more about her?
+  text: >-
+    A note, you say.. and you think there are more? Well.. Look out for them.. I hope we'll be able to do something.. To keep them like that
+    is just cruel, they're just as much of a person as.. whoever did this. Can you tell me more about her?
   next: instances-hub-3
       
 instances-hub-3:
@@ -260,8 +264,13 @@ instances-hub-3:
   - text: >-
         In her version of the world, everyone was fighting for food.
     condition: |-
-        return TerminalModule.state_variables.explored_instances.hunger and not TerminalModule.state_variables.talks.narra.instances.hunger
+      return TerminalModule.state_variables.explored_instances.hunger and not TerminalModule.state_variables.talks.narra.instances.hunger
     next: instance-hunger-1
+  - text: >-
+      In her world, they couldn't invent new things like here.
+    condition: |-
+      return TerminalModule.state_variables.explored_instances.forest and not TerminalModule.state_variables.talks.narra.instances.forest
+    next: instance-forest-1
 
 instance-hunger-1:
   char: narra
@@ -282,19 +291,62 @@ instance-hunger-3:
 instance-hunger-4:
   responses:
   - text: >-
-      I learned how to get to that.. world.. from a note I found.. It said that things didn't work out well, just like "other things" didn't.
-      So there must be more than this one.. then.. and one of them is yours, the latest one. I would imagine it's the latest one at least,
-      since you were here when I woke up, and things seemed to be going well for you.
+      The note said that things didn't work out well, just like "other things" didn't. So there must be more than this one world.
+      And one of them is yours, the latest one. I would imagine it's the latest one at least, since you were here when
+      I woke up, and things seem to be going well for you.
 
 instance-hunger-5:
   text: >-
-    A note, you say.. and you think there are more? Well.. Look out for them.. I hope we'll be able to do something.. To keep them like that
-    is just cruel, they're just as much of a person as.. whoever did this.
+    Yeah, I'd say things are going pretty well, thanks to you.
 
 instance-hunger-6:
   script_after: |-
       TerminalModule.state_variables.talks.narra.instances.hunger = true
   responses:
   - text: >-
-      Hopefully we will. Surely there must be some reason behind this..
+      I'm trying my best, there isn't much else I can do.
+      Hopefully we can figure this situation out. Surely there must be some reason behind this..
     next: talk-about
+
+instance-forest-1:
+  char: narra
+  text: >-
+    You mean, like, people smashing things together to create new ones?
+
+instance-forest-2:
+  char: player
+  responses:
+  - text: >-
+      I think that's what they meant at least.. the note said "they won't get anywhere without this", referring to the fact
+      that you'd probably need a house and a table, and something about letting you create them.
+
+instance-forest-3:
+  char: narra
+  text: >-
+    I can hardly imagine my life without those nowdays, for sure.
+
+instance-forest-4:
+  char: player
+  responses:
+  - text: >-
+      So that world was deemed a failure and put aside, looking like the room you found yourself in.
+
+instance-forest-5:
+  char: narra
+  text: >-
+    Sure they may have "not gotten anywhere" without it, but was it really necessary to remove everything like that?
+
+instance-forest-6:
+  char: player
+  responses:
+  - text: Maybe there was some reason for it.
+  - text: Probably not.
+
+instance-forest-7:
+  char: narra
+  script_after: |-
+      TerminalModule.state_variables.talks.narra.instances.forest = true  
+  text: >-
+    I suppose we'll learn more about that at some point.
+  next: talk-about
+    
