@@ -23,7 +23,7 @@ config:
   char: description
   text: >-
     After you come back to the kitchen, you notice, looking out of the window, that she's outside talking with Maj.
-    You go outside to join them, Narra waves at you, as she notices you approaching.
+    There's a sizable backpack on the floor nearby. You go outside to join them, Narra waves at you, as she notices you approaching.
 
 4:
   char: narra
@@ -41,4 +41,74 @@ config:
 6:
   char: narra
   script: TerminalModule.state_variables.day4.currently_talking_with_maj = false
-  text: Continue here
+  text: >-
+    So.. While you've been sleeping in, we've been talking about something we could do today: looking around inside that cave
+    < if state_variables.day3.forest_search.other_parts.caves then >
+    we visited, but didn't go in
+    < else >
+    I mentioned
+    < end >
+    yesterday before we found Kiki.
+
+7:
+  char: player
+  responses:
+  - text: Well, what about it?
+
+8:
+  char: maj
+  wait: true
+  text: >-
+    Well, you see.. We've only ever gone there a long time ago, when we just found out what fire is. The trip was documented, of course,
+    but not exactly too well, it was quite difficult with what was available at the time, and afterwards everyone seemed to just lose interest
+    in it, because it was dark and dank and nobody wants to go there even if there's probably no danger in doing it.
+
+9:
+  char: narra
+  text: >-
+    Probably?
+
+10:
+  char: maj
+  wait: true
+  text: >-
+    Well, you never know.. So, I though you two should go and look around again with some of the new equipment I got. I could go with you,
+    of course, but I'd rather coordinate this whole thing from here with these handy things..
+
+11:
+  char: description
+  wait: true
+  text: >-
+    He rifles through the backpack and pulls out three small black devices, handing them to both of you, and leaving one to himself. Inside the
+    backpack, you can also see another one, that takes the rest of the backpack.
+
+12:
+  char: maj
+  wait: true
+  text: >-
+    Basically, these things allow us to communicate remotely AND without having to put a long wire between the two places. I've set this up a while ago,
+    and there's a base station here in the village. The range is alright, but it can't pierce through super thick things like mountains so you'll have
+    to take this retranslator in the backpack with you. It's a bit heavy but nothing too bad, I'm sure you'll manage. It has a battery that should
+    last you for some time. Set it up at the entrace of the cave, and we should be able to communicate when you're inside. I've also prepared an
+    electrical lamp for you, and some paper for your task at hand. Sorry, only one lamp because the backpack is alreadyy heavy, so you'll have to stick
+    together. Look around for anything interesting while you're in there of course, but please remember to document it on the map too.
+
+13:
+  char: player
+  responses:
+  - text: Right.. I guess there could be something interesting in there.
+  # TODO: do something else, like talk to kiki
+  # -
+
+14:
+  char: narra
+  text: >-
+    Alright then, take that backpack and let's go then, hopefully we'll discover something interesting along with mapping the place.
+
+15:
+  char: description
+  text: >-
+    You sigh and take the backpack. It is a bit heavy, but as Maj sad, nothing too bad. The walk to the cave proves a bit more difficult
+    with it, as you have to ascend some ground to get there, and you make a few stops to rest, but it is otherwise uneventful. Once there,
+    you putting what Maj called the retranslator at the mouth of the cave and press the only big red button it has. The machine confirms
+    with a loud beep that it is on. With that, you turn the lamp on and enter the cave.

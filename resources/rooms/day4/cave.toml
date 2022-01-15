@@ -1,0 +1,101 @@
+[shaders.cave]
+lightPoint = { module = "components.tilemap", name = "player_light_position"}
+n = 1
+
+[entities.tilemap.tilemap]
+# 40 x 32
+tiles = """
+#s######################################
+ep=================#==================##
+#       #########  #   ############    #
+#   #####          #   ############    #
+#                      ############   ##
+#   #########   ####    ########      ##
+#   #########   ####     ######       ##
+#   #########   ####     ########     ##
+#   ###         ####     ######        #
+#   ###         ####     ########      #
+#   ###   ###   ####     #######       #
+#   ###   ###   ####    ########      ##
+#   ###   ###   ####    ########     ###
+#   ###   ###   ####     #######     ###
+##  ###   ###   ####     #######     ###
+#   ###   ###   ####     #######     ###
+#   ###   ###   ####     #######     ###
+#   ###   ###   ####     ######       ##
+#   ###   ###   ####     ########      #
+#   ###   ###   ####     #########     #
+#   ###         ####    ###########    #
+#                                      #
+#      ########################        #
+##                                    ##
+###        #######     ##########    ###
+####      ######################      ##
+#####    ##  ###########   ####        #
+######                                 #
+########          ##########          ##
+##########       ############      #####
+############                     #######
+########################################
+"""
+texture = "cave_tilemap"
+sheet = "resources/sprites/room/cave_tileset/"
+
+[entities.tilemap.tilemap.map."#"]
+sprites = ["Wall"]
+type = "wall"
+
+[entities.tilemap.tilemap.map." "]
+sprites = ["Floor"]
+type = "floor"
+
+[entities.tilemap.tilemap.map."p"]
+# The floor underneath
+sprites = ["Floor", "Water"]
+# The player sprite
+player_sprite = "Player"
+type = "player"
+
+[entities.tilemap.tilemap.map."e"]
+# Entrance
+sprites = ["Floor", "Water"]
+type = "wall"
+
+[entities.tilemap.tilemap.map."="]
+sprites = ["Floor", "Water"]
+type = "floor"
+
+[entities.tilemap.tilemap.map."s"]
+sprites = ["Suspicious Wall"]
+type = "interaction"
+callback = { module = "components.tilemap", name = "tilemap_talk" }
+
+[[entities.tilemap.tilemap.map."s".callback.args.phrases]]
+color = [211, 0, 0]
+text = "Huh? This wall looks weird."
+
+[[entities.tilemap.tilemap.map."s".callback.args.phrases]]
+color = [255, 255, 255]
+text = "It really does.. Let's try pushing it.."
+
+[entities.tilemap.tilemap.map."b"]
+sprites = ["Brickwork"]
+type = "wall"
+
+[entities.water_sound.sound_player]
+sound_asset = "water"
+loop = true
+position = { distance = 245, angle = 0 }
+
+[entities.talk_text]
+tags = [ "TileTalkText" ]
+
+[entities.talk_text.drawable]
+kind = "text"
+text = { text = "testx", font_size = 24 }
+z = 0
+layer = "overlay"
+enabled = false
+
+[entities.talk_text.transformable]
+position = [100, 800]

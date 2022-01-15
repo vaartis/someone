@@ -40,6 +40,9 @@ status_room_computer = "room/status_room/computer_screen.png"
 mainchar = "mainchar/mainchar.png"
 food_room_look_at_can = "room/food_room/food_room_look_at_can.png"
 
+# Cave tilemap
+cave_tilemap = "room/cave_tileset/cave_tileset.png"
+
 [sounds]
 button_press = "button_press.ogg"
 
@@ -52,3 +55,4 @@ puzzle_jingle = "puzzle_jingle/puzzle_jingle.ogg"
 dial_jingle = "dial_jingle/dial_jingle.ogg"
 
 wind = "wind.ogg"
+water = "water.ogg"

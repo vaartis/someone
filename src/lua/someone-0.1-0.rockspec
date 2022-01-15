@@ -36,6 +36,7 @@ build = {
          ["components.dial_puzzle"] = "components/dial_puzzle.lua",
          ["components.walkway"] = "components/walkway.lua",
          ["components.status_room"] = "components/status_room.lua",
+         ["components.tilemap"] = "components/tilemap.lua",
 
          terminal = "terminal.lua",
          ["terminal.instance_menu"] = "terminal/instance_menu.lua",

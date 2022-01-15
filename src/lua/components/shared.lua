@@ -58,6 +58,8 @@ end
 function RenderSystem:onAddEntity() self:_sort_targets() end
 function RenderSystem:onRemoveEntity() self:_sort_targets() end
 function RenderSystem:draw(layer)
+   if not self._sorted_targets then return end
+
    for _, entity in ipairs(self._sorted_targets) do
       local drawable = entity:get("Drawable")
 
@@ -156,7 +158,7 @@ function AnimationSystem:update(dt)
    end
 end
 
-function M.load_sheet_data(dir_path)
+function M.load_sheet_json(dir_path)
    local dir_basename = path.basename(path.remove_dir_end(dir_path))
    local json_path = tostring(path.join(dir_path, dir_basename)) .. ".json"
 
@@ -167,6 +169,12 @@ function M.load_sheet_data(dir_path)
    local file = io.open(json_path, "r")
    local sprite_json = json.decode(file:read("*all"))
    file:close()
+
+   return sprite_json
+end
+
+function M.load_sheet_data(dir_path)
+   local sprite_json = M.load_sheet_json(dir_path)
 
    local animation_frames = {}
    for fname, frame in pairs(sprite_json["frames"]) do
@@ -250,6 +258,9 @@ function M.components.drawable.process_component(new_ent, comp, entity_name)
       end
 
       drawable = assets.create_sprite_from_asset(comp.texture_asset)
+      if comp.texture_rect then
+         drawable.texture_rect = IntRect.new(comp.texture_rect.x, comp.texture_rect.y, comp.texture_rect.w, comp.texture_rect.h)
+      end
    elseif comp.kind == "text" then
       drawable = Text.new(comp.text.text, StaticFonts.main_font, comp.text.font_size or StaticFonts.font_size)
    else

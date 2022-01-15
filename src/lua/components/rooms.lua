@@ -93,16 +93,26 @@ function M.room_shaders() return M._room_shaders or {} end
 function M.compile_room_shader_enabled()
    if M._room_shaders then
       for name, shader in pairs(M._room_shaders) do
-         setmetatable(
-            M._room_shaders[name],
-            {
-               enabled_compiled = interaction_components.process_activatable(
+         local meta = {}
+         for name, value in pairs(shader) do
+            -- This is a function description
+            if type(value) == "table" and value["module"] and value["name"] then
+               local processor
+               if name == "enabled" then
+                  processor = interaction_components.process_activatable
+               else
+                  processor = interaction_components.process_interaction
+               end
+
+               meta[name .. "_compiled"] = processor(
                   shader,
-                  "enabled",
-                  { entity_name = "rooms", comp_name = "load_room", needed_for = "shader enabled" }
+                  name,
+                  { entity_name = "rooms", comp_name = "load_room", needed_for = "shader " .. name }
                )
-            }
-         )
+            end
+         end
+
+         setmetatable(M._room_shaders[name], meta)
       end
    end
 end

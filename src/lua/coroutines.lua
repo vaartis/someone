@@ -61,7 +61,10 @@ function M.run(dt)
       local was_ok, results = results[1], lume.slice(results, 2)
 
       -- If there was an error, the only result will be the error message
-      if not was_ok then error(results[1]) end
+      if not was_ok then
+         local err = "Coroutine exited with \"" .. results[1] .. "\"\n  " .. debug.traceback(cor.cor) .. "\n\n"
+         error(err)
+      end
 
       -- If a function was returned, create a coroutine from it and add it as a
       -- waiting condition, and pass it all the other arguments returned

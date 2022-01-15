@@ -6,6 +6,7 @@
 
 #include "logger.hpp"
 #include "lua_module_env.hpp"
+#include "sol/forward.hpp"
 
 class WalkingEnv : public LuaModuleEnv {
 private:
@@ -54,6 +55,20 @@ public:
                     "n", "integer",
                     "brightness", "float",
                     "point", "vec2i"
+                ),
+                "need_screen_size", true
+            );
+        }
+
+        {
+            auto shader = std::make_unique<sf::Shader>();
+            auto success = shader->loadFromFile("resources/shaders/cave.frag", sf::Shader::Fragment);
+            shaders["cave"] = lua.create_table_with(
+                "shader", std::move(shader),
+                "declared_args", lua.create_table_with(
+                    "n", "integer",
+                    "lightPoint", "vec2i",
+                    "entrancePoint", "vec2i"
                 ),
                 "need_screen_size", true
             );
@@ -125,14 +140,14 @@ public:
                 }
 
                 bool enabled = true;
-                sol::object enabled_lua = shaders_data_obj.get<sol::table>()[shader_name][sol::metatable_key]["enabled_compiled"];
-                if (enabled_lua.is<sol::protected_function>()) {
+                sol::optional<sol::object> compiled_enabled = shaders_data_obj.get<sol::table>()[shader_name][sol::metatable_key]["enabled_compiled"];
+                if (compiled_enabled) {
                     // If "enabled" is a function, call it and convert result to bool
-                    auto result_function = enabled_lua.as<sol::protected_function>();
+                    auto result_function = (*compiled_enabled).as<sol::protected_function>();
                     enabled = bool(call_or_throw(result_function));
-                } else {
+                } else if (shader_data.contains("enabled")) {
                     // Otherwise just convert to bool
-                    enabled = enabled_lua.as<bool>();
+                    enabled = shader_data.at("enabled").as<bool>();
                 }
 
                 // If the shader is evaluated as enabled, skip the paramter
@@ -144,6 +159,14 @@ public:
 
                     // Skip the n and enabled field
                     if (name == "n" || name == "enabled") continue;
+
+                    sol::optional<sol::protected_function> compiled =
+                        shaders_data_obj.get<sol::table>()[shader_name][sol::metatable_key][name + "_compiled"];
+                    //lua.script("return print").get<sol::protected_function>()(
+                    //    lua.script("return require('inspect')").get<sol::protected_function>()(compiled)
+                    //);
+                    if (compiled)
+                        value = call_or_throw(*compiled);
 
                     if (value.is<float>()) {
                         shader->setUniform(name, value.as<float>());
