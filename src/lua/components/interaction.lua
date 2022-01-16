@@ -48,8 +48,11 @@ function InteractionSystem:requires()
    }
 end
 function InteractionSystem:onStopSystem()
-   local interaction_text_drawable = util.first(self.targets.interaction_text):get("Drawable")
-   interaction_text_drawable.enabled = false
+   local interaction_text_drawable = util.first(self.targets.interaction_text)
+   if interaction_text_drawable then
+         interaction_text_drawable = interaction_text_drawable:get("Drawable")
+         interaction_text_drawable.enabled = false
+   end
 end
 function InteractionSystem:update(dt)
    -- If there are any interactables, look up the interaction text entity
@@ -680,7 +683,10 @@ function M.disable_player(engine)
    if engine.systemRegistry["PlayerMovementSystem"].active then
       engine:stopSystem("PlayerMovementSystem")
 
-      util.rooms_mod().find_player():get("Animation").playing = false
+      local player = util.rooms_mod().find_player()
+      if player then
+         player:get("Animation").playing = false
+      end
    end
 end
 

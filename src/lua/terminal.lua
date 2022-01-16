@@ -585,6 +585,14 @@ M.state_variables = {
       },
       status_room = {
          way_up_checked = false
+      },
+      -- Day 4 cave from the terminal segment
+      cave = {
+         water = false,
+         mountain = false,
+         tight_corridors = false,
+         bricks = false,
+         dents = false
       }
    }
 }

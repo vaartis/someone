@@ -157,9 +157,6 @@ end
 
 function M.find_player()
    local player = util.first(M.engine:getEntitiesWithComponent("PlayerMovement"))
-   if not player then
-      error("No player entity found")
-   end
 
    return player
 end

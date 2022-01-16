@@ -4,6 +4,7 @@ local assets = require("components.assets")
 local shared_components = require("components.shared")
 local collider_components = require("components.collider")
 local interaction_components = require("components.interaction")
+local passage_components = require("components.passage")
 local util = require("util")
 local coroutines = require("coroutines")
 
@@ -23,7 +24,7 @@ M.components = {
    interaction_tile = {
       class = Component.create(
          "InteractionTile",
-         { "callback" }
+         { "callback", "activatable_callback" }
       )
    }
 }
@@ -58,8 +59,8 @@ function M.components.tilemap.process_component(new_ent, comp, entity_name)
          if tile_info.type == "wall" then
             template.collider = { mode = "constant", size = { frame.w, frame.h } }
          elseif tile_info.type == "interaction" then
-            template.collider = { mode = "constant", size = { frame.w, frame.h } }
-            template.interaction_tile = { callback = tile_info.callback }
+            template.collider = { mode = "constant", size = { frame.w, frame.h }, trigger = tile_info.trigger }
+            template.interaction_tile = { callback = tile_info.callback, activatable_callback = tile_info.activatable_callback }
          end
          util.entities_mod().instantiate_entity(lume.format("tile_{1}_{2}", {x, y}), template)
 
@@ -108,8 +109,16 @@ function M.components.interaction_tile.process_component(new_ent, comp, entity_n
       "callback",
       { entity_name = entity_name, comp_name = "interaction_tile", needed_for = "interaction", entity = new_ent }
    )
+   local activatable_callback
+   if comp.activatable_callback then
+      activatable_callback = interaction_components.process_activatable(
+         comp,
+         "activatable_callback",
+         { entity_name = entity_name, comp_name = "interaction_tile", needed_for = "interaction", entity = new_ent }
+      )
+   end
 
-   new_ent:add(M.components.interaction_tile.class(callback))
+   new_ent:add(M.components.interaction_tile.class(callback, activatable_callback))
 end
 
 
@@ -141,20 +150,34 @@ TilePlayerSystem.update = function(self, dt)
          if pos_diff.x ~= 0 or pos_diff.y ~= 0 then
             local target_pos = { x = x + (pos_diff.x * w), y = y + (pos_diff.y * h) }
 
-            local cols, len = physics_world:queryPoint(target_pos.x + 1, target_pos.y + 1)
-            if len == 0 then
+            local function start_movement()
                player.target_pos = target_pos
                player.movement_progress = 0
 
                player.footstep_sound:play()
+            end
+
+            local cols, len = physics_world:queryPoint(target_pos.x + 1, target_pos.y + 1)
+            if len == 0 then
+               start_movement()
             else
-               local interaction_tile = lume.match(
-                  cols,
-                  function (ent) return ent:has("InteractionTile") end
-               )
+               local interaction_tile = lume.match(cols, function (ent) return ent:has("InteractionTile") end)
                if interaction_tile and interaction_components.seconds_since_last_interaction > interaction_components.seconds_before_next_interaction then
-                  interaction_components.seconds_since_last_interaction = 0
-                  interaction_tile:get("InteractionTile").callback()
+                  local function run_callback()
+                     local interaction_tile_data = interaction_tile:get("InteractionTile")
+                     if interaction_tile_data.activatable_callback == nil or interaction_tile_data.activatable_callback() then
+                        interaction_components.seconds_since_last_interaction = 0
+                        interaction_tile_data.callback()
+                     end
+                  end
+                  if interaction_tile:get("Collider").trigger then
+                     start_movement()
+                     -- Wait until finished moving
+                     player.movement_finished_callback = run_callback
+                  else
+                     -- Run now
+                     run_callback()
+                  end
                end
             end
          end
@@ -168,6 +191,10 @@ TilePlayerSystem.update = function(self, dt)
          player.movement_progress = player.movement_progress + 0.05
          if player.movement_progress > 1 then
             player.target_pos = nil
+            if player.movement_finished_callback then
+               player.movement_finished_callback()
+               player.movement_finished_callback = nil
+            end
          end
       end
    end
@@ -191,6 +218,10 @@ M.interaction_callbacks.player_light_position = function()
 end
 
 M.interaction_callbacks.tilemap_talk = function(_state, args)
+   if args.state_variable then
+      interaction_components.interaction_callbacks.state_variable_set(_state, args.state_variable, true)
+   end
+
    local phrases = args.phrases
 
    local engine = util.rooms_mod().engine
@@ -207,6 +238,14 @@ M.interaction_callbacks.tilemap_talk = function(_state, args)
          for _, phrase_data in ipairs(phrases) do
             local letter = 1
             local timer = 0
+
+            if phrase_data.sound then
+               local sound = assets.create_sound_from_asset(phrase_data.sound.asset)
+               if phrase_data.sound.volume then
+                  sound.volume = phrase_data.sound.volume
+               end
+               sound:play()
+            end
 
             text_drawable.drawable.fill_color = Color.new(phrase_data.color[1], phrase_data.color[2], phrase_data.color[3], 255)
             text_drawable.drawable.string = ""
@@ -240,6 +279,27 @@ M.interaction_callbacks.tilemap_talk = function(_state, args)
          text_drawable.enabled = false
          engine:startSystem("TilePlayerSystem")
    end)
+end
+
+function M.interaction_callbacks.switch_room(_current_state, room)
+   local rooms = util.rooms_mod()
+   local engine = rooms.engine
+   engine:stopSystem("TilePlayerSystem")
+
+   local final_room_name = passage_components.get_final_room_name({ to = room })
+
+   coroutines.create_coroutine(
+      coroutines.black_screen_out,
+      function()
+         -- When the screen in blacked out, change the room
+
+         rooms.load_room(final_room_name)
+      end,
+      function()
+         -- Enable the player back when the room has changed
+         engine:startSystem("TilePlayerSystem")
+      end
+   )
 end
 
 return M

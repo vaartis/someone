@@ -32,10 +32,12 @@ function NoteSystem:draw()
             note.text_object.string = lume.wordwrap(note.text, max_text_len)
             note.text_object.position = tf:world_position(entity) + Vector2f.new(slice.left, slice.top)
 
-            note.bottom_text_object.string = lume.wordwrap(note.bottom_text, max_text_len)
-            local bottom_text_width = note.bottom_text_object.global_bounds.width
-            note.bottom_text_object.position =
-               tf:world_position(entity) + Vector2f.new(bottom_slice.left + bottom_slice.width - bottom_text_width, bottom_slice.top)
+            if note.borrom_text then
+               note.bottom_text_object.string = lume.wordwrap(note.bottom_text, max_text_len)
+               local bottom_text_width = note.bottom_text_object.global_bounds.width
+               note.bottom_text_object.position =
+                  tf:world_position(entity) + Vector2f.new(bottom_slice.left + bottom_slice.width - bottom_text_width, bottom_slice.top)
+            end
          end
 
          GLOBAL.drawing_target:draw(note.text_object)
@@ -66,6 +68,12 @@ function NoteInteractionSystem:update(dt)
 
       -- Keep the player disabled
       interaction_components.disable_player(engine)
+      local disabled_tile = false
+      if lume.count(engine:getEntitiesWithComponent("TilePlayer")) > 0 then
+         -- Keep the tile player disabled
+         engine:stopSystem("TilePlayerSystem")
+         disabled_tile = true
+      end
 
       local interaction_text_drawable = util.first(self.targets.interaction_text):get("Drawable")
       if not interaction_text_drawable.enabled then
@@ -78,7 +86,13 @@ function NoteInteractionSystem:update(dt)
             [KeyboardKey.E] = function()
                -- Delete the note entity and re-enable the player
                engine:removeEntity(entity, true)
+               -- Re-enabled player
                interaction_components.enable_player(engine)
+               if disabled_tile then
+                  -- Re-enable tile player
+                  engine:startSystem("TilePlayerSystem")
+                  interaction_text_drawable.enabled = false
+               end
             end
       })
    end

@@ -27,3 +27,8 @@ passwd: velvetgreen
 
 ctrl z switch instance
 """
+
+[cave]
+text = """
+test
+"""

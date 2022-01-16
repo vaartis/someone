@@ -4,45 +4,53 @@ n = 1
 
 [entities.tilemap.tilemap]
 # 40 x 32
-tiles = """
-#s######################################
-ep=================#==================##
-#       #########  #   ############    #
-#   #####          #   ############    #
+tiles = '''
+########################################
+ep=================#===============111##
+#       /########  #   ############    #
+#   #####          #      333333       #
 #                      ############   ##
-#   #########   ####    ########      ##
-#   #########   ####     ######       ##
+#   /#######\   /##\    ########      ##
+#   #########   ####     ######5      ##
 #   #########   ####     ########     ##
-#   ###         ####     ######        #
+#   ###         ####     ######5       #
 #   ###         ####     ########      #
-#   ###   ###   ####     #######       #
-#   ###   ###   ####    ########      ##
+#   ###   /#\   ####     #######       #
+#   ###   ###   ####    /#######      ##
 #   ###   ###   ####    ########     ###
 #   ###   ###   ####     #######     ###
 ##  ###   ###   ####     #######     ###
 #   ###   ###   ####     #######     ###
 #   ###   ###   ####     #######     ###
-#   ###   ###   ####     ######       ##
-#   ###   ###   ####     ########      #
-#   ###   ###   ####     #########     #
-#   ###         ####    ###########    #
+#   ###   ###   ####     ######5      ##
+#   ###   ###   ####     #######\      #
+#   ###   ###   ####     ########\     #
+#   ###         ####    /#########\    #
 #                                      #
 #      ########################        #
-##                                    ##
-###        #######     ##########    ###
-####      ######################      ##
-#####    ##  ###########   ####        #
-######                                 #
-########          ##########          ##
-##########       ############      #####
-############                     #######
+#\             333333333333           ##
+##\        /#####\     /#######\     ###
+###\      /#####################     4bb
+####\2   /#55###########555####      44b
+#####\22             333             44s
+#######\22        /########\         4bb
+#########\22     /##########\      /####
+###########\22      3333          /#####
 ########################################
-"""
+'''
 texture = "cave_tilemap"
 sheet = "resources/sprites/room/cave_tileset/"
 
 [entities.tilemap.tilemap.map."#"]
 sprites = ["Wall"]
+type = "wall"
+
+[entities.tilemap.tilemap.map."\\"]
+sprites = ["Half Wall Left"]
+type = "wall"
+
+[entities.tilemap.tilemap.map."/"]
+sprites = ["Half Wall Right"]
 type = "wall"
 
 [entities.tilemap.tilemap.map." "]
@@ -68,31 +76,136 @@ type = "floor"
 [entities.tilemap.tilemap.map."s"]
 sprites = ["Suspicious Wall"]
 type = "interaction"
-callback = { module = "components.tilemap", name = "tilemap_talk" }
-
-[[entities.tilemap.tilemap.map."s".callback.args.phrases]]
-color = [211, 0, 0]
-text = "Huh? This wall looks weird."
-
-[[entities.tilemap.tilemap.map."s".callback.args.phrases]]
-color = [255, 255, 255]
-text = "It really does.. Let's try pushing it.."
+callback = { module = "components.tilemap", name = "switch_room", args = ["cave_2"] }
 
 [entities.tilemap.tilemap.map."b"]
 sprites = ["Brickwork"]
 type = "wall"
 
+# Talking about the water going deeper
+[entities.tilemap.tilemap.map."1"]
+sprites = ["Floor", "Water"]
+type = "interaction"
+trigger = true
+callback = { module = "components.tilemap", name = "tilemap_talk", args = { state_variable = ["cave", "water"] } }
+activatable_callback = { module = "components.interaction", name = "state_variable_equal", args = [ ["cave", "water"], false ] }
+
+[[entities.tilemap.tilemap.map."1".callback.args.phrases]]
+color = [255, 255, 255]
+text = "Seems like the water here goes from deep inside the mountain and through the mouth of the cave."
+
+[[entities.tilemap.tilemap.map."1".callback.args.phrases]]
+color = [211, 0, 0]
+text = "Must be why it's so dank in here, it's running pretty lively."
+
+[[entities.tilemap.tilemap.map."1".callback.args.phrases]]
+color = [135, 206, 235]
+text = "So it does go deeper, interesting. Going to write it down just in case."
+sound = { asset = "radio", volume = 8 }
+
+# Talking about the mountain being really thick
+[entities.tilemap.tilemap.map."2"]
+sprites = ["Floor"]
+type = "interaction"
+trigger = true
+callback = { module = "components.tilemap", name = "tilemap_talk", args = { state_variable = ["cave", "mountain"] } }
+activatable_callback = { module = "components.interaction", name = "state_variable_equal", args = [ ["cave", "mountain"], false ] }
+
+[[entities.tilemap.tilemap.map."2".callback.args.phrases]]
+color = [211, 0, 0]
+text = "The rock layer here seems to be really thick, doesn't seem to be any way around it.\nHopefully communication still works."
+
+[[entities.tilemap.tilemap.map."2".callback.args.phrases]]
+color = [135, 206, 235]
+text = "Yep, still here."
+sound = { asset = "radio", volume = 8 }
+
+[[entities.tilemap.tilemap.map."2".callback.args.phrases]]
+color = [255, 255, 255]
+text = "We're on one of the south-west deep end of the cave, and I don't see any path to go that way further,\nso we'll look around the other parts."
+
+[[entities.tilemap.tilemap.map."2".callback.args.phrases]]
+color = [135, 206, 235]
+text = "Alright. Writing down that there's a thick layer of rock there."
+sound = { asset = "radio", volume = 8 }
+
+# Talking about tigh corridors
+[entities.tilemap.tilemap.map."3"]
+sprites = ["Floor"]
+type = "interaction"
+trigger = true
+callback = { module = "components.tilemap", name = "tilemap_talk", args = { state_variable = ["cave", "tight_corridors"] } }
+activatable_callback = { module = "components.interaction", name = "state_variable_equal", args = [ ["cave", "tight_corridors"], false ] }
+
+[[entities.tilemap.tilemap.map."3".callback.args.phrases]]
+color = [211, 0, 0]
+text = "Really don't like all these tight corridors. We can barely fit in here,\nhopefully they don't get any more narrow."
+
+[[entities.tilemap.tilemap.map."3".callback.args.phrases]]
+color = [135, 206, 235]
+text = "At moments like these I'm glad that it's not me walking around there."
+sound = { asset = "radio", volume = 8 }
+
+[[entities.tilemap.tilemap.map."3".callback.args.phrases]]
+color = [255, 255, 255]
+text = "Right. This isn't my idea of a comfortable place either."
+
+# Talking about the weird bricks
+[entities.tilemap.tilemap.map."4"]
+sprites = ["Floor"]
+type = "interaction"
+trigger = true
+callback = { module = "components.tilemap", name = "tilemap_talk", args = { state_variable = ["cave", "bricks"] } }
+activatable_callback = { module = "components.interaction", name = "state_variable_equal", args = [ ["cave", "bricks"], false ] }
+
+[[entities.tilemap.tilemap.map."4".callback.args.phrases]]
+color = [211, 0, 0]
+text = "That's really weird. There is something that looks like.. bricks here on the deep north-east side."
+
+[[entities.tilemap.tilemap.map."4".callback.args.phrases]]
+color = [135, 206, 235]
+text = "Bricks? Why would there be bricks there? Nothing like that is on the old maps either."
+sound = { asset = "radio", volume = 8 }
+
+[[entities.tilemap.tilemap.map."4".callback.args.phrases]]
+color = [255, 255, 255]
+text = "There's also a wall that looks loose, maybe we can try pushing it.."
+
+[[entities.tilemap.tilemap.map."4".callback.args.phrases]]
+color = [135, 206, 235]
+text = "You should try, then. Please keep me posted."
+sound = { asset = "radio", volume = 8 }
+
+# Talking about dents in the walls
+[entities.tilemap.tilemap.map."5"]
+sprites = ["Floor"]
+type = "interaction"
+trigger = true
+callback = { module = "components.tilemap", name = "tilemap_talk", args = { state_variable = ["cave", "dents"] } }
+activatable_callback = { module = "components.interaction", name = "state_variable_equal", args = [ ["cave", "dents"], false ] }
+
+[[entities.tilemap.tilemap.map."5".callback.args.phrases]]
+color = [211, 0, 0]
+text = "There seems to be quite a few dents like this one in the walls here."
+
+[[entities.tilemap.tilemap.map."5".callback.args.phrases]]
+color = [135, 206, 235]
+text = "Noted. Maybe this is just a normal thing for caves, we haven't seen that many thoroughly."
+sound = { asset = "radio", volume = 8 }
+
+# Background water sound
 [entities.water_sound.sound_player]
 sound_asset = "water"
 loop = true
 position = { distance = 245, angle = 0 }
 
+# Text for talking
 [entities.talk_text]
 tags = [ "TileTalkText" ]
 
 [entities.talk_text.drawable]
 kind = "text"
-text = { text = "testx", font_size = 24 }
+text = { text = "", font_size = 24 }
 z = 0
 layer = "overlay"
 enabled = false

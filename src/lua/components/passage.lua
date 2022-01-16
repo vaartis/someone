@@ -21,7 +21,7 @@ end
 
 M.interaction_callbacks = {}
 
-local function get_final_room_name(passage_comp)
+function M.get_final_room_name(passage_comp)
    if not rooms then
       rooms = util.rooms_mod()
    end
@@ -111,7 +111,7 @@ end
 function M.interaction_callbacks.switch_room(_current_state, ent)
    local passage_comp = ent:get("Passage")
 
-   local final_room_name = get_final_room_name(passage_comp)
+   local final_room_name = M.get_final_room_name(passage_comp)
 
    local player_movement = util.rooms_mod().find_player():get("PlayerMovement")
    player_movement.active = false
@@ -227,7 +227,7 @@ function M.components.passage.class:show_editor(ent)
       if editor_state.can_go_from then
          local new_comp_data = { to = editor_state.to, from = editor_state.from, player_y = editor_state.player_y }
          local was_ok, final_name = pcall(
-            get_final_room_name,
+            M.get_final_room_name,
             new_comp_data
          )
          if not was_ok then

@@ -1,0 +1,100 @@
+[shaders.cave]
+lightPoint = { module = "components.tilemap", name = "player_light_position"}
+n = 1
+
+[entities.tilemap.tilemap]
+tiles = '''
+##########----
+e         #---
+#######   #---
+------#   #---
+------#   #---
+-######   #---
+#         #---
+#         #---
+np        #---
+#         #---
+#         #---
+-#########----
+--------------
+--------------
+'''
+texture = "cave_tilemap"
+sheet = "resources/sprites/room/cave_tileset/"
+
+[entities.tilemap.tilemap.map."#"]
+sprites = ["Brickwork"]
+type = "wall"
+
+[entities.tilemap.tilemap.map."-"]
+sprites = ["Wall"]
+type = "wall"
+
+[entities.tilemap.tilemap.map." "]
+sprites = ["Floor"]
+type = "floor"
+
+[entities.tilemap.tilemap.map."p"]
+# The floor underneath
+sprites = ["Floor"]
+# The player sprite
+player_sprite = "Player"
+type = "player"
+
+[entities.tilemap.tilemap.map."e"]
+# Entrance
+sprites = ["Floor"]
+type = "wall"
+
+[entities.tilemap.tilemap.map."n"]
+sprites = ["Brickwork", "Note"]
+type = "interaction"
+callback = { module = "components.note", name = "read_note", args = [ "cave" ] }
+
+# Talking about the water going deeper
+# [entities.tilemap.tilemap.map."1"]
+# sprites = ["Floor", "Water"]
+# type = "interaction"
+# trigger = true
+# callback = { module = "components.tilemap", name = "tilemap_talk", args = { state_variable = ["cave", "water"] } }
+# activatable_callback = { module = "components.interaction", name = "state_variable_equal", args = [ ["cave", "water"], false ] }
+#
+# [[entities.tilemap.tilemap.map."1".callback.args.phrases]]
+# color = [255, 255, 255]
+# text = "Seems like the water here goes from deep inside the mountain and through the mouth of the cave."
+#
+# [[entities.tilemap.tilemap.map."1".callback.args.phrases]]
+# color = [211, 0, 0]
+# text = "Must be why it's so dank in here, it's running pretty lively."
+#
+# [[entities.tilemap.tilemap.map."1".callback.args.phrases]]
+# color = [135, 206, 235]
+# text = "So it does go deeper, interesting. Going to write it down just in case."
+# sound = { asset = "radio", volume = 8 }
+
+# Text for talking
+[entities.talk_text]
+tags = [ "TileTalkText" ]
+
+[entities.talk_text.drawable]
+kind = "text"
+text = { text = "", font_size = 24 }
+z = 0
+layer = "overlay"
+enabled = false
+
+[entities.talk_text.transformable]
+position = [100, 800]
+
+[entities.interaction_text]
+tags = [ "InteractionText" ]
+
+[entities.interaction_text.drawable]
+kind = "text"
+text = { text = "", font_size = 32 }
+layer = "overlay"
+z = 0
+enabled = false
+
+[entities.interaction_text.transformable]
+position = [100, 900]
