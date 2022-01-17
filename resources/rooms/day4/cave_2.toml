@@ -49,7 +49,7 @@ type = "wall"
 [entities.tilemap.tilemap.map."n"]
 sprites = ["Brickwork", "Note"]
 type = "interaction"
-callback = { module = "components.note", name = "read_note", args = [ "cave" ] }
+callback = { module = "components.note", name = "read_note", args = [ "cave-1" ] }
 
 # Talking about the water going deeper
 # [entities.tilemap.tilemap.map."1"]

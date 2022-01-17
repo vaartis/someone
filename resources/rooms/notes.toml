@@ -28,7 +28,61 @@ passwd: velvetgreen
 ctrl z switch instance
 """
 
-[cave]
+[cave-1]
 text = """
-test
+First off, I'm sorry for putting you through all
+of this. I had to make sure you'd be able to
+finish everything, which means making sure you can
+cooperate and solve problems. The whole system is
+running on emergency power right now, as you might
+have noticed from one of the status terminals I've
+put up for myself, this means the world isn't
+running on full power, and you only have
+low-powered emergency lights and important
+computer terminals running. In this state it can
+run pretty much forever, and I've prepared for
+this outcome. The biggest power concern is, of
+course, the living thinking things. They are
+complex creatures to simulate, and I've worked my
+whole life to make it possible. Still, it requires
+a substatial amount of power when there are so
+many of them. This is why you probably haven't
+seen much of anyone else besides her and some of
+her closer friends.
+
+Now, to the problem that you have to solve. For a
+long time, I could not figure out a way to retain
+memories when digitizing them. She didn't have
+much time left, so we had to do without. They're
+still there, but she can't access them and I hope
+you figure out a way to help her and everyone
+else, if you find it in your heart. Perhaps it's
+better left untouched, as they have already lived
+wholly different lifes. I stayed behind to finish
+the techology, foolishly. I did finish it, of
+course, just recently. It took a long time. Too
+long.
+"""
+
+[cave-2]
+text = """
+Something happened with the power supply. I
+specifically designed it to be sustainable as long
+as there are natural forces, but still, something
+happened outside and, I must admit, I am too old
+to go out there and survive a trip back. Still, I
+am going to do it. Chances are I do not succeed
+and there is practically no way of me surviving
+it. If I do, then you won't be seeing this note.
+
+There is a lever somewhere around here. It should
+unlock the way to the upper levels as well as,
+perhaps, some other things. You are young, and
+with proper preparations, you should be able to
+finish what I started. Go out there and find what
+the problem is.
+
+Save yourself, and her, and everyone.
+
+Love, W.S.
 """
