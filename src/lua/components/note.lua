@@ -1,7 +1,6 @@
 local util = require("util")
 local lume = require("lume")
 local debug_components = require("components.debug")
-
 local interaction_components
 
 local M = {}
@@ -17,9 +16,14 @@ M.components = {
 }
 
 local NoteSystem = class("NoteSystem", System)
-function NoteSystem:requires() return { "Slices", "Note", "Transformable" } end
+function NoteSystem:requires()
+   return {
+      objects = { "Slices", "Note", "Transformable" },
+      interaction_text = { "InteractionTextTag" }
+   }
+end
 function NoteSystem:draw()
-   for _, entity in pairs(self.targets) do
+   for _, entity in pairs(self.targets.objects) do
       local drawable = entity:get("Drawable")
 
       if drawable.enabled then
@@ -50,6 +54,20 @@ function NoteSystem:draw()
                note.page_number_text_object.position =
                   tf:world_position(entity) + Vector2f.new(bottom_slice.left + bottom_slice.width, bottom_slice.top)
                note.page_number_text_object.string = lume.format("{1}/{2}", {note.displayed_page, #note.pages})
+            end
+
+            local interaction_text_drawable = util.first(self.targets.interaction_text):get("Drawable")
+            interaction_text_drawable.drawable.string = "[E] "
+            if note.pages[note.current_page].close_text then
+               interaction_text_drawable.drawable.string = interaction_text_drawable.drawable.string ..
+                  note.pages[note.current_page].close_text
+            else
+               interaction_text_drawable.drawable.string = interaction_text_drawable.drawable.string ..
+                  "to close the note"
+            end
+            if #note.pages > 1 then
+               interaction_text_drawable.drawable.string = interaction_text_drawable.drawable.string ..
+                  ", [A/D] to turn pages"
             end
          end
 
@@ -95,11 +113,6 @@ function NoteInteractionSystem:update(dt)
       local interaction_text_drawable = util.first(self.targets.interaction_text):get("Drawable")
       if not interaction_text_drawable.enabled then
          interaction_text_drawable.enabled = true
-         interaction_text_drawable.drawable.string = "[E] to close the note"
-         if #note.pages > 1 then
-            interaction_text_drawable.drawable.string = interaction_text_drawable.drawable.string ..
-               ", [A/D] to turn pages"
-         end
       end
 
       interaction_components.update_seconds_since_last_interaction(dt)
@@ -113,6 +126,16 @@ function NoteInteractionSystem:update(dt)
                   -- Re-enable tile player
                   engine:startSystem("TilePlayerSystem")
                   interaction_text_drawable.enabled = false
+               end
+
+               if note.pages[note.current_page].on_close_callback then
+                  local callback = interaction_components.process_interaction(
+                     note.pages[note.current_page],
+                     "on_close_callback",
+                     { entity_name = "note", comp_name = "note", needed_for = "on_close_callback" }
+                  )
+
+                  callback()
                end
             end,
             [KeyboardKey.D] = function()

@@ -1,5 +1,6 @@
 local lume = require("lume")
 
+local terminal = require("terminal")
 local assets = require("components.assets")
 local shared_components = require("components.shared")
 local collider_components = require("components.collider")
@@ -298,6 +299,24 @@ function M.interaction_callbacks.switch_room(_current_state, room)
       function()
          -- Enable the player back when the room has changed
          engine:startSystem("TilePlayerSystem")
+      end
+   )
+end
+
+function M.interaction_callbacks.switch_to_terminal(curr_state)
+   local engine = util.rooms_mod().engine
+   engine:stopSystem("TilePlayerSystem")
+
+   coroutines.create_coroutine(
+      coroutines.black_screen_out,
+      function()
+         -- Just resume it since the player doesn't have control now
+         engine:startSystem("TilePlayerSystem")
+
+         GLOBAL.set_current_state(CurrentState.Terminal)
+      end,
+      function()
+         terminal.active = true
       end
    )
 end

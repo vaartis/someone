@@ -465,8 +465,11 @@ function M.switch_to_walking(room)
 
    local player_movement
    if not _G.mod then
-      player_movement = util.rooms_mod().find_player():get("PlayerMovement")
-      player_movement.active = false
+      player_movement = util.rooms_mod().find_player()
+      if player_movement then
+         player_movement:get("PlayerMovement")
+         player_movement.active = false
+      end
    end
 
    -- Create a coroutine that blackens the screen with time

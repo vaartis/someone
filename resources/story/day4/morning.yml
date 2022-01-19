@@ -80,7 +80,7 @@ config:
   wait: true
   text: >-
     He rifles through the backpack and pulls out three small black devices, handing them to both of you, and leaving one to himself. Inside the
-    backpack, you can also see another one, that takes the rest of the backpack.
+    backpack, you can also see another one, that takes the rest of available space in the backpack.
 
 12:
   char: maj
@@ -107,8 +107,11 @@ config:
 
 15:
   char: description
+  wait: true
+  script_after: TerminalModule.switch_to_walking("day4/cave")
   text: >-
     You sigh and take the backpack. It is a bit heavy, but as Maj sad, nothing too bad. The walk to the cave proves a bit more difficult
     with it, as you have to ascend some ground to get there, and you make a few stops to rest, but it is otherwise uneventful. Once there,
     you putting what Maj called the retranslator at the mouth of the cave and press the only big red button it has. The machine confirms
     with a loud beep that it is on. With that, you turn the lamp on and enter the cave.
+  next: day4/evening/1

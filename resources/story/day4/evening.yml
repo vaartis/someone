@@ -1,0 +1,15 @@
+config:
+  chars:
+    player:
+      color: [255, 255, 255]
+    description:
+      color: [185, 118, 252]
+    narra:
+      color: [211, 0, 0]
+    maj:
+      color: [135, 206, 235]
+
+1:
+  char: description
+  text: >-
+    Afterwards..

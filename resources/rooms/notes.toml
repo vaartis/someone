@@ -86,3 +86,5 @@ Save yourself, and her, and everyone.
 
 Love, W.S.
 """
+on_close_callback = { module = "components.tilemap", name = "switch_to_terminal" }
+close_text = "to close the note and talk about it"
