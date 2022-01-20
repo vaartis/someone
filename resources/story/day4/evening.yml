@@ -8,8 +8,166 @@ config:
       color: [211, 0, 0]
     maj:
       color: [135, 206, 235]
+  dialogue_between: [narra, player]
 
 1:
   char: description
   text: >-
-    Afterwards..
+    After having read the note aloud. Both of you take a bit of time to think. There is a mix of emotions in Narra's
+    face.
+
+2:
+  char: narra
+  text: >-
+    Right.. This clears thing up a bit. Conserving power must be important in such a situation. And I don't remember
+    anything before my life here, that much is obvious, they clearly knew about this. Still, there must've been no other
+    choise if that was the necessary sacrifice for me to live. The initials aren't exactly helpful, though, we still
+    have no idea who that person is. Still they clearly cared about us enough to set up all this.. elaborate way of
+    showing you around and doing all of the.. digitizing process in the first place.
+
+3:
+  custom:
+    terminal.select_line.SelectLine:
+    - condition: return not require("lume").all(TerminalModule.state_variables.day4.evening_note_talk)
+      # Talk about something else
+      next: !line-name 4
+      # Continue
+    - next: !line-name 5
+4:
+  char: player
+  responses:
+  - text: What I'm concerned about is that, supposedly, I have to go outside and what that entails.
+    condition: return not TerminalModule.state_variables.day4.evening_note_talk.outside
+    next: outside-1
+  - text: This whole digitizing process seems sketchy, I do wonder how it's supposed to work.
+    condition: return not TerminalModule.state_variables.day4.evening_note_talk.digitizing
+    next: digitizing-1
+  - text: >-
+      They said that you still have your memories, though they're not accessible. Wonder whether
+      we should do anything about that.
+    condition: return not TerminalModule.state_variables.day4.evening_note_talk.memories
+    next: memories-1
+  - text: I do wonder what's on those upper levels.
+    condition: |
+      return not TerminalModule.state_variables.day4.evening_note_talk.upper and
+          TerminalModule.state_variables.day4.evening_note_talk.outside
+    next: upper-1
+
+outside-1:
+  char: narra
+  text: >-
+    < if state_variables.talks.narra.way_up_checked then >
+    Well, clearly from what you've seen, it must be really cold out there.
+    < else >
+    It's probably not great out there if you're hidden so deep inside this place.
+    < end >
+
+outside-2:
+  responses:
+  - text: >-
+      Yeah. Definetely not good outside. Still, I don't think I have much of a choice
+      if I want to live.
+      < if state_variables.talks.narra.found_food then >
+      And not spend my life here eating canned peaches every day.
+      < else >
+      And not spend my life in these gloomy corridors that are barely lit.
+      < end >
+
+outside-3:
+  text: >-
+    Pretty much. You'll have to put some work in, get to those upper levels and continue from there, and hopefully you
+    can save the day. I believe you can do it. I'm sure you understand I want to live and see my friends just as much.
+
+outside-4:
+  script_after: TerminalModule.state_variables.day4.evening_note_talk.outside = true
+  responses:
+  - text: Of course.
+    next: 3
+  - text: I'll try my best.
+    next: 3
+
+upper-1:
+  char: narra
+  text: >-
+    Clearly, a way to go outside somehow, and probably a way to access the power supply. Must be why they
+    were so cautious of letting you go up there.
+
+upper-2:
+  responses:
+  - text: >-
+      Hopefully there's also equipment for the task. But besides that, what else could be there..  Probably some place
+      of living, maybe the place where this whole thing was developed in. Though I'm not sure about the uh.. server
+      it's running on. Maybe that one's somewhere lower, actually, deeper where it's protected from whatever is
+      happening outside.
+
+upper-3:
+  text: >-
+    Sorry, I don't understand too much of how these computer things work, but I suppose putting it away from everything
+    else would be the safest choice in case something goes really badly on the upper levels or the outside.
+    Perhaps there's something to spend your time on up there, like you know, to not go insane from all the work?
+
+upper-4:
+  script_after: TerminalModule.state_variables.day4.evening_note_talk.upper = true
+  responses:
+  - text: Best we can do is speculate, until I actually get there.
+    next: 3
+
+digitizing-1:
+  char: maj
+  wait: true
+  text: >-
+    Actually, I may have something to say about this one.
+
+digitizing-2:
+  char: narra
+  text: >-
+    ... I totally forgot you were listening.
+
+digitizing-3:
+  char: maj
+  text: >-
+    Right. Well, I was here all the time. Very interesting, indeed. So, it's not exactly out of question that it is
+    possible to say, scan someone's body with some sort of advanced techology to perfectly or very nearly perfectly
+    replicate it in a computer program. It'd take a while, sure, and the techology needed for such a thing must really
+    be unique. I can't even begin to imagine how much time and resources this must have taken. And that's not even
+    touching the part where all of this needs very specific software AND hardware developed from scratch, since it's
+    such an intricate and complicated process. This person clearly was some sort of genius to do this, and I must admit,
+    I admire them even more greatly for this. Still, geniuses make mistakes too, and clearly don't live forever when it
+    comes to your world. I can understand not wanting to forget all the work you've done on this techology, since there
+    would be nobody else besides you who knows how everything works. They're probably gone now, so that is the case
+    either way. You, and I mean <= state_variables.input_variables.p >, will have to figure something out for this, if
+    you want to.. well, I suppose come live here with us. This must be what they meant by saving yourself.
+
+digitizing-4:
+  char: player
+  script_after: TerminalModule.state_variables.day4.evening_note_talk.digitizing = true
+  responses:
+  - text: >-
+      This totally beats spending my life in here. I'll have to do it, not like there's much choice.
+    next: 3
+  - text: >-
+      I'll try my best to figure something out, though I'm not sure how well I'm fit for the task. Still, there's nobody
+      else that can do it.
+    next: 3
+
+memories-1:
+  char: narra
+  text: >-
+    That's a.. complicated topic. Of course, on one hand I want to know. On the other hand, I may have been a completely
+    different person. The two of us may.. conflict. I don't really want to think about this right now, we have enough
+    problems already besides this. It can probably wait.
+
+memories-2:
+  char: maj
+  text: Agreed.
+
+memories-3:
+  char: player
+  script_after: TerminalModule.state_variables.day4.evening_note_talk.memories = true
+  responses:
+  - text: I see. Well, that's settled, then. For now.
+    next: 3
+
+5:
+  char: narra
+  text: Continue..

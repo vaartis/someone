@@ -535,7 +535,13 @@ M.state_variables = {
       },
    },
    day4 = {
-      currently_talking_with_maj = false
+      currently_talking_with_maj = false,
+      evening_note_talk = {
+         outside = false,
+         digitizing = false,
+         memories = false,
+         upper = false
+      }
    },
    -- Instances that were decrypted
    decrypted_instances = {},
