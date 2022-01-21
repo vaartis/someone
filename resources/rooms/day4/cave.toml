@@ -100,7 +100,7 @@ text = "Must be why it's so dank in here, it's running pretty lively."
 
 [[entities.tilemap.tilemap.map."1".callback.args.phrases]]
 color = [135, 206, 235]
-text = "So it does go deeper, interesting. Going to write it down just in case."
+text = "so it does go deeper, interesting. going to write it down just in case."
 sound = { asset = "radio", volume = 8 }
 
 # Talking about the mountain being really thick
@@ -117,7 +117,7 @@ text = "The rock layer here seems to be really thick, doesn't seem to be any way
 
 [[entities.tilemap.tilemap.map."2".callback.args.phrases]]
 color = [135, 206, 235]
-text = "Yep, still here."
+text = "yep, still here."
 sound = { asset = "radio", volume = 8 }
 
 [[entities.tilemap.tilemap.map."2".callback.args.phrases]]
@@ -126,7 +126,7 @@ text = "We're on one of the south-west deep end of the cave, and I don't see any
 
 [[entities.tilemap.tilemap.map."2".callback.args.phrases]]
 color = [135, 206, 235]
-text = "Alright. Writing down that there's a thick layer of rock there."
+text = "alright. writing down that there's a thick layer of rock there."
 sound = { asset = "radio", volume = 8 }
 
 # Talking about tigh corridors
@@ -143,7 +143,7 @@ text = "Really don't like all these tight corridors. We can barely fit in here,\
 
 [[entities.tilemap.tilemap.map."3".callback.args.phrases]]
 color = [135, 206, 235]
-text = "At moments like these I'm glad that it's not me walking around there."
+text = "at moments like these i'm glad that it's not me walking around there."
 sound = { asset = "radio", volume = 8 }
 
 [[entities.tilemap.tilemap.map."3".callback.args.phrases]]
@@ -164,7 +164,7 @@ text = "That's really weird. There is something that looks like.. bricks here on
 
 [[entities.tilemap.tilemap.map."4".callback.args.phrases]]
 color = [135, 206, 235]
-text = "Bricks? Why would there be bricks there? Nothing like that is on the old maps either."
+text = "bricks? why would there be bricks there? nothing like that is on the old maps either."
 sound = { asset = "radio", volume = 8 }
 
 [[entities.tilemap.tilemap.map."4".callback.args.phrases]]
@@ -173,7 +173,7 @@ text = "There's also a wall that looks loose, maybe we can try pushing it.."
 
 [[entities.tilemap.tilemap.map."4".callback.args.phrases]]
 color = [135, 206, 235]
-text = "You should try, then. Please keep me posted."
+text = "you should try, then. please keep me posted."
 sound = { asset = "radio", volume = 8 }
 
 # Talking about dents in the walls
@@ -190,7 +190,7 @@ text = "There seems to be quite a few dents like this one in the walls here."
 
 [[entities.tilemap.tilemap.map."5".callback.args.phrases]]
 color = [135, 206, 235]
-text = "Noted. Maybe this is just a normal thing for caves, we haven't seen that many thoroughly."
+text = "noted. maybe this is just a normal thing for caves, we haven't seen that many thoroughly."
 sound = { asset = "radio", volume = 8 }
 
 # Background water sound
