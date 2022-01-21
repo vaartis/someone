@@ -116,7 +116,7 @@ digitizing-1:
   char: maj
   wait: true
   text: >-
-    Actually, I may have something to say about this one.
+    actually, i may have something to say about this one.
 
 digitizing-2:
   char: narra
@@ -126,17 +126,17 @@ digitizing-2:
 digitizing-3:
   char: maj
   text: >-
-    Right. Well, I was here all the time. Very interesting, indeed. So, it's not exactly out of question that it is
+    right. well, i was here all the time. very interesting, indeed. so, it's not exactly out of question that it is
     possible to say, scan someone's body with some sort of advanced techology to perfectly or very nearly perfectly
-    replicate it in a computer program. It'd take a while, sure, and the techology needed for such a thing must really
-    be unique. I can't even begin to imagine how much time and resources this must have taken. And that's not even
-    touching the part where all of this needs very specific software AND hardware developed from scratch, since it's
-    such an intricate and complicated process. This person clearly was some sort of genius to do this, and I must admit,
-    I admire them even more greatly for this. Still, geniuses make mistakes too, and clearly don't live forever when it
-    comes to your world. I can understand not wanting to forget all the work you've done on this techology, since there
-    would be nobody else besides you who knows how everything works. They're probably gone now, so that is the case
-    either way. You, and I mean <= state_variables.input_variables.p >, will have to figure something out for this, if
-    you want to.. well, I suppose come live here with us. This must be what they meant by saving yourself.
+    replicate it in a computer program. it'd take a while, sure, and the techology needed for such a thing must really
+    be unique. i can't even begin to imagine how much time and resources this must have taken. and that's not even
+    touching the part where all of this needs very specific software and hardware developed from scratch, since it's
+    such an intricate and complicated process. this person clearly was some sort of genius to do this, and i must admit,
+    i admire them even more greatly for this. still, geniuses make mistakes too, and clearly don't live forever when it
+    comes to your world. i can understand not wanting to forget all the work you've done on this techology, since there
+    would be nobody else besides you who knows how everything works. they're probably gone now, so that is the case
+    either way. you, and i mean <= state_variables.input_variables.p >, will have to figure something out for this, if
+    you want to.. well, i suppose come live here with us. this must be what they meant by saving yourself.
 
 digitizing-4:
   char: player
@@ -159,7 +159,7 @@ memories-1:
 
 memories-2:
   char: maj
-  text: Agreed.
+  text: agreed.
 
 memories-3:
   char: player
@@ -170,4 +170,4 @@ memories-3:
 
 5:
   char: narra
-  text: Continue..
+  text: Alright, enough hanging around in this cave, let's head back and meet at Maj's

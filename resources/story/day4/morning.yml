@@ -59,7 +59,7 @@ config:
   char: maj
   wait: true
   text: >-
-    Well, you see.. We've only ever gone there a long time ago, when we just found out what fire is. The trip was documented, of course,
+    well, you see.. we've only ever gone there a long time ago, when we just found out what fire is. the trip was documented, of course,
     but not exactly too well, it was quite difficult with what was available at the time, and afterwards everyone seemed to just lose interest
     in it, because it was dark and dank and nobody wants to go there even if there's probably no danger in doing it.
 
@@ -72,8 +72,8 @@ config:
   char: maj
   wait: true
   text: >-
-    Well, you never know.. So, I though you two should go and look around again with some of the new equipment I got. I could go with you,
-    of course, but I'd rather coordinate this whole thing from here with these handy things..
+    well, you never know.. so, i though you two should go and look around again with some of the new equipment i got. i could go with you,
+    of course, but i'd rather coordinate this whole thing from here with these handy things..
 
 11:
   char: description
@@ -86,12 +86,12 @@ config:
   char: maj
   wait: true
   text: >-
-    Basically, these things allow us to communicate remotely AND without having to put a long wire between the two places. I've set this up a while ago,
-    and there's a base station here in the village. The range is alright, but it can't pierce through super thick things like mountains so you'll have
-    to take this retranslator in the backpack with you. It's a bit heavy but nothing too bad, I'm sure you'll manage. It has a battery that should
-    last you for some time. Set it up at the entrace of the cave, and we should be able to communicate when you're inside. I've also prepared an
-    electrical lamp for you. Sorry, only one lamp because the backpack is already heavy, so you'll have to stick
-    together. Look around for anything interesting while you're in there of course, but please remember to document it on the map too.
+    basically, these things allow us to communicate remotely and without having to put a long wire between the two places. i've set this up a while ago,
+    and there's a base station here in the village. the range is alright, but it can't pierce through super thick things like mountains so you'll have
+    to take this retranslator in the backpack with you. it's a bit heavy but nothing too bad, i'm sure you'll manage. it has a battery that should
+    last you for some time. set it up at the entrace of the cave, and we should be able to communicate when you're inside. i've also prepared an
+    electrical lamp for you. sorry, only one lamp because the backpack is already heavy, so you'll have to stick
+    together. look around for anything interesting while you're in there of course, but please remember to document it on the map too.
 
 13:
   char: player
