@@ -8,6 +8,8 @@ config:
       color: [211, 0, 0]
     maj:
       color: [135, 206, 235]
+    kiki:
+      color: [0, 121, 100]
   dialogue_between: [narra, player]
 
 1:
@@ -170,4 +172,160 @@ memories-3:
 
 5:
   char: narra
-  text: Alright, enough hanging around in this cave, let's head back and meet at Maj's
+  text: Alright, enough hanging around in this cave, let's head back to Maj's place.
+
+6:
+  char: maj
+  text: >-
+    alright, you've been there for a while. i'll be waiting, maybe tell me when you're nearby so i can put the kettle on
+    and make tea beforehand. i'll also go invite kiki over.
+
+7:
+  char: narra
+  text: Got it.
+
+8:
+  char: description
+  wait: true
+  text: >-
+    You trace back your steps to the entrance of the cave. When you're out of the cave, it's evening already.
+    You put the big device and the lamp back into the backpack and head home. The note, still in your hand,
+    goes into the backpack, too.
+
+9:
+  char: narra
+  text: >-
+    Guess Maj was right about us being in there for a long time. Time sure flies.
+
+10:
+  char: player
+  responses:
+  - text: >-
+      Wasn't that long for me,
+      < if state_variables.talks.narra.found_food then >
+      but we already know time works differently for you, so now wonder.
+      < else >
+      seems like time isn't exactly flowing in the same way here outside.
+      < end >
+
+11:
+  char: narra
+  wait: true
+  text: >-
+    < if state_variables.talks.narra.found_food then >
+    Yeah, still don't really get it.
+    < else >
+    I don't really understand how that works, I guess computers can do that?
+    Maj'd probably understand this, but I don't really want to bother him.
+    < end >
+
+12:
+  char: description
+  text: >-
+    After a bit, you're closing in on the village.
+
+13:
+  char: narra
+  text: >-
+    Hey, we're almost there. Did you get Kiki already?
+
+14:
+  char: kiki
+  text: >-
+    Indeed, I am here. I've been busy with my plants at home, as usual, so I'd rather like
+    to know, how your little trip to that old cave went.
+
+15:
+  char: description
+  wait: true
+  text: >-
+    After a few more minutes, you get to Maj's house and go in as usual, unsurprisingly finding Maj and Kiki in the
+    kitchen sipping tea already. You both sit at the table, Maj pours you some tea. Since he's boiled the water
+    beforehand, it's not too hot by now, in fact it's of perfect drinking temperature, so you both have some.
+
+16:
+  char: narra
+  text: >-
+    Hey. So.. Cutting to the chase, Maj suggested we go explore that old cave with an actual lamp this time. Since,
+    you know, nobody's been there in a while, it wasn't exactly very interesting.
+
+17:
+  char: kiki
+  text: >-
+    Aha, Yes. So, he suggested you go look around, and what did you find?
+
+18:
+  char: narra
+  wait: true
+  text: >-
+    Well, turns out someone.. called W.S., whatever these initials are supposed to mean, has left a note in there some time ago.
+    For <= state_variables.input_variables.p>, mostly, but some bits were about me, too. It must've been the creator,
+    obviously, there isn't anyone else who could have done something like that. I'll just.. give you the note to read
+    yourself.
+
+19:
+  char: description
+  text: >-
+    Narra takes the note out of the backback, and Kiki takes some time to read and re-read the note, then returns it.
+
+20:
+  char: kiki
+  text: >-
+    What a.. peculiar situation. Well, <= state_variables.input_variables.p>, we're counting on you. Though it is clearly
+    in your best interest to do it for yourself, too. The creator.. they really were a genius, it's a shame it had to
+    end like this, but what's done is done, that's what they decided for themselves and, in part, for you. It's a
+    responsibility, of course, but I believe you can manage it.
+
+21:
+  char: player
+  responses:
+  - text: Thank you for the encouragement.
+  - text: I hope I'll manage to do it, and bear this responsibility.
+
+22:
+  char: kiki
+  text: >-
+    Now, I think I'll head home back to my sweeties. Maj, I must say, your tea is delicious, as usual.
+
+23:
+  char: maj
+  text: >-
+    thank you. it's really nothing special, but i try my best.
+
+24:
+  char: kiki
+  text: Goodnight, everyone.
+
+25:
+  char: description
+  text: As you wave goodbyes, she leaves.
+
+26:
+  char: narra
+  wait: true
+  text: >-
+    I guess we should be going too. <= state_variables.input_variables.p> will probably
+    have some work tonight, seeing as they've gained access to the upper levels.
+
+27:
+  char: description
+  wait: true
+  text: >-
+    You say your goodbyes and leave, going home. Narra has a bath, as usual, and meets you in the bedroom,
+    ready to sleep.
+
+28:
+  char: narra
+  text: >-
+    It's been an exhausting day, I really needed that bath. And some rest, now.
+
+29:
+  char: player
+  responses:
+  - text: Of course. Goodnight.
+  - text: Get a good rest. Goodnight.
+
+30:
+  char: description
+  text: >-
+    She falls asleep fast, and after some tossing and turning you do too.
