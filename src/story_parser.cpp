@@ -11,6 +11,11 @@
 #include "string_utils.hpp"
 #include "line_data.hpp"
 
+#ifndef NDEBUG
+#include <fstream>
+#include "toml++/toml.h"
+#endif
+
 namespace YAML {
 
 template <> struct convert<sf::Color> {
@@ -57,6 +62,7 @@ void StoryParser::total_wordcount() {
       }
   }
 
+  uint32_t total_wordcount = 0;
   uint32_t wordcount = 0;
   for (const auto &str : all_strings) {
       bool in_script = false;
@@ -67,11 +73,36 @@ void StoryParser::total_wordcount() {
           if (ch == '>' && in_script)
               in_script = false;
           if (!in_script && std::isspace(ch))
-              wordcount += 1;
+              wordcount++;
       }
   }
+  total_wordcount += wordcount;
 
-  spdlog::debug("Total amount of words: {}", wordcount);
+  uint32_t notes_wordcount = 0;
+  {
+      auto notes_file = toml::parse_file("resources/rooms/notes.toml");
+      for (auto kv : notes_file) {
+          toml::table *note = kv.second.as_table();
+
+          auto main_text = note->get("text");
+          auto text = main_text->as_string()->get();
+          for (const char ch : text) {
+              if (std::isspace(ch))
+                  notes_wordcount++;
+          }
+
+          if (auto bottom_text = note->get("bottom_text"); bottom_text) {
+              auto bot_text = bottom_text->as_string()->get();
+              for (const char ch : bot_text) {
+                  if (std::isspace(ch))
+                      notes_wordcount++;
+              }
+          }
+      }
+  }
+  total_wordcount += notes_wordcount;
+
+  spdlog::debug("Total amount of words: {} ({} + {})", total_wordcount, wordcount, notes_wordcount);
 }
 #endif
 
