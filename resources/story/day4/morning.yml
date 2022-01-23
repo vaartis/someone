@@ -8,6 +8,8 @@ config:
       color: [211, 0, 0]
     maj:
       color: [135, 206, 235]
+    kiki:
+      color: [0, 121, 100]
 
 1:
   char: description
@@ -97,8 +99,8 @@ config:
   char: player
   responses:
   - text: Right.. I guess there could be something interesting in there.
-  # TODO: do something else, like talk to kiki
-  # -
+  - text: I want to go say good morning to Kiki first.
+    next: kiki-1
 
 14:
   char: narra
@@ -115,3 +117,63 @@ config:
     you putting what Maj called the retranslator at the mouth of the cave and press the only big red button it has. The machine confirms
     with a loud beep that it is on. With that, you turn the lamp on and enter the cave.
   next: day4/evening/1
+
+kiki-1:
+  char: narra
+  text: >-
+    Sure, I'll be here with Maj, just don't be too long.
+
+kiki-2:
+  char: description
+  wait: true
+  text: >-
+    You nod and are on your way to Kiki's house, easily distringushed by the flowers on her veranda and those seen inside through the window.
+    You go up to the door and knock a few time. You hear her footsteps from inside the house.
+
+kiki-3:
+  char: kiki
+  text: >-
+    Coming!
+
+kiki-4:
+  char: description
+  text: >-
+    She opens the door, looking at you with a smile.
+
+kiki-5:
+  char: player
+  responses:
+  - text: Hey, just wanted to come say good morning, before me and Narra go mapping out that cave, from which the spring flows out.
+
+kiki-6:
+  char: kiki
+  text: >-
+    A good morning indeed. That old cave really hasn't gotten any attention in a long time, it's so dark in there you can't see
+    a thing.
+
+kiki-7:
+  char: player
+  responses:
+  - text: >-
+      So Maj suggested we take some new equipment like lamps and.. some remote communication thing, and go look around there.
+      He even prepared a backpack with everything for us.
+
+kiki-8:
+  char: kiki
+  text: >-
+    How sweet of him. Well, go on, see what you can find in there, map that place out properly. And when you come back,
+    do tell me how all that goes.
+
+kiki-9:
+  char: player
+  script_after: TerminalModule.state_variables.day4.morning_talk_with_kiki = true
+  responses:
+  - text: Of course.
+  - text: Sure.
+
+kiki-10:
+  char: description
+  text: >-
+    She smiles again and goes back inside, and you are on your way back to Narra and Maj, still talking in front of his house.
+    You wave to them again as you come close.
+  next: 14

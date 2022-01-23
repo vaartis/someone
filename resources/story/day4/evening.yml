@@ -232,8 +232,13 @@ memories-3:
 14:
   char: kiki
   text: >-
-    Indeed, I am here. I've been busy with my plants at home, as usual, so I'd rather like
-    to know, how your little trip to that old cave went.
+    Indeed, I am here. I've been busy with my plants at home, as usual.
+    < if state_variables.day4.morning_talk_with_kiki then >
+    <= state_variables.input_variables.p> told me about your plans to map out the cave in the morning,
+    < else >
+    Maj mentioned your plans to map out the cave briefly when I came around during the day to say hi,
+    < end >
+    so I'd rather like to hear how your little trip to that old cave went.
 
 15:
   char: description
@@ -246,13 +251,18 @@ memories-3:
 16:
   char: narra
   text: >-
-    Hey. So.. Cutting to the chase, Maj suggested we go explore that old cave with an actual lamp this time. Since,
+    So.. Cutting to the chase, Maj suggested we go explore that old cave with an actual lamp this time. Since,
     you know, nobody's been there in a while, it wasn't exactly very interesting.
 
 17:
   char: kiki
   text: >-
-    Aha, Yes. So, he suggested you go look around, and what did you find?
+    < if state_variables.day4.morning_talk_with_kiki then >
+    Yes, <= state_variables.input_variables.p> mentioned something like this.
+    < else >
+    I see.
+    < end >
+    So, did you find anything intersting in there?
 
 18:
   char: narra

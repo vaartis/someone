@@ -536,6 +536,7 @@ M.state_variables = {
    },
    day4 = {
       currently_talking_with_maj = false,
+      morning_talk_with_kiki = false,
       evening_note_talk = {
          outside = false,
          digitizing = false,
