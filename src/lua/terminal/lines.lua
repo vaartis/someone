@@ -404,7 +404,7 @@ function M.VariantInputLine:fields_to_save()
 end
 
 M.TextInputLine = class("TextInputLine", M.TerminalLine)
-function M.TextInputLine:initialize(before, after, variable, max_length, nxt)
+function M.TextInputLine:initialize(before, after, variable, max_length, filters, nxt)
    M.TextInputLine.super.initialize(self)
 
    self._next = nxt
@@ -414,6 +414,7 @@ function M.TextInputLine:initialize(before, after, variable, max_length, nxt)
    self._after = insert_variables(name, after)
    self._variable = variable
    self._max_length = max_length
+   self._filters = filters
 
    self._done_input = false
    self._input_text = ""
@@ -498,13 +499,37 @@ function M.TextInputLine:handle_interaction(event)
             self._done_input = true
 
             -- Set the variable
-            TerminalModule.state_variables.input_variables[self._variable] = self._input_text
+            if self._variable:find(".") then
+               -- If there's a dot it's a global variable
+
+               local _, lastdot = self._variable:find(".*%.")
+               local path = self._variable:sub(0, lastdot - 1)
+               local var_name = self._variable:sub(lastdot + 1)
+
+               require(path)[var_name] = self._input_text
+            else
+               TerminalModule.state_variables.input_variables[self._variable] = self._input_text
+            end
 
             return true
          end
       elseif event.type == EventType.TextEntered then
-         if GLOBAL.isalpha(event.text.unicode) and #self._input_text < self._max_length then
-            local char = utf8.char(event.text.unicode)
+         local char = utf8.char(event.text.unicode)
+
+         local allowed = false
+         for _, filter in ipairs(self._filters) do
+            if filter == "alpha" then
+               allowed = GLOBAL.isalpha(event.text.unicode)
+            elseif filter == "numeric" then
+               allowed = tonumber(char) ~= nil
+            elseif filter == "path" then
+               allowed = lume.find({ ".", "/", "\\", "%" }, char) == nil and not GLOBAL.iscntrl(event.text.unicode)
+            end
+
+            if allowed then break end
+         end
+
+         if allowed and #self._input_text < self._max_length then
             self._input_text = self._input_text .. char
             self._letters_output = self._letters_output + 1
 
@@ -546,7 +571,7 @@ function M.make_line(name, line_source)
    elseif tp == "TerminalVariantInputLineData" then
       to_insert = M.VariantInputLine:newFromAllocated(to_insert, line.variants)
    elseif tp == "TerminalTextInputLineData" then
-      to_insert = M.TextInputLine:newFromAllocated(to_insert, line.before, line.after, line.variable, line.max_length, line.next)
+      to_insert = M.TextInputLine:newFromAllocated(to_insert, line.before, line.after, line.variable, line.max_length, line.filters, line.next)
    elseif tp == "TerminalCustomLineData" then
       to_insert = line.class:newFromAllocated(to_insert, line.data)
    else

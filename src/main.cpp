@@ -129,6 +129,7 @@ int main(int argc, char **argv) {
         "get_current_state", [&]() { return current_state; },
         // Apparently lua doesn't have a good equivalent
         "isalpha", [](int num) { return std::isalpha(num) != 0; },
+        "iscntrl", [](int num) { return std::iscntrl(num) != 0; },
         "loaded_mods", loaded_mods
     );
 

@@ -94,6 +94,7 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
         "after", sol::readonly(&TerminalTextInputLineData::after),
         "variable", sol::readonly(&TerminalTextInputLineData::variable),
         "max_length", sol::readonly(&TerminalTextInputLineData::max_length),
+        "filters", sol::readonly(&TerminalTextInputLineData::filters),
         "next", sol::readonly(&TerminalTextInputLineData::next)
     );
 

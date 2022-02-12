@@ -409,11 +409,18 @@ void StoryParser::parse(std::string file_name, std::filesystem::path base) {
                 next_references_to_check.insert({inserted_name, next});
             }
 
+            std::vector<std::string> filters;
+            if (data["filters"]) {
+                filters = data["filters"].as<std::vector<std::string>>();
+            } else {
+                filters = { "alpha" };
+            }
+
             result_object =
                 sol::make_object<TerminalTextInputLineData>(
                     lua,
                     data["before"].as<std::string>(), data["after"].as<std::string>(), data["variable"].as<std::string>(),
-                    data["max_length"].as<uint32_t>(), next
+                    data["max_length"].as<uint32_t>(), filters, next
                 );
         } else if (node["custom"]) {
             auto custom = node["custom"];
