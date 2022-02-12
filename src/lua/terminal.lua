@@ -70,7 +70,36 @@ function show_info_message(message, params)
    )
 end
 
-local function save_game(first_line, last_line)
+-- Set before showing the save game menu, which calls the save_game function
+-- after the slot has been selected
+M.save_game_lines = { first_line = nil, last_line = nil }
+-- Selected in the save menu
+M.selected_save_slot = nil
+function M.save_game()
+   local first_line, last_line = M.save_game_lines.first_line, M.save_game_lines.last_line
+
+   local known_slots = require("terminal.save_load_menu").known_slots
+
+   local slot_path
+   local maybe_slot_num = tonumber(M.selected_save_slot)
+   if maybe_slot_num then
+      if maybe_slot_num > #known_slots then
+         -- Show a error
+         M.set_first_line_on_screen("save_load/save_load/save-error")
+         return
+      end
+
+      slot_path = known_slots[maybe_slot_num]
+   else
+      if lume.trim(M.selected_save_slot) == "" then
+         -- Show a error
+         M.set_first_line_on_screen("save_load/save_load/save-error")
+         return
+      end
+
+      slot_path = lume.format("saves/{1}.toml", {M.selected_save_slot})
+   end
+
    local lines_to_save = {}
    local current_line = first_line
 
@@ -97,7 +126,7 @@ local function save_game(first_line, last_line)
 
    -- Encode and save the data
    local toml_encoded = TOML.encode(saved_data)
-   local file, err = io.open("save.toml", "w")
+   local file, err = io.open(slot_path, "w")
    if err then
       show_info_message("Error while saving: \"" .. err .. "\"")
 
@@ -108,52 +137,61 @@ local function save_game(first_line, last_line)
    file:close()
 
    show_info_message("Game saved")
+
+   -- Exit the save menu and return to the game
+   M.save_or_restore_first("save", nil)
 end
 
-local function load_game()
-   local file, err = io.open("save.toml", "r")
+function M.load_game()
+   local known_slots = require("terminal.save_load_menu").known_slots
+
+   local slot_num = tonumber(M.selected_save_slot)
+   if slot_num > #known_slots then
+      -- Show a error
+      M.set_first_line_on_screen("save_load/save_load/load-error")
+      return
+   end
+   local slot_path = known_slots[slot_num]
+
+   local data, err = TOML.parse(slot_path)
    if err then
-      show_info_message("Error loading save data: \"" .. err .. "\"")
+      show_info_message("Error decoding save data: \"" .. err .. "\"")
+      M.set_first_line_on_screen("save_load/save_load/load-error")
+
+      return
    end
-   file:close()
 
-   if file then
-      local data, err = TOML.parse("save.toml")
-      if err then
-         show_info_message("Error decoding save data: \"" .. err .. "\"")
+   -- Reset manually
+   M.saved_first = {}
 
-         return
+   local first_line_name = data["lines"]["first_line"]
+   local last_line_name = data["lines"]["last_line"]
+
+   local first_line = lines.make_line(first_line_name, lines.native_lines)
+   local current_line = first_line
+   while true do
+      -- Copy the values, preserving the metatable
+      for k, v in pairs(data["lines"][current_line._name]) do
+         current_line[k] = v
       end
 
-      local first_line_name = data["lines"]["first_line"]
-      local last_line_name = data["lines"]["last_line"]
+      if current_line._name == last_line_name then break end
 
-      local first_line = lines.make_line(first_line_name, lines.native_lines)
-      local current_line = first_line
-      while true do
-         -- Copy the values, preserving the metatable
-         for k, v in pairs(data["lines"][current_line._name]) do
-            current_line[k] = v
-         end
-
-         if current_line._name == last_line_name then break end
-
-         current_line = current_line:next()
-      end
-
-      -- Just in case, reset like after text input
-      lines.reset_after_text_input()
-
-      first_line_on_screen = first_line
-
-      M.state_variables = util.deep_merge(M.state_variables, data["variables"])
-
-      if data.environment then
-         M.set_environment_image(data.environment.name)
-      end
-
-      show_info_message("Game loaded")
+      current_line = current_line:next()
    end
+
+   -- Just in case, reset like after text input
+   lines.reset_after_text_input()
+
+   first_line_on_screen = first_line
+
+   M.state_variables = util.deep_merge(M.state_variables, data["variables"])
+
+   if data.environment then
+      M.set_environment_image(data.environment.name)
+   end
+
+   show_info_message("Game loaded")
 end
 
 local time_before_output = 0.5
@@ -386,7 +424,21 @@ function M.update_event_timer(dt)
    time_since_last_interaction = time_since_last_interaction + dt
 end
 
-local main_instance_saved_first
+-- Saved first line to return to from special menus
+M.saved_first = { }
+
+function M.save_or_restore_first(save_to, go_to)
+   if not M.saved_first[save_to] then
+      M.saved_first[save_to] = first_line_on_screen
+      M.set_first_line_on_screen(go_to)
+   else
+      -- Reset the text input in case it was used
+      lines.reset_after_text_input()
+
+      first_line_on_screen = M.saved_first[save_to]
+      M.saved_first[save_to] = nil
+   end
+end
 
 function M.process_event(event, dt)
    local line = first_line_on_screen
@@ -411,25 +463,18 @@ function M.process_event(event, dt)
                -- Save the game
                if Keyboard.is_key_pressed(KeyboardKey.S) then
                   time_since_last_interaction = 0
+
                   -- Pass the first and the last line
-                  save_game(first_line_on_screen, line)
+                  M.save_game_lines = { first_line = first_line_on_screen, last_line = line }
+                  M.save_or_restore_first("save", "save_load/save_load/1")
                elseif Keyboard.is_key_pressed(KeyboardKey.L) then
                   time_since_last_interaction = 0
-                  -- Pass the first and the last line
-                  load_game()
+
+                  M.save_or_restore_first("load", "save_load/save_load/load-1")
                elseif Keyboard.is_key_pressed(KeyboardKey.Z) then
                   time_since_last_interaction = 0
 
-                  if not main_instance_saved_first then
-                     main_instance_saved_first = first_line_on_screen
-                     M.set_first_line_on_screen("instances/menu/1")
-                  else
-                     -- Reset the text input in case it was used in the instance menu
-                     lines.reset_after_text_input()
-
-                     first_line_on_screen = main_instance_saved_first
-                     main_instance_saved_first = nil
-                  end
+                  M.save_or_restore_first("main_instance", "instances/menu/1")
                end
             end
          end

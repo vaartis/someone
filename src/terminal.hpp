@@ -61,6 +61,7 @@ public:
         // Parse the lines from the prologue file and going forward from it
         parser.parse("day1/prologue");
         parser.parse("instances/menu");
+        parser.parse("save_load/save_load");
 
         // Add the lines from the loaded file
         set_lines();

@@ -1,0 +1,73 @@
+config:
+  chars:
+    text:
+      color: [255, 255, 255]
+    big_text:
+      color: [255, 255, 255]
+      font_size: 32
+    error:
+      color: [255, 0, 0]
+
+1:
+  text: "Save game"
+  char: big_text
+
+2:
+  text: >-
+    To overwrite a slot, input its number. To create a new slot, input a name for it. To cancel, press Ctrl+S again.
+  char: text
+
+3:
+  char: text
+  custom:
+    terminal.save_load_menu.SaveSlotsLine:
+      next: !line-name 4
+
+4:
+  char: text
+  text_input:
+    before: "Slot: "
+    after: ""
+    variable: terminal.selected_save_slot
+    max_length: 40
+    filters: [path]
+  script_after: |
+    TerminalModule.save_game()
+  next: ""
+
+save-error:
+  char: error
+  text: Invalid slot selected
+  next: 1
+
+load-1:
+  text: "Load game"
+  char: big_text
+
+load-2:
+  text: >-
+    To load a slot, input its number. To cancel, press Ctrl+L again.
+  char: text
+
+load-3:
+  char: text
+  custom:
+    terminal.save_load_menu.SaveSlotsLine:
+      next: !line-name load-4  
+
+load-4:
+  char: text
+  text_input:
+    before: "Slot: "
+    after: ""
+    variable: terminal.selected_save_slot
+    max_length: 3
+    filters: [numeric]
+  script_after: |
+    TerminalModule.load_game()
+  next: ""
+  
+load-error:
+  char: error
+  text: Invalid slot selected
+  next: load-1
