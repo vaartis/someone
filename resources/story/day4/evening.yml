@@ -15,7 +15,7 @@ config:
 1:
   char: description
   text: >-
-    After having read the note aloud. Both of you take a bit of time to think. There is a mix of emotions in Narra's
+    After having read the note aloud to her, both of you take a bit of time to think. There is a mix of emotions on Narra's
     face.
 
 2:
@@ -23,7 +23,7 @@ config:
   text: >-
     Right.. This clears thing up a bit. Conserving power must be important in such a situation. And I don't remember
     anything before my life here, that much is obvious, they clearly knew about this. Still, there must've been no other
-    choise if that was the necessary sacrifice for me to live. The initials aren't exactly helpful, though, we still
+    choice if that was the necessary sacrifice for me to live. The initials aren't exactly helpful, though, we still
     have no idea who that person is. Still they clearly cared about us enough to set up all this.. elaborate way of
     showing you around and doing all of the.. digitizing process in the first place.
 
