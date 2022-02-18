@@ -499,7 +499,7 @@ function M.TextInputLine:handle_interaction(event)
             self._done_input = true
 
             -- Set the variable
-            if self._variable:find(".") then
+            if self._variable:find("%.") then
                -- If there's a dot it's a global variable
 
                local _, lastdot = self._variable:find(".*%.")
