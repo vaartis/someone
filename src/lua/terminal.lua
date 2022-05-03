@@ -124,6 +124,8 @@ function M.save_game()
       saved_data["lines"][line._name] = line_saved_fields
    end
 
+   saved_data["version"] = 2
+
    -- Encode and save the data
    local toml_encoded = TOML.encode(saved_data)
    local file, err = io.open(slot_path, "w")
@@ -159,6 +161,13 @@ function M.load_game()
       M.set_first_line_on_screen("save_load/save_load/load-error")
 
       return
+   end
+
+   -- No version means version 1
+   if not data["version"] then
+      print("Migrating saved game 1->2")
+
+      data["variables"]["walking"] = data["walking_variables"]
    end
 
    -- Reset manually
