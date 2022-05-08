@@ -1,0 +1,10 @@
+[prefab]
+name = "day4/status_room"
+
+[entities.ladder_up.passage]
+from = "status_room"
+to = "upper_hall"
+player_y = 591
+
+[entities.ladder_up.interaction]
+callback = { module = "components.passage", name = "switch_room", self = true }

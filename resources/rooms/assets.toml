@@ -18,6 +18,9 @@ status_room = "room/status_room/status_room.png"
 food_room = "room/food_room/food_room.png"
 food_room_taken_can = "room/food_room/food_room_taken_can.png"
 
+upper_hall_background = "room/upper_hall/upper_hall_background.png"
+upper_hall_walls = "room/upper_hall/upper_hall_walls.png"
+
 table = "room/table/table.png"
 button = "room/button/button.png"
 passage = "room/passage/passage.png"

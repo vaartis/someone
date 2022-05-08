@@ -1,0 +1,36 @@
+[shaders.room_darker]
+n = 1
+ambientLightLevel = 0.4
+
+[entities.background.drawable]
+kind = "sprite"
+texture_asset = "upper_hall_background"
+z = 0
+
+[entities.walls.drawable]
+kind = "sprite"
+texture_asset = "upper_hall_walls"
+z = 4
+
+[entities.player]
+prefab = "player"
+
+[entities.player.transformable]
+position = [300, 811]
+
+[entities.ladder_passage.transformable]
+position = [ 431, 600 ]
+
+[entities.ladder_passage.collider]
+size = [ 80, 200 ]
+trigger = true
+mode = "constant"
+
+[entities.ladder_passage.passage]
+from = "upper_hall"
+to = "status_room"
+player_y = 650
+
+[entities.ladder_passage.interaction]
+callback = { module = "components.passage", name = "switch_room", self = true }
+action_text = "climb down"

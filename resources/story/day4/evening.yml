@@ -337,5 +337,7 @@ memories-3:
 
 30:
   char: description
+  wait: true
+  script_after: TerminalModule.switch_to_walking("day5/computer_room")
   text: >-
     She falls asleep fast, and after some tossing and turning you do too.

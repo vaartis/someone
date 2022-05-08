@@ -57,7 +57,7 @@ to = "food_room"
 player_y = 644
 
 [entities.ladder.interaction]
-action_text = "go down"
+action_text = "climb down"
 callback = { module = "components.passage", name = "switch_room", self = true }
 
 [entities.ladder_up.transformable]
@@ -69,7 +69,7 @@ mode = "constant"
 trigger = true
 
 [entities.ladder_up.interaction]
-action_text = "go up"
+action_text = "climb up"
 callback = { module = "components.status_room", name = "check_way_up", args = [ "Seems like the way up is blocked by something" ] }
 
 [entities.box_note.transformable]
