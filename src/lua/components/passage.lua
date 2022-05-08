@@ -39,7 +39,10 @@ function M.get_final_room_name(passage_comp)
          "{1}/{2}", { rooms.current_namespace, passage_comp.to }
       )
 
-      local exists = "resources/rooms/" .. in_current_namespace .. ".toml"
+      local f = io.open("resources/rooms/" .. in_current_namespace .. ".toml", "r")
+      local exists = f ~= nil
+      if f then f:close() end
+
       if exists then
          -- A version of the room in the current namespace exists, load that version
          final_room_name = in_current_namespace
@@ -63,7 +66,10 @@ function M.get_final_room_name(passage_comp)
                { without_number, number, passage_comp.to }
             )
 
-            local exists = "resources/rooms/" .. name_to_use .. ".toml"
+            local f = io.open("resources/rooms/" .. name_to_use .. ".toml", "r")
+            local exists = f ~= nil
+            if f then f:close() end
+
             if exists then
                return name_to_use
             elseif number == 0 then
