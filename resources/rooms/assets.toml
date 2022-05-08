@@ -21,6 +21,9 @@ food_room_taken_can = "room/food_room/food_room_taken_can.png"
 upper_hall_background = "room/upper_hall/upper_hall_background.png"
 upper_hall_walls = "room/upper_hall/upper_hall_walls.png"
 
+upper_door_background = "room/upper_door/upper_door_background.png"
+upper_door_walls = "room/upper_door/upper_door_walls.png"
+
 table = "room/table/table.png"
 button = "room/button/button.png"
 passage = "room/passage/passage.png"

@@ -34,3 +34,20 @@ player_y = 650
 [entities.ladder_passage.interaction]
 callback = { module = "components.passage", name = "switch_room", self = true }
 action_text = "climb down"
+
+[entities.upper_door_passage_from]
+transformable = { position = [ 860, 650 ] }
+collider = { mode = "constant", size = [ 40, 176 ], trigger = true }
+passage = { to = "upper_door", player_y = 650 }
+
+[entities.upper_door_passage]
+transformable = { position = [ 990, 650 ] }
+collider = { mode = "constant", size = [ 40, 200 ], trigger = true }
+
+[entities.upper_door_passage.passage]
+from = "upper_hall"
+to = "upper_door"
+
+[entities.upper_door_passage.interaction]
+touch_activated = true
+callback = { module = "components.passage", name = "switch_room", self = true }

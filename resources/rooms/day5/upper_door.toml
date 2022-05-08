@@ -1,0 +1,41 @@
+[shaders.circle_light]
+brightness = 0.1
+n = 2
+point = [ 730, 656 ]
+
+[shaders.room_darker]
+ambientLightLevel = 0.4
+n = 1
+
+[entities.background.drawable]
+kind = "sprite"
+texture_asset = "upper_door_background"
+z = 0
+
+[entities.background_walls.drawable]
+kind = "sprite"
+texture_asset = "upper_door_walls"
+z = 4
+
+[entities.player]
+prefab = "player"
+
+[entities.player.transformable]
+position = [ 300, 843 ]
+
+[entities.upper_hall_passage_from]
+transformable = { position = [ 110, 669 ] }
+collider = { mode = "constant", size = [ 40, 176 ], trigger = true }
+passage = { to = "upper_hall", player_y = 650 }
+
+[entities.upper_hall_passage]
+transformable = { position = [ 30, 650 ] }
+collider = { mode = "constant", size = [ 40, 200 ], trigger = true }
+
+[entities.upper_hall_passage.passage]
+from = "upper_door"
+to = "upper_hall"
+
+[entities.upper_hall_passage.interaction]
+touch_activated = true
+callback = { module = "components.passage", name = "switch_room", self = true }
