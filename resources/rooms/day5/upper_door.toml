@@ -47,3 +47,18 @@ collider = { mode = "constant", size = [ 80, 100 ], trigger = true }
 [entities.computer.interaction]
 callback = { module = "components.look_closer", name = "look", args = { prefab = "upper_door/look_outside" } }
 action_text = "look at the screen"
+
+[entities.door]
+transformable = { position = [ 941, 642 ] }
+collider = { mode = "constant", size = [ 40, 200 ], trigger = true }
+
+[entities.door.interaction]
+callback = { module = "components.look_closer", name = "look", args = { prefab = "upper_door/look_door" } }
+action_text = "go outside"
+
+[entities.right_wall.transformable]
+position = [ 985, 640 ]
+
+[entities.right_wall.collider]
+size = [ 50, 200 ]
+mode = "constant"

@@ -45,6 +45,7 @@ look_down = "room/walkway_room/look_down.png"
 status_room_computer = "room/status_room/computer_screen.png"
 
 upper_door_look_outside = "room/upper_door/look_outside.png"
+upper_door_look_door = "room/upper_door/look_door.png"
 
 mainchar = "mainchar/mainchar.png"
 food_room_look_at_can = "room/food_room/food_room_look_at_can.png"

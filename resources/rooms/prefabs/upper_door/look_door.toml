@@ -1,0 +1,7 @@
+prefab = "look_closer_image"
+
+[drawable]
+texture_asset = "upper_door_look_door"
+
+[children.caption.drawable]
+text = { text = "I don't think I should go out without preparing" }
