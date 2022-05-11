@@ -159,8 +159,13 @@ function AnimationSystem:update(dt)
 end
 
 function M.load_sheet_json(dir_path)
-   local dir_basename = path.basename(path.remove_dir_end(dir_path))
-   local json_path = tostring(path.join(dir_path, dir_basename)) .. ".json"
+   local json_path
+   if path.extension(dir_path) == ".json" then
+      json_path = dir_path
+   else
+      local dir_basename = path.basename(path.remove_dir_end(dir_path))
+      json_path = tostring(path.join(dir_path, dir_basename)) .. ".json"
+   end
 
    if _G.mod then
       json_path = lume.format("resources/mods/{1}/{2}", { getmetatable(_G.mod).name, json_path })
