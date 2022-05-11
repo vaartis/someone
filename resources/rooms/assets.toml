@@ -1,6 +1,7 @@
 [config]
 textures = { root = "sprites/" }
 sounds = { root = "sounds/" }
+shaders = { root = "shaders/" }
 
 [textures]
 
@@ -63,3 +64,17 @@ dial_jingle = "dial_jingle/dial_jingle.ogg"
 wind = "wind.ogg"
 water = "water.ogg"
 radio = "radio.ogg"
+
+[shaders.room_darker]
+file = "room_darker.frag"
+args = { n = "integer", ambientLightLevel = "float" }
+
+[shaders.circle_light]
+file = "circle_light.frag"
+args = { n = "integer", brightness = "float", point = "vec2i" }
+need_screen_size = true
+
+[shaders.cave]
+file = "cave.frag"
+args = { n = "integer", lightPoint = "vec2i", entrancePoint = "vec2i" }
+need_screen_size = true

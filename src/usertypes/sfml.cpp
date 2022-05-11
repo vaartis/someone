@@ -286,6 +286,15 @@ void register_sfml_usertypes(sol::state &lua, StaticFonts &fonts) {
         "TextEntered", sf::Event::TextEntered
     );
 
+    auto shader_type = lua.new_usertype<sf::Shader>(
+        "Shader", sol::constructors<sf::Shader()>(),
+        "load_from_file", sol::resolve<bool(const std::string &, sf::Shader::Type)>(&sf::Shader::loadFromFile)
+    );
+    auto shader_type_enum = lua.new_enum(
+        "ShaderType",
+        "Fragment", sf::Shader::Fragment
+    );
+
     // Not SFML, but mimicks the interface
 
     auto sound_buf_type = lua.new_usertype<someone::SoundBuffer>(

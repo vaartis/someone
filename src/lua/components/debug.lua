@@ -295,7 +295,7 @@ function M.show_callback_args(callback, callback_name)
 end
 
 local function shader_debug_menu()
-   local available_shaders = GLOBAL.available_shaders
+   local available_shaders = assets.assets.shaders
 
    if ImGui.BeginCombo("##add_shader_combo", debug_menu_state.adding_shader.name or "(none)") then
       for name, shader in pairs(available_shaders) do

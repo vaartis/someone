@@ -31,48 +31,8 @@ public:
         clear_event_store_f = module["clear_event_store"];
         load_room_f = module["load_room"];
 
-        shaders = lua.create_table();
-        lua["GLOBAL"]["available_shaders"] = shaders;
-
-        {
-            auto shader = std::make_unique<sf::Shader>();
-            shader->loadFromFile("resources/shaders/room_darker.frag", sf::Shader::Fragment);
-            shaders["room_darker"] = lua.create_table_with(
-                "shader", std::move(shader),
-                "declared_args", lua.create_table_with(
-                    "n", "integer",
-                    "ambientLightLevel", "float"
-                )
-            );
-        }
-
-        {
-            auto shader = std::make_unique<sf::Shader>();
-            shader->loadFromFile("resources/shaders/circle_light.frag", sf::Shader::Fragment);
-            shaders["circle_light"] = lua.create_table_with(
-                "shader", std::move(shader),
-                "declared_args", lua.create_table_with(
-                    "n", "integer",
-                    "brightness", "float",
-                    "point", "vec2i"
-                ),
-                "need_screen_size", true
-            );
-        }
-
-        {
-            auto shader = std::make_unique<sf::Shader>();
-            auto success = shader->loadFromFile("resources/shaders/cave.frag", sf::Shader::Fragment);
-            shaders["cave"] = lua.create_table_with(
-                "shader", std::move(shader),
-                "declared_args", lua.create_table_with(
-                    "n", "integer",
-                    "lightPoint", "vec2i",
-                    "entrancePoint", "vec2i"
-                ),
-                "need_screen_size", true
-            );
-        }
+        sol::table assets_module = lua.script("return require('components.assets')");
+        shaders = assets_module["assets"]["shaders"];
     }
 
     void update(float dt) {
@@ -132,7 +92,7 @@ public:
                 }
 
                 auto shader_tbl = *shader_tbl_;
-                std::unique_ptr<sf::Shader> &shader = shader_tbl["shader"];
+                sf::Shader *shader = shader_tbl["shader"];
 
                 if (sol::optional<bool> need_screen_size = shader_tbl["need_screen_size"];
                     need_screen_size.has_value() && *need_screen_size) {
@@ -184,7 +144,7 @@ public:
                     spdlog::error("Parameter {} of unknown type in shader {}", name, shader_name);
                 }
 
-                if (enabled) target_window.draw(shaders_sprite, shader.get());
+                if (enabled) target_window.draw(shaders_sprite, shader);
             }
         }
     }

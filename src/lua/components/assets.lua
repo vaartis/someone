@@ -10,12 +10,14 @@ local toml_data = nil
 
 local known_assets = {
   textures = {},
-  sounds = {}
+  sounds = {},
+  shaders = {}
 }
 
 M.assets = {
   textures = {},
-  sounds = {}
+  sounds = {},
+  shaders = {}
 }
 
 M.placeholder_texture = Texture.new()
@@ -36,11 +38,24 @@ local function load_from_known_assets(asset_type, key)
       asset = Texture.new()
    elseif asset_type == "sounds" then
       asset = SoundBuffer.new()
+   elseif asset_type == "shaders" then
+      asset = maybe_known_asset_path
+
+      -- Swap the name to be like other "functions" for debug menu
+      asset.declared_args = asset.args
+      asset.args = nil
+
+      asset.shader = Shader.new()
    else
       error("Unknown asset type: " .. tostring(asset_type))
    end
 
-   asset:load_from_file(maybe_known_asset_path)
+   if asset_type == "shaders" then
+      asset.shader:load_from_file(maybe_known_asset_path.file, ShaderType.Fragment)
+   else
+      asset:load_from_file(maybe_known_asset_path)
+   end
+
    M.assets[asset_type][key] = asset
 
    return asset
@@ -51,16 +66,16 @@ function M.list_known_assets(asset_type)
 end
 
 
-setmetatable(M.assets.textures, {
-  __index = function(_, key)
-    return load_from_known_assets("textures", key)
-  end
-})
-setmetatable(M.assets.sounds, {
-  __index = function(_, key)
-    return load_from_known_assets("sounds", key)
-  end
-})
+for k, v in pairs(M.assets) do
+   setmetatable(
+      v,
+      {
+         __index = function(_, key)
+            return load_from_known_assets(k, key)
+         end
+      }
+   )
+end
 
 M.used_assets = {}
 -- Mark table keys as weak, so they don't prevent GC
@@ -88,12 +103,11 @@ function M.create_sprite_from_asset(asset_name)
    return drawable
 end
 
-local debug_menu_state = {
-   textures = { selected = 1, search = "",
-                select_path_search = "", selected_dir = nil, selected_path = nil },
-   sounds = { selected = 1, search = "",
-              select_path_search = "" }
-}
+local debug_menu_state = { }
+for k, _ in pairs(M.assets) do
+   debug_menu_state[k] = { selected = 1, search = "",
+                           select_path_search = "", selected_dir = nil, selected_path = nil }
+end
 
 function M.debug_menu()
    local function list_toml_assets(key)
@@ -298,7 +312,8 @@ function M.load_assets()
 
    local asset_types = {
       { name = "textures", default_root = "sprites/"},
-      { name = "sounds", default_root = "sounds/"}
+      { name = "sounds", default_root = "sounds/"},
+      { name = "shaders", default_root = "shaders/"}
    }
 
    for _, asset_type in ipairs(asset_types) do
@@ -321,7 +336,13 @@ function M.load_assets()
                name = "mod." .. name
             end
 
-            add_to_known_assets(asset_type.name, name, path.join(root, asset_path))
+            if asset_type.name == "shaders" then
+               asset_path.file = path.join(root, asset_path.file)
+            else
+               asset_path = path.join(root, asset_path)
+            end
+
+            add_to_known_assets(asset_type.name, name, asset_path)
          end
       end
    end
