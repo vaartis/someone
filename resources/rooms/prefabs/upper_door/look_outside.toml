@@ -1,0 +1,12 @@
+prefab = "look_closer_image"
+
+[drawable]
+texture_asset = "upper_door_look_outside"
+
+[animation]
+sheet = "resources/sprites/room/upper_door/look_outside.json"
+playing = true
+loop = true
+
+[children.caption.drawable]
+text = { text = "So that's what's outside.." }

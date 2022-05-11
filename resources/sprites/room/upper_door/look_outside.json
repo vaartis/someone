@@ -1,0 +1,35 @@
+{ "frames": {
+   "1": {
+    "frame": { "x": 0, "y": 0, "w": 640, "h": 480 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 640, "h": 480 },
+    "sourceSize": { "w": 640, "h": 480 },
+    "duration": 200
+   },
+   "2": {
+    "frame": { "x": 0, "y": 480, "w": 640, "h": 480 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 640, "h": 480 },
+    "sourceSize": { "w": 640, "h": 480 },
+    "duration": 200
+   },
+   "3": {
+    "frame": { "x": 0, "y": 960, "w": 640, "h": 480 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 640, "h": 480 },
+    "sourceSize": { "w": 640, "h": 480 },
+    "duration": 200
+   }
+ },
+ "meta": {
+  "app": "http://www.aseprite.org/",
+  "version": "1.2.34.1-dev",
+  "image": "look_outside.png",
+  "format": "RGBA8888",
+  "size": { "w": 640, "h": 1440 },
+  "scale": "1"
+ }
+}

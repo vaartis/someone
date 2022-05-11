@@ -39,3 +39,11 @@ to = "upper_hall"
 [entities.upper_hall_passage.interaction]
 touch_activated = true
 callback = { module = "components.passage", name = "switch_room", self = true }
+
+[entities.computer]
+transformable = { position = [ 700, 600 ] }
+collider = { mode = "constant", size = [ 80, 100 ], trigger = true }
+
+[entities.computer.interaction]
+callback = { module = "components.look_closer", name = "look", args = { prefab = "upper_door/look_outside" } }
+action_text = "look at the screen"
