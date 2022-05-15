@@ -10,6 +10,26 @@ namespace {
 
 static std::map<std::string, toml::table> file_node_map;
 
+std::tuple<toml::key, toml::node_view<const toml::node>> find_by_path_with_key(const std::string &file, const std::vector<std::string> &path) {
+    const toml::table &file_table = file_node_map[file];
+
+    toml::node_view current_node(file_table);
+    toml::key result;
+
+    for (const auto &path_element : path) {
+        if (!current_node.as_table()->contains(path_element)) {
+            spdlog::error("Can't find path element {} in file {}", path_element, file);
+            std::terminate();
+        }
+
+
+        result = current_node.as_table()->find(path_element)->first;
+        current_node = current_node[path_element];
+    }
+
+    return std::make_tuple(result, current_node);
+}
+
 toml::node_view<const toml::node> find_by_path(const std::string &file, const std::vector<std::string> &path) {
     const toml::table &file_table = file_node_map[file];
 
@@ -20,7 +40,6 @@ toml::node_view<const toml::node> find_by_path(const std::string &file, const st
             spdlog::error("Can't find path element {} in file {}", path_element, file);
             std::terminate();
         }
-
 
         current_node = current_node[path_element];
     }
@@ -51,7 +70,7 @@ std::tuple<sol::object, sol::table> convert_to_lua(
 
                 for (auto [k, v] : node) {
                     auto sub_path = full_path;
-                    sub_path.push_back(k);
+                    sub_path.push_back(std::string(k.str()));
 
                     auto [val, src] = convert_to_lua(lua, v, need_source, sub_path);
                     if (src == sol::lua_nil)
@@ -61,8 +80,8 @@ std::tuple<sol::object, sol::table> convert_to_lua(
                         src["__node_path"] = sol::make_object(lua, sub_path);
                     }
 
-                    this_tbl[k] = val;
-                    tbl_src[k] = src;
+                    this_tbl[k.str()] = val;
+                    tbl_src[k.str()] = src;
                 }
                 if (need_source) {
                     tbl_src["__node_file"] = sol::make_object(lua, node_file);
@@ -202,7 +221,7 @@ std::string encode_toml(sol::this_state lua_, sol::object from, int inline_from_
     toml::default_formatter formatter(
         *result_view.node(),
         // Disable literal strings format flag by overriding it in the formatter
-        toml::format_flags::allow_multi_line_strings | toml::format_flags::allow_value_format_flags
+        toml::format_flags::allow_multi_line_strings | toml::format_flags::relaxed_float_precision
     );
     ss << formatter;
 
@@ -257,13 +276,11 @@ void delete_part_from_comp(sol::state_view lua, const std::string &deleted_name,
         // Again, if it doesn't exist in the parent node, then nothing is to be deleted
         return;
 
-    auto deleted_node = find_by_path(deleted_file, deleted_path).node();
-    auto deleted_location = deleted_node->source();
+    auto [deleted_key, deleted_node] = find_by_path_with_key(deleted_file, deleted_path);
+    auto deleted_location = deleted_node.node()->source();
 
     // For non-inline parent extend the location to capture the whole key
-    if (!parent_node->is_inline()) {
-        deleted_location.begin.column = 1;
-    }
+    deleted_location.begin = deleted_key.source().begin;
 
     std::ifstream toml_file;
     toml_file.open(deleted_file);
@@ -275,7 +292,7 @@ void delete_part_from_comp(sol::state_view lua, const std::string &deleted_name,
         // For inline parent, go back until the previous , or {
 
         // Go back from the initial { of the node if it's a table
-        if (deleted_node->is_table())
+        if (deleted_node.is_table())
             beginning--;
         while (contents[beginning] != ',' && contents[beginning] != '{')
             beginning--;
@@ -952,9 +969,11 @@ void save_asset(sol::this_state lua_,
 
         auto current_path = current_location["__node_path"].get<std::vector<std::string>>();
 
-        used_src = find_by_path(current_file, current_path).node()->source();
+        auto [used_key, used_node] = find_by_path_with_key(current_file, current_path);
+        used_src = used_node.node()->source();
+
         // Replace from the start of the line
-        used_src.begin.column = 1;
+        used_src.begin = used_key.source().begin;
     } else {
         auto category_path = category_locations["__node_path"].get<std::vector<std::string>>();
 
@@ -983,7 +1002,7 @@ void save_asset(sol::this_state lua_,
         toml::default_formatter formatter(
             kv_table,
             // Disable literal strings format flag by overriding it in the formatter
-            toml::format_flags::allow_multi_line_strings | toml::format_flags::allow_value_format_flags
+            toml::format_flags::allow_multi_line_strings | toml::format_flags::relaxed_float_precision
         );
 
         ss << formatter;
