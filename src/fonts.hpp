@@ -1,10 +1,12 @@
 #pragma once
 
-#include <SFML/Graphics/Font.hpp>
+#include <string>
+
+#include <SFML/Graphics/Text.hpp>
 
 struct StaticFonts {
     StaticFonts();
 
     sf::Font main_font;
-    static constexpr uint32_t font_size = 16;
+    static constexpr unsigned int font_size = 16;
 };

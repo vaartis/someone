@@ -1,11 +1,16 @@
 #include <filesystem>
 
-#include <SFML/Graphics.hpp>
-#include <SFML/Window/Event.hpp>
+#include <SFML/Window/Window.hpp>
+#include <SFML/System/Vector2.hpp>
 #include <SFML/System/Clock.hpp>
+#include <SFML/Graphics/Shader.hpp>
 
-#include "imgui.h"
-#include "imgui-SFML.h"
+//#include <SFML/Graphics.hpp>
+//#include <SFML/Window/Event.hpp>
+//#include <SFML/System/Clock.hpp>
+
+//#include "imgui.h"
+//#include "imgui-SFML.h"
 
 #include "sol/sol.hpp"
 
@@ -69,22 +74,20 @@ int main(int argc, char **argv) {
     uint8_t current_window_size = 0;
 
     const auto &default_size = window_sizes[current_window_size];
-    sf::RenderWindow window(sf::VideoMode(default_size.x, default_size.y), "Someone", sf::Style::Titlebar | sf::Style::Close);
+    sf::RenderWindow window(sf::VideoMode(default_size.x, default_size.y), "Someone");
     window.setFramerateLimit(60);
     window.setPosition(sf::Vector2i(0, 0));
 
-    ImGui::SFML::Init(window);
-    ImGuiIO& io = ImGui::GetIO();
+    //ImGui::SFML::Init(window);
+    //ImGuiIO& io = ImGui::GetIO();
     // Disable the ini file
-    io.IniFilename = nullptr;
+    //io.IniFilename = nullptr;
 
     sf::RenderTexture target;
     {
         auto winSize = window.getSize();
         target.create(winSize.x, winSize.y);
     }
-    auto &targetTexture = target.getTexture();
-    sf::Sprite targetSprite(targetTexture);
 
     StaticFonts static_fonts;
 
@@ -237,7 +240,7 @@ int main(int argc, char **argv) {
                     break;
                 }
             } else {
-                ImGui::SFML::ProcessEvent(event);
+                //ImGui::SFML::ProcessEvent(event);
             }
         }
 
@@ -256,7 +259,7 @@ int main(int argc, char **argv) {
 
             // Run all the drawing in lua and then draw it to the screen
             walking_env.draw();
-            walking_env.draw_target_to_window(window, targetSprite);
+            walking_env.draw_target_to_window(window, target);
 
             // Now clear the target and draw the overlay
             target.clear(sf::Color::Transparent);
@@ -277,14 +280,14 @@ int main(int argc, char **argv) {
         }
 
         // Draw what hasn't been drawn yet
-        window.draw(targetSprite);
+        window.draw(target);
 
         target.display();
 
         if (debug_menu) {
-            ImGui::SFML::Update(window, dt_time);
+            //ImGui::SFML::Update(window, dt_time);
 
-            ImGui::Begin("Debug menu", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+            //ImGui::Begin("Debug menu", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
             switch (current_state) {
             case CurrentState::Terminal:
@@ -295,10 +298,11 @@ int main(int argc, char **argv) {
                 break;
             }
 
-            ImGui::End();
+            //ImGui::End();
 
-            ImGui::SFML::Render(window);
+            //ImGui::SFML::Render(window);
         }
+
         window.display();
     }
 }

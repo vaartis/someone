@@ -8,8 +8,6 @@ file(MAKE_DIRECTORY
 
 if (NOT WIN32)
    set(SDL2_DISABLED
-   --disable-video --disable-video-vulkan --disable-video-dummy
-   --disable-render --disable-events
    --disable-joystick --disable-haptic --disable-sensor
    --disable-power)
 endif()
@@ -17,7 +15,7 @@ endif()
 ExternalProject_Add(SDL
   #URL "https://github.com/libsdl-org/SDL/archive/refs/tags/release-2.0.14.zip"
   GIT_REPOSITORY "https://github.com/libsdl-org/SDL"
-  GIT_TAG de6d290
+  GIT_TAG 61115ae
   # Keeps the project from rebuilding every time
   UPDATE_COMMAND ""
 
@@ -101,3 +99,57 @@ target_link_libraries(SDL2::SDL2_mixer INTERFACE
   SDL2::SDL2)
 target_include_directories(SDL2::SDL2_mixer INTERFACE "${SDL_MIXER_SRC}")
 add_dependencies(SDL2::SDL2_mixer SDL_mixer)
+
+set(SDL_GFX_INSTALL "${PROJECT_BINARY_DIR}/deps/SDL_gfx/install")
+ExternalProject_Add(SDL_gfx
+  URL "http://www.ferzkopp.net/Software/SDL2_gfx/SDL2_gfx-1.0.4.zip"
+
+  CONFIGURE_COMMAND
+  chmod +x <SOURCE_DIR>/configure
+  COMMAND
+  <SOURCE_DIR>/configure --prefix=${SDL_GFX_INSTALL} --disable-shared
+
+  BUILD_COMMAND make
+  INSTALL_COMMAND make install
+  PREFIX "${PROJECT_BINARY_DIR}/deps/SDL_gfx")
+add_library(SDL2::SDL2_gfx STATIC IMPORTED)
+set_target_properties(SDL2::SDL2_gfx
+  PROPERTIES IMPORTED_LOCATION "${SDL_GFX_INSTALL}/lib/libSDL2_gfx.a")
+add_dependencies(SDL2::SDL2_gfx SDL_gfx)
+target_include_directories(SDL2::SDL2_gfx INTERFACE "${PROJECT_BINARY_DIR}/deps/SDL_gfx/src/SDL_gfx")
+
+set(SDL_IMAGE_INSTALL "${PROJECT_BINARY_DIR}/deps/SDL_image/install")
+ExternalProject_Add(SDL_image
+  URL "https://github.com/libsdl-org/SDL_image/archive/refs/tags/release-2.0.5.zip"
+
+  CONFIGURE_COMMAND
+  chmod +x <SOURCE_DIR>/configure
+  COMMAND
+  <SOURCE_DIR>/configure --prefix=${SDL_IMAGE_INSTALL} --disable-shared
+
+  BUILD_COMMAND make
+  INSTALL_COMMAND make install
+  PREFIX "${PROJECT_BINARY_DIR}/deps/SDL_image")
+add_library(SDL2::SDL2_image STATIC IMPORTED)
+set_target_properties(SDL2::SDL2_image
+  PROPERTIES IMPORTED_LOCATION "${SDL_IMAGE_INSTALL}/lib/libSDL2_image.a")
+add_dependencies(SDL2::SDL2_image SDL_image)
+target_include_directories(SDL2::SDL2_image INTERFACE "${PROJECT_BINARY_DIR}/deps/SDL_image/src/SDL_image")
+
+set(SDL_TTF_INSTALL "${PROJECT_BINARY_DIR}/deps/SDL_ttf/install")
+ExternalProject_Add(SDL_ttf
+  URL "https://github.com/libsdl-org/SDL_ttf/archive/refs/tags/release-2.0.18.zip"
+
+  CONFIGURE_COMMAND
+  chmod +x <SOURCE_DIR>/configure
+  COMMAND
+  <SOURCE_DIR>/configure --prefix=${SDL_TTF_INSTALL} --disable-shared
+
+  BUILD_COMMAND make
+  INSTALL_COMMAND make install
+  PREFIX "${PROJECT_BINARY_DIR}/deps/SDL_ttf")
+add_library(SDL2::SDL2_ttf STATIC IMPORTED)
+set_target_properties(SDL2::SDL2_ttf
+  PROPERTIES IMPORTED_LOCATION "${SDL_TTF_INSTALL}/lib/libSDL2_ttf.a")
+add_dependencies(SDL2::SDL2_ttf SDL_ttf)
+target_include_directories(SDL2::SDL2_ttf INTERFACE "${PROJECT_BINARY_DIR}/deps/SDL_ttf/src/SDL_ttf")

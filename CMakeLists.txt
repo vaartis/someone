@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.16)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS TRUE)
 
-if(NOT WIN32)
+if(NOT WIN32 AND NOT CMAKE_TOOLCHAIN_FILE MATCHES "Emscripten")
   # To allow overriding to clang of different name
   if(NOT CMAKE_C_COMPILER)
     set(CMAKE_C_COMPILER clang)
@@ -73,7 +73,11 @@ else()
   else()
     target_link_options(someone_lib PUBLIC -Wl,-E)
   endif()
+  if (EMSCRIPTEN)
+    target_compile_definitions(someone_lib PUBLIC SOMEONE_EMSCRIPTEN)
+  endif()
 endif()
+target_include_directories(someone_lib PUBLIC "${CMAKE_SOURCE_DIR}/src/web_stubs/")
 
 target_link_libraries(someone someone_lib)
 
@@ -89,31 +93,54 @@ endif()
 
 # SDL / SDL_mixer
 
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-include(SDL_mixer)
+if(NOT EMSCRIPTEN)
+  list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+  include(SDL_mixer)
 
-target_link_libraries(someone_lib SDL2::SDL2_mixer)
+  target_link_libraries(someone_lib SDL2::SDL2_mixer)
+  target_link_libraries(someone_lib SDL2::SDL2_gfx)
+  target_link_libraries(someone_lib SDL2::SDL2_image)
+  target_link_libraries(someone_lib SDL2::SDL2_ttf)
 
-target_link_libraries(someone SDL2::SDL2_main)
+  target_link_libraries(someone SDL2::SDL2_main)
+else()
+  target_link_options(someone_lib PUBLIC "SHELL:-s USE_SDL=2" "SHELL:-s USE_SDL_MIXER=2")
+endif()
 
-# === SFML
+if(FALSE) # NOT EMSCRIPTEN
+  # === SFML
+  set(SFML_BUILD_AUDIO FALSE)
+  add_subdirectory("${PROJECT_SOURCE_DIR}/deps/sfml" EXCLUDE_FROM_ALL)
+  target_link_libraries(someone_lib sfml-graphics)
+  set_target_properties(sfml-graphics PROPERTIES CXX_STANDARD 14)
 
-set(SFML_BUILD_AUDIO FALSE)
-add_subdirectory("${PROJECT_SOURCE_DIR}/deps/sfml" EXCLUDE_FROM_ALL)
-target_link_libraries(someone_lib sfml-graphics)
-set_target_properties(sfml-graphics PROPERTIES CXX_STANDARD 14)
 
-# ===
+  # ===
 
-# === IMGUI SFML
+  # === IMGUI SFML
 
-set(IMGUI_SFML_FIND_SFML FALSE)
-set(IMGUI_DIR "${PROJECT_SOURCE_DIR}/deps/imgui")
-set(SFML_DIR "${PROJECT_SOURCE_DIR}/deps/sfml")
-add_subdirectory("${PROJECT_SOURCE_DIR}/deps/imgui-sfml" EXCLUDE_FROM_ALL)
-target_link_libraries(someone_lib ImGui-SFML::ImGui-SFML)
+  set(IMGUI_SFML_FIND_SFML FALSE)
+  set(IMGUI_DIR "${PROJECT_SOURCE_DIR}/deps/imgui")
+  set(SFML_DIR "${PROJECT_SOURCE_DIR}/deps/sfml")
+  add_subdirectory("${PROJECT_SOURCE_DIR}/deps/imgui-sfml" EXCLUDE_FROM_ALL)
+  target_link_libraries(someone_lib ImGui-SFML::ImGui-SFML)
 
-# ===
+  # ===
+else()
+  target_include_directories(someone_lib PRIVATE "${PROJECT_SOURCE_DIR}/deps/imgui/")
+  add_library(imgui_lib STATIC
+    "${PROJECT_SOURCE_DIR}/deps/imgui/imgui.cpp"
+    "${PROJECT_SOURCE_DIR}/deps/imgui/imgui.cpp"
+    "${PROJECT_SOURCE_DIR}/deps/imgui/imgui_draw.cpp"
+    "${PROJECT_SOURCE_DIR}/deps/imgui/imgui_widgets.cpp"
+    "${PROJECT_SOURCE_DIR}/deps/imgui/misc/cpp/imgui_stdlib.cpp")
+  target_include_directories(imgui_lib PRIVATE "${PROJECT_SOURCE_DIR}/deps/imgui")
+
+  target_link_libraries(someone_lib imgui_lib)
+endif()
+
+find_package(OpenGL REQUIRED)
+target_link_libraries(someone_lib OpenGL GLU)
 
 # === fmt
 

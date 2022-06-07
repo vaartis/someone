@@ -2,7 +2,9 @@
 
 #include <map>
 
-#include "SFML/Graphics.hpp"
+#include <SFML/System/Vector2.hpp>
+#include <SFML/Graphics/RenderTexture.hpp>
+//#include <SFML/Graphics.hpp>
 
 #include "logger.hpp"
 #include "lua_module_env.hpp"
@@ -16,7 +18,6 @@ private:
     sol::table shaders;
 
     sf::RenderTexture shaders_texture;
-    sf::Sprite shaders_sprite;
 public:
     WalkingEnv(sol::state &lua) : LuaModuleEnv(lua) {
         // This both defines a global for the module and returns it
@@ -32,6 +33,7 @@ public:
         load_room_f = module["load_room"];
 
         sol::table assets_module = lua.script("return require('components.assets')");
+
         shaders = assets_module["assets"]["shaders"];
     }
 
@@ -56,7 +58,7 @@ public:
         );
     }
 
-    void draw_target_to_window(sf::RenderWindow &target_window, sf::Sprite &final_sprite) {
+    void draw_target_to_window(sf::RenderWindow &target_window, sf::RenderTexture &final_sprite) {
         // First, draw the actual sprite
         target_window.draw(final_sprite);
 
@@ -65,7 +67,6 @@ public:
         auto screen_size = target_window.getSize();
         if (shaders_texture.getSize() != screen_size) {
             shaders_texture.create(screen_size.x, screen_size.y);
-            shaders_sprite.setTexture(shaders_texture.getTexture());
         }
         shaders_texture.clear(sf::Color::Transparent);
 
@@ -144,7 +145,7 @@ public:
                     spdlog::error("Parameter {} of unknown type in shader {}", name, shader_name);
                 }
 
-                if (enabled) target_window.draw(shaders_sprite, shader);
+                if (enabled) target_window.draw(shaders_texture, shader);
             }
         }
     }

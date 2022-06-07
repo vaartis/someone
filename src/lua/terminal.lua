@@ -240,16 +240,18 @@ function initialize_terminal()
    width_offset, height_offset = win_size.x / 100, win_size.y / 100 * 2
    rect_height, rect_width = win_size.y / 100 * (80 - 10), win_size.x - (width_offset * 2)
 
+   --[[
    terminal_view = View.new()
    terminal_view:reset(FloatRect.new(width_offset, height_offset, rect_width, rect_height))
    terminal_view.viewport = FloatRect.new(
       width_offset / win_size.x, height_offset / win_size.y,
       rect_width / win_size.x, rect_height / win_size.y
-   )
+      )
+   ]]
 
    -- Construct and draw the background rectangle
    rect = RectangleShape.new(Vector2f.new(rect_width, rect_height))
-   rect.outline_thickness = 2.0
+   --rect.outline_thickness = 2.0
    rect.outline_color = Color.Black
    rect.fill_color = Color.Black
    rect.position = Vector2f.new(width_offset, height_offset)
@@ -334,7 +336,7 @@ function M.draw(dt)
    -- The total height of the text to compare it with the terminal rectangle
    local total_text_height = 0
 
-   GLOBAL.drawing_target.view = terminal_view
+   --GLOBAL.drawing_target.view = terminal_view
 
    local first_height
 
@@ -378,7 +380,7 @@ function M.draw(dt)
       end
    end
 
-   GLOBAL.drawing_target.view = GLOBAL.drawing_target.default_view
+   --GLOBAL.drawing_target.view = GLOBAL.drawing_target.default_view
 
    --[[
       Scroll the screen smoothly, until all the lines are on screen.

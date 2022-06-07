@@ -1,6 +1,6 @@
 #include "fonts.hpp"
 
-#include <exception>
+#include <stdexcept>
 
 StaticFonts::StaticFonts() {
     if (!main_font.loadFromFile("resources/fonts/Ubuntu-R.ttf")) {

@@ -1,7 +1,17 @@
-#include <SFML/Graphics.hpp>
-#include <SFML/Window/Event.hpp>
-
+#include <cstdint>
 #include <numeric>
+
+
+#include <SFML/Window/Window.hpp>
+#include <SFML/System/Vector2.hpp>
+#include <SFML/System/Vector3.hpp>
+#include <SFML/System/Rect.hpp>
+#include <SFML/Graphics/Color.hpp>
+#include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/Texture.hpp>
+#include <SFML/Graphics/RenderTarget.hpp>
+#include <SFML/Graphics/Transformable.hpp>
+
 #include "sol/sol.hpp"
 #include <fmt/format.h>
 
@@ -86,8 +96,7 @@ decltype(auto) register_rect(sol::state &lua, std::string name) {
         "left", &sf::Rect<T>::left,
         "top", &sf::Rect<T>::top,
         "width", &sf::Rect<T>::width,
-        "height", &sf::Rect<T>::height,
-        "intersects", sol::resolve<bool (const sf::Rect<T>&) const>(&sf::Rect<T>::intersects)
+        "height", &sf::Rect<T>::height
     );
 }
 } // namespace
@@ -142,14 +151,14 @@ void register_sfml_usertypes(sol::state &lua, StaticFonts &fonts) {
 
     auto render_target_type = lua.new_usertype<sf::RenderTarget>(
         "RenderTarget",
-        "draw", [](sf::RenderTarget &target, const sf::Drawable &drawable) { target.draw(drawable); },
-        "size", sol::property(&sf::RenderTarget::getSize),
-        "view", sol::property(&sf::RenderTarget::getView, &sf::RenderTarget::setView),
-        "default_view", sol::property(&sf::RenderTarget::getDefaultView),
-        "map_pixel_to_coords", [](const sf::RenderTarget &target, const sf::Vector2f& pos) { return target.mapPixelToCoords(sf::Vector2i(pos.x, pos.y)); },
-        "map_coords_to_pixel", [](const sf::RenderTarget &target, const sf::Vector2f& pos) { return sf::Vector2f(target.mapCoordsToPixel(pos)); }
+        "draw", [](sf::RenderTarget &target, sf::Drawable &drawable) { target.draw(drawable); },
+        "size", sol::property(&sf::RenderTarget::getSize)
+        //"view", sol::property(&sf::RenderTarget::getView, &sf::RenderTarget::setView),
+        //"default_view", sol::property(&sf::RenderTarget::getDefaultView),
+        //"map_pixel_to_coords", [](const sf::RenderTarget &target, const sf::Vector2f& pos) { return target.mapPixelToCoords(sf::Vector2i(pos.x, pos.y)); },
+        //"map_coords_to_pixel", [](const sf::RenderTarget &target, const sf::Vector2f& pos) { return sf::Vector2f(target.mapCoordsToPixel(pos)); }
     );
-    auto render_states_type = lua.new_usertype<sf::RenderStates>("RenderStates");
+    //auto render_states_type = lua.new_usertype<sf::RenderStates>("RenderStates");
 
     auto render_texture_type = lua.new_usertype<sf::RenderTexture>(
         "RenderTexture",
@@ -157,21 +166,23 @@ void register_sfml_usertypes(sol::state &lua, StaticFonts &fonts) {
         "size", sol::property(&sf::RenderTexture::getSize)
     );
 
+    /*
     auto view_type = lua.new_usertype<sf::View>(
         "View", sol::constructors<sf::View()>(),
         "reset", &sf::View::reset,
         "viewport", sol::property(&sf::View::getViewport, &sf::View::setViewport)
     );
+    */
 
     auto drawable_type = lua.new_usertype<sf::Drawable>("Drawable");
 
     auto font_type = lua.new_usertype<sf::Font>("Font");
 
     auto text_type = lua.new_usertype<sf::Text>(
-        "Text", sol::constructors<sf::Text(const std::string&, const sf::Font&, unsigned int)>(),
+        "Text", sol::constructors<sf::Text(const std::string&, sf::Font&, unsigned int)>(),
         sol::base_classes, sol::bases<sf::Drawable, sf::Transformable>(),
         "string", sol::property(
-            [](sf::Text &self) { return self.getString().toAnsiString(); },
+            [](sf::Text &self) { return self.getString(); },
             [](sf::Text &self, std::string str) { return self.setString(str); }
         ),
         "global_bounds", sol::property(&sf::Text::getGlobalBounds),
@@ -192,10 +203,12 @@ void register_sfml_usertypes(sol::state &lua, StaticFonts &fonts) {
     auto rect_shape_type = lua.new_usertype<sf::RectangleShape>(
         "RectangleShape", sol::constructors<sf::RectangleShape(const sf::Vector2f&)>(),
         sol::base_classes, sol::bases<sf::Drawable, sf::Transformable>(),
+        /*
         "outline_thickness", sol::property(
             &sf::RectangleShape::getOutlineThickness,
             &sf::RectangleShape::setOutlineThickness
         ),
+        */
         "outline_color", sol::property(
             &sf::RectangleShape::getOutlineColor,
             &sf::RectangleShape::setOutlineColor
@@ -215,10 +228,10 @@ void register_sfml_usertypes(sol::state &lua, StaticFonts &fonts) {
     auto sprite = lua.new_usertype<sf::Sprite>(
         "Sprite", sol::constructors<sf::Sprite()>(),
         sol::base_classes, sol::bases<sf::Drawable, sf::Transformable>(),
-        "texture", sol::property(&sf::Sprite::getTexture, [](sf::Sprite &sprite, const sf::Texture &texture) { sprite.setTexture(texture); }),
+        "texture", sol::property(&sf::Sprite::getTexture, [](sf::Sprite &sprite, sf::Texture *texture) { sprite.setTexture(texture); }),
         "texture_rect", sol::property(&sf::Sprite::getTextureRect, &sf::Sprite::setTextureRect),
-        "global_bounds", sol::property(&sf::Sprite::getGlobalBounds),
-        "color", sol::property(&sf::Sprite::getColor, &sf::Sprite::setColor)
+        "global_bounds", sol::property(&sf::Sprite::getGlobalBounds)
+        //"color", sol::property(&sf::Sprite::getColor, &sf::Sprite::setColor)
     );
 
     auto event_type = lua.new_usertype<sf::Event>(
@@ -267,7 +280,6 @@ void register_sfml_usertypes(sol::state &lua, StaticFonts &fonts) {
         "S", sf::Keyboard::S,
         "D", sf::Keyboard::D,
         "E", sf::Keyboard::E,
-        "S", sf::Keyboard::S,
         "L", sf::Keyboard::L,
         "Z", sf::Keyboard::Z,
         "X", sf::Keyboard::X,
