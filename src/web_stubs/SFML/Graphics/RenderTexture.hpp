@@ -24,6 +24,9 @@ public:
         }
 
         texture = Texture(texturePtr);
+
+        SDL_SetTextureBlendMode(texture.texture, SDL_BLENDMODE_BLEND);
+        SDL_SetRenderDrawBlendMode(currentRenderer, SDL_BLENDMODE_BLEND);
     }
 
     Vector2u getSize() const override {
@@ -55,11 +58,13 @@ public:
     }
 
     void clear(const sf::Color &color) {
+        auto prevTarget = SDL_GetRenderTarget(currentRenderer);
         SDL_SetRenderTarget(currentRenderer, texture.texture);
 
         SDL_SetRenderDrawColor(currentRenderer, color.r, color.g, color.b, color.a);
-        SDL_RenderFillRect(currentRenderer, nullptr);
-        SDL_SetRenderTarget(currentRenderer, nullptr);
+        SDL_RenderClear(currentRenderer);
+
+        SDL_SetRenderTarget(currentRenderer, prevTarget);
     }
 
     void drawToTarget() override {
@@ -67,11 +72,12 @@ public:
     }
 
     void draw(Drawable &drawable, Shader *shader = nullptr) override {
+        auto prevTarget = SDL_GetRenderTarget(currentRenderer);
         SDL_SetRenderTarget(currentRenderer, texture.texture);
 
         drawable.drawToTarget();
 
-        SDL_SetRenderTarget(currentRenderer, nullptr);
+        SDL_SetRenderTarget(currentRenderer, prevTarget);
     }
 };
 

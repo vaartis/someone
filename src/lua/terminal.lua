@@ -243,8 +243,8 @@ function initialize_terminal()
    terminal_view = View.new()
    terminal_view:reset(FloatRect.new(width_offset, height_offset, rect_width, rect_height))
    terminal_view.viewport = FloatRect.new(
-      0, 0,
-      rect_width - width_offset, rect_height - height_offset
+      width_offset, height_offset,
+      rect_width, rect_height
    )
 
    -- Construct and draw the background rectangle

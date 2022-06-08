@@ -106,30 +106,6 @@ target_link_libraries(SDL2::SDL2_mixer INTERFACE
 target_include_directories(SDL2::SDL2_mixer INTERFACE "${SDL_MIXER_SRC}")
 add_dependencies(SDL2::SDL2_mixer SDL_mixer)
 
-if(EMSCRIPTEN)
-  set(SDL_GFX_DISABLED --enable-mmx=no)
-endif()
-set(SDL_GFX_INSTALL "${PROJECT_BINARY_DIR}/deps/SDL_gfx/install")
-ExternalProject_Add(SDL_gfx
-  URL "http://www.ferzkopp.net/Software/SDL2_gfx/SDL2_gfx-1.0.4.zip"
-
-  CONFIGURE_COMMAND
-  chmod +x <SOURCE_DIR>/configure
-  COMMAND
-  SDL_CONFIG=${SDL_INSTALL}/bin/sdl2-config <SOURCE_DIR>/configure --prefix=${SDL_GFX_INSTALL} --disable-shared ${SDL_GFX_DISABLED}
-  --disable-sdltest
-  CFLAGS=-I${SDL_INSTALL}/include/SDL2
-  LDFLAGS=-L${SDL_INSTALL}/lib\ -lSDL2
-
-  BUILD_COMMAND make
-  INSTALL_COMMAND make install
-  PREFIX "${PROJECT_BINARY_DIR}/deps/SDL_gfx")
-add_library(SDL2::SDL2_gfx STATIC IMPORTED)
-set_target_properties(SDL2::SDL2_gfx
-  PROPERTIES IMPORTED_LOCATION "${SDL_GFX_INSTALL}/lib/libSDL2_gfx.a")
-add_dependencies(SDL2::SDL2_gfx SDL_gfx)
-target_include_directories(SDL2::SDL2_gfx INTERFACE "${PROJECT_BINARY_DIR}/deps/SDL_gfx/src/SDL_gfx")
-
 set(SDL_IMAGE_INSTALL "${PROJECT_BINARY_DIR}/deps/SDL_image/install")
 ExternalProject_Add(SDL_image
   URL "https://github.com/libsdl-org/SDL_image/archive/refs/tags/release-2.0.5.zip"
@@ -178,6 +154,5 @@ add_dependencies(SDL2::SDL2_ttf SDL_ttf)
 target_include_directories(SDL2::SDL2_ttf INTERFACE "${PROJECT_BINARY_DIR}/deps/SDL_ttf/src/SDL_ttf")
 
 add_dependencies(SDL_mixer SDL)
-add_dependencies(SDL_gfx SDL_mixer)
-add_dependencies(SDL_image SDL_gfx)
+add_dependencies(SDL_image SDL_mixer)
 add_dependencies(SDL_ttf SDL_image)

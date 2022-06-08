@@ -33,6 +33,7 @@ public:
 
         SDL_SetRenderDrawColor(currentRenderer, outlineColor.r, outlineColor.g, outlineColor.b, outlineColor.a);
         SDL_RenderDrawRect(currentRenderer, &rect);
+        SDL_SetRenderDrawColor(currentRenderer, fillColor.r, fillColor.g, fillColor.b, fillColor.a);
         SDL_RenderFillRect(currentRenderer, &rect);
     }
 };

@@ -1,7 +1,7 @@
 #pragma once
 
 #include <SDL.h>
-#include <SDL2_rotozoom.h>
+#include <SDL_render.h>
 
 #include "SFML/System/Rect.hpp"
 #include "SFML/Graphics/Transformable.hpp"
@@ -41,11 +41,59 @@ public:
         result.left = position.y;
 
         auto scale = getScale();
-        rotozoomSurfaceSizeXY(textureRect.width, textureRect.height,
-                            getRotation(), scale.x, scale.y,
-                            &result.width, &result.height);
+        result.width = std::abs(textureRect.width * scale.x);
+        result.height = std::abs(textureRect.height * scale.y);
+        if (result.height == 0)
+            result.height = 1;
+        if (result.width == 0)
+            result.width = 1;
 
         return result;
+    }
+
+    void drawToTarget() override {
+        SDL_Rect texRect;
+        texRect.x = textureRect.left;
+        texRect.y = textureRect.top;
+        texRect.h = textureRect.height;
+        texRect.w = textureRect.width;
+
+        auto orig = getOrigin();
+        auto scale = getScale();
+        auto pos = getPosition();
+        SDL_Rect dstRect;
+        dstRect.x = pos.x - orig.x;
+        dstRect.y = pos.y - orig.y;
+        dstRect.w = std::abs(textureRect.width * scale.x);
+        dstRect.h = std::abs(textureRect.height * scale.y);
+
+
+        SDL_Point origin = { .x = (int)orig.x, .y = (int)orig.y };
+
+        SDL_RendererFlip flip = SDL_FLIP_NONE;
+        if (scale.x < 0) {
+            flip = (SDL_RendererFlip)(flip | SDL_FLIP_HORIZONTAL);
+        }
+        if (scale.y < 0) {
+            flip = (SDL_RendererFlip)(flip | SDL_FLIP_VERTICAL);
+        }
+
+        //spdlog::info("tex {} {} {} {}", texRect.x, texRect.y, texRect.w, texRect.h);
+        //spdlog::info("dst {} {} {} {}", dstRect.x, dstRect.y, dstRect.w, dstRect.h);
+        //spdlog::info("---");
+
+        int result = SDL_RenderCopyEx(
+            currentRenderer,
+            texture->texture,
+            &texRect,
+            &dstRect,
+            getRotation(),
+            &origin,
+            flip
+        );
+
+        if (result != 0)
+            spdlog::error("{}", SDL_GetError());
     }
 
     Texture *getTexture() {

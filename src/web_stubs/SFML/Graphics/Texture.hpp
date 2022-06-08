@@ -24,6 +24,17 @@ public:
         SDL_QueryTexture(texture, &format, nullptr, &w, &h);
     }
 
+    Texture(const Texture&) = delete;
+    void operator=(Texture const &) = delete;
+    Texture &operator=(Texture&& other) {
+        texture = other.texture;
+        SDL_QueryTexture(texture, &format, nullptr, &w, &h);
+
+        other.texture = nullptr;
+
+        return *this;
+    }
+
     void loadFromFile(const std::string &filename) {
         SDL_Surface *surface = IMG_Load(filename.c_str());
         if (!surface) {

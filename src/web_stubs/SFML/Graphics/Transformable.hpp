@@ -6,7 +6,7 @@ namespace sf {
 class Transformable {
     Vector2f position;
     Vector2f origin;
-    Vector2f scale;
+    Vector2f scale { 1, 1 };
     float rotation = 0;
 
 public:

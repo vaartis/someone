@@ -103,7 +103,6 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(SDL_mixer)
 
 target_link_libraries(someone_lib SDL2::SDL2_mixer)
-target_link_libraries(someone_lib SDL2::SDL2_gfx)
 target_link_libraries(someone_lib SDL2::SDL2_image)
 target_link_libraries(someone_lib SDL2::SDL2_ttf)
 

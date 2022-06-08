@@ -392,7 +392,7 @@ local function room_debug_menu()
 
       local list_dir
       list_dir = function(dir_path)
-         local sorted_dir = lume.array(fs.dir(dir_path))
+         local sorted_dir = fs.dir(dir_path)
          table.sort(sorted_dir)
 
          for _, file in ipairs(sorted_dir) do
