@@ -346,7 +346,7 @@ int main(int argc, char **argv) {
 
 #ifndef SOMEONE_EMSCRIPTEN
     while(true) {
-        main_loop(context);
+        main_loop(&context);
         if (context.should_exit)
             break;
     }

@@ -381,8 +381,6 @@ function M.VariantInputLine:handle_interaction(event)
       -- Convert the character to it's number equivalent
       local chnum = tonumber(ch)
 
-      print(chnum)
-
       -- Add 1 because indexes start at 1 in lua
       if chnum and chnum >= 1 and chnum < #self._variants + 1 then
          -- If the text has already bean output, set the answer,

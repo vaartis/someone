@@ -13,17 +13,15 @@ if (NOT WIN32)
 endif()
 if(EMSCRIPTEN)
   set(SDL2_DISABLED ${SDL2_DISABLED} --host=asmjs-unknown-emscripten --disable-assembly --disable-cpuinfo --enable-pthreads)
-  set(CFG_PRE EMCONFIGURE_JS=1 "${EMSCRIPTEN_ROOT_PATH}/emconfigure")
 endif()
 
 ExternalProject_Add(SDL
-  #URL "https://github.com/libsdl-org/SDL/archive/refs/tags/release-2.0.14.zip"
   GIT_REPOSITORY "https://github.com/libsdl-org/SDL"
   GIT_TAG 61115ae
   # Keeps the project from rebuilding every time
   UPDATE_COMMAND ""
 
-  CONFIGURE_COMMAND ${CFG_PRE} <SOURCE_DIR>/configure --prefix=${SDL_INSTALL}
+  CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=${SDL_INSTALL}
   ${SDL2_DISABLED} --enable-shared=no
 
   BUILD_COMMAND make
@@ -64,10 +62,10 @@ ExternalProject_Add(SDL_mixer
    BUILD_IN_SOURCE true
 
    CONFIGURE_COMMAND
-   cmake -E env
+   ${CMAKE_COMMAND} -E env
    PKG_CONFIG_PATH=${SDL_INSTALL}/lib/pkgconfig
 
-   sh -c "${CFG_PRE} ./configure \
+   sh -c "./configure \
    CC=${CMAKE_C_COMPILER} \
    CFLAGS=\"-I${SDL_MIXER_INSTALL}/include\" \
    LDFLAGS=\"-L${SDL_MIXER_INSTALL}/lib\" \
@@ -85,10 +83,10 @@ ExternalProject_Add_Step(SDL_mixer build-ogg
   COMMAND make install)
 ExternalProject_Add_Step(SDL_mixer build-vorbis
   WORKING_DIRECTORY <SOURCE_DIR>/external/libvorbis-1.3.5/
-  COMMAND cmake -E env
+  COMMAND ${CMAKE_COMMAND} -E env
   PKG_CONFIG_PATH=${SDL_MIXER_INSTALL}/lib/pkgconfig/
 
-  sh -c "${CFG_PRE} ./configure \
+  sh -c "./configure \
   CC=${CMAKE_C_COMPILER} \
   --disable-shared --enable-static \
   --prefix=${SDL_MIXER_INSTALL}"
@@ -108,6 +106,9 @@ target_link_libraries(SDL2::SDL2_mixer INTERFACE
 target_include_directories(SDL2::SDL2_mixer INTERFACE "${SDL_MIXER_SRC}")
 add_dependencies(SDL2::SDL2_mixer SDL_mixer)
 
+if(EMSCRIPTEN)
+  set(SDL_GFX_DISABLED --enable-mmx=no)
+endif()
 set(SDL_GFX_INSTALL "${PROJECT_BINARY_DIR}/deps/SDL_gfx/install")
 ExternalProject_Add(SDL_gfx
   URL "http://www.ferzkopp.net/Software/SDL2_gfx/SDL2_gfx-1.0.4.zip"
@@ -115,7 +116,7 @@ ExternalProject_Add(SDL_gfx
   CONFIGURE_COMMAND
   chmod +x <SOURCE_DIR>/configure
   COMMAND
-  SDL_CONFIG=${SDL_INSTALL}/bin/sdl2-config ${CFG_PRE} <SOURCE_DIR>/configure --prefix=${SDL_GFX_INSTALL} --disable-shared --enable-mmx=no
+  SDL_CONFIG=${SDL_INSTALL}/bin/sdl2-config <SOURCE_DIR>/configure --prefix=${SDL_GFX_INSTALL} --disable-shared ${SDL_GFX_DISABLED}
   --disable-sdltest
   CFLAGS=-I${SDL_INSTALL}/include/SDL2
   LDFLAGS=-L${SDL_INSTALL}/lib\ -lSDL2
@@ -136,7 +137,7 @@ ExternalProject_Add(SDL_image
   CONFIGURE_COMMAND
   chmod +x <SOURCE_DIR>/configure
   COMMAND
-  SDL2_CONFIG=${SDL_INSTALL}/bin/sdl2-config ${CFG_PRE} <SOURCE_DIR>/configure --prefix=${SDL_IMAGE_INSTALL} --disable-shared --disable-sdltest
+  SDL2_CONFIG=${SDL_INSTALL}/bin/sdl2-config <SOURCE_DIR>/configure --prefix=${SDL_IMAGE_INSTALL} --disable-shared --disable-sdltest
 
   BUILD_COMMAND make
   INSTALL_COMMAND make install
@@ -147,6 +148,14 @@ set_target_properties(SDL2::SDL2_image
 add_dependencies(SDL2::SDL2_image SDL_image)
 target_include_directories(SDL2::SDL2_image INTERFACE "${PROJECT_BINARY_DIR}/deps/SDL_image/src/SDL_image")
 
+if(EMSCRIPTEN)
+  set(SDL_TTF_ADDITIONAL
+    --disable-sdltest
+    --host=asmjs-unknown-emscripten
+    CFLAGS=-pthread\ -I${SDL_INSTALL}/include/SDL2
+    LDFLAGS=-pthread\ -L${SDL_INSTALL}/lib\ -lSDL2
+    CXXFLAGS=-pthread)
+endif()
 set(SDL_TTF_INSTALL "${PROJECT_BINARY_DIR}/deps/SDL_ttf/install")
 ExternalProject_Add(SDL_ttf
   GIT_REPOSITORY "https://github.com/libsdl-org/SDL_ttf"
@@ -157,11 +166,7 @@ ExternalProject_Add(SDL_ttf
   CONFIGURE_COMMAND
   chmod +x <SOURCE_DIR>/configure
   COMMAND
-  SDL2_CONFIG=${SDL_INSTALL}/bin/sdl2-config ${CFG_PRE} <SOURCE_DIR>/configure --prefix=${SDL_TTF_INSTALL} --disable-sdltest
-  --host=asmjs-unknown-emscripten
-  CFLAGS=-pthread\ -I${SDL_INSTALL}/include/SDL2
-  LDFLAGS=-pthread\ -L${SDL_INSTALL}/lib\ -lSDL2
-  CXXFLAGS=-pthread
+  SDL2_CONFIG=${SDL_INSTALL}/bin/sdl2-config ${CFG_PRE} <SOURCE_DIR>/configure --prefix=${SDL_TTF_INSTALL}
 
   BUILD_COMMAND make
   INSTALL_COMMAND make install

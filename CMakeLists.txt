@@ -143,7 +143,7 @@ endif()
 
 if(NOT EMSCRIPTEN)
   find_package(OpenGL REQUIRED)
-  target_link_libraries(someone_lib OpenGL GLU)
+  target_link_libraries(someone_lib OpenGL)
 endif()
 
 # === fmt
@@ -200,7 +200,7 @@ if(WIN32)
   set(LUA_PLATFORM mingw)
 elseif(APPLE)
   set(LUA_PLATFORM macosx)
-else()
+elseif(EMSCRIPTEN)
   set(LUA_PLATFORM linux CC=clang)
   set(LUA_PLATFORM_ADDITIONAL
     COMMAND ${CMAKE_COMMAND} -E copy ${LUA_SRC}/lua ${LUA_SRC}/_lua
@@ -208,6 +208,8 @@ else()
     COMMAND make generic CC=${CMAKE_C_COMPILER} CFLAGS=-DLUA_USE_POSIX\ -pthread
     LDFLAGS=-pthread
     COMMAND ${CMAKE_COMMAND} -E copy ${LUA_SRC}/_lua ${LUA_SRC}/lua)
+else()
+  set(LUA_PLATFORM linux)
 endif()
 
 ExternalProject_Add(lua
@@ -240,7 +242,7 @@ target_include_directories(someone_lib PUBLIC ${LUA_SRC})
 
 add_custom_command(
   OUTPUT "${PROJECT_BINARY_DIR}/deps/luarocks/"
-  COMMAND cmake -E copy_directory "${PROJECT_SOURCE_DIR}/deps/luarocks/" "${PROJECT_BINARY_DIR}/deps/luarocks/"
+  COMMAND ${CMAKE_COMMAND} -E copy_directory "${PROJECT_SOURCE_DIR}/deps/luarocks/" "${PROJECT_BINARY_DIR}/deps/luarocks/"
 )
 add_custom_target(copy-luarocks-before-build DEPENDS "${PROJECT_BINARY_DIR}/deps/luarocks/")
 
