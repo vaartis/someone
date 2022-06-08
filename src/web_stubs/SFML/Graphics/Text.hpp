@@ -36,12 +36,6 @@ class Font {
         return true;
     }
 
-    void textSize(const std::string &text, unsigned int size, int *w, int* h) {
-        loadFontSize(size);
-
-        TTF_SizeUTF8(fonts[size], text.c_str(), w, h);
-    }
-
     friend class Text;
 public:
     bool loadFromFile(std::string file, int defaultSize = 16) {
@@ -75,17 +69,20 @@ private:
     unsigned int size;
 
     SDL_Texture *texture = nullptr;
+    Vector2i textureSize;
 
     void recreateTexture() {
         font.loadFontSize(size);
 
         TTF_SetFontStyle(font.fonts[size], style);
         SDL_Surface *textSurface =
-            TTF_RenderUTF8_Blended(
+            TTF_RenderUTF8_Blended_Wrapped(
                 // SDL_ttf doesn't like empty text
                 font.fonts[size], text.empty() ? " " : text.c_str(),
-                SDL_Color { .r = color.r, .g = color.g, .b = color.b, .a = color.a }
+                SDL_Color { .r = color.r, .g = color.g, .b = color.b, .a = color.a },
+                0
             );
+
         if(!textSurface) {
             spdlog::error("{}", TTF_GetError());
         } else {
@@ -93,6 +90,8 @@ private:
                 SDL_DestroyTexture(texture);
             texture = SDL_CreateTextureFromSurface(currentRenderer, textSurface);
             SDL_FreeSurface(textSurface);
+
+            SDL_QueryTexture(texture, nullptr, nullptr, &textureSize.x, &textureSize.y);
         }
     }
 public:
@@ -142,8 +141,8 @@ public:
         auto pos = getPosition();
         result.left = pos.x;
         result.top = pos.y;
-
-        font.textSize(text, size, &result.width, &result.height);
+        result.width = textureSize.x;
+        result.height = textureSize.y;
 
         return result;
     }

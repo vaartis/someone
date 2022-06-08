@@ -14,6 +14,7 @@ void register_imgui_usertypes(sol::state &lua) {
         "Begin", &ImGui::Begin,
         "End", &ImGui::End,
 
+
         "InputText", sol::overload(
             [](const char *label, std::string str) {
                 bool submitted = ImGui::InputText(label, &str, ImGuiInputTextFlags_EnterReturnsTrue);
@@ -88,7 +89,7 @@ void register_imgui_usertypes(sol::state &lua) {
         "BeginMenu", &ImGui::BeginMenu,
         "EndMenu", &ImGui::EndMenu,
 
-        "OpenPopup", &ImGui::OpenPopup,
+        "OpenPopup", [](const char *id) { return ImGui::OpenPopup(id); },
         "BeginPopupModal", [](const char *label) { return ImGui::BeginPopupModal(
                 label, nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse
             );

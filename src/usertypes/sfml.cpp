@@ -1,7 +1,7 @@
 #include <cstdint>
 #include <numeric>
 
-
+#include <SFML/Graphics/View.hpp>
 #include <SFML/Window/Window.hpp>
 #include <SFML/System/Vector2.hpp>
 #include <SFML/System/Vector3.hpp>
@@ -152,13 +152,12 @@ void register_sfml_usertypes(sol::state &lua, StaticFonts &fonts) {
     auto render_target_type = lua.new_usertype<sf::RenderTarget>(
         "RenderTarget",
         "draw", [](sf::RenderTarget &target, sf::Drawable &drawable) { target.draw(drawable); },
-        "size", sol::property(&sf::RenderTarget::getSize)
-        //"view", sol::property(&sf::RenderTarget::getView, &sf::RenderTarget::setView),
-        //"default_view", sol::property(&sf::RenderTarget::getDefaultView),
-        //"map_pixel_to_coords", [](const sf::RenderTarget &target, const sf::Vector2f& pos) { return target.mapPixelToCoords(sf::Vector2i(pos.x, pos.y)); },
-        //"map_coords_to_pixel", [](const sf::RenderTarget &target, const sf::Vector2f& pos) { return sf::Vector2f(target.mapCoordsToPixel(pos)); }
+        "size", sol::property(&sf::RenderTarget::getSize),
+        "view", sol::property(&sf::RenderTarget::getView, &sf::RenderTarget::setView),
+        "default_view", sol::property(&sf::RenderTarget::getDefaultView),
+        "map_pixel_to_coords", [](const sf::RenderTarget &target, const sf::Vector2f& pos) { return target.mapPixelToCoords(sf::Vector2i(pos.x, pos.y)); },
+        "map_coords_to_pixel", [](const sf::RenderTarget &target, const sf::Vector2f& pos) { return sf::Vector2f(target.mapCoordsToPixel(pos)); }
     );
-    //auto render_states_type = lua.new_usertype<sf::RenderStates>("RenderStates");
 
     auto render_texture_type = lua.new_usertype<sf::RenderTexture>(
         "RenderTexture",
@@ -166,13 +165,11 @@ void register_sfml_usertypes(sol::state &lua, StaticFonts &fonts) {
         "size", sol::property(&sf::RenderTexture::getSize)
     );
 
-    /*
     auto view_type = lua.new_usertype<sf::View>(
         "View", sol::constructors<sf::View()>(),
         "reset", &sf::View::reset,
         "viewport", sol::property(&sf::View::getViewport, &sf::View::setViewport)
     );
-    */
 
     auto drawable_type = lua.new_usertype<sf::Drawable>("Drawable");
 

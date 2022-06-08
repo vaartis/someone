@@ -78,6 +78,8 @@ struct Event {
         uint32_t unicode;
     };
 
+    SDL_Event sdlEvent;
+
     EventType type;
 
     KeyEvent key;
@@ -85,11 +87,10 @@ struct Event {
 };
 
 class RenderWindow : public RenderTarget {
+public:
     SDL_Window *window = nullptr;
     SDL_Renderer *renderer = nullptr;
 
-    float frameLimit;
-public:
     RenderWindow(const VideoMode mode, const std::string &title) {
         int rendererFlags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC, windowFlags = SDL_WINDOW_OPENGL;
 
@@ -119,8 +120,6 @@ public:
     void setPosition(Vector2i pos) {
         SDL_SetWindowPosition(window, pos.x, pos.y);
     }
-
-    void setFramerateLimit(float limit) { frameLimit = limit; };
 
     void display() {
         SDL_RenderPresent(renderer);
@@ -167,7 +166,11 @@ public:
 
             break;
         }
+        default:
+            theEvent.type = Event::Unknown;
+            break;
         }
+        theEvent.sdlEvent = sdlEvent;
 
         return result;
     }

@@ -109,37 +109,20 @@ target_link_libraries(someone_lib SDL2::SDL2_ttf)
 
 target_link_libraries(someone SDL2::SDL2_main)
 
-if(FALSE) # NOT EMSCRIPTEN
-  # === SFML
-  set(SFML_BUILD_AUDIO FALSE)
-  add_subdirectory("${PROJECT_SOURCE_DIR}/deps/sfml" EXCLUDE_FROM_ALL)
-  target_link_libraries(someone_lib sfml-graphics)
-  set_target_properties(sfml-graphics PROPERTIES CXX_STANDARD 14)
+add_library(imgui_lib STATIC
+  "${PROJECT_SOURCE_DIR}/deps/imgui/imgui.cpp"
+  "${PROJECT_SOURCE_DIR}/deps/imgui/imgui.cpp"
+  "${PROJECT_SOURCE_DIR}/deps/imgui/imgui_draw.cpp"
+  "${PROJECT_SOURCE_DIR}/deps/imgui/imgui_tables.cpp"
+  "${PROJECT_SOURCE_DIR}/deps/imgui/imgui_widgets.cpp"
+  "${PROJECT_SOURCE_DIR}/deps/imgui/misc/cpp/imgui_stdlib.cpp"
 
+  "${PROJECT_SOURCE_DIR}/deps/imgui/backends/imgui_impl_sdl.cpp"
+  "${PROJECT_SOURCE_DIR}/deps/imgui/backends/imgui_impl_sdlrenderer.cpp")
+target_include_directories(imgui_lib PUBLIC "${PROJECT_SOURCE_DIR}/deps/imgui")
+target_link_libraries(imgui_lib SDL2::SDL2)
 
-  # ===
-
-  # === IMGUI SFML
-
-  set(IMGUI_SFML_FIND_SFML FALSE)
-  set(IMGUI_DIR "${PROJECT_SOURCE_DIR}/deps/imgui")
-  set(SFML_DIR "${PROJECT_SOURCE_DIR}/deps/sfml")
-  add_subdirectory("${PROJECT_SOURCE_DIR}/deps/imgui-sfml" EXCLUDE_FROM_ALL)
-  target_link_libraries(someone_lib ImGui-SFML::ImGui-SFML)
-
-  # ===
-else()
-  target_include_directories(someone_lib PRIVATE "${PROJECT_SOURCE_DIR}/deps/imgui/")
-  add_library(imgui_lib STATIC
-    "${PROJECT_SOURCE_DIR}/deps/imgui/imgui.cpp"
-    "${PROJECT_SOURCE_DIR}/deps/imgui/imgui.cpp"
-    "${PROJECT_SOURCE_DIR}/deps/imgui/imgui_draw.cpp"
-    "${PROJECT_SOURCE_DIR}/deps/imgui/imgui_widgets.cpp"
-    "${PROJECT_SOURCE_DIR}/deps/imgui/misc/cpp/imgui_stdlib.cpp")
-  target_include_directories(imgui_lib PRIVATE "${PROJECT_SOURCE_DIR}/deps/imgui")
-
-  target_link_libraries(someone_lib imgui_lib)
-endif()
+target_link_libraries(someone_lib imgui_lib)
 
 if(NOT EMSCRIPTEN)
   find_package(OpenGL REQUIRED)

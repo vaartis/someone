@@ -30,6 +30,30 @@ public:
         return texture.getSize();
     }
 
+    void setView(View other) override {
+        RenderTarget::setView(other);
+
+        if (view.isDefault()) {
+            SDL_RenderSetViewport(currentRenderer, nullptr);
+            SDL_RenderSetClipRect(currentRenderer, nullptr);
+        } else {
+            SDL_Rect viewRect;
+            viewRect.x = view.viewport.left;
+            viewRect.y = view.viewport.top;
+            viewRect.w = view.viewport.width;
+            viewRect.h = view.viewport.height;
+
+            SDL_Rect clipRect;
+            clipRect.x = view.shownRect.left;
+            clipRect.y = view.shownRect.top;
+            clipRect.w = view.shownRect.width;
+            clipRect.h = view.shownRect.height;
+
+            SDL_RenderSetViewport(currentRenderer, &viewRect);
+            SDL_RenderSetClipRect(currentRenderer, &clipRect);
+        }
+    }
+
     void clear(const sf::Color &color) {
         SDL_SetRenderTarget(currentRenderer, texture.texture);
 

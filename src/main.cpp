@@ -5,8 +5,9 @@
 #include <SFML/System/Clock.hpp>
 #include <SFML/Graphics/Shader.hpp>
 
-//#include "imgui.h"
-//#include "imgui-SFML.h"
+#include "imgui.h"
+#include "backends/imgui_impl_sdl.h"
+#include "backends/imgui_impl_sdlrenderer.h"
 
 #include "sol/sol.hpp"
 
@@ -127,7 +128,7 @@ void main_loop(void *ctx_) {
                 break;
             }
         } else {
-            //ImGui::SFML::ProcessEvent(event);
+            ImGui_ImplSDL2_ProcessEvent(&event.sdlEvent);
         }
     }
 
@@ -169,12 +170,12 @@ void main_loop(void *ctx_) {
     // Draw what hasn't been drawn yet
     ctx.window.draw(ctx.target);
 
-    ctx.target.display();
-
     if (ctx.debug_menu) {
-        //ImGui::SFML::Update(window, dt_time);
+        ImGui_ImplSDLRenderer_NewFrame();
+        ImGui_ImplSDL2_NewFrame();
+        ImGui::NewFrame();
 
-        //ImGui::Begin("Debug menu", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+        ImGui::Begin("Debug menu", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
         switch (ctx.current_state) {
         case CurrentState::Terminal:
@@ -185,9 +186,10 @@ void main_loop(void *ctx_) {
             break;
         }
 
-        //ImGui::End();
+        ImGui::End();
 
-        //ImGui::SFML::Render(window);
+        ImGui::Render();
+        ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
     }
 
     ctx.window.display();
@@ -229,13 +231,15 @@ int main(int argc, char **argv) {
 
     const auto &default_size = window_sizes[current_window_size];
     sf::RenderWindow window(sf::VideoMode(default_size.x, default_size.y), "Someone");
-    window.setFramerateLimit(60);
     window.setPosition(sf::Vector2i(0, 0));
 
-    //ImGui::SFML::Init(window);
-    //ImGuiIO& io = ImGui::GetIO();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
     // Disable the ini file
-    //io.IniFilename = nullptr;
+    io.IniFilename = nullptr;
+
+    ImGui_ImplSDL2_InitForSDLRenderer(window.window, window.renderer);
+    ImGui_ImplSDLRenderer_Init(window.renderer);
 
     sf::RenderTexture target;
     {
@@ -353,4 +357,8 @@ int main(int argc, char **argv) {
 #else
     emscripten_set_main_loop_arg(&main_loop, &context, 0, true);
 #endif
+
+    ImGui_ImplSDLRenderer_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
 }
