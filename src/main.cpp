@@ -5,10 +5,6 @@
 #include <SFML/System/Clock.hpp>
 #include <SFML/Graphics/Shader.hpp>
 
-//#include <SFML/Graphics.hpp>
-//#include <SFML/Window/Event.hpp>
-//#include <SFML/System/Clock.hpp>
-
 //#include "imgui.h"
 //#include "imgui-SFML.h"
 
@@ -34,10 +30,168 @@
 #include "keyboard.hpp"
 #endif
 
+#ifdef SOMEONE_EMSCRIPTEN
+#include <emscripten.h>
+#endif
+
 enum class CurrentState {
     Terminal,
     Walking
 };
+
+struct MainLoopContext {
+    sf::Clock clock;
+    CurrentState &current_state;
+    sf::RenderWindow &window;
+
+    bool should_exit = false;
+    bool debug_menu = false;
+
+    int current_window_size = 0;
+
+    sf::RenderTexture &target;
+
+    WalkingEnv &walking_env;
+    TerminalEnv &terminal_env;
+    CoroutinesEnv &coroutines_env;
+};
+
+constexpr std::pair<int, int> initial_size(1280, 1024);
+const std::vector<sf::Vector2u> window_sizes = {
+    { initial_size.first, initial_size.second },
+    { initial_size.first / 2, initial_size.second / 2},
+    { initial_size.first * 2, initial_size.second * 2}
+};
+
+void main_loop(void *ctx_) {
+    auto &ctx = *(MainLoopContext *)ctx_;
+
+    auto dt_time = ctx.clock.restart();
+    auto dt = dt_time.asSeconds();
+
+    sf::Color clear_color;
+    switch (ctx.current_state) {
+    case CurrentState::Terminal:
+        clear_color = sf::Color::White;
+        break;
+    case CurrentState::Walking:
+        clear_color = sf::Color::Black;
+    }
+    ctx.target.clear(clear_color);
+
+    sf::Event event;
+    while (ctx.window.pollEvent(event)) {
+#ifdef SOMEONE_APPLE
+        // Track keyboard manually
+        someone::KeypressTracker::processEvent(event);
+#endif
+
+        switch (event.type) {
+        case sf::Event::Closed:
+            ctx.window.close();
+            ctx.should_exit = true;
+
+            return;
+        case sf::Event::KeyReleased: {
+            switch (event.key.code) {
+            case sf::Keyboard::Tilde:
+                // Activate debug menu on ~
+                ctx.debug_menu = !ctx.debug_menu;
+                break;
+            case sf::Keyboard::F1:
+                if (ctx.current_window_size + 1 >= window_sizes.size()) {
+                    ctx.current_window_size = 0;
+                } else {
+                    ctx.current_window_size++;
+                }
+                ctx.window.setSize(window_sizes[ctx.current_window_size]);
+
+                break;
+            default:
+                break;
+            }
+
+            break;
+        }
+
+        default: break;
+        }
+
+        if (!ctx.debug_menu) {
+            switch (ctx.current_state) {
+            case CurrentState::Terminal:
+                ctx.terminal_env.process_event(event);
+                break;
+            case CurrentState::Walking:
+                ctx.walking_env.add_event(event);
+                break;
+            }
+        } else {
+            //ImGui::SFML::ProcessEvent(event);
+        }
+    }
+
+    ctx.window.clear();
+
+    switch (ctx.current_state) {
+    case CurrentState::Terminal:
+        ctx.terminal_env.update_event_timer(dt);
+        ctx.terminal_env.draw(dt);
+
+        // Don't draw to the screen yet, will be drawn after coroutines run
+
+        break;
+    case CurrentState::Walking:
+        ctx.walking_env.update(dt);
+
+        // Run all the drawing in lua and then draw it to the screen
+        ctx.walking_env.draw();
+        ctx.walking_env.draw_target_to_window(ctx.window, ctx.target);
+
+        // Now clear the target and draw the overlay
+        ctx.target.clear(sf::Color::Transparent);
+        ctx.walking_env.draw_overlay();
+
+        // Don't draw yet, wait for coroutines to run,
+        // then everything will be drawn
+
+        break;
+    }
+
+    // After everything has been drawn and processed, run the coroutines
+    ctx.coroutines_env.run(dt);
+
+    if (ctx.current_state == CurrentState::Walking) {
+        // Clear the event store as the very last thing, after the coroutines run
+        ctx.walking_env.clear_event_store();
+    }
+
+    // Draw what hasn't been drawn yet
+    ctx.window.draw(ctx.target);
+
+    ctx.target.display();
+
+    if (ctx.debug_menu) {
+        //ImGui::SFML::Update(window, dt_time);
+
+        //ImGui::Begin("Debug menu", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+
+        switch (ctx.current_state) {
+        case CurrentState::Terminal:
+            ctx.terminal_env.debug_menu();
+            break;
+        case CurrentState::Walking:
+            ctx.walking_env.debug_menu();
+            break;
+        }
+
+        //ImGui::End();
+
+        //ImGui::SFML::Render(window);
+    }
+
+    ctx.window.display();
+}
 
 int main(int argc, char **argv) {
     args::ArgumentParser arg_parser("Someone - engine options");
@@ -178,131 +332,25 @@ int main(int argc, char **argv) {
 
     bool debug_menu = false;
 
-    sf::Clock clock;
-    while (true) {
-        auto dt_time = clock.restart();
-        auto dt = dt_time.asSeconds();
+    MainLoopContext context = {
+        .current_state = current_state,
+        .window = window,
 
-        sf::Color clear_color;
-        switch (current_state) {
-        case CurrentState::Terminal:
-            clear_color = sf::Color::White;
+        .target = target,
+
+        .walking_env = walking_env,
+        .terminal_env = terminal_env,
+        .coroutines_env = coroutines_env
+    };
+
+
+#ifndef SOMEONE_EMSCRIPTEN
+    while(true) {
+        main_loop(context);
+        if (context.should_exit)
             break;
-        case CurrentState::Walking:
-            clear_color = sf::Color::Black;
-        }
-        target.clear(clear_color);
-
-        sf::Event event;
-        while (window.pollEvent(event)) {
-#ifdef SOMEONE_APPLE
-            // Track keyboard manually
-            someone::KeypressTracker::processEvent(event);
-#endif
-
-            switch (event.type) {
-            case sf::Event::Closed:
-                window.close();
-
-                return 0;
-            case sf::Event::KeyReleased: {
-                switch (event.key.code) {
-                case sf::Keyboard::Tilde:
-                    // Activate debug menu on ~
-                    debug_menu = !debug_menu;
-                    break;
-                case sf::Keyboard::F1:
-                    if (current_window_size + 1 >= window_sizes.size()) {
-                        current_window_size = 0;
-                    } else {
-                        current_window_size++;
-                    }
-                    window.setSize(window_sizes[current_window_size]);
-
-                    break;
-                default:
-                    break;
-                }
-
-                break;
-            }
-
-            default: break;
-            }
-
-            if (!debug_menu) {
-                switch (current_state) {
-                case CurrentState::Terminal:
-                    terminal_env.process_event(event);
-                    break;
-                case CurrentState::Walking:
-                    walking_env.add_event(event);
-                    break;
-                }
-            } else {
-                //ImGui::SFML::ProcessEvent(event);
-            }
-        }
-
-        window.clear();
-
-        switch (current_state) {
-        case CurrentState::Terminal:
-            terminal_env.update_event_timer(dt);
-            terminal_env.draw(dt);
-
-            // Don't draw to the screen yet, will be drawn after coroutines run
-
-            break;
-        case CurrentState::Walking:
-            walking_env.update(dt);
-
-            // Run all the drawing in lua and then draw it to the screen
-            walking_env.draw();
-            walking_env.draw_target_to_window(window, target);
-
-            // Now clear the target and draw the overlay
-            target.clear(sf::Color::Transparent);
-            walking_env.draw_overlay();
-
-            // Don't draw yet, wait for coroutines to run,
-            // then everything will be drawn
-
-            break;
-        }
-
-        // After everything has been drawn and processed, run the coroutines
-        coroutines_env.run(dt);
-
-        if (current_state == CurrentState::Walking) {
-            // Clear the event store as the very last thing, after the coroutines run
-            walking_env.clear_event_store();
-        }
-
-        // Draw what hasn't been drawn yet
-        window.draw(target);
-
-        target.display();
-
-        if (debug_menu) {
-            //ImGui::SFML::Update(window, dt_time);
-
-            //ImGui::Begin("Debug menu", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
-
-            switch (current_state) {
-            case CurrentState::Terminal:
-                terminal_env.debug_menu();
-                break;
-            case CurrentState::Walking:
-                walking_env.debug_menu();
-                break;
-            }
-
-            //ImGui::End();
-
-            //ImGui::SFML::Render(window);
-        }
-
-        window.display();
     }
+#else
+    emscripten_set_main_loop_arg(&main_loop, &context, 0, true);
+#endif
 }

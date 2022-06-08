@@ -1,11 +1,13 @@
+#include <filesystem>
 #include <numeric>
-#include "sol/sol.hpp"
-#include <fmt/format.h>
 
 #include "story_parser.hpp"
 #include "usertypes.hpp"
 #include "line_data.hpp"
+
 #include "toml.hpp"
+
+#include "sol/sol.hpp"
 
 void register_usertypes(sol::state &lua, StaticFonts &fonts) {
     // Basic SFML types
@@ -98,5 +100,23 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
         sol::base_classes, sol::bases<TerminalLineData>(),
         "class", sol::readonly(&TerminalCustomLineData::class_),
         "data", sol::readonly(&TerminalCustomLineData::data)
+    );
+
+    lua["fs"] = lua.create_table_with(
+        "isdir", [](const std::string &path) { return std::filesystem::is_directory(path); },
+        "isfile", [](const std::string &path) { return std::filesystem::is_regular_file(path); },
+        "exists", [](const std::string &path) { return std::filesystem::exists(path); },
+        "mkdir", [](const std::string &path) { return std::filesystem::create_directory(path); },
+        "each", [](const std::string &path) { return std::filesystem::create_directory(path); },
+        "dir", [&lua](const std::string &path) {
+            auto result = lua.create_table();
+            for (const auto &entry : std::filesystem::directory_iterator(path)) {
+                std::string basePath = std::filesystem::path(entry).filename();
+                result.add(basePath);
+            }
+            result.add("..");
+
+            return result;
+        }
     );
 }

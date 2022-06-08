@@ -4,7 +4,6 @@
 
 #include "SFML/Graphics/Drawable.hpp"
 #include "SFML/Graphics/Transformable.hpp"
-#include <SDL_render.h>
 #include <SFML/Graphics/Texture.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/System/Vector2.hpp>

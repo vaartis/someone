@@ -1,5 +1,4 @@
 local path = require("path")
-local fs = require("path.fs")
 local class = require("middleclass")
 local lume = require("lume")
 
@@ -20,7 +19,11 @@ function M.SaveSlotsLine:initialize(args)
    local i = 0
 
    if not fs.exists("saves") then fs.mkdir("saves") end
-   for slot in fs.each({ file = "saves/*.toml" }) do
+   for slot in fs.dir("saves") do
+      if not slot:match(".toml$") then
+         goto next
+      end
+
       i = i + 1
 
       local slot_name = path.splitext(path.basename(slot))
@@ -33,6 +36,8 @@ function M.SaveSlotsLine:initialize(args)
       table.insert(slots, { text = slot_line_text, text_object = text_object, file_path = slot })
       -- Save the slot paths for usage from save_game
       table.insert(M.known_slots, slot)
+
+      ::next::
    end
    self._slots = slots
 

@@ -1,6 +1,5 @@
 local lume = require("lume")
 local path = require("path")
-local fs = require("path.fs")
 
 local util = require("util")
 

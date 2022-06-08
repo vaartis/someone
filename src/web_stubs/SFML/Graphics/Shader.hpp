@@ -6,7 +6,6 @@
 
 #define GL_GLEXT_PROTOTYPES
 #include <GL/gl.h>
-#include <GL/glu.h>
 #include <GL/glext.h>
 
 #include <SFML/System/Vector2.hpp>
@@ -19,7 +18,7 @@ class Shader {
 
     bool checkError() {
         if (glGetError() != GL_NO_ERROR) {
-            spdlog::error(gluErrorString(glGetError()));
+            spdlog::error("OpenGL error: {}", glGetError());
             return true;
         }
 
@@ -62,12 +61,12 @@ public:
 
     void setUniform(std::string name, Vector2f value) {
         GLint location = glGetUniformLocation(program, name.c_str());
-        glProgramUniform2f(program, location, value.x, value.y);
+        glUniform2f(location, value.x, value.y);
     }
 
     void setUniform(std::string name, float value) {
         GLint location = glGetUniformLocation(program, name.c_str());
-        glProgramUniform1f(program, location, value);
+        glUniform1f(location, value);
     }
 
     ~Shader() {

@@ -19,6 +19,12 @@ endif()
 
 project(someone CXX C)
 
+if(EMSCRIPTEN)
+  add_compile_options("-pthread")
+  add_link_options("-sLLD_REPORT_UNDEFINED" "-sFORCE_FILESYSTEM" "-pthread"
+    "-sINCLUDE_FULL_LIBRARY")
+endif()
+
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_EXTENSIONS FALSE)
 
@@ -93,19 +99,15 @@ endif()
 
 # SDL / SDL_mixer
 
-if(NOT EMSCRIPTEN)
-  list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-  include(SDL_mixer)
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
+include(SDL_mixer)
 
-  target_link_libraries(someone_lib SDL2::SDL2_mixer)
-  target_link_libraries(someone_lib SDL2::SDL2_gfx)
-  target_link_libraries(someone_lib SDL2::SDL2_image)
-  target_link_libraries(someone_lib SDL2::SDL2_ttf)
+target_link_libraries(someone_lib SDL2::SDL2_mixer)
+target_link_libraries(someone_lib SDL2::SDL2_gfx)
+target_link_libraries(someone_lib SDL2::SDL2_image)
+target_link_libraries(someone_lib SDL2::SDL2_ttf)
 
-  target_link_libraries(someone SDL2::SDL2_main)
-else()
-  target_link_options(someone_lib PUBLIC "SHELL:-s USE_SDL=2" "SHELL:-s USE_SDL_MIXER=2")
-endif()
+target_link_libraries(someone SDL2::SDL2_main)
 
 if(FALSE) # NOT EMSCRIPTEN
   # === SFML
@@ -139,8 +141,10 @@ else()
   target_link_libraries(someone_lib imgui_lib)
 endif()
 
-find_package(OpenGL REQUIRED)
-target_link_libraries(someone_lib OpenGL GLU)
+if(NOT EMSCRIPTEN)
+  find_package(OpenGL REQUIRED)
+  target_link_libraries(someone_lib OpenGL GLU)
+endif()
 
 # === fmt
 
@@ -191,25 +195,31 @@ target_link_libraries(someone_lib sol2)
 
 include(ExternalProject)
 
+set(LUA_SRC "${PROJECT_BINARY_DIR}/deps/lua/src/lua/src/")
 if(WIN32)
   set(LUA_PLATFORM mingw)
 elseif(APPLE)
   set(LUA_PLATFORM macosx)
 else()
-  set(LUA_PLATFORM linux)
+  set(LUA_PLATFORM linux CC=clang)
+  set(LUA_PLATFORM_ADDITIONAL
+    COMMAND ${CMAKE_COMMAND} -E copy ${LUA_SRC}/lua ${LUA_SRC}/_lua
+    COMMAND make clean
+    COMMAND make generic CC=${CMAKE_C_COMPILER} CFLAGS=-DLUA_USE_POSIX\ -pthread
+    LDFLAGS=-pthread
+    COMMAND ${CMAKE_COMMAND} -E copy ${LUA_SRC}/_lua ${LUA_SRC}/lua)
 endif()
 
 ExternalProject_Add(lua
-   URL "https://www.lua.org/ftp/lua-5.3.5.tar.gz"
+  URL "https://www.lua.org/ftp/lua-5.3.5.tar.gz"
    CONFIGURE_COMMAND ""
-   BUILD_COMMAND make ${LUA_PLATFORM}
-   BUILD_ALWAYS true
+   BUILD_COMMAND
+   make ${LUA_PLATFORM}
+   ${LUA_PLATFORM_ADDITIONAL}
    BUILD_IN_SOURCE true
    INSTALL_COMMAND ""
    PREFIX "${PROJECT_BINARY_DIR}/deps/lua/"
 )
-
-set(LUA_SRC "${PROJECT_BINARY_DIR}/deps/lua/src/lua/src/")
 
 if(WIN32)
   set(LUA_EXECUTABLE "${LUA_SRC}/lua.exe")
@@ -248,6 +258,8 @@ else()
     OUTPUT ${LUAROCKS_BIN}
     DEPENDS lua copy-luarocks-before-build
     COMMAND ./configure --with-lua-bin=${LUA_SRC} --with-lua-include=${LUA_SRC} --with-lua-lib=${LUA_SRC} && PATH=${LUA_SRC}:$ENV{PATH} make
+    COMMAND ${LUAROCKS_BIN} config variables.CC ${CMAKE_C_COMPILER}
+    COMMAND ${LUAROCKS_BIN} config variables.LD ${CMAKE_C_COMPILER}
     WORKING_DIRECTORY "${PROJECT_BINARY_DIR}/deps/luarocks/"
   )
 endif()
@@ -293,13 +305,13 @@ function(install_rocks)
       add_custom_command(
         OUTPUT ${full_output_path}
         DEPENDS luarocks "${PROJECT_SOURCE_DIR}/src/lua/${rockspec}"
-        COMMAND ${LUAROCKS_COMMAND} build ${rockspec}
+        COMMAND CC=${CMAKE_C_COMPILER} ${LUAROCKS_COMMAND} build ${rockspec}
         WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/src/lua")
     else()
       add_custom_command(
         OUTPUT ${full_output_path}
         DEPENDS luarocks
-        COMMAND ${LUAROCKS_COMMAND} install ${name})
+        COMMAND CC=${CMAKE_C_COMPILER} ${LUAROCKS_COMMAND} install ${name})
     endif()
 
     add_custom_target(${name}-rockspec-build DEPENDS ${full_output_path})
@@ -346,6 +358,14 @@ add_custom_target(copy-resources ALL
   ${CMAKE_SOURCE_DIR}/resources/ ${CMAKE_CURRENT_BINARY_DIR}/resources
 )
 add_dependencies(someone_lib copy-resources)
+
+if(EMSCRIPTEN)
+ add_custom_command(TARGET someone POST_BUILD
+    COMMAND "${EMSCRIPTEN_ROOT_PATH}/tools/file_packager" resources.data --preload resources --js-output=resources.js &> /dev/null
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PROJECT_SOURCE_DIR}/src/web_stubs/emscripten_template.html" "${PROJECT_BINARY_DIR}/html5/index.html"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PROJECT_BINARY_DIR}/someone.js" "${PROJECT_BINARY_DIR}/someone.wasm"
+    "${PROJECT_BINARY_DIR}/resources.data" "${PROJECT_BINARY_DIR}/resources.js" "${PROJECT_BINARY_DIR}/html5/")
+endif()
 
 # Testing
 

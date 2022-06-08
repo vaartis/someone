@@ -11,6 +11,10 @@ if (NOT WIN32)
    --disable-joystick --disable-haptic --disable-sensor
    --disable-power)
 endif()
+if(EMSCRIPTEN)
+  set(SDL2_DISABLED ${SDL2_DISABLED} --host=asmjs-unknown-emscripten --disable-assembly --disable-cpuinfo --enable-pthreads)
+  set(CFG_PRE EMCONFIGURE_JS=1 "${EMSCRIPTEN_ROOT_PATH}/emconfigure")
+endif()
 
 ExternalProject_Add(SDL
   #URL "https://github.com/libsdl-org/SDL/archive/refs/tags/release-2.0.14.zip"
@@ -19,11 +23,15 @@ ExternalProject_Add(SDL
   # Keeps the project from rebuilding every time
   UPDATE_COMMAND ""
 
-  CONFIGURE_COMMAND <SOURCE_DIR>/configure --prefix=${SDL_INSTALL}
-  ${SDL2_DISABLED} --disable-shared
+  CONFIGURE_COMMAND ${CFG_PRE} <SOURCE_DIR>/configure --prefix=${SDL_INSTALL}
+  ${SDL2_DISABLED} --enable-shared=no
 
   BUILD_COMMAND make
+
   INSTALL_COMMAND make install
+  COMMAND
+  sed -i "s/sdl_static_libs=/sdl_static_libs='-lSDL2' #/" ${SDL_INSTALL}/bin/sdl2-config
+
   PREFIX "${PROJECT_BINARY_DIR}/deps/SDL")
 add_library(SDL2::SDL2 STATIC IMPORTED)
 set_target_properties(SDL2::SDL2
@@ -59,10 +67,10 @@ ExternalProject_Add(SDL_mixer
    cmake -E env
    PKG_CONFIG_PATH=${SDL_INSTALL}/lib/pkgconfig
 
-   sh -c "./configure \
+   sh -c "${CFG_PRE} ./configure \
    CC=${CMAKE_C_COMPILER} \
-   CFLAGS=-I${SDL_MIXER_INSTALL}/include \
-   LDFLAGS=-L${SDL_MIXER_INSTALL}/lib \
+   CFLAGS=\"-I${SDL_MIXER_INSTALL}/include\" \
+   LDFLAGS=\"-L${SDL_MIXER_INSTALL}/lib\" \
    --prefix=${SDL_MIXER_INSTALL} \
    --disable-music-cmd --disable-music-mod \
    --disable-music-midi --disable-music-flac --disable-music-mp3-mpg123 --disable-music-opus --disable-music-ogg-shared --disable-shared"
@@ -80,7 +88,7 @@ ExternalProject_Add_Step(SDL_mixer build-vorbis
   COMMAND cmake -E env
   PKG_CONFIG_PATH=${SDL_MIXER_INSTALL}/lib/pkgconfig/
 
-  sh -c "./configure \
+  sh -c "${CFG_PRE} ./configure \
   CC=${CMAKE_C_COMPILER} \
   --disable-shared --enable-static \
   --prefix=${SDL_MIXER_INSTALL}"
@@ -107,7 +115,10 @@ ExternalProject_Add(SDL_gfx
   CONFIGURE_COMMAND
   chmod +x <SOURCE_DIR>/configure
   COMMAND
-  <SOURCE_DIR>/configure --prefix=${SDL_GFX_INSTALL} --disable-shared
+  SDL_CONFIG=${SDL_INSTALL}/bin/sdl2-config ${CFG_PRE} <SOURCE_DIR>/configure --prefix=${SDL_GFX_INSTALL} --disable-shared --enable-mmx=no
+  --disable-sdltest
+  CFLAGS=-I${SDL_INSTALL}/include/SDL2
+  LDFLAGS=-L${SDL_INSTALL}/lib\ -lSDL2
 
   BUILD_COMMAND make
   INSTALL_COMMAND make install
@@ -125,7 +136,7 @@ ExternalProject_Add(SDL_image
   CONFIGURE_COMMAND
   chmod +x <SOURCE_DIR>/configure
   COMMAND
-  <SOURCE_DIR>/configure --prefix=${SDL_IMAGE_INSTALL} --disable-shared
+  SDL2_CONFIG=${SDL_INSTALL}/bin/sdl2-config ${CFG_PRE} <SOURCE_DIR>/configure --prefix=${SDL_IMAGE_INSTALL} --disable-shared --disable-sdltest
 
   BUILD_COMMAND make
   INSTALL_COMMAND make install
@@ -138,12 +149,19 @@ target_include_directories(SDL2::SDL2_image INTERFACE "${PROJECT_BINARY_DIR}/dep
 
 set(SDL_TTF_INSTALL "${PROJECT_BINARY_DIR}/deps/SDL_ttf/install")
 ExternalProject_Add(SDL_ttf
-  URL "https://github.com/libsdl-org/SDL_ttf/archive/refs/tags/release-2.0.18.zip"
+  GIT_REPOSITORY "https://github.com/libsdl-org/SDL_ttf"
+  GIT_TAG b35c03d
+
+  UPDATE_COMMAND ""
 
   CONFIGURE_COMMAND
   chmod +x <SOURCE_DIR>/configure
   COMMAND
-  <SOURCE_DIR>/configure --prefix=${SDL_TTF_INSTALL} --disable-shared
+  SDL2_CONFIG=${SDL_INSTALL}/bin/sdl2-config ${CFG_PRE} <SOURCE_DIR>/configure --prefix=${SDL_TTF_INSTALL} --disable-sdltest
+  --host=asmjs-unknown-emscripten
+  CFLAGS=-pthread\ -I${SDL_INSTALL}/include/SDL2
+  LDFLAGS=-pthread\ -L${SDL_INSTALL}/lib\ -lSDL2
+  CXXFLAGS=-pthread
 
   BUILD_COMMAND make
   INSTALL_COMMAND make install
@@ -153,3 +171,8 @@ set_target_properties(SDL2::SDL2_ttf
   PROPERTIES IMPORTED_LOCATION "${SDL_TTF_INSTALL}/lib/libSDL2_ttf.a")
 add_dependencies(SDL2::SDL2_ttf SDL_ttf)
 target_include_directories(SDL2::SDL2_ttf INTERFACE "${PROJECT_BINARY_DIR}/deps/SDL_ttf/src/SDL_ttf")
+
+add_dependencies(SDL_mixer SDL)
+add_dependencies(SDL_gfx SDL_mixer)
+add_dependencies(SDL_image SDL_gfx)
+add_dependencies(SDL_ttf SDL_image)
