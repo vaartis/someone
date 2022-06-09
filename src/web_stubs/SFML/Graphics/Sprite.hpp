@@ -36,11 +36,16 @@ public:
     IntRect getGlobalBounds() {
         IntRect result;
 
+        auto orig = getOrigin();
         auto position = getPosition();
-        result.top = position.x;
-        result.left = position.y;
-
         auto scale = getScale();
+
+        float x_scale_modifier = scale.x > 0 ? 1 - scale.x : scale.x * -1;
+        float y_scale_modifier = scale.y > 0 ? 1 - scale.y : scale.y * -1;
+
+        result.left = position.x - (orig.x * scale.x) - (textureRect.width * x_scale_modifier);
+        result.top = position.y - (orig.y * scale.y) - (textureRect.height * y_scale_modifier);
+
         result.width = std::abs(textureRect.width * scale.x);
         result.height = std::abs(textureRect.height * scale.y);
         if (result.height == 0)
@@ -58,15 +63,16 @@ public:
         texRect.h = textureRect.height;
         texRect.w = textureRect.width;
 
+        auto bounds = getGlobalBounds();
+
         auto orig = getOrigin();
         auto scale = getScale();
-        auto pos = getPosition();
-        SDL_Rect dstRect;
-        dstRect.x = pos.x - orig.x;
-        dstRect.y = pos.y - orig.y;
-        dstRect.w = std::abs(textureRect.width * scale.x);
-        dstRect.h = std::abs(textureRect.height * scale.y);
 
+        SDL_Rect dstRect;
+        dstRect.x = bounds.left;
+        dstRect.y = bounds.top;
+        dstRect.w = bounds.width;
+        dstRect.h = bounds.height;
 
         SDL_Point origin = { .x = (int)orig.x, .y = (int)orig.y };
 
