@@ -56,8 +56,8 @@ public:
         return result;
     }
 
-    void drawToTarget() override {
-        SDL_Rect texRect;
+    void drawToTarget(GPU_Target *toTarget) override {
+        GPU_Rect texRect;
         texRect.x = textureRect.left;
         texRect.y = textureRect.top;
         texRect.h = textureRect.height;
@@ -68,38 +68,34 @@ public:
         auto orig = getOrigin();
         auto scale = getScale();
 
-        SDL_Rect dstRect;
+        GPU_Rect dstRect;
         dstRect.x = bounds.left;
         dstRect.y = bounds.top;
         dstRect.w = bounds.width;
         dstRect.h = bounds.height;
 
-        SDL_Point origin = { .x = (int)orig.x, .y = (int)orig.y };
-
-        SDL_RendererFlip flip = SDL_FLIP_NONE;
+        GPU_FlipEnum flip = GPU_FLIP_NONE;
         if (scale.x < 0) {
-            flip = (SDL_RendererFlip)(flip | SDL_FLIP_HORIZONTAL);
+            flip = (SDL_RendererFlip)(flip | GPU_FLIP_HORIZONTAL);
         }
         if (scale.y < 0) {
-            flip = (SDL_RendererFlip)(flip | SDL_FLIP_VERTICAL);
+            flip = (SDL_RendererFlip)(flip | GPU_FLIP_VERTICAL);
         }
 
         //spdlog::info("tex {} {} {} {}", texRect.x, texRect.y, texRect.w, texRect.h);
         //spdlog::info("dst {} {} {} {}", dstRect.x, dstRect.y, dstRect.w, dstRect.h);
         //spdlog::info("---");
 
-        int result = SDL_RenderCopyEx(
-            currentRenderer,
+        GPU_BlitRectX(
             texture->texture,
             &texRect,
+            toTarget,
             &dstRect,
             getRotation(),
-            &origin,
+            orig.x,
+            orig.y,
             flip
         );
-
-        if (result != 0)
-            spdlog::error("{}", SDL_GetError());
     }
 
     Texture *getTexture() {

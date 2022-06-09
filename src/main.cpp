@@ -7,7 +7,7 @@
 
 #include "imgui.h"
 #include "backends/imgui_impl_sdl.h"
-#include "backends/imgui_impl_sdlrenderer.h"
+#include "backends/imgui_impl_opengl3.h"
 
 #include "sol/sol.hpp"
 
@@ -170,8 +170,10 @@ void main_loop(void *ctx_) {
     // Draw what hasn't been drawn yet
     ctx.window.draw(ctx.target);
 
+    ctx.target.display();
+
     if (ctx.debug_menu) {
-        ImGui_ImplSDLRenderer_NewFrame();
+        ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplSDL2_NewFrame();
         ImGui::NewFrame();
 
@@ -189,7 +191,7 @@ void main_loop(void *ctx_) {
         ImGui::End();
 
         ImGui::Render();
-        ImGui_ImplSDLRenderer_RenderDrawData(ImGui::GetDrawData());
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
 
     ctx.window.display();
@@ -238,8 +240,9 @@ int main(int argc, char **argv) {
     // Disable the ini file
     io.IniFilename = nullptr;
 
-    ImGui_ImplSDL2_InitForSDLRenderer(window.window, window.renderer);
-    ImGui_ImplSDLRenderer_Init(window.renderer);
+    ImGui_ImplSDL2_InitForOpenGL(window.window, window.target->context->context);
+    ImGui_ImplOpenGL3_Init("#version 130");
+
 
     sf::RenderTexture target;
     {
@@ -358,7 +361,7 @@ int main(int argc, char **argv) {
     emscripten_set_main_loop_arg(&main_loop, &context, 0, true);
 #endif
 
-    ImGui_ImplSDLRenderer_Shutdown();
+    ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
 }

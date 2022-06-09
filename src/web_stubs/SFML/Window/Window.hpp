@@ -1,24 +1,21 @@
 #pragma once
 
-#include "spdlog/spdlog.h"
-#include <SDL_error.h>
-#include <SDL_render.h>
-#include <SDL_scancode.h>
 #include <SDL_video.h>
 #include <string>
 
 #include <SDL.h>
 #include <SDL_image.h>
 #include <SDL_ttf.h>
+#include <SDL_gpu.h>
 
+#include "SFML/Graphics/RenderTexture.hpp"
+#include "SFML/Graphics/Texture.hpp"
 #include <SFML/Graphics/Shader.hpp>
 #include <SFML/Graphics/RenderTarget.hpp>
 #include <SFML/Graphics/Sprite.hpp>
 #include <SFML/System/Vector2.hpp>
 
 namespace sf {
-
-inline SDL_Renderer *currentRenderer = nullptr;
 
 struct VideoMode {
     unsigned int w = 0, h = 0;
@@ -89,28 +86,34 @@ struct Event {
 class RenderWindow : public RenderTarget {
 public:
     SDL_Window *window = nullptr;
-    SDL_Renderer *renderer = nullptr;
+    GPU_Target *target = nullptr;
+
+    SDL_GLContext glContext = nullptr;
 
     RenderWindow(const VideoMode mode, const std::string &title) {
-        int rendererFlags = SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC, windowFlags = SDL_WINDOW_OPENGL;
-
         SDL_Init(SDL_INIT_VIDEO);
         IMG_Init(IMG_INIT_PNG);
         TTF_Init();
 
-        window = SDL_CreateWindow(title.c_str(), SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED, mode.w, mode.h, windowFlags);
-        if (!window)
-            spdlog::error("{}", SDL_GetError());
+        target = GPU_Init(mode.w, mode.h, GPU_DEFAULT_INIT_FLAGS);
+        if (!target)
+            spdlog::error("{}", GPU_PopErrorCode().details);
 
-        renderer = SDL_CreateRenderer(window, -1, rendererFlags);
-        if (!renderer)
-            spdlog::error("{}", SDL_GetError());
+        window = SDL_GetWindowFromID(target->context->windowID);
+        SDL_SetWindowTitle(window, title.c_str());
 
-        currentRenderer = renderer;
+        GPU_SetDefaultAnchor(0, 0);
     }
 
-    void draw(Drawable &drawable, Shader *shader = nullptr) override {
-        drawable.drawToTarget();
+    void draw(RenderTexture &texture, Shader *shader = nullptr) {
+        texture.drawToTarget(target);
+
+        if (shader != nullptr)
+            shader->drawWithTexture(texture, target);
+    }
+
+    void draw(Drawable &drawable) override {
+        drawable.drawToTarget(target);
     }
 
     void setSize(Vector2u newSize) {
@@ -121,8 +124,8 @@ public:
         SDL_SetWindowPosition(window, pos.x, pos.y);
     }
 
-    void display() {
-        SDL_RenderPresent(renderer);
+    void display() override {
+        GPU_Flip(target);
     }
 
     bool hasFocus() {
@@ -176,11 +179,10 @@ public:
     }
 
     void clear() {
-        SDL_RenderClear(renderer);
+        GPU_Clear(target);
     }
 
     void close() {
-        SDL_DestroyRenderer(renderer);
         SDL_DestroyWindow(window);
     }
 

@@ -153,6 +153,21 @@ set_target_properties(SDL2::SDL2_ttf
 add_dependencies(SDL2::SDL2_ttf SDL_ttf)
 target_include_directories(SDL2::SDL2_ttf INTERFACE "${PROJECT_BINARY_DIR}/deps/SDL_ttf/src/SDL_ttf")
 
+ExternalProject_Add(SDL_gpu
+  GIT_REPOSITORY "https://github.com/grimfang4/sdl-gpu"
+  GIT_TAG 4552147
+
+  UPDATE_COMMAND ""
+
+  CMAKE_ARGS -DBUILD_DEMOS=OFF -DBUILD_SHARED=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>/install
+  PREFIX "${PROJECT_BINARY_DIR}/deps/SDL_gpu")
+add_library(SDL2::SDL2_gpu STATIC IMPORTED)
+set_target_properties(SDL2::SDL2_gpu
+  PROPERTIES IMPORTED_LOCATION "${PROJECT_BINARY_DIR}/deps/SDL_gpu/install/lib/libSDL2_gpu.a")
+add_dependencies(SDL2::SDL2_gpu SDL_gpu)
+target_include_directories(SDL2::SDL2_gpu INTERFACE "${PROJECT_BINARY_DIR}/deps/SDL_gpu/install/include/SDL2")
+
 add_dependencies(SDL_mixer SDL)
 add_dependencies(SDL_image SDL_mixer)
 add_dependencies(SDL_ttf SDL_image)
+add_dependencies(SDL_gpu SDL_ttf)

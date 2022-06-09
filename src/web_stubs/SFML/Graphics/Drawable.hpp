@@ -1,11 +1,11 @@
 #pragma once
 
-#include "SDL.h"
+#include <SDL_gpu.h>
 
 namespace sf {
 class Drawable {
 public:
-    virtual void drawToTarget() { }
+    virtual void drawToTarget(GPU_Target *toTarget) { }
 
     virtual ~Drawable() {}
 };

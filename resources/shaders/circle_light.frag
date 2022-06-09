@@ -1,15 +1,15 @@
 #version 130
 
-uniform vec2 screenSize;
-
 uniform sampler2D currentTexture;
 
+uniform vec2 screenSize;
 uniform float brightness;
-
 uniform vec2 point;
 
+varying vec2 texCoord;
+
 void main() {
-    vec2 coord = gl_TexCoord[0].st;
+    vec2 coord = texCoord.st;
     vec4 color = texture(currentTexture, coord);
 
     vec2 screenPoint = point / screenSize;

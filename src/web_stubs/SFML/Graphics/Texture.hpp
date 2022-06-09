@@ -5,30 +5,40 @@
 #include <SFML/System/Vector2.hpp>
 
 #include <SDL_image.h>
+#include <SDL_gpu.h>
 
 #include "logger.hpp"
 
 namespace sf {
 
-extern SDL_Renderer *currentRenderer;
-
 class Texture {
     int w = 0, h = 0;
+
+    GPU_Target *target = nullptr;
+
+    void updateForTexture() {
+        w = texture->w;
+        h = texture->h;
+        format = texture->format;
+
+        GPU_SetImageFilter(texture, GPU_FILTER_NEAREST);
+    }
 public:
     uint32_t format = 0;
-    SDL_Texture *texture = nullptr;
+
+    GPU_Image *texture = nullptr;
 
     Texture() = default;
 
-    Texture(SDL_Texture *texture) : texture(texture) {
-        SDL_QueryTexture(texture, &format, nullptr, &w, &h);
+    Texture(GPU_Image *texture) : texture(texture) {
+        updateForTexture();
     }
 
     Texture(const Texture&) = delete;
     void operator=(Texture const &) = delete;
     Texture &operator=(Texture&& other) {
         texture = other.texture;
-        SDL_QueryTexture(texture, &format, nullptr, &w, &h);
+        updateForTexture();
 
         other.texture = nullptr;
 
@@ -41,19 +51,26 @@ public:
             spdlog::error("Failed loading {}", filename);
             return;
         }
-        texture = SDL_CreateTextureFromSurface(currentRenderer, surface);
+        texture = GPU_CopyImageFromSurface(surface);
         SDL_FreeSurface(surface);
-
-        SDL_QueryTexture(texture, &format, nullptr, &w, &h);
+        updateForTexture();
     }
 
     Vector2u getSize() const {
         return Vector2u(w, h);
     }
 
+    GPU_Target *getTarget() {
+        if (target == nullptr)
+            target = GPU_LoadTarget(texture);
+        return target;
+    }
+
     ~Texture() {
         if (texture != nullptr)
-            SDL_DestroyTexture(texture);
+            GPU_FreeImage(texture);
+        if (target != nullptr)
+            GPU_FreeTarget(target);
     }
 };
 }

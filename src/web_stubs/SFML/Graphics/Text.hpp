@@ -1,5 +1,6 @@
 #pragma once
 
+#include <SDL_gpu.h>
 #include <string>
 #include <map>
 
@@ -15,8 +16,6 @@
 #include "logger.hpp"
 
 namespace sf {
-
-extern SDL_Renderer *currentRenderer;
 
 class Text;
 class Font {
@@ -68,8 +67,7 @@ private:
     Font &font;
     unsigned int size;
 
-    SDL_Texture *texture = nullptr;
-    Vector2i textureSize;
+    Texture texture;
 
     void recreateTexture() {
         font.loadFontSize(size);
@@ -86,12 +84,8 @@ private:
         if(!textSurface) {
             spdlog::error("{}", TTF_GetError());
         } else {
-            if (texture != nullptr)
-                SDL_DestroyTexture(texture);
-            texture = SDL_CreateTextureFromSurface(currentRenderer, textSurface);
+            texture = Texture(GPU_CopyImageFromSurface(textSurface));
             SDL_FreeSurface(textSurface);
-
-            SDL_QueryTexture(texture, nullptr, nullptr, &textureSize.x, &textureSize.y);
         }
     }
 public:
@@ -141,23 +135,17 @@ public:
         auto pos = getPosition();
         result.left = pos.x;
         result.top = pos.y;
-        result.width = textureSize.x;
-        result.height = textureSize.y;
+        result.width = texture.getSize().x;
+        result.height = texture.getSize().y;
 
         return result;
     }
 
-    virtual void drawToTarget() {
+    virtual void drawToTarget(GPU_Target *target) {
         auto pos = getGlobalBounds();
-        SDL_Rect dest { .x = pos.left, .y = pos.top, .w = pos.width, .h = pos.height };
+        GPU_Rect dest { (float)pos.left, (float)pos.top, (float)pos.width, (float)pos.height };
 
-        if (SDL_RenderCopy(currentRenderer, texture, nullptr, &dest) != 0)
-            spdlog::error("{}", SDL_GetError());
-    }
-
-    ~Text() {
-        if (texture != nullptr)
-            SDL_DestroyTexture(texture);
+        GPU_BlitRect(texture.texture, nullptr, target, &dest);
     }
 };
 

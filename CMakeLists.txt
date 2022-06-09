@@ -105,6 +105,7 @@ include(SDL_mixer)
 target_link_libraries(someone_lib SDL2::SDL2_mixer)
 target_link_libraries(someone_lib SDL2::SDL2_image)
 target_link_libraries(someone_lib SDL2::SDL2_ttf)
+target_link_libraries(someone_lib SDL2::SDL2_gpu)
 
 target_link_libraries(someone SDL2::SDL2_main)
 
@@ -117,15 +118,17 @@ add_library(imgui_lib STATIC
   "${PROJECT_SOURCE_DIR}/deps/imgui/misc/cpp/imgui_stdlib.cpp"
 
   "${PROJECT_SOURCE_DIR}/deps/imgui/backends/imgui_impl_sdl.cpp"
-  "${PROJECT_SOURCE_DIR}/deps/imgui/backends/imgui_impl_sdlrenderer.cpp")
+  "${PROJECT_SOURCE_DIR}/deps/imgui/backends/imgui_impl_opengl3.cpp")
 target_include_directories(imgui_lib PUBLIC "${PROJECT_SOURCE_DIR}/deps/imgui")
 target_link_libraries(imgui_lib SDL2::SDL2)
 
 target_link_libraries(someone_lib imgui_lib)
 
 if(NOT EMSCRIPTEN)
-  find_package(OpenGL REQUIRED)
-  target_link_libraries(someone_lib OpenGL)
+  find_package(OpenGL REQUIRED OpenGL GLX)
+  find_package(GLEW REQUIRED)
+
+  target_link_libraries(someone_lib OpenGL GLEW GLX)
 endif()
 
 # === fmt

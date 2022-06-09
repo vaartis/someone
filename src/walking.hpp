@@ -4,7 +4,7 @@
 
 #include <SFML/System/Vector2.hpp>
 #include <SFML/Graphics/RenderTexture.hpp>
-//#include <SFML/Graphics.hpp>
+#include <SFML/Graphics/Shader.hpp>
 
 #include "logger.hpp"
 #include "lua_module_env.hpp"
@@ -95,11 +95,6 @@ public:
                 auto shader_tbl = *shader_tbl_;
                 sf::Shader *shader = shader_tbl["shader"];
 
-                if (sol::optional<bool> need_screen_size = shader_tbl["need_screen_size"];
-                    need_screen_size.has_value() && *need_screen_size) {
-                    shader->setUniform("screenSize", sf::Vector2f(target_window.getSize()));
-                }
-
                 bool enabled = true;
                 sol::optional<sol::object> compiled_enabled = shaders_data_obj.get<sol::table>()[shader_name][sol::metatable_key]["enabled_compiled"];
                 if (compiled_enabled) {
@@ -114,6 +109,11 @@ public:
                 // If the shader is evaluated as enabled, skip the paramter
                 // and go to the next one, if it's disabled, stop processing and don't run the shader
                 if (!enabled) continue;
+
+                if (sol::optional<bool> need_screen_size = shader_tbl["need_screen_size"];
+                    need_screen_size.has_value() && *need_screen_size) {
+                    shader->setUniform("screenSize", sf::Vector2f(target_window.getSize()));
+                }
 
                 for (auto &param_data : shader_data) {
                     auto [name, value] = param_data;
