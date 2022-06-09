@@ -268,6 +268,7 @@ function M.components.drawable.process_component(new_ent, comp, entity_name)
       end
    elseif comp.kind == "text" then
       drawable = Text.new(comp.text.text, StaticFonts.main_font, comp.text.font_size or StaticFonts.font_size)
+      drawable.fill_color = Color.White
    else
       error("Unknown kind of drawable in " .. tostring(entity_name) .. "." .. tostring(comp_name))
    end

@@ -117,6 +117,7 @@ void register_sfml_usertypes(sol::state &lua, StaticFonts &fonts) {
         "b", &sf::Color::b,
         "a", &sf::Color::a,
 
+        "White", sol::var(sf::Color::White),
         "Black", sol::var(sf::Color::Black),
         "Red", sol::var(sf::Color::Red),
         "Yellow", sol::var(sf::Color::Yellow),
