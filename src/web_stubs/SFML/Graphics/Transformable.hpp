@@ -10,13 +10,13 @@ class Transformable {
     float rotation = 0;
 
 public:
-    Vector2f getPosition() { return position; }
+    Vector2f &getPosition() { return position; }
     void setPosition(const Vector2f &pos) { position = pos; }
 
     Vector2f getOrigin() { return origin * getScale(); }
     void setOrigin(const Vector2f &orig) { origin = orig; }
 
-    Vector2f getScale() { return scale; }
+    Vector2f &getScale() { return scale; }
     void setScale(const Vector2f &scal) { scale = scal; }
 
     float getRotation() { return rotation; }
