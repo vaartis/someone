@@ -360,7 +360,7 @@ if(EMSCRIPTEN)
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PROJECT_BINARY_DIR}/someone.js" "${PROJECT_BINARY_DIR}/someone.wasm"
     "${PROJECT_BINARY_DIR}/resources.data" "${PROJECT_BINARY_DIR}/resources.js" "${PROJECT_BINARY_DIR}/html5/")
   add_dependencies(copy-emscripten-resources copy-resources)
-  add_dependencies(someone_lib copy-emscripten-resources)
+  add_dependencies(copy-emscripten-resources someone)
 endif()
 
 # Testing
