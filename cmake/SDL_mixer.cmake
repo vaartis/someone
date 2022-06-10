@@ -106,24 +106,6 @@ target_link_libraries(SDL2::SDL2_mixer INTERFACE
 target_include_directories(SDL2::SDL2_mixer INTERFACE "${SDL_MIXER_SRC}")
 add_dependencies(SDL2::SDL2_mixer SDL_mixer)
 
-set(SDL_IMAGE_INSTALL "${PROJECT_BINARY_DIR}/deps/SDL_image/install")
-ExternalProject_Add(SDL_image
-  URL "https://github.com/libsdl-org/SDL_image/archive/refs/tags/release-2.0.5.zip"
-
-  CONFIGURE_COMMAND
-  chmod +x <SOURCE_DIR>/configure
-  COMMAND
-  SDL2_CONFIG=${SDL_INSTALL}/bin/sdl2-config <SOURCE_DIR>/configure --prefix=${SDL_IMAGE_INSTALL} --disable-shared --disable-sdltest
-
-  BUILD_COMMAND make
-  INSTALL_COMMAND make install
-  PREFIX "${PROJECT_BINARY_DIR}/deps/SDL_image")
-add_library(SDL2::SDL2_image STATIC IMPORTED)
-set_target_properties(SDL2::SDL2_image
-  PROPERTIES IMPORTED_LOCATION "${SDL_IMAGE_INSTALL}/lib/libSDL2_image.a")
-add_dependencies(SDL2::SDL2_image SDL_image)
-target_include_directories(SDL2::SDL2_image INTERFACE "${PROJECT_BINARY_DIR}/deps/SDL_image/src/SDL_image")
-
 if(EMSCRIPTEN)
   set(SDL_TTF_ADDITIONAL
     --disable-sdltest
@@ -143,6 +125,7 @@ ExternalProject_Add(SDL_ttf
   chmod +x <SOURCE_DIR>/configure
   COMMAND
   SDL2_CONFIG=${SDL_INSTALL}/bin/sdl2-config ${CFG_PRE} <SOURCE_DIR>/configure --prefix=${SDL_TTF_INSTALL}
+  ${SDL_TTF_ADDITIONAL}
 
   BUILD_COMMAND make
   INSTALL_COMMAND make install
@@ -153,21 +136,26 @@ set_target_properties(SDL2::SDL2_ttf
 add_dependencies(SDL2::SDL2_ttf SDL_ttf)
 target_include_directories(SDL2::SDL2_ttf INTERFACE "${PROJECT_BINARY_DIR}/deps/SDL_ttf/src/SDL_ttf")
 
+if(EMSCRIPTEN)
+  set(SDL_GPU_CMAKE_PRE "${EMSCRIPTEN_ROOT_PATH}/emcmake")
+endif()
 ExternalProject_Add(SDL_gpu
   GIT_REPOSITORY "https://github.com/grimfang4/sdl-gpu"
   GIT_TAG 4552147
 
   UPDATE_COMMAND ""
 
-  CMAKE_ARGS -DBUILD_DEMOS=OFF -DBUILD_SHARED=OFF -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>/install
+  CMAKE_COMMAND ${SDL_GPU_CMAKE_PRE} ${CMAKE_COMMAND}
+  CMAKE_ARGS -DBUILD_DEMOS=OFF -DBUILD_SHARED=OFF -DDISABLE_GLES_1=ON -DINSTALL_LIBRARY=ON
+  -DCMAKE_INSTALL_PREFIX=<INSTALL_DIR>/install
   PREFIX "${PROJECT_BINARY_DIR}/deps/SDL_gpu")
 add_library(SDL2::SDL2_gpu STATIC IMPORTED)
 set_target_properties(SDL2::SDL2_gpu
   PROPERTIES IMPORTED_LOCATION "${PROJECT_BINARY_DIR}/deps/SDL_gpu/install/lib/libSDL2_gpu.a")
 add_dependencies(SDL2::SDL2_gpu SDL_gpu)
 target_include_directories(SDL2::SDL2_gpu INTERFACE "${PROJECT_BINARY_DIR}/deps/SDL_gpu/install/include/SDL2")
+file(MAKE_DIRECTORY "${PROJECT_BINARY_DIR}/deps/SDL_gpu/install/include/SDL2")
 
 add_dependencies(SDL_mixer SDL)
-add_dependencies(SDL_image SDL_mixer)
-add_dependencies(SDL_ttf SDL_image)
+add_dependencies(SDL_ttf SDL_mixer)
 add_dependencies(SDL_gpu SDL_ttf)

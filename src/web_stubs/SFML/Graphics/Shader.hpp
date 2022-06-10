@@ -19,7 +19,6 @@
 
 namespace sf {
 class Shader {
-    GLuint shader = 0;
     GLuint program = 0;
 
     GPU_ShaderBlock block;
@@ -29,30 +28,56 @@ public:
     };
 
     bool loadFromFile(const std::string &file, Type type) {
-        std::ifstream shaderFile;
-        shaderFile.open(file);
-        if (!shaderFile.is_open())
-            return false;
+        std::string shaderPrefix;
+#if SOMEONE_EMSCRIPTEN
+        shaderPrefix = "#version 300 es\nprecision mediump float;";
+#else
+        shaderPrefix = "#version 130";
+#endif
 
-        std::ostringstream sstr;
-        sstr << shaderFile.rdbuf();
+        GLuint fragShader, vertShader;
+        {
+            std::ifstream shaderFile;
+            shaderFile.open(file);
+            if (!shaderFile.is_open())
+                return false;
 
-        std::string shaderCode = sstr.str();
-        shaderFile >> shaderCode;
-        shaderFile.close();
+            std::ostringstream sstr;
+            sstr << shaderFile.rdbuf();
+            shaderFile.close();
 
-        switch (type) {
-        case Fragment:
-            shader = GPU_CompileShader(GPU_FRAGMENT_SHADER, shaderCode.c_str());
-            break;
+            std::string shaderCode = shaderPrefix + "\n\n" + sstr.str();
+
+            switch (type) {
+            case Fragment:
+                fragShader = GPU_CompileShader(GPU_FRAGMENT_SHADER, shaderCode.c_str());
+                break;
+            }
+            if (fragShader == 0) {
+                spdlog::error("{}", GPU_GetShaderMessage());
+                return false;
+            }
         }
-        if (shader == 0) {
-            spdlog::error("{}", GPU_GetShaderMessage());
-            return false;
-        }
-        auto vertShader = GPU_LoadShader(GPU_VERTEX_SHADER, "resources/shaders/common.vert");
+        {
+            std::ifstream shaderFile;
+            shaderFile.open("resources/shaders/common.vert");
+            if (!shaderFile.is_open())
+                return false;
 
-        program = GPU_LinkShaders(vertShader, shader);
+            std::ostringstream sstr;
+            sstr << shaderFile.rdbuf();
+            shaderFile.close();
+
+            std::string shaderCode = shaderPrefix + "\n\n" + sstr.str();
+
+            vertShader = GPU_CompileShader(GPU_VERTEX_SHADER, shaderCode.c_str());
+            if (vertShader == 0) {
+                spdlog::error("{}", GPU_GetShaderMessage());
+                return false;
+            }
+        }
+
+        program = GPU_LinkShaders(vertShader, fragShader);
         if (program == 0) {
             spdlog::error("{}", GPU_GetShaderMessage());
             return false;

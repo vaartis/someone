@@ -22,7 +22,7 @@ project(someone CXX C)
 if(EMSCRIPTEN)
   add_compile_options("-pthread")
   add_link_options("-sLLD_REPORT_UNDEFINED" "-sFORCE_FILESYSTEM" "-pthread"
-    "-sINCLUDE_FULL_LIBRARY")
+    "-sINCLUDE_FULL_LIBRARY" "-sFULL_ES3" "-sALLOW_MEMORY_GROWTH" "-Wno-pthreads-mem-growth")
 endif()
 
 set(CMAKE_CXX_STANDARD 20)
@@ -103,7 +103,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(SDL_mixer)
 
 target_link_libraries(someone_lib SDL2::SDL2_mixer)
-target_link_libraries(someone_lib SDL2::SDL2_image)
+#target_link_libraries(someone_lib SDL2::SDL2_image)
 target_link_libraries(someone_lib SDL2::SDL2_ttf)
 target_link_libraries(someone_lib SDL2::SDL2_gpu)
 
@@ -121,6 +121,9 @@ add_library(imgui_lib STATIC
   "${PROJECT_SOURCE_DIR}/deps/imgui/backends/imgui_impl_opengl3.cpp")
 target_include_directories(imgui_lib PUBLIC "${PROJECT_SOURCE_DIR}/deps/imgui")
 target_link_libraries(imgui_lib SDL2::SDL2)
+if(EMSCRIPTEN)
+  target_compile_definitions(imgui_lib PUBLIC IMGUI_IMPL_OPENGL_ES3)
+endif()
 
 target_link_libraries(someone_lib imgui_lib)
 
@@ -347,11 +350,17 @@ add_custom_target(copy-resources ALL
 add_dependencies(someone_lib copy-resources)
 
 if(EMSCRIPTEN)
- add_custom_command(TARGET someone POST_BUILD
+  set(EMSCRIPTEN_OUTPUTS
+    "${PROJECT_BINARY_DIR}/html5/index.html"
+    "${PROJECT_BINARY_DIR}/someone.js" "${PROJECT_BINARY_DIR}/someone.wasm"
+    "${PROJECT_BINARY_DIR}/resources.data" "${PROJECT_BINARY_DIR}/resources.js")
+  add_custom_target(copy-emscripten-resources ALL
     COMMAND "${EMSCRIPTEN_ROOT_PATH}/tools/file_packager" resources.data --preload resources --js-output=resources.js &> /dev/null
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PROJECT_SOURCE_DIR}/src/web_stubs/emscripten_template.html" "${PROJECT_BINARY_DIR}/html5/index.html"
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PROJECT_BINARY_DIR}/someone.js" "${PROJECT_BINARY_DIR}/someone.wasm"
     "${PROJECT_BINARY_DIR}/resources.data" "${PROJECT_BINARY_DIR}/resources.js" "${PROJECT_BINARY_DIR}/html5/")
+  add_dependencies(copy-emscripten-resources copy-resources)
+  add_dependencies(someone_lib copy-emscripten-resources)
 endif()
 
 # Testing

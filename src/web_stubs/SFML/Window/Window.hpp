@@ -4,7 +4,6 @@
 #include <string>
 
 #include <SDL.h>
-#include <SDL_image.h>
 #include <SDL_ttf.h>
 #include <SDL_gpu.h>
 
@@ -92,7 +91,6 @@ public:
 
     RenderWindow(const VideoMode mode, const std::string &title) {
         SDL_Init(SDL_INIT_VIDEO);
-        IMG_Init(IMG_INIT_PNG);
         TTF_Init();
 
         target = GPU_Init(mode.w, mode.h, GPU_DEFAULT_INIT_FLAGS);
@@ -187,8 +185,8 @@ public:
     }
 
     ~RenderWindow() {
-        IMG_Quit();
         TTF_Quit();
+        GPU_Quit();
         SDL_Quit();
     }
 };

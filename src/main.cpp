@@ -241,8 +241,7 @@ int main(int argc, char **argv) {
     io.IniFilename = nullptr;
 
     ImGui_ImplSDL2_InitForOpenGL(window.window, window.target->context->context);
-    ImGui_ImplOpenGL3_Init("#version 130");
-
+    ImGui_ImplOpenGL3_Init(nullptr);
 
     sf::RenderTexture target;
     {

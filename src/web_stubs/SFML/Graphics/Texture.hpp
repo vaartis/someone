@@ -4,7 +4,6 @@
 
 #include <SFML/System/Vector2.hpp>
 
-#include <SDL_image.h>
 #include <SDL_gpu.h>
 
 #include "logger.hpp"
@@ -46,13 +45,11 @@ public:
     }
 
     void loadFromFile(const std::string &filename) {
-        SDL_Surface *surface = IMG_Load(filename.c_str());
-        if (!surface) {
-            spdlog::error("Failed loading {}", filename);
+        texture = GPU_LoadImage(filename.c_str());
+        if (!texture) {
+            spdlog::error("Failed loading {}: {}", filename, GPU_PopErrorCode().details);
             return;
         }
-        texture = GPU_CopyImageFromSurface(surface);
-        SDL_FreeSurface(surface);
         updateForTexture();
     }
 
