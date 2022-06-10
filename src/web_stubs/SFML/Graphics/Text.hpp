@@ -37,6 +37,11 @@ class Font {
 
     friend class Text;
 public:
+    Font() {
+        if (!TTF_WasInit())
+            TTF_Init();
+    }
+
     bool loadFromFile(std::string file, int defaultSize = 16) {
         fontFile = file;
 
