@@ -87,8 +87,14 @@ type = "wall"
 sprites = ["Floor", "Water"]
 type = "interaction"
 trigger = true
-callback = { module = "components.tilemap", name = "tilemap_talk", args = { state_variable = ["cave", "water"] } }
 activatable_callback = { module = "components.interaction", name = "state_variable_equal", args = [ ["cave", "water"], false ] }
+
+[entities.tilemap.tilemap.map."1".callback]
+module = "components.tilemap"
+name = "tilemap_talk"
+
+[entities.tilemap.tilemap.map."1".callback.args]
+state_variable = ["cave", "water"]
 
 [[entities.tilemap.tilemap.map."1".callback.args.phrases]]
 color = [255, 255, 255]
@@ -108,8 +114,14 @@ sound = { asset = "radio", volume = 8 }
 sprites = ["Floor"]
 type = "interaction"
 trigger = true
-callback = { module = "components.tilemap", name = "tilemap_talk", args = { state_variable = ["cave", "mountain"] } }
 activatable_callback = { module = "components.interaction", name = "state_variable_equal", args = [ ["cave", "mountain"], false ] }
+
+[entities.tilemap.tilemap.map."2".callback]
+module = "components.tilemap"
+name = "tilemap_talk"
+
+[entities.tilemap.tilemap.map."2".callback.args]
+state_variable = ["cave", "mountain"]
 
 [[entities.tilemap.tilemap.map."2".callback.args.phrases]]
 color = [211, 0, 0]
@@ -134,8 +146,14 @@ sound = { asset = "radio", volume = 8 }
 sprites = ["Floor"]
 type = "interaction"
 trigger = true
-callback = { module = "components.tilemap", name = "tilemap_talk", args = { state_variable = ["cave", "tight_corridors"] } }
 activatable_callback = { module = "components.interaction", name = "state_variable_equal", args = [ ["cave", "tight_corridors"], false ] }
+
+[entities.tilemap.tilemap.map."3".callback]
+module = "components.tilemap"
+name = "tilemap_talk"
+
+[entities.tilemap.tilemap.map."3".callback.args]
+state_variable = ["cave", "tight_corridors"]
 
 [[entities.tilemap.tilemap.map."3".callback.args.phrases]]
 color = [211, 0, 0]
@@ -155,8 +173,14 @@ text = "Right. This isn't my idea of a comfortable place either."
 sprites = ["Floor"]
 type = "interaction"
 trigger = true
-callback = { module = "components.tilemap", name = "tilemap_talk", args = { state_variable = ["cave", "bricks"] } }
 activatable_callback = { module = "components.interaction", name = "state_variable_equal", args = [ ["cave", "bricks"], false ] }
+
+[entities.tilemap.tilemap.map."4".callback]
+module = "components.tilemap"
+name = "tilemap_talk"
+
+[entities.tilemap.tilemap.map."4".callback.args]
+state_variable = ["cave", "bricks"]
 
 [[entities.tilemap.tilemap.map."4".callback.args.phrases]]
 color = [211, 0, 0]
@@ -181,8 +205,14 @@ sound = { asset = "radio", volume = 8 }
 sprites = ["Floor"]
 type = "interaction"
 trigger = true
-callback = { module = "components.tilemap", name = "tilemap_talk", args = { state_variable = ["cave", "dents"] } }
 activatable_callback = { module = "components.interaction", name = "state_variable_equal", args = [ ["cave", "dents"], false ] }
+
+[entities.tilemap.tilemap.map."5".callback]
+module = "components.tilemap"
+name = "tilemap_talk"
+
+[entities.tilemap.tilemap.map."5".callback.args]
+state_variable = ["cave", "dents"]
 
 [[entities.tilemap.tilemap.map."5".callback.args.phrases]]
 color = [211, 0, 0]
