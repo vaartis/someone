@@ -83,13 +83,14 @@ struct Event {
 };
 
 class RenderWindow : public RenderTarget {
+    VideoMode mode;
 public:
     SDL_Window *window = nullptr;
     GPU_Target *target = nullptr;
 
     SDL_GLContext glContext = nullptr;
 
-    RenderWindow(const VideoMode mode, const std::string &title) {
+    RenderWindow(const VideoMode mode, const std::string &title) : mode(mode) {
         SDL_Init(SDL_INIT_VIDEO);
         TTF_Init();
 
@@ -101,6 +102,7 @@ public:
         SDL_SetWindowTitle(window, title.c_str());
 
         GPU_SetDefaultAnchor(0, 0);
+        GPU_SetVirtualResolution(target, mode.w, mode.h);
     }
 
     void draw(RenderTexture &texture, Shader *shader = nullptr) {
@@ -115,11 +117,13 @@ public:
     }
 
     void setSize(Vector2u newSize) {
-        SDL_SetWindowSize(window, newSize.x, newSize.y);
+        GPU_SetWindowResolution(newSize.x, newSize.y);
+        GPU_SetVirtualResolution(target, mode.w, mode.h);
     }
 
     void setPosition(Vector2i pos) {
         SDL_SetWindowPosition(window, pos.x, pos.y);
+        GPU_SetVirtualResolution(target, mode.w, mode.h);
     }
 
     void display() override {

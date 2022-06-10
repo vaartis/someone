@@ -28,6 +28,7 @@ public:
         }
 
         texture = Texture(texturePtr);
+        //GPU_SetImageVirtualResolution(texture.texture, w, h);
     }
 
     Vector2u getSize() const override {
@@ -37,26 +38,13 @@ public:
     void setView(View other) override {
         RenderTarget::setView(other);
 
-        return;
-
         if (view.isDefault()) {
             GPU_UnsetViewport(texture.getTarget());
             GPU_UnsetClip(texture.getTarget());
         } else {
-            GPU_Rect viewRect;
-            viewRect.x = view.viewport.left;
-            viewRect.y = view.viewport.top;
-            viewRect.w = view.viewport.width;
-            viewRect.h = view.viewport.height;
-
-            GPU_Rect clipRect;
-            clipRect.x = view.shownRect.left;
-            clipRect.y = view.shownRect.top;
-            clipRect.w = view.shownRect.width;
-            clipRect.h = view.shownRect.height;
-
-            GPU_SetViewport(texture.getTarget(), viewRect);
-            GPU_SetClipRect(texture.getTarget(), clipRect);
+            // This doesn't work for some reason, but I don't really need it anyway
+            //GPU_SetViewport(texture.getTarget(), GPU_MakeRect(view.viewport.left, view.viewport.top, view.viewport.width, view.viewport.height));
+            GPU_SetClipRect(texture.getTarget(), GPU_MakeRect(view.shownRect.left, view.shownRect.top, view.shownRect.width, view.shownRect.height));
         }
     }
 
