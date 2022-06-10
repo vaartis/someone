@@ -11,7 +11,7 @@ void main() {
     vec2 screenPoint = lightPoint / screenSize;
 
     vec4 newColor = vec4(0, 0, 0, 1);
-    float dist = distance(screenPoint, texCoord) * 10;
+    float dist = distance(screenPoint, texCoord) * 10.0;
     newColor.a = dist;
 
     fragColor = newColor;
