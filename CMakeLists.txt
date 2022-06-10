@@ -361,11 +361,11 @@ add_dependencies(someone copy-resources)
 if(EMSCRIPTEN)
   set(EMSCRIPTEN_OUTPUTS
     "${PROJECT_BINARY_DIR}/html5/index.html"
-    "${PROJECT_BINARY_DIR}/someone.js" "${PROJECT_BINARY_DIR}/someone.wasm"
+    "${PROJECT_BINARY_DIR}/wtktotf.js" "${PROJECT_BINARY_DIR}/wtktotf.wasm"
     "${PROJECT_BINARY_DIR}/resources.data" "${PROJECT_BINARY_DIR}/resources.js")
   add_custom_target(copy-emscripten-resources ALL
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PROJECT_SOURCE_DIR}/src/web_stubs/emscripten_template.html" "${PROJECT_BINARY_DIR}/html5/index.html"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PROJECT_BINARY_DIR}/someone.js" "${PROJECT_BINARY_DIR}/someone.wasm" "${PROJECT_BINARY_DIR}/html5/"
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PROJECT_BINARY_DIR}/wtktotf.js" "${PROJECT_BINARY_DIR}/wtktotf.wasm" "${PROJECT_BINARY_DIR}/html5/"
     COMMAND "${EMSCRIPTEN_ROOT_PATH}/tools/file_packager" html5/resources.data --preload resources --js-output=html5/resources.js &> /dev/null)
 
   add_dependencies(copy-emscripten-resources someone)
