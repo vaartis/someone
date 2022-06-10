@@ -20,10 +20,9 @@ endif()
 project(someone CXX C)
 
 if(EMSCRIPTEN)
-  add_compile_options("-pthread")
-  add_link_options("-sLLD_REPORT_UNDEFINED" "-sFORCE_FILESYSTEM" "-pthread"
-    "-sINCLUDE_FULL_LIBRARY" "-sFULL_ES3" "-sALLOW_MEMORY_GROWTH" "-Wno-pthreads-mem-growth"
-    "-lidbfs.js")
+  add_link_options("-sLLD_REPORT_UNDEFINED" "-sFULL_ES3"
+    "-sFORCE_FILESYSTEM" "-sINCLUDE_FULL_LIBRARY"
+    "-sALLOW_MEMORY_GROWTH" "-lidbfs.js")
 endif()
 
 set(CMAKE_CXX_STANDARD 20)
@@ -90,10 +89,10 @@ target_link_libraries(someone someone_lib)
 
 target_include_directories(someone_lib PUBLIC "src")
 
-if (CMAKE_BUILD_TYPE STREQUAL "Release" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-  set(BUILD_SHARED_LIBS FALSE)
-  set(YAML_BUILD_SHARED_LIBS FALSE)
-elseif(NOT SOMEONE_TESTING)
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "Disabled shared libraries everywhere" FORCE)
+set(YAML_BUILD_SHARED_LIBS OFF CACHE BOOL "Disable shared libraries")
+
+if(NOT SOMEONE_TESTING)
   file(RELATIVE_PATH SOMEONE_EDITOR_BASE_PATH "${CMAKE_BINARY_DIR}" "${CMAKE_SOURCE_DIR}")
   target_compile_definitions(someone_lib PUBLIC SOMEONE_EDITOR_BASE_PATH="${SOMEONE_EDITOR_BASE_PATH}")
 endif()
@@ -101,14 +100,14 @@ endif()
 # SDL / SDL_mixer
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
-include(SDL_mixer)
+include(SDL)
 
-target_link_libraries(someone_lib SDL2::SDL2_mixer)
-#target_link_libraries(someone_lib SDL2::SDL2_image)
-target_link_libraries(someone_lib SDL2::SDL2_ttf)
-target_link_libraries(someone_lib SDL2::SDL2_gpu)
+target_link_libraries(someone_lib SDL2-static)
+target_link_libraries(someone_lib SDL2::mixer)
+target_link_libraries(someone_lib SDL2_ttf)
+target_link_libraries(someone_lib SDL_gpu)
 
-target_link_libraries(someone SDL2::SDL2_main)
+target_include_directories(someone_lib PUBLIC "${PROJECT_SOURCE_DIR}/deps/SDL_gpu/include/")
 
 add_library(imgui_lib STATIC
   "${PROJECT_SOURCE_DIR}/deps/imgui/imgui.cpp"
@@ -121,7 +120,7 @@ add_library(imgui_lib STATIC
   "${PROJECT_SOURCE_DIR}/deps/imgui/backends/imgui_impl_sdl.cpp"
   "${PROJECT_SOURCE_DIR}/deps/imgui/backends/imgui_impl_opengl3.cpp")
 target_include_directories(imgui_lib PUBLIC "${PROJECT_SOURCE_DIR}/deps/imgui")
-target_link_libraries(imgui_lib SDL2::SDL2)
+target_link_libraries(imgui_lib SDL2-static)
 if(EMSCRIPTEN)
   target_compile_definitions(imgui_lib PUBLIC IMGUI_IMPL_OPENGL_ES3)
 endif()
@@ -144,8 +143,8 @@ target_link_libraries(someone_lib fmt)
 
 # === yaml-cpp
 
-set(YAML_CPP_BUILD_CONTRIB FALSE)
-set(YAML_CPP_BUILD_TOOLS FALSE)
+set(YAML_CPP_BUILD_CONTRIB FALSE CACHE BOOL "")
+set(YAML_CPP_BUILD_TOOLS FALSE CACHE BOOL "")
 add_subdirectory("${PROJECT_SOURCE_DIR}/deps/yaml-cpp")
 target_link_libraries(someone_lib yaml-cpp)
 
@@ -194,8 +193,7 @@ elseif(EMSCRIPTEN)
   set(LUA_PLATFORM_ADDITIONAL
     COMMAND ${CMAKE_COMMAND} -E copy ${LUA_SRC}/lua ${LUA_SRC}/_lua
     COMMAND make clean
-    COMMAND make generic CC=${CMAKE_C_COMPILER} CFLAGS=-DLUA_USE_POSIX\ -pthread
-    LDFLAGS=-pthread
+    COMMAND make generic CC=${CMAKE_C_COMPILER} CFLAGS=-DLUA_USE_POSIX
     COMMAND ${CMAKE_COMMAND} -E copy ${LUA_SRC}/_lua ${LUA_SRC}/lua)
 else()
   set(LUA_PLATFORM linux)
