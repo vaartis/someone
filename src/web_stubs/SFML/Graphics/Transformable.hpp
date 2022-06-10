@@ -20,10 +20,15 @@ public:
     void setScale(const Vector2f &scal) { scale = scal; }
 
     float getRotation() { return rotation; }
-    void setRotation(float rot) { rotation = rot; }
+    void setRotation(float rot) {
+        rotation = (int)rot % 360;
+        if (rotation < 0) {
+            rotation += 360;
+        }
+    }
 
     void rotate(float rot) {
-        rotation += rot;
+        setRotation(rotation + rot);
     }
 
     virtual ~Transformable() { }

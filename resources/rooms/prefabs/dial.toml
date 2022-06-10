@@ -9,7 +9,7 @@ layer = "overlay"
 
 [children.back.transformable]
 position = [ 0, 0 ]
-origin = [ 15.5, 15.5 ]
+origin = [ 16, 16 ]
 scale = [10, 10]
 
 [children.handle]
@@ -23,5 +23,5 @@ layer = "overlay"
 
 [children.handle.transformable]
 position = [ 0, 0 ]
-origin = [ 15.5, 15.5 ]
+origin = [ 16, 16 ]
 scale = [ 10, 10 ]
