@@ -1,19 +1,23 @@
 #pragma once
 
-#include "SFML/Graphics/Texture.hpp"
-#include <SDL_gpu.h>
-#include <SDL_render.h>
+#include "SDL_gpu.h"
+
 #include <string>
 #include <iostream>
 #include <sstream>
 #include <fstream>
 
 #define GL_GLEXT_PROTOTYPES
-#include <GL/gl.h>
-#include <GL/glext.h>
+#ifdef SOMEONE_APPLE
+  #include <OpenGL/gl.h>
+  #include <OpenGL/glext.h>
+#else
+  #include <GL/gl.h>
+  #include <GL/glext.h>
+#endif
 
-#include <SFML/System/Vector2.hpp>
-#include <SFML/Graphics/RenderTexture.hpp>
+#include "SFML/System/Vector2.hpp"
+#include "SFML/Graphics/RenderTexture.hpp"
 
 #include "logger.hpp"
 

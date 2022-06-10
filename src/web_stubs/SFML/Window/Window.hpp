@@ -1,18 +1,17 @@
 #pragma once
 
-#include <SDL_video.h>
 #include <string>
 
-#include <SDL.h>
-#include <SDL_ttf.h>
-#include <SDL_gpu.h>
+#include "SDL.h"
+#include "SDL_ttf.h"
+#include "SDL_gpu.h"
 
 #include "SFML/Graphics/RenderTexture.hpp"
 #include "SFML/Graphics/Texture.hpp"
-#include <SFML/Graphics/Shader.hpp>
-#include <SFML/Graphics/RenderTarget.hpp>
-#include <SFML/Graphics/Sprite.hpp>
-#include <SFML/System/Vector2.hpp>
+#include "SFML/Graphics/Shader.hpp"
+#include "SFML/Graphics/RenderTarget.hpp"
+#include "SFML/Graphics/Sprite.hpp"
+#include "SFML/System/Vector2.hpp"
 
 namespace sf {
 
@@ -59,7 +58,9 @@ struct Event {
         Closed,
         KeyReleased,
         KeyPressed,
-        TextEntered
+        TextEntered,
+        GainedFocus,
+        LostFocus
     };
 
     struct KeyEvent {
@@ -171,6 +172,14 @@ public:
 
             break;
         }
+        case SDL_WINDOWEVENT:
+            if (sdlEvent.window.type == SDL_WINDOWEVENT_FOCUS_GAINED) {
+                theEvent.type = Event::GainedFocus;
+            } else if (sdlEvent.window.type == SDL_WINDOWEVENT_FOCUS_LOST) {
+                theEvent.type = Event::LostFocus;
+            }
+
+            break;
         default:
             theEvent.type = Event::Unknown;
             break;

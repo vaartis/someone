@@ -1,16 +1,16 @@
 #include <cstdint>
 #include <numeric>
 
-#include <SFML/Graphics/View.hpp>
-#include <SFML/Window/Window.hpp>
-#include <SFML/System/Vector2.hpp>
-#include <SFML/System/Vector3.hpp>
-#include <SFML/System/Rect.hpp>
-#include <SFML/Graphics/Color.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
-#include <SFML/Graphics/Texture.hpp>
-#include <SFML/Graphics/RenderTarget.hpp>
-#include <SFML/Graphics/Transformable.hpp>
+#include "SFML/Window/Window.hpp"
+#include "SFML/System/Vector2.hpp"
+#include "SFML/System/Vector3.hpp"
+#include "SFML/System/Rect.hpp"
+#include "SFML/Graphics/Color.hpp"
+#include "SFML/Graphics/RectangleShape.hpp"
+#include "SFML/Graphics/Texture.hpp"
+#include "SFML/Graphics/RenderTarget.hpp"
+#include "SFML/Graphics/Transformable.hpp"
+#include "SFML/Graphics/View.hpp"
 
 #include "sol/sol.hpp"
 #include <fmt/format.h>

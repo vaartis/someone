@@ -1,6 +1,3 @@
-[submodule "deps/sfml"]
-	path = deps/sfml
-	url = https://github.com/SFML/SFML
 [submodule "deps/fmt"]
 	path = deps/fmt
 	url = https://github.com/fmtlib/fmt
@@ -16,9 +13,6 @@
 [submodule "deps/luarocks"]
 	path = deps/luarocks
 	url = https://github.com/luarocks/luarocks
-[submodule "deps/imgui-sfml"]
-	path = deps/imgui-sfml
-	url = https://github.com/eliasdaler/imgui-sfml
 [submodule "deps/imgui"]
 	path = deps/imgui
 	url = https://github.com/ocornut/imgui

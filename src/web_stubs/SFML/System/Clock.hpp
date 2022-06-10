@@ -3,7 +3,7 @@
 #include <SDL_timer.h>
 #include <cstdint>
 
-#include <SDL.h>
+#include "SDL.h"
 
 namespace sf {
 

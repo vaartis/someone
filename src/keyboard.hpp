@@ -1,6 +1,6 @@
 #include <map>
 
-#include <SFML/Window/Event.hpp>
+#include "SFML/Window/Window.hpp"
 
 namespace someone {
 

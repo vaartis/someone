@@ -1,7 +1,6 @@
 #pragma once
 
-#include "SDL.h"
-#include <SDL_gpu.h>
+#include "SDL_gpu.h"
 
 #include "SFML/System/Vector2.hpp"
 #include "SFML/Graphics/Drawable.hpp"

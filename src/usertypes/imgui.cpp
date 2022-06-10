@@ -6,8 +6,8 @@
 
 #include "usertypes.hpp"
 
-#include <SFML/System/Vector2.hpp>
-#include <SFML/Graphics/Color.hpp>
+#include "SFML/System/Vector2.hpp"
+#include "SFML/Graphics/Color.hpp"
 
 void register_imgui_usertypes(sol::state &lua) {
     lua["ImGui"] = lua.create_table_with(

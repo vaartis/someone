@@ -1,15 +1,13 @@
 #pragma once
 
-#include <SDL.h>
+#include "SDL.h"
+#include "SDL_gpu.h"
+#include "SDL_render.h"
 
-#include "SFML/Graphics/Drawable.hpp"
-#include "SFML/Graphics/Transformable.hpp"
-#include <SDL_gpu.h>
-#include <SDL_render.h>
-#include <SFML/Graphics/Texture.hpp>
-#include <SFML/Graphics/RenderTarget.hpp>
-#include <SFML/System/Vector2.hpp>
-#include <SFML/Graphics/Color.hpp>
+#include "SFML/Graphics/Texture.hpp"
+#include "SFML/Graphics/RenderTarget.hpp"
+#include "SFML/System/Vector2.hpp"
+#include "SFML/Graphics/Color.hpp"
 
 namespace sf {
 

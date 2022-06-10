@@ -1,10 +1,10 @@
 #pragma once
 
-#include <SDL_gpu.h>
 #include <string>
 #include <map>
 
-#include <SDL_ttf.h>
+#include "SDL_gpu.h"
+#include "SDL_ttf.h"
 
 #include "SFML/System/Rect.hpp"
 #include "SFML/System/Vector2.hpp"

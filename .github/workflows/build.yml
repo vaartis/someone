@@ -18,7 +18,7 @@ jobs:
         # Install a newer version of LLVM
         wget https://apt.llvm.org/llvm.sh
         chmod +x llvm.sh
-        sudo ./llvm.sh 11
+        sudo ./llvm.sh 14
 
         sudo apt-get update && sudo apt-get install -y build-essential cmake xorg-dev libgl-dev\
              libudev-dev libasound2-dev libpulse-dev libreadline-dev libncurses-dev libglew-dev\
@@ -31,13 +31,13 @@ jobs:
     - name: Build and run tests
       run: |
         mkdir $GITHUB_WORKSPACE/_build && cd $GITHUB_WORKSPACE/_build
-        cmake .. -DCMAKE_BUILD_TYPE=Debug -DSOMEONE_TESTING=TRUE -DCMAKE_C_COMPILER=clang-11 -DCMAKE_CXX_COMPILER=clang++-11
+        cmake .. -DCMAKE_BUILD_TYPE=Debug -DSOMEONE_TESTING=TRUE -DCMAKE_C_COMPILER=clang-14 -DCMAKE_CXX_COMPILER=clang++-14
         # Run Lua tests
         xvfb-run -a -s "-screen 0 1920x1080x24 +extension GLX +render" make -j $(nproc) lua-test
         # Run C++ tests
         xvfb-run -a -s "-screen 0 1920x1080x24 +extension GLX +render" make -j $(nproc) cpp-test
-        llvm-profdata-11 merge -sparse -o default.prof default.profraw
-        llvm-cov-11 export -format lcov -instr-profile default.prof ./someone_tests ../src/ > default.info
+        llvm-profdata-14 merge -sparse -o default.prof default.profraw
+        llvm-cov-14 export -format lcov -instr-profile default.prof ./someone_tests ../src/ > default.info
 
     - name: Upload lua coverage
       uses: codecov/codecov-action@v1
@@ -61,10 +61,11 @@ jobs:
         # Install a newer version of LLVM
         wget https://apt.llvm.org/llvm.sh
         chmod +x llvm.sh
-        sudo ./llvm.sh 11
+        sudo ./llvm.sh 14
 
         sudo apt-get update && sudo apt-get install -y build-essential cmake xorg-dev libgl-dev\
-             libudev-dev libasound2-dev libpulse-dev libreadline-dev libncurses-dev xvfb
+             libudev-dev libasound2-dev libpulse-dev libreadline-dev libncurses-dev libglew-dev\
+             xvfb
 
     - name: Setup emsdk
       uses: mymindstorm/setup-emsdk@v11
@@ -84,6 +85,12 @@ jobs:
         cd $GITHUB_WORKSPACE/_build_emscripten/
         sudo cp -r html5/* /someone-html5
 
+    - name: Upload the HTML5 release artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: "someone-${{github.sha}}-html5"
+        path: "/someone-html5/"
+
     - name: Upload the HTML5 release to itch.io
       if: ${{ github.event_name == 'release' }}
       env:
@@ -98,7 +105,7 @@ jobs:
     - name: Build
       run: |
         mkdir $GITHUB_WORKSPACE/_build && cd $GITHUB_WORKSPACE/_build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang-11 -DCMAKE_CXX_COMPILER=clang++-11
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang-14 -DCMAKE_CXX_COMPILER=clang++-14
         make -j $(nproc)
 
     - name: Copy the release to /someone/someone-${{github.sha}}/
@@ -106,6 +113,18 @@ jobs:
         sudo mkdir -p /someone/someone-${{github.sha}}/
         cd $GITHUB_WORKSPACE/_build/
         sudo cp -r someone resources/ /someone/someone-${{github.sha}}/
+
+    - name: Delete old artifacts
+      uses: c-hive/gha-remove-artifacts@v1.1.0
+      with:
+        age: 1 day
+        skip-tags: true
+
+    - name: Upload the release artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: "someone-${{github.sha}}-linux"
+        path: "/someone/"
 
     - name: Upload release to itch.io
       if: ${{ github.event_name == 'release' }}
@@ -116,23 +135,6 @@ jobs:
       run: |
         ./butler push ${RELDIR} vaartis/someone:${CHANNEL} --userversion ${GITHUB_REF:10}
 
-    - name: Delete old artifacts
-      uses: c-hive/gha-remove-artifacts@v1.1.0
-      with:
-        age: 1 day
-        skip-tags: true
-
-    - name: Upload the HTML5 release artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: "someone-${{github.sha}}-windows-x86_64"
-        path: "/someone-html5/"
-
-    - name: Upload the release artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: "someone-${{github.sha}}-linux"
-        path: "/someone/"
 
   build-windows:
     runs-on: windows-2019
@@ -146,8 +148,8 @@ jobs:
       with:
         update: true
         install: >-
-          mingw-w64-x86_64-cmake mingw-w64-x86_64-clang mingw-w64-x86_64-freetype
-          mingw-w64-i686-cmake mingw-w64-i686-clang mingw-w64-i686-freetype
+          mingw-w64-x86_64-cmake mingw-w64-x86_64-clang mingw-w64-x86_64-freetype mingw-w64-x86_64-glew
+          mingw-w64-i686-cmake mingw-w64-i686-clang mingw-w64-i686-freetype mingw-w64-i686-glew
           make
         path-type: inherit
 

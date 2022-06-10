@@ -107,6 +107,10 @@ target_link_libraries(someone_lib SDL2::mixer)
 target_link_libraries(someone_lib SDL2_ttf)
 target_link_libraries(someone_lib SDL_gpu)
 
+if(WIN32 OR APPLE)
+  target_link_libraries(someone_lib SDL2main)
+endif()
+
 target_include_directories(someone_lib PUBLIC "${PROJECT_SOURCE_DIR}/deps/SDL_gpu/include/")
 
 add_library(imgui_lib STATIC
@@ -128,10 +132,14 @@ endif()
 target_link_libraries(someone_lib imgui_lib)
 
 if(NOT EMSCRIPTEN)
-  find_package(OpenGL REQUIRED OpenGL GLX)
-  find_package(GLEW REQUIRED)
+  if(APPLE OR WIN32)
+    find_package(OpenGL REQUIRED OpenGL)
+  else()
+    find_package(OpenGL REQUIRED OpenGL GLX)
 
-  target_link_libraries(someone_lib OpenGL GLEW GLX)
+    target_link_libraries(someone_lib OpenGL::GLX)
+  endif()
+  target_link_libraries(someone_lib OpenGL::GL)
 endif()
 
 # === fmt
@@ -346,7 +354,7 @@ add_custom_target(copy-resources ALL
   COMMAND ${CMAKE_COMMAND} -E copy_directory
   ${CMAKE_SOURCE_DIR}/resources/ ${CMAKE_CURRENT_BINARY_DIR}/resources
 )
-add_dependencies(someone_lib copy-resources)
+add_dependencies(someone copy-resources)
 
 if(EMSCRIPTEN)
   set(EMSCRIPTEN_OUTPUTS
@@ -354,11 +362,10 @@ if(EMSCRIPTEN)
     "${PROJECT_BINARY_DIR}/someone.js" "${PROJECT_BINARY_DIR}/someone.wasm"
     "${PROJECT_BINARY_DIR}/resources.data" "${PROJECT_BINARY_DIR}/resources.js")
   add_custom_target(copy-emscripten-resources ALL
-    COMMAND "${EMSCRIPTEN_ROOT_PATH}/tools/file_packager" resources.data --preload resources --js-output=resources.js &> /dev/null
     COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PROJECT_SOURCE_DIR}/src/web_stubs/emscripten_template.html" "${PROJECT_BINARY_DIR}/html5/index.html"
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PROJECT_BINARY_DIR}/someone.js" "${PROJECT_BINARY_DIR}/someone.wasm"
-    "${PROJECT_BINARY_DIR}/resources.data" "${PROJECT_BINARY_DIR}/resources.js" "${PROJECT_BINARY_DIR}/html5/")
-  add_dependencies(copy-emscripten-resources copy-resources)
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different "${PROJECT_BINARY_DIR}/someone.js" "${PROJECT_BINARY_DIR}/someone.wasm" "${PROJECT_BINARY_DIR}/html5/"
+    COMMAND "${EMSCRIPTEN_ROOT_PATH}/tools/file_packager" html5/resources.data --preload resources --js-output=html5/resources.js &> /dev/null)
+
   add_dependencies(copy-emscripten-resources someone)
 endif()
 

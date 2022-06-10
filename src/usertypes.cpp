@@ -111,7 +111,7 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
         "dir", [&lua](const std::string &path) {
             auto result = lua.create_table();
             for (const auto &entry : std::filesystem::directory_iterator(path)) {
-                std::string basePath = std::filesystem::path(entry).filename();
+                std::string basePath = std::filesystem::path(entry).filename().string();
                 result.add(basePath);
             }
             result.add("..");

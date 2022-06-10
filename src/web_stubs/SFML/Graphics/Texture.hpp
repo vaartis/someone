@@ -2,9 +2,9 @@
 
 #include <string>
 
-#include <SFML/System/Vector2.hpp>
+#include "SDL_gpu.h"
 
-#include <SDL_gpu.h>
+#include "SFML/System/Vector2.hpp"
 
 #include "logger.hpp"
 

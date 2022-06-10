@@ -1,6 +1,6 @@
 #include <filesystem>
 
-#include <SFML/Graphics/Color.hpp>
+#include "SFML/Graphics/Color.hpp"
 
 #include "sol/sol.hpp"
 #include "fmt/format.h"

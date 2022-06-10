@@ -1,13 +1,4 @@
 # SDL
-
-if(NOT WIN32)
-  set(SDL_JOYSTICK OFF CACHE BOOL "Disable joystick" FORCE)
-  set(SDL_HAPTIC OFF CACHE BOOL "Disable haptic" FORCE)
-  set(SDL_SENSOR OFF CACHE BOOL "Disable sensor" FORCE)
-  set(SDL_POWER OFF CACHE BOOL "Disable power" FORCE)
-  set(SDL_LOCALE OFF CACHE BOOL "Disble locale" FORCE)
-  set(SDL_WAYLAND OFF CACHE BOOL "Disble wayland" FORCE)
-endif()
 add_subdirectory(deps/SDL EXCLUDE_FROM_ALL)
 
 # Specifically override this for packages that want to link with the dynamic

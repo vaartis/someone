@@ -2,9 +2,9 @@
 
 #include <map>
 
-#include <SFML/System/Vector2.hpp>
-#include <SFML/Graphics/RenderTexture.hpp>
-#include <SFML/Graphics/Shader.hpp>
+#include "SFML/System/Vector2.hpp"
+#include "SFML/Graphics/RenderTexture.hpp"
+#include "SFML/Graphics/Shader.hpp"
 
 #include "logger.hpp"
 #include "lua_module_env.hpp"

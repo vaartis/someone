@@ -1,9 +1,9 @@
 #include <filesystem>
 
-#include <SFML/Window/Window.hpp>
-#include <SFML/System/Vector2.hpp>
-#include <SFML/System/Clock.hpp>
-#include <SFML/Graphics/Shader.hpp>
+#include "SFML/Window/Window.hpp"
+#include "SFML/System/Vector2.hpp"
+#include "SFML/System/Clock.hpp"
+#include "SFML/Graphics/Shader.hpp"
 
 #include "imgui.h"
 #include "backends/imgui_impl_sdl.h"

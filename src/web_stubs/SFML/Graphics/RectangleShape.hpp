@@ -1,6 +1,6 @@
 #pragma once
 
-#include <SDL_gpu.h>
+#include "SDL_gpu.h"
 
 #include "SFML/Graphics/Color.hpp"
 #include "SFML/Graphics/Drawable.hpp"

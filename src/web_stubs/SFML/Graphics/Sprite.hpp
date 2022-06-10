@@ -1,7 +1,7 @@
 #pragma once
 
-#include <SDL.h>
-#include <SDL_render.h>
+#include "SDL.h"
+#include "SDL_render.h"
 
 #include "SFML/System/Rect.hpp"
 #include "SFML/Graphics/Transformable.hpp"
