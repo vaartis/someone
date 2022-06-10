@@ -40,11 +40,8 @@ public:
         auto position = getPosition();
         auto scale = getScale();
 
-        float x_scale_modifier = scale.x > 0 ? 1 - scale.x : scale.x * -1;
-        float y_scale_modifier = scale.y > 0 ? 1 - scale.y : scale.y * -1;
-
-        result.left = position.x - (orig.x * scale.x) - (textureRect.width * x_scale_modifier);
-        result.top = position.y - (orig.y * scale.y) - (textureRect.height * y_scale_modifier);
+        result.left = position.x - orig.x;
+        result.top = position.y - orig.y;
 
         result.width = std::abs(textureRect.width * scale.x);
         result.height = std::abs(textureRect.height * scale.y);
@@ -81,10 +78,6 @@ public:
         if (scale.y < 0) {
             flip = (SDL_RendererFlip)(flip | GPU_FLIP_VERTICAL);
         }
-
-        //spdlog::info("tex {} {} {} {}", texRect.x, texRect.y, texRect.w, texRect.h);
-        //spdlog::info("dst {} {} {} {}", dstRect.x, dstRect.y, dstRect.w, dstRect.h);
-        //spdlog::info("---");
 
         GPU_BlitRectX(
             texture->texture,

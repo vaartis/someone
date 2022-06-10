@@ -47,6 +47,12 @@ Vector2<T> operator*(T right, const sf::Vector2<T> &left) {
 }
 
 template<typename T>
+Vector2<T> operator*(const sf::Vector2<T> &left, const sf::Vector2<T> &right) {
+    return Vector2(left.x * right.x, left.y * right.x);
+}
+
+
+template<typename T>
 Vector2<T> operator/(const sf::Vector2<T> &left, T right) {
     return Vector2(left.x / right, left.y / right);
 }

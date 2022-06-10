@@ -47,16 +47,7 @@ function M.ColliderUpdateSystem.update_from_sprite(entity)
       -- Update the physics world with the new size
       physics_world:update(entity, x, y, sprite_size.width, sprite_size.height)
 
-      x, y = x + (tf.origin.x * tf.scale.x), y + (tf.origin.y * tf.scale.y)
-
-      -- Adjust the position for scale (doing the opposite of the thing done when
-      -- first putting the entity into the world)
-      local x_scale_modifier, y_scale_modifier
-      if tf.scale.x > 0 then x_scale_modifier = 1 - tf.scale.x else x_scale_modifier = tf.scale.x * -1 end
-      if tf.scale.y > 0 then y_scale_modifier = 1 - tf.scale.y else y_scale_modifier = tf.scale.y * -1 end
-
-      x = x + (sprite_size.width * x_scale_modifier)
-      y = y + (sprite_size.height * y_scale_modifier)
+      x, y = x + tf.origin.x, y + tf.origin.y
 
       tfc:set_world_position(entity, Vector2f.new(x, y))
    else
@@ -64,15 +55,7 @@ function M.ColliderUpdateSystem.update_from_sprite(entity)
       -- transformable position minus the origin change
 
       local pos = tfc:world_position(entity)
-      local x, y = pos.x - (tf.origin.x * tf.scale.x), pos.y - (tf.origin.y * tf.scale.y)
-
-      -- Adjust the position for scale
-      local x_scale_modifier, y_scale_modifier
-      if tf.scale.x > 0 then x_scale_modifier = 1 - tf.scale.x else x_scale_modifier = tf.scale.x * -1 end
-      if tf.scale.y > 0 then y_scale_modifier = 1 - tf.scale.y else y_scale_modifier = tf.scale.y * -1 end
-
-      x = x - (sprite_size.width * x_scale_modifier)
-      y = y - (sprite_size.height * y_scale_modifier)
+      local x, y = pos.x - tf.origin.x, pos.y - tf.origin.y
 
       physics_world:add(entity, x, y, sprite_size.width, sprite_size.height)
    end
