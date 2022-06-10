@@ -537,7 +537,7 @@ function rooms_debug_menu()
 
          local list_dir
          list_dir = function(dir_path)
-            for file in fs.dir(dir_path) do
+            for _, file in ipairs(fs.dir(dir_path)) do
                if file == "." or file == ".." then
                   goto continue
                end

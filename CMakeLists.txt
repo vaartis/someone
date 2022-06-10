@@ -22,7 +22,8 @@ project(someone CXX C)
 if(EMSCRIPTEN)
   add_compile_options("-pthread")
   add_link_options("-sLLD_REPORT_UNDEFINED" "-sFORCE_FILESYSTEM" "-pthread"
-    "-sINCLUDE_FULL_LIBRARY" "-sFULL_ES3" "-sALLOW_MEMORY_GROWTH" "-Wno-pthreads-mem-growth")
+    "-sINCLUDE_FULL_LIBRARY" "-sFULL_ES3" "-sALLOW_MEMORY_GROWTH" "-Wno-pthreads-mem-growth"
+    "-lidbfs.js")
 endif()
 
 set(CMAKE_CXX_STANDARD 20)

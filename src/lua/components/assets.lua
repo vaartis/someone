@@ -116,7 +116,7 @@ function M.debug_menu()
          if ImGui.BeginPopupModal("Select asset file##" .. key) then
             ImGui.Text(key_debug_menu.selected_dir)
 
-            local sorted_dir = lume.array(fs.dir(key_debug_menu.selected_dir))
+            local sorted_dir = fs.dir(key_debug_menu.selected_dir)
             if key_debug_menu.selected_dir == "resources" then
                lume.remove(sorted_dir, "..")
             end
@@ -136,7 +136,7 @@ function M.debug_menu()
             sorted_dir = lume.filter(sorted_dir, function (k) return k:match(key_debug_menu.select_path_search) end)
 
             ImGui.SetNextItemWidth(300)
-            local new_selected, changed = ImGui.ListBox("", -1, sorted_dir)
+            local new_selected, changed = ImGui.ListBox("#dir_list", -1, sorted_dir)
             if changed then
                -- Normalize in case the path includes ..
                local fullpath = path.normalize(

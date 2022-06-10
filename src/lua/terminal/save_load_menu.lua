@@ -19,10 +19,11 @@ function M.SaveSlotsLine:initialize(args)
    local i = 0
 
    if not fs.exists("saves") then fs.mkdir("saves") end
-   for slot in fs.dir("saves") do
+   for _, slot in ipairs(fs.dir("saves")) do
       if not slot:match(".toml$") then
          goto next
       end
+      slot = path.join("saves", slot)
 
       i = i + 1
 

@@ -137,6 +137,7 @@ function M.save_game()
 
    file:write(toml_encoded)
    file:close()
+   GLOBAL.synchronize_saves()
 
    show_info_message("Game saved")
 

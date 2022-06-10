@@ -293,7 +293,12 @@ int main(int argc, char **argv) {
         // Apparently lua doesn't have a good equivalent
         "isalpha", [](int num) { return std::isalpha(num) != 0; },
         "iscntrl", [](int num) { return std::iscntrl(num) != 0; },
-        "loaded_mods", loaded_mods
+        "loaded_mods", loaded_mods,
+        "synchronize_saves", []() {
+#if SOMEONE_EMSCRIPTEN
+            EM_ASM(FS.syncfs(false, (err) => assert(!err)));
+#endif
+        }
     );
 
     // Initialize the walking env after GLOBAL, because it needs to put things in there
@@ -357,6 +362,14 @@ int main(int argc, char **argv) {
             break;
     }
 #else
+    EM_ASM(
+        FS.mkdir("saves");
+        FS.mount(IDBFS, {}, "saves");
+
+        // Synchronize any files that are in IndexedDB
+        FS.syncfs(true, (err) => assert(!err));
+    );
+
     emscripten_set_main_loop_arg(&main_loop, &context, 0, true);
 #endif
 
