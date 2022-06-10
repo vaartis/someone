@@ -21,7 +21,8 @@ jobs:
         sudo ./llvm.sh 11
 
         sudo apt-get update && sudo apt-get install -y build-essential cmake xorg-dev libgl-dev\
-             libudev-dev libasound2-dev libpulse-dev libreadline-dev libncurses-dev xvfb
+             libudev-dev libasound2-dev libpulse-dev libreadline-dev libncurses-dev libglew-dev\
+             xvfb
 
     # Uncomment to allow SSH access into the environment for debugging
     #- name: Setup tmate session
@@ -65,6 +66,35 @@ jobs:
         sudo apt-get update && sudo apt-get install -y build-essential cmake xorg-dev libgl-dev\
              libudev-dev libasound2-dev libpulse-dev libreadline-dev libncurses-dev xvfb
 
+    - name: Setup emsdk
+      uses: mymindstorm/setup-emsdk@v11
+      with:
+        version: 3.1.13
+        actions-cache-folder: 'emsdk-cache'
+
+    - name: Build the HTML5 version
+      run: |
+        mkdir $GITHUB_WORKSPACE/_build_emscripten && cd $GITHUB_WORKSPACE/_build_emscripten
+        emcmake cmake .. -DCMAKE_BUILD_TYPE=Release
+        emmake make -j $(nproc)
+
+    - name: Copy the HTML5 version
+      run: |
+        sudo mkdir -p /someone-html5
+        cd $GITHUB_WORKSPACE/_build_emscripten/
+        sudo cp -r html5/* /someone-html5
+
+    - name: Upload the HTML5 release to itch.io
+      if: ${{ github.event_name == 'release' }}
+      env:
+        BUTLER_API_KEY: ${{ secrets.BUTLER_CREDENTIALS }}
+        CHANNEL: html5
+        RELDIR: /someone-html5
+      run: |
+        curl -L -o butler.zip https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/default
+        unzip butler.zip && chmod +x butler
+        ./butler push ${RELDIR} vaartis/someone:${CHANNEL}
+
     - name: Build
       run: |
         mkdir $GITHUB_WORKSPACE/_build && cd $GITHUB_WORKSPACE/_build
@@ -84,16 +114,19 @@ jobs:
         CHANNEL: linux
         RELDIR: "/someone/"
       run: |
-        curl -L -o butler.zip https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/default
-        unzip butler.zip && chmod +x butler
         ./butler push ${RELDIR} vaartis/someone:${CHANNEL} --userversion ${GITHUB_REF:10}
-
 
     - name: Delete old artifacts
       uses: c-hive/gha-remove-artifacts@v1.1.0
       with:
         age: 1 day
         skip-tags: true
+
+    - name: Upload the HTML5 release artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: "someone-${{github.sha}}-windows-x86_64"
+        path: "/someone-html5/"
 
     - name: Upload the release artifact
       uses: actions/upload-artifact@v2
