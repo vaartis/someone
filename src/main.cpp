@@ -99,6 +99,7 @@ void main_loop(void *ctx_) {
                 // Activate debug menu on ~
                 ctx.debug_menu = !ctx.debug_menu;
                 break;
+#ifndef SOMEONE_EMSCRIPTEN
             case sf::Keyboard::F1:
                 if (ctx.current_window_size + 1 >= window_sizes.size()) {
                     ctx.current_window_size = 0;
@@ -108,6 +109,7 @@ void main_loop(void *ctx_) {
                 ctx.window.setSize(window_sizes[ctx.current_window_size]);
 
                 break;
+#endif
             default:
                 break;
             }
