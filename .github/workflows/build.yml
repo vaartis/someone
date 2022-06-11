@@ -91,7 +91,6 @@ jobs:
         path: "/someone-html5/"
 
     - name: Upload the HTML5 release to itch.io
-      if: ${{ github.event_name == 'release' }}
       env:
         BUTLER_API_KEY: ${{ secrets.BUTLER_CREDENTIALS }}
         CHANNEL: html5
@@ -99,7 +98,7 @@ jobs:
       run: |
         curl -L -o butler.zip https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/default
         unzip butler.zip && chmod +x butler
-        ./butler push ${RELDIR} vaartis/someone:${CHANNEL}
+        ./butler push ${RELDIR} vaartis/wtktotf:${CHANNEL}
 
     - name: Build
       run: |
@@ -216,7 +215,7 @@ jobs:
       run: |
         cd ${GITHUB_WORKSPACE}/_build
         mkdir -p /d/wtktotf-i686/wtktotf-${{github.sha}}-i686/
-        cp -r wtkotf.exe resources\
+        cp -r wtktotf.exe resources\
               deps/lua/src/lua/src/lua53.dll /mingw32/bin/{libbrotlicommon.dll,libbrotlidec.dll,libbz2-1.dll,libfreetype-6.dll,\
         libgcc_s_dw2-1.dll,libglib-2.0-0.dll,libgraphite2.dll,libharfbuzz-0.dll,libiconv-2.dll,libintl-8.dll,libpcre-1.dll,\
         libpng16-16.dll,libstdc++-6.dll,libwinpthread-1.dll,zlib1.dll}\
