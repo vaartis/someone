@@ -65,7 +65,7 @@ function M.ModWrapperLine:initialize(data)
       setmetatable(_G.mod, { name = data.name })
 
       -- Load the assets now if there are any
-      if path.exists(lume.format("resources/mods/{1}/resources/rooms/assets.toml", {data.name})) then
+      if fs.exists(lume.format("resources/mods/{1}/resources/rooms/assets.toml", {data.name})) then
          assets.load_assets()
       end
 
