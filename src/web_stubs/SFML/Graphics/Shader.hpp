@@ -89,6 +89,11 @@ public:
 
         block = GPU_LoadShaderBlock(program, "gpu_Vertex", "gpu_TexCoord", "gpu_Color", "gpu_ModelViewProjectionMatrix");
 
+        GPU_DetachShader(program, vertShader);
+        GPU_DetachShader(program, fragShader);
+        GPU_FreeShaderProgram(vertShader);
+        GPU_FreeShaderProgram(fragShader);
+
         return true;
     }
 
