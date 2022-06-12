@@ -13,7 +13,7 @@ public:
     Vector2f &getPosition() { return position; }
     void setPosition(const Vector2f &pos) { position = pos; }
 
-    Vector2f getOrigin() { return origin * getScale(); }
+    Vector2f getOrigin() { return { std::abs(origin.x * scale.x), std::abs(origin.y * scale.y) }; }
     void setOrigin(const Vector2f &orig) { origin = orig; }
 
     Vector2f &getScale() { return scale; }
