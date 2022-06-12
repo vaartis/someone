@@ -137,11 +137,7 @@ public:
     }
 
     Vector2u getSize() const override {
-        Vector2u result;
-
-        SDL_GetWindowSize(window, (int *)&result.x, (int *)&result.y);
-
-        return result;
+        return {mode.w, mode.h};
     }
 
     bool pollEvent(Event &theEvent) {
