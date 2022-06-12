@@ -79,14 +79,16 @@ public:
             flip = (SDL_RendererFlip)(flip | GPU_FLIP_VERTICAL);
         }
 
+        auto unscaledOrigin = getUnscaledOrigin();
+
         GPU_BlitRectX(
             texture->texture,
             &texRect,
             toTarget,
             &dstRect,
             getRotation(),
-            orig.x,
-            orig.y,
+            unscaledOrigin.x,
+            unscaledOrigin.y,
             flip
         );
     }

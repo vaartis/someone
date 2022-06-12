@@ -16,6 +16,8 @@ public:
     Vector2f getOrigin() { return { std::abs(origin.x * scale.x), std::abs(origin.y * scale.y) }; }
     void setOrigin(const Vector2f &orig) { origin = orig; }
 
+    Vector2f getUnscaledOrigin() { return origin; }
+
     Vector2f &getScale() { return scale; }
     void setScale(const Vector2f &scal) { scale = scal; }
 
