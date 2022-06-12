@@ -77,7 +77,7 @@ struct Event {
 
     SDL_Event sdlEvent;
 
-    EventType type;
+    EventType type = Unknown;
 
     KeyEvent key;
     TextEvent text;

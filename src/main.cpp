@@ -298,7 +298,7 @@ int main(int argc, char **argv) {
         "loaded_mods", loaded_mods,
         "synchronize_saves", []() {
 #if SOMEONE_EMSCRIPTEN
-            EM_ASM(FS.syncfs(false, (err) => assert(!err)));
+            EM_ASM(FS.syncfs(false, (err) => { if (err) console.error("Could not save to IndexedDB") }));
 #endif
         }
     );
@@ -369,7 +369,7 @@ int main(int argc, char **argv) {
         FS.mount(IDBFS, {}, "saves");
 
         // Synchronize any files that are in IndexedDB
-        FS.syncfs(true, (err) => assert(!err));
+        FS.syncfs(true, (err) => { if (err) console.error("Could not load from IndexedDB") });
     );
 
     emscripten_set_main_loop_arg(&main_loop, &context, 0, true);
