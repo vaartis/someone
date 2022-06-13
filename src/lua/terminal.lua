@@ -454,10 +454,13 @@ function M.process_event(event, dt)
    local line = first_line_on_screen
    while true do
       local should_wait = line:should_wait()
+      should_wait = should_wait or
+         (line._script_after and not line._script_after_executed) or
+         (line._script and not line._script_executed)
 
       -- If line has an is_interactive function, use it
       if line.is_interactive then
-         if line:should_wait() and line:is_interactive() and (lines.inputting_text or time_since_last_interaction > time_between_interactions) then
+         if should_wait and line:is_interactive() and (lines.inputting_text or time_since_last_interaction > time_between_interactions) then
             if line:handle_interaction(event) then
                time_since_last_interaction = 0
 
@@ -467,7 +470,7 @@ function M.process_event(event, dt)
          end
       end
 
-      if should_wait then
+      local function check_keys(last_line)
          if time_since_last_interaction > time_between_interactions then
             if Keyboard.is_key_pressed(KeyboardKey.LControl) then
                -- Save the game
@@ -475,7 +478,7 @@ function M.process_event(event, dt)
                   time_since_last_interaction = 0
 
                   -- Pass the first and the last line
-                  M.save_game_lines = { first_line = first_line_on_screen, last_line = line }
+                  M.save_game_lines = { first_line = first_line_on_screen, last_line = last_line }
                   M.save_or_restore_first("save", "save_load/save_load/1")
                elseif Keyboard.is_key_pressed(KeyboardKey.L) then
                   time_since_last_interaction = 0
@@ -488,12 +491,20 @@ function M.process_event(event, dt)
                end
             end
          end
+      end
 
+      if should_wait then
+         check_keys(line)
          break
       end
 
+      local current_line = line
       line = line:next()
-      if line == nil then break end
+      if line == nil then
+         -- In case there are no more lines, the current line is the last one
+         check_keys(current_line)
+         break
+      end
    end
 end
 

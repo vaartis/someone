@@ -12,8 +12,15 @@ protected:
     template<typename... T>
     decltype(auto) call_or_throw(sol::protected_function &fnc, T... args) {
         auto res = fnc(args...);
-        if (!res.valid())
-            throw sol::error(res);
+        if (!res.valid()) {
+            auto err = sol::error(res);
+
+#ifdef SOMEONE_EMSCRIPTEN
+            spdlog::error("{}", err.what());;
+#endif
+
+            throw err;
+        }
         return res;
     }
 };
