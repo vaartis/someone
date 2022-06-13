@@ -376,8 +376,7 @@ end
 
 function M.VariantInputLine:handle_interaction(event)
    if event.type == EventType.TextEntered then
-      local ch = utf8.char(event.text.unicode)
-
+      local ch = event.text.unicode
       -- Convert the character to it's number equivalent
       local chnum = tonumber(ch)
 
@@ -514,7 +513,7 @@ function M.TextInputLine:handle_interaction(event)
             return true
          end
       elseif event.type == EventType.TextEntered then
-         local char = utf8.char(event.text.unicode)
+         local char = event.text.unicode
 
          local allowed = false
          for _, filter in ipairs(self._filters) do

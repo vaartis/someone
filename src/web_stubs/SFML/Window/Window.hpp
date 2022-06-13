@@ -72,7 +72,7 @@ struct Event {
     };
 
     struct TextEvent {
-        uint32_t unicode;
+        std::string unicode;
     };
 
     SDL_Event sdlEvent;
@@ -164,7 +164,7 @@ public:
         }
         case SDL_TEXTINPUT: {
             theEvent.type = Event::TextEntered;
-            theEvent.text.unicode = sdlEvent.text.text[0];
+            theEvent.text.unicode = sdlEvent.text.text;
 
             break;
         }

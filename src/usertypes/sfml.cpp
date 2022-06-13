@@ -228,8 +228,8 @@ void register_sfml_usertypes(sol::state &lua, StaticFonts &fonts) {
         sol::base_classes, sol::bases<sf::Drawable, sf::Transformable>(),
         "texture", sol::property(&sf::Sprite::getTexture, [](sf::Sprite &sprite, sf::Texture *texture) { sprite.setTexture(texture); }),
         "texture_rect", sol::property(&sf::Sprite::getTextureRect, &sf::Sprite::setTextureRect),
-        "global_bounds", sol::property(&sf::Sprite::getGlobalBounds)
-        //"color", sol::property(&sf::Sprite::getColor, &sf::Sprite::setColor)
+        "global_bounds", sol::property(&sf::Sprite::getGlobalBounds),
+        "color", sol::property(&sf::Sprite::getColor, &sf::Sprite::setColor)
     );
 
     auto event_type = lua.new_usertype<sf::Event>(

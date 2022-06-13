@@ -51,11 +51,15 @@ function M.InstanceMenuLine:initialize(args)
          local text = lume.format("{1}. {2}", {line_counter, instance.name})
          line_counter = line_counter + 1
 
+         local text_obj = Text.new("", StaticFonts.main_font, StaticFonts.font_size)
+         text_obj.fill_color = self._character.color
+         text_obj.character_size = self._character.font_size
+
          table.insert(
             self._decrypted_lines_texts,
             {
                text = text,
-               text_object = Text.new("", StaticFonts.main_font, StaticFonts.font_size),
+               text_object = text_obj,
                next = instance.next,
                -- Only exists for mods
                mod = instance.mod,
@@ -125,10 +129,16 @@ function M.InstanceMenuLine:handle_interaction(event)
    if not lines.inputing_text then lines.inputting_text = true end
 
    if event.type == EventType.TextEntered then
-      local char = utf8.char(event.text.unicode)
+      local char = event.text.unicode
 
-      -- Because SFML considers backspace and return as inputting text, it has to be handled here
-      if char == "\b" then
+      self._password_input_text.text = self._password_input_text.text .. char
+      self._letters_output = self._letters_output + 1
+
+      self:calculate_longest_line()
+
+      return true
+   elseif event.type == EventType.KeyPressed then
+      if event.key.code == KeyboardKey.Backspace then
          if #self._password_input_text.text > self._password_input_text.initial_length then
             -- Remove the last character
             self._password_input_text.text = self._password_input_text.text:sub(1, -2)
@@ -137,20 +147,13 @@ function M.InstanceMenuLine:handle_interaction(event)
 
             self:calculate_longest_line()
          end
-      elseif char == "\r" then
+      elseif event.key.code == KeyboardKey.Return then
          if #self._password_input_text.text > self._password_input_text.initial_length then
             -- Finish input
             lines.reset_after_text_input()
             self._done_input = true
-
-            return true
          end
-      else
-         self._password_input_text.text = self._password_input_text.text .. char
-         self._letters_output = self._letters_output + 1
       end
-
-      self:calculate_longest_line()
 
       return true
    end

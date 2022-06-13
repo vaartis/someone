@@ -292,8 +292,8 @@ int main(int argc, char **argv) {
         "set_current_state", [&](CurrentState new_state) { current_state = new_state; },
         "get_current_state", [&]() { return current_state; },
         // Apparently lua doesn't have a good equivalent
-        "isalpha", [](int num) { return std::isalpha(num) != 0; },
-        "iscntrl", [](int num) { return std::iscntrl(num) != 0; },
+        "isalpha", [](const std::string &num) { return std::all_of(num.begin(), num.end(), [](int ch) { return std::isalpha(ch); }); },
+        "iscntrl", [](const std::string &num) { return std::all_of(num.begin(), num.end(), [](int ch) { return std::iscntrl(ch); }); },
         "loaded_mods", loaded_mods,
         "synchronize_saves", []() {
 #if SOMEONE_EMSCRIPTEN

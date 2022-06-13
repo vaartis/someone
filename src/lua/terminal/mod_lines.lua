@@ -89,7 +89,7 @@ function M.ModWrapperLine:initialize(data)
                   error(err)
                end
 
-               if type("loaded") == "function" then
+               if type(loaded) == "function" then
                   into[name] = loaded()
                else
                   into[name] = loaded

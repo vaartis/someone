@@ -107,7 +107,7 @@ function InteractionSystem:update(dt)
 
                pressed_e = true
             elseif event.type == EventType.TextEntered then
-               local ch = utf8.char(event.text.unicode)
+               local ch = event.text.unicode
 
                -- Convert the character to it's number equivalent
                pressed_number = tonumber(ch)

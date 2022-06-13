@@ -12,6 +12,7 @@ namespace sf {
 class Sprite : public Transformable, public Drawable {
     Texture *texture = nullptr;
 
+    Color color = Color::White;
     IntRect textureRect;
 public:
     Sprite() = default;
@@ -32,6 +33,9 @@ public:
     void setTextureRect(const IntRect &rect) {
         textureRect = rect;
     }
+
+    sf::Color &getColor() { return color; }
+    void setColor(sf::Color other) { color = other; }
 
     IntRect getGlobalBounds() {
         IntRect result;
@@ -81,6 +85,7 @@ public:
 
         auto unscaledOrigin = getUnscaledOrigin();
 
+        GPU_SetRGBA(texture->texture, color.r, color.g, color.b, color.a);
         GPU_BlitRectX(
             texture->texture,
             &texRect,
@@ -91,6 +96,7 @@ public:
             unscaledOrigin.y,
             flip
         );
+        GPU_UnsetColor(texture->texture);
     }
 
     Texture *getTexture() {
