@@ -85,23 +85,6 @@ jobs:
         cd $GITHUB_WORKSPACE/_build_emscripten/
         sudo cp -r html5/* /someone-html5
 
-    - name: Upload the HTML5 release artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: "someone-${{github.sha}}-html5"
-        path: "/someone-html5/"
-
-    - name: Upload the HTML5 release to itch.io
-      if: ${{ github.event_name == 'release' }}
-      env:
-        BUTLER_API_KEY: ${{ secrets.BUTLER_CREDENTIALS }}
-        CHANNEL: html5
-        RELDIR: /someone-html5
-      run: |
-        curl -L -o butler.zip https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/default
-        unzip butler.zip && chmod +x butler
-        ./butler push ${RELDIR} vaartis/someone:${CHANNEL}
-
     - name: Build
       run: |
         mkdir $GITHUB_WORKSPACE/_build && cd $GITHUB_WORKSPACE/_build
@@ -120,11 +103,28 @@ jobs:
         age: 1 day
         skip-tags: true
 
+    - name: Upload the HTML5 release artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: "someone-${{github.sha}}-html5"
+        path: "/someone-html5/"
+
     - name: Upload the release artifact
       uses: actions/upload-artifact@v2
       with:
         name: "someone-${{github.sha}}-linux"
         path: "/someone/"
+
+    - name: Upload the HTML5 release to itch.io
+      if: ${{ github.event_name == 'release' }}
+      env:
+        BUTLER_API_KEY: ${{ secrets.BUTLER_CREDENTIALS }}
+        CHANNEL: html5
+        RELDIR: /someone-html5
+      run: |
+        curl -L -o butler.zip https://broth.itch.ovh/butler/linux-amd64/LATEST/archive/default
+        unzip butler.zip && chmod +x butler
+        ./butler push ${RELDIR} vaartis/someone:${CHANNEL} --userversion ${GITHUB_REF:10}
 
     - name: Upload release to itch.io
       if: ${{ github.event_name == 'release' }}
@@ -177,22 +177,6 @@ jobs:
         curl -L -o butler.zip https://broth.itch.ovh/butler/windows-amd64/LATEST/archive/default
         unzip butler.zip && chmod +x butler.exe
 
-    - name: Upload the x86_64 release to itch.io
-      shell: msys2 {0}
-      if: ${{ github.event_name == 'release' }}
-      env:
-        BUTLER_API_KEY: ${{ secrets.BUTLER_CREDENTIALS }}
-        CHANNEL: windows-x86_64
-        RELDIR: "D:\\someone-x86_64"
-      run: |
-        ./butler push ${RELDIR} vaartis/someone:${CHANNEL} --userversion ${GITHUB_REF:10}
-
-    - name: Upload the x86_64 release artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: "someone-${{github.sha}}-windows-x86_64"
-        path: "D:\\someone-x86_64"
-
     - name: Build i686
       env:
         MSYSTEM: MINGW32
@@ -214,6 +198,28 @@ jobs:
         libpng16-16.dll,libstdc++-6.dll,libwinpthread-1.dll,zlib1.dll}\
               /d/someone-i686/someone-${{github.sha}}-i686
 
+    - name: Upload the x86_64 release artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: "someone-${{github.sha}}-windows-x86_64"
+        path: "D:\\someone-x86_64"
+
+    - name: Upload the i686 release artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: "someone-${{github.sha}}-windows-i686"
+        path: "D:\\someone-i686"
+
+    - name: Upload the x86_64 release to itch.io
+      shell: msys2 {0}
+      if: ${{ github.event_name == 'release' }}
+      env:
+        BUTLER_API_KEY: ${{ secrets.BUTLER_CREDENTIALS }}
+        CHANNEL: windows-x86_64
+        RELDIR: "D:\\someone-x86_64"
+      run: |
+        ./butler push ${RELDIR} vaartis/someone:${CHANNEL} --userversion ${GITHUB_REF:10}
+
     - name: Upload the i686 release to itch.io
       shell: msys2 {0}
       if: ${{ github.event_name == 'release' }}
@@ -223,12 +229,6 @@ jobs:
         RELDIR: "D:\\someone-i686"
       run: |
         ./butler push ${RELDIR} vaartis/someone:${CHANNEL} --userversion ${GITHUB_REF:10}
-
-    - name: Upload the i686 release artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: "someone-${{github.sha}}-windows-i686"
-        path: "D:\\someone-i686"
 
   build-macos:
     runs-on: macos-10.15
