@@ -22,7 +22,7 @@ M.assets = {
 M.placeholder_texture = Texture.new()
 M.placeholder_texture:load_from_file("resources/sprites/room/placeholder.png")
 
-local function add_to_known_assets(asset_type, key, path)
+M.add_to_known_assets = function(asset_type, key, path)
    known_assets[asset_type][key] = path
 end
 
@@ -228,7 +228,7 @@ function M.debug_menu()
             end
             if editing_asset.new_name then
                -- Put the new asset in its place, if there is one
-               add_to_known_assets(
+               M.add_to_known_assets(
                   key,
                   editing_asset.new_name,
                   path.join(M.resources_root(), toml_data.config[key].root, editing_asset.path)
@@ -341,7 +341,7 @@ function M.load_assets()
                asset_path = path.join(root, asset_path)
             end
 
-            add_to_known_assets(asset_type.name, name, asset_path)
+            M.add_to_known_assets(asset_type.name, name, asset_path)
          end
       end
    end

@@ -3,52 +3,9 @@ lightPoint = { module = "components.tilemap", name = "player_light_position"}
 n = 1
 
 [entities.tilemap.tilemap]
-tiles = '''
-##########----
-ep        #---
-#######   #---
-------#   #---
-------#   #---
--######   #---
-#         #---
-#         #---
-n         #---
-#         #---
-#         #---
--#########----
---------------
---------------
-'''
-texture = "cave_tilemap"
-sheet = "resources/sprites/room/cave_tileset/"
+tilemap = "resources/sprites/room/cave_tileset/cave_2.tmj"
 
-[entities.tilemap.tilemap.map."#"]
-sprites = ["Brickwork"]
-type = "wall"
-
-[entities.tilemap.tilemap.map."-"]
-sprites = ["Wall"]
-type = "wall"
-
-[entities.tilemap.tilemap.map." "]
-sprites = ["Floor"]
-type = "floor"
-
-[entities.tilemap.tilemap.map."p"]
-# The floor underneath
-sprites = ["Floor"]
-# The player sprite
-player_sprite = "Player"
-type = "player"
-
-[entities.tilemap.tilemap.map."e"]
-# Entrance
-sprites = ["Floor"]
-type = "wall"
-
-[entities.tilemap.tilemap.map."n"]
-sprites = ["Brickwork", "Note"]
-type = "interaction"
+[entities.tilemap.tilemap.interactions.note]
 callback = { module = "components.note", name = "read_note", args = [ "cave-1" ] }
 
 # Text for talking

@@ -1,4 +1,6 @@
+local json = require("lunajson")
 local lume = require("lume")
+local path = require("path")
 
 local terminal = require("terminal")
 local assets = require("components.assets")
@@ -31,71 +33,143 @@ M.components = {
 }
 
 function M.components.tilemap.process_component(new_ent, comp, entity_name)
-   local tile_mapping = comp.map
+   if not comp.tilemap then error("Tilemap path is not set in " .. entity_name) end
 
-   local sheet_json = shared_components.load_sheet_json(comp.sheet)
-   local tile_frames = sheet_json["frames"]
+   local map_file = io.open(comp.tilemap, "r")
+   local map = json.decode(map_file:read("*all"))
+   map_file:close()
 
-   -- Trim leading/ending newlines
-   local tile_string = lume.trim(comp.tiles)
+   -- Load the tileset image
 
-   local lines = lume.split(tile_string, "\n")
-   for y, line in ipairs(lines) do
-      for x = 1, #line do
-         local tile_symbol = line:sub(x, x)
+   local sets, paths_to_names = {}, {}
+   for _, tset_info in ipairs(map.tilesets) do
+      local tset_path = path.join(path.dirname(comp.tilemap), tset_info.source)
 
-         local tile_info = tile_mapping[tile_symbol]
-         if not tile_info then
-            error("Unknown tile " .. tile_symbol)
-         end
+      local set_file = io.open(tset_path, "r")
+      local set = json.decode(set_file:read("*all"))
+      set_file:close()
+      sets[set.name] = set
+      paths_to_names[tset_info.source] = set.name
 
-         -- First process the base
-         local frame = tile_frames[tile_info.sprites[1]].frame
-         local tile_transformable = { position = { frame.w * (x - 1), frame.h * (y - 1) } }
-         local template = {
-            drawable = { kind = "sprite", texture_asset = comp.texture, texture_rect = frame, z = 1 },
-            transformable = tile_transformable
-         }
-         -- Add a collider for walls
-         if tile_info.type == "wall" then
-            template.collider = { mode = "constant", size = { frame.w, frame.h } }
-         elseif tile_info.type == "interaction" then
-            template.collider = { mode = "constant", size = { frame.w, frame.h }, trigger = tile_info.trigger }
-            template.interaction_tile = { callback = tile_info.callback, activatable_callback = tile_info.activatable_callback }
-         end
-         util.entities_mod().instantiate_entity(lume.format("tile_{1}_{2}", {x, y}), template)
+      local image_path = path.join(path.dirname(tset_path), set.image)
+      local image_name = path.splitext(set.image)
 
-         -- If there are more than 1 sprite, draw those on top
-         if #tile_info.sprites > 1 then
-            for additional_i = 2, #tile_info.sprites do
-               local additional_sprite = tile_info.sprites[additional_i]
-               local frame = tile_frames[additional_sprite].frame
-
-               local template = {
-                  drawable = { kind = "sprite", texture_asset = comp.texture, texture_rect = frame, z = additional_i },
-                  transformable = tile_transformable
-               }
-               util.entities_mod().instantiate_entity(lume.format("tile_{1}_{2}_layer{3}", {x, y, additional_i}), template)
-            end
-         end
-
-         -- Additionally, if the sprite is of type player, spawn the player there
-         if tile_info.type == "player" then
-            local frame = tile_frames[tile_info.player_sprite].frame
-            local template = {
-               drawable = { kind = "sprite", texture_asset = comp.texture, texture_rect = frame, z = 10 },
-               transformable = tile_transformable,
-               -- Hardcoded..
-               tile_player = { footstep_sound_asset = "footstep" }
-            }
-            template.collider = { mode = "sprite" }
-
-            util.entities_mod().instantiate_entity(lume.format("player", {x, y}), template)
-          end
-      end
+      -- Load the texture into known assets
+      assets.add_to_known_assets("textures", image_name, image_path)
+      set.image = image_name
+      set.firstgid = tset_info.firstgid
    end
 
-   -- new_ent:add(M.components.rotation.class(comp.rotation_speed))
+   local function gid_to_tile(tile)
+      local from_tileset
+      for _, set in lume.ripairs(map.tilesets) do
+         if set.firstgid <= tile then
+            tile = tile - set.firstgid
+
+            local tile_val = tile
+            tile = lume.match(sets[paths_to_names[set.source]].tiles, function(til) return til.id == tile end)
+            if tile == nil then
+               -- Tile has no special properties, so not in the tilemap
+               tile = { id = tile_val }
+            end
+            tile.tileset = paths_to_names[set.source]
+
+            break
+         end
+      end
+
+      return tile
+   end
+
+   local function tile_to_frame(tile)
+      local tset = sets[tile.tileset]
+
+      -- Width/Height of the tileset in tile number
+      local tset_w = tset.imagewidth / tset.tilewidth
+      local tset_h = tset.imageheight / tset.tileheight
+      -- Position in tileset
+      local ts_x = math.floor(tile.id % tset_w)
+      local ts_y = math.floor(tile.id / tset_w)
+
+      return { x = ts_x * tset.tilewidth, y = ts_y * tset.tileheight, w = tset.tilewidth, h = tset.tileheight }
+   end
+
+   local FLIPPED_HORIZONTALLY_FLAG = 0x80000000
+   local FLIPPED_VERTICALLY_FLAG = 0x40000000
+   local FLIPPED_DIAGONALLY_FLAG = 0x20000000
+   local ROTATED_HEXAGONAL_120_FLAG = 0x10000000
+   for layer_n, layer in ipairs(map.layers) do
+      if layer.type == "tilelayer" then
+         for n, tile in ipairs(layer.data) do
+            -- 0 = no tile
+            if tile == 0 then
+               goto next
+            end
+
+            local flipped_horizontally = (tile & FLIPPED_HORIZONTALLY_FLAG)
+            local flipped_vertically = (tile & FLIPPED_VERTICALLY_FLAG)
+            local flipped_diagonally = (tile & FLIPPED_DIAGONALLY_FLAG)
+            local rotated_hex120 = (tile & ROTATED_HEXAGONAL_120_FLAG)
+            tile = tile & ~(FLIPPED_HORIZONTALLY_FLAG |
+                            FLIPPED_VERTICALLY_FLAG |
+                            FLIPPED_DIAGONALLY_FLAG |
+                            ROTATED_HEXAGONAL_120_FLAG)
+
+            tile = gid_to_tile(tile)
+
+            local tset = sets[tile.tileset]
+
+            local x = (n - 1) % layer.width
+            local y = math.floor((n - 1) / layer.width)
+            local w, h = tset.tilewidth, tset.tileheight
+
+            local frame = tile_to_frame(tile)
+
+            local tile_transformable = { position = { w * x, h * y } }
+            local template = {
+               drawable = { kind = "sprite", texture_asset = sets[tile.tileset].image, texture_rect = frame, z = layer_n },
+               transformable = tile_transformable
+            }
+            -- Add a collider for walls
+            if tile.type == "Wall" then
+               template.collider = { mode = "constant", size = { tset.tilewidth, tset.tileheight } }
+            elseif tile.type == "Player" then
+               template.tile_player = { footstep_sound_asset = "footstep" }
+               template.collider = { mode = "sprite" }
+            end
+            util.entities_mod().instantiate_entity(lume.format("tile_{1}_{2}_{3}", {layer_n, x, y}), template)
+
+            ::next::
+         end
+      elseif layer.type == "objectgroup" then
+         for n, obj in ipairs(layer.objects) do
+            local props = {}
+            for _, prop in ipairs(obj.properties) do
+               props[prop.name] = prop.value
+            end
+            obj.properties = props
+
+            local template = {
+               transformable = {
+                  position = { obj.x, obj.y }
+               }
+            }
+            if obj.properties.interaction then
+               template.interaction_tile = comp.interactions[obj.properties.interaction]
+               template.collider = { mode = "constant", size = { obj.width, obj.height }, trigger = obj.properties.trigger }
+            end
+            if obj.gid then
+               local tile = gid_to_tile(obj.gid)
+               local frame = tile_to_frame(tile)
+               template.drawable = { kind = "sprite", texture_asset = sets[tile.tileset].image, texture_rect = frame, z = layer_n }
+               -- Adjust position, but why does this happen?
+               template.transformable.position[2] = template.transformable.position[2] - obj.height
+            end
+
+            util.entities_mod().instantiate_entity(lume.format("object_{1}_{2}_{3}", {layer_n, obj.x, obj.y}), template)
+         end
+      end
+   end
 end
 
 function M.components.tile_player.process_component(new_ent, comp, entity_name)
