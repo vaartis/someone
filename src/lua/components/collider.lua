@@ -66,7 +66,9 @@ function M.components.collider.process_component(new_ent, comp, entity_name)
       error("Transformable is required for a collider on " .. tostring(entity_name))
    end
 
-   local pos = new_ent:get("Transformable"):world_position(new_ent)
+   local tf = new_ent:get("Transformable")
+   local pos = tf:world_position(new_ent)
+   local orig = tf.transformable.origin
 
    if comp.mode == "sprite" then
       if not (new_ent:has("Drawable") and new_ent:get("Drawable").kind == "sprite") then
@@ -82,7 +84,7 @@ function M.components.collider.process_component(new_ent, comp, entity_name)
       end
       local ph_width, ph_height = comp.size[1], comp.size[2]
 
-      M.physics_world:add(new_ent, pos.x, pos.y, ph_width, ph_height)
+      M.physics_world:add(new_ent, pos.x - orig.x, pos.y - orig.y, ph_width, ph_height)
       new_ent:add(M.components.collider.class(comp.mode, comp.trigger))
    else
       error("Unknown collider mode " .. tostring(comp.mode) .. " for " .. tostring(entity_name))
