@@ -106,10 +106,10 @@ function M.components.tilemap.process_component(new_ent, comp, entity_name)
                goto next
             end
 
-            local flipped_horizontally = (tile & FLIPPED_HORIZONTALLY_FLAG)
-            local flipped_vertically = (tile & FLIPPED_VERTICALLY_FLAG)
-            local flipped_diagonally = (tile & FLIPPED_DIAGONALLY_FLAG)
-            local rotated_hex120 = (tile & ROTATED_HEXAGONAL_120_FLAG)
+            local flipped_horizontally = (tile & FLIPPED_HORIZONTALLY_FLAG) ~= 0
+            local flipped_vertically = (tile & FLIPPED_VERTICALLY_FLAG) ~= 0
+            local flipped_diagonally = (tile & FLIPPED_DIAGONALLY_FLAG) ~= 0
+            local rotated_hex120 = (tile & ROTATED_HEXAGONAL_120_FLAG) ~= 0
             tile = tile & ~(FLIPPED_HORIZONTALLY_FLAG |
                             FLIPPED_VERTICALLY_FLAG |
                             FLIPPED_DIAGONALLY_FLAG |
@@ -125,7 +125,16 @@ function M.components.tilemap.process_component(new_ent, comp, entity_name)
 
             local frame = tile_to_frame(tile)
 
-            local tile_transformable = { position = { w * x, h * y } }
+            local scale = { 1, 1 }
+            if flipped_diagonally then
+               scale[1], scale[2] = scale[2], scale[1]
+            end
+            if flipped_horizontally then scale[1] = -scale[1] end
+            if flipped_vertically then scale[2] = -scale[2] end
+
+            local tile_transformable = { position = { (w * x) + (w / 2), (h * y) + (h / 2) },
+                                         origin = {math.floor(w / 2), math.floor(h / 2)},
+                                         scale = scale }
             local template = {
                drawable = { kind = "sprite", texture_asset = sets[tile.tileset].image, texture_rect = frame, z = layer_n },
                transformable = tile_transformable
