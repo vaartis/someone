@@ -55,9 +55,14 @@ function RenderSystem:_sort_targets()
    self._sorted_targets = entities
 end
 
-function RenderSystem:onAddEntity() self:_sort_targets() end
-function RenderSystem:onRemoveEntity() self:_sort_targets() end
+function RenderSystem:onAddEntity() self._need_sorting = true end
+function RenderSystem:onRemoveEntity() self._need_sorting = true end
 function RenderSystem:draw(layer)
+   if self._need_sorting then
+      self:_sort_targets()
+      self._need_sorting = false
+   end
+
    if not self._sorted_targets then return end
 
    for _, entity in ipairs(self._sorted_targets) do
