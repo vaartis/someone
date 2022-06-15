@@ -103,9 +103,6 @@ describe "ECS", ->
       drawable = ent\get("Drawable")
       drawable2 = ent2\get("Drawable")
 
-    it "sorts entities by Z level", ->
-      assert.are.same { ent2, ent }, rooms.engine.systemRegistry["RenderSystem"]._sorted_targets
-
 walking_data = require("test.walking_data")
 
 describe "Callbacks", ->
