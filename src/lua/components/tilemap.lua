@@ -100,6 +100,10 @@ function M.components.tilemap.process_component(new_ent, comp, entity_name)
    local ROTATED_HEXAGONAL_120_FLAG = 0x10000000
    for layer_n, layer in ipairs(map.layers) do
       if layer.type == "tilelayer" then
+         if layer.compression == "zlib" then
+            layer.data = decode_base64_and_decompress_zlib(layer.data, layer.width * layer.height)
+         end
+
          for n, tile in ipairs(layer.data) do
             -- 0 = no tile
             if tile == 0 then

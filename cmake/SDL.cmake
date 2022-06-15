@@ -19,6 +19,9 @@ add_subdirectory(deps/SDL_mixer EXCLUDE_FROM_ALL)
 
 # SDL_ttf
 
+set(FT_DISABLE_ZLIB FALSE CACHE BOOL "Use system zlib" FORCE)
+set(FT_REQUIRE_ZLIB TRUE CACHE BOOL "Use system zlib" FORCE)
+
 set(BUILD_SAMPLES FALSE CACHE BOOL "Don't build samples" FORCE)
 set(TTF_DISABLE_INSTALL TRUE CACHE BOOL "Disable install" FORCE)
 add_subdirectory(deps/SDL_ttf EXCLUDE_FROM_ALL)
