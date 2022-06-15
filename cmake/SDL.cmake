@@ -19,6 +19,16 @@ add_subdirectory(deps/SDL_mixer EXCLUDE_FROM_ALL)
 
 # SDL_ttf
 
+if (EMSCRIPTEN)
+  file(WRITE "${PROJECT_BINARY_DIR}/dummy/dummy.c" "")
+  try_compile(
+    EMSCRIPTEN_ZLIB
+    "${PROJECT_BINARY_DIR}"
+    "${PROJECT_BINARY_DIR}/dummy/dummy.c"
+    LINK_OPTIONS "-sUSE_ZLIB=1")
+  file(REMOVE_RECURSE "${PROJECT_BINARY_DIR}/dummy")
+endif()
+
 set(FT_DISABLE_ZLIB FALSE CACHE BOOL "Use system zlib" FORCE)
 set(FT_REQUIRE_ZLIB TRUE CACHE BOOL "Use system zlib" FORCE)
 
