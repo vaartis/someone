@@ -1,8 +1,5 @@
 #pragma once
 
-#include "SDL.h"
-#include "SDL_render.h"
-
 #include "SFML/System/Rect.hpp"
 #include "SFML/Graphics/Transformable.hpp"
 #include "SFML/Graphics/RenderTexture.hpp"
@@ -109,109 +106,115 @@ public:
 
 class NineSliceSprite : public Sprite {
     Vector2i size;
+
+    struct Vertex {
+        float x, y, u, v;
+        float r = 1.0, g = 1.0, b = 1.0, a = 1.0;
+    } __attribute__((packed));
 public:
     const Vector2i &getSize() { return size; };
     void setSize(Vector2i other) { size = other; };
 
     void drawToTarget(GPU_Target *toTarget) override {
+        auto bounds = getGlobalBounds();
         auto texSize = texture->getSize();
 
-        auto topLeftRect = GPU_MakeRect(0, 0, textureRect.left, textureRect.top);
-        auto topCenterRect = GPU_MakeRect(textureRect.left, 0, textureRect.width, textureRect.top);
-        auto topRightRect = GPU_MakeRect(textureRect.left + textureRect.width, 0, texSize.x - (textureRect.left + textureRect.width), textureRect.top);
+        float posX = bounds.left;
+        float posY = bounds.top;
 
-        auto centerLeftRect = GPU_MakeRect(0, textureRect.top, textureRect.left, textureRect.height);
-        auto centerRect = GPU_MakeRect(textureRect.left, textureRect.top, textureRect.width, textureRect.height);
-        auto centerRightRect = GPU_MakeRect(topRightRect.x, textureRect.top, topRightRect.w, textureRect.height);
+        float leftX = textureRect.left;
+        float rightX = leftX + textureRect.width;
+        float centerTopY = textureRect.top;
+        float centerBottomY = centerTopY + textureRect.height;
 
-        auto bottomLeftRect = GPU_MakeRect(0, textureRect.top + textureRect.height, textureRect.left, textureRect.top);
-        auto bottomCenterRect = GPU_MakeRect(topCenterRect.x, bottomLeftRect.y,
-                                             textureRect.width, texSize.y - (textureRect.top + textureRect.height));
-        auto bottomRightRect = GPU_MakeRect(topRightRect.x, bottomLeftRect.y,
-                                            topRightRect.w, topRightRect.h);
+        auto lx = leftX / texSize.x;
+        auto rx = rightX / texSize.x;
+        auto ty = centerTopY / texSize.y;
+        auto by = centerBottomY / texSize.y;
 
-        auto bounds = getGlobalBounds();
-        GPU_Rect dstRect = GPU_MakeRect(bounds.left, bounds.top, topLeftRect.w, topLeftRect.h);
+        // Offsets to be used on the stretched texture to determine where the stretch points end
+        auto rightXOffset = texSize.x - rightX;
+        auto bottomYOffset = texSize.y - centerBottomY;
 
-        GPU_SetRGBA(texture->texture, color.r, color.g, color.b, color.a);
+        // Now, after calculating texture positions, offset all positions to where they actually are on the screen,
+        // this includes positioning rightX and centerBottomY to stretch
+        leftX += posX;
+        rightX = posX + size.x - rightXOffset;
+        centerTopY += posY;
+        centerBottomY = posY + size.y - bottomYOffset;
+        float w = posX + size.x;
+        float h = posY + size.y;
 
-        GPU_BlitRect(
-            texture->texture,
-            &topLeftRect,
-            toTarget,
-            &dstRect
-        );
-        dstRect.x += dstRect.w;
-        dstRect.w = size.x - (topLeftRect.w + topRightRect.w);
-        GPU_BlitRect(
-            texture->texture,
-            &topCenterRect,
-            toTarget,
-            &dstRect
-        );
-        dstRect.x += dstRect.w;
-        dstRect.w = topRightRect.w;
-        GPU_BlitRect(
-            texture->texture,
-            &topRightRect,
-            toTarget,
-            &dstRect
-        );
-        dstRect.x = bounds.left;
-        dstRect.y = bounds.top + topLeftRect.h;
-        dstRect.w = centerLeftRect.w;
-        dstRect.h = size.y - (topLeftRect.h + bottomLeftRect.h);
-        GPU_BlitRect(
-            texture->texture,
-            &centerLeftRect,
-            toTarget,
-            &dstRect
-        );
-        dstRect.x += dstRect.w;
-        dstRect.w = size.x - (topLeftRect.w + topRightRect.w);
-        GPU_BlitRect(
-            texture->texture,
-            &centerRect,
-            toTarget,
-            &dstRect
-        );
-        dstRect.x += dstRect.w;
-        dstRect.w = centerRightRect.w;
-        GPU_BlitRect(
-            texture->texture,
-            &centerRightRect,
-            toTarget,
-            &dstRect
-        );
-        dstRect.x = bounds.left;
-        dstRect.y += dstRect.h;
-        dstRect.w = bottomLeftRect.w;
-        dstRect.h = bottomLeftRect.h;
-        GPU_BlitRect(
-            texture->texture,
-            &bottomLeftRect,
-            toTarget,
-            &dstRect
-        );
-        dstRect.x += dstRect.w;
-        dstRect.w = size.x - (topLeftRect.w + topRightRect.w);
-        GPU_BlitRect(
-            texture->texture,
-            &bottomCenterRect,
-            toTarget,
-            &dstRect
-        );
-        dstRect.x += dstRect.w;
-        dstRect.w = bottomRightRect.w;
-        GPU_BlitRect(
-            texture->texture,
-            &bottomRightRect,
-            toTarget,
-            &dstRect
-        );
+        // 0---l---r---w     0---1---2---3
+        // |   |   |   |     | \ | \ | \ |
+        // t---+---+---+     4---5---6---7
+        // |   |   |   |     | \ | \ | \ |
+        // b---+---+---+     8---9---A---B
+        // |   |   |   |     | \ | \ | \ |
+        // h---+---+---*     C---D---E---F
+        std::array<uint16_t, 54> indices = {
+            // First row
+            0, 5, 4,
+            0, 1, 5,
 
+            1, 6, 5,
+            1, 2, 6,
 
-        GPU_UnsetColor(texture->texture);
+            2, 7, 6,
+            2, 3, 7,
+
+            // Second row
+            4, 9, 8,
+            4, 5, 9,
+
+            5, 0xA, 9,
+            5, 6, 0xA,
+
+            6, 0xB, 0xA,
+            6, 7, 0xB,
+
+            // Third row
+            8, 0xD, 0xC,
+            8, 9, 0xD,
+
+            9, 0xE, 0xD,
+            9, 0xA, 0xE,
+
+            0xA, 0xF, 0xE,
+            0xA, 0xF, 0xB,
+        };
+
+        // Each member is x y u v r g b a, these members relate to the table comment above,
+        // each member is the number in the table, from 1 to 16
+        std::array<Vertex, 16> verts = {
+            {
+                // First row
+                { posX, posY, 0, 0 },
+                { leftX, posY, lx, 0 },
+                { rightX, posY, rx, 0 },
+                { w, posY, 1, 0 },
+                // Second row
+                { posX, centerTopY, 0, ty },
+                { leftX, centerTopY, lx, ty },
+                { rightX, centerTopY, rx, ty },
+                { w, centerTopY, 1, ty },
+                // Third row
+                { posX, centerBottomY, 0, by },
+                { leftX, centerBottomY, lx, by },
+                { rightX, centerBottomY, rx, by },
+                { w, centerBottomY, 1, by },
+                // Fourth row
+                { posX, h, 0, 1 },
+                { leftX, h, lx, 1 },
+                { rightX, h, rx, 1 },
+                { w, h, 1, 1 }
+            }
+        };
+
+        GPU_TriangleBatch(texture->texture, toTarget,
+                          verts.size(), (float*)verts.data(),
+                          indices.size(), indices.data(),
+                          GPU_BATCH_XY_ST_RGBA);
     }
 };
 }
