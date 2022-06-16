@@ -102,8 +102,9 @@ decltype(auto) register_rect(sol::state &lua, std::string name) {
 } // namespace
 
 void register_sfml_usertypes(sol::state &lua, StaticFonts &fonts) {
- auto vec2f_type = register_vector2<float>(lua, "Vector2f");
+    auto vec2f_type = register_vector2<float>(lua, "Vector2f");
     auto vec2u_type = register_vector2<unsigned int>(lua, "Vector2u");
+    auto vec2i_type = register_vector2<int>(lua, "Vector2i");
 
     auto vec3f_type = register_vector3<float>(lua, "Vector3f");
 
@@ -230,6 +231,11 @@ void register_sfml_usertypes(sol::state &lua, StaticFonts &fonts) {
         "texture_rect", sol::property(&sf::Sprite::getTextureRect, &sf::Sprite::setTextureRect),
         "global_bounds", sol::property(&sf::Sprite::getGlobalBounds),
         "color", sol::property(&sf::Sprite::getColor, &sf::Sprite::setColor)
+    );
+    auto nineSliceSprite = lua.new_usertype<sf::NineSliceSprite>(
+        "NineSliceSprite", sol::constructors<sf::NineSliceSprite()>(),
+        sol::base_classes, sol::bases<sf::Sprite, sf::Transformable, sf::Drawable>(),
+        "size", sol::property(&sf::NineSliceSprite::getSize, &sf::NineSliceSprite::setSize)
     );
 
     auto event_type = lua.new_usertype<sf::Event>(

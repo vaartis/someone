@@ -10,6 +10,7 @@
 
 namespace sf {
 class Sprite : public Transformable, public Drawable {
+protected:
     Texture *texture = nullptr;
 
     Color color = Color::White;
@@ -101,6 +102,116 @@ public:
 
     Texture *getTexture() {
         return texture;
+    }
+
+    virtual ~Sprite() { }
+};
+
+class NineSliceSprite : public Sprite {
+    Vector2i size;
+public:
+    const Vector2i &getSize() { return size; };
+    void setSize(Vector2i other) { size = other; };
+
+    void drawToTarget(GPU_Target *toTarget) override {
+        auto texSize = texture->getSize();
+
+        auto topLeftRect = GPU_MakeRect(0, 0, textureRect.left, textureRect.top);
+        auto topCenterRect = GPU_MakeRect(textureRect.left, 0, textureRect.width, textureRect.top);
+        auto topRightRect = GPU_MakeRect(textureRect.left + textureRect.width, 0, texSize.x - (textureRect.left + textureRect.width), textureRect.top);
+
+        auto centerLeftRect = GPU_MakeRect(0, textureRect.top, textureRect.left, textureRect.height);
+        auto centerRect = GPU_MakeRect(textureRect.left, textureRect.top, textureRect.width, textureRect.height);
+        auto centerRightRect = GPU_MakeRect(topRightRect.x, textureRect.top, topRightRect.w, textureRect.height);
+
+        auto bottomLeftRect = GPU_MakeRect(0, textureRect.top + textureRect.height, textureRect.left, textureRect.top);
+        auto bottomCenterRect = GPU_MakeRect(topCenterRect.x, bottomLeftRect.y,
+                                             textureRect.width, texSize.y - (textureRect.top + textureRect.height));
+        auto bottomRightRect = GPU_MakeRect(topRightRect.x, bottomLeftRect.y,
+                                            topRightRect.w, topRightRect.h);
+
+        auto bounds = getGlobalBounds();
+        GPU_Rect dstRect = GPU_MakeRect(bounds.left, bounds.top, topLeftRect.w, topLeftRect.h);
+
+        GPU_SetRGBA(texture->texture, color.r, color.g, color.b, color.a);
+
+        GPU_BlitRect(
+            texture->texture,
+            &topLeftRect,
+            toTarget,
+            &dstRect
+        );
+        dstRect.x += dstRect.w;
+        dstRect.w = size.x - (topLeftRect.w + topRightRect.w);
+        GPU_BlitRect(
+            texture->texture,
+            &topCenterRect,
+            toTarget,
+            &dstRect
+        );
+        dstRect.x += dstRect.w;
+        dstRect.w = topRightRect.w;
+        GPU_BlitRect(
+            texture->texture,
+            &topRightRect,
+            toTarget,
+            &dstRect
+        );
+        dstRect.x = bounds.left;
+        dstRect.y = bounds.top + topLeftRect.h;
+        dstRect.w = centerLeftRect.w;
+        dstRect.h = size.y - (topLeftRect.h + bottomLeftRect.h);
+        GPU_BlitRect(
+            texture->texture,
+            &centerLeftRect,
+            toTarget,
+            &dstRect
+        );
+        dstRect.x += dstRect.w;
+        dstRect.w = size.x - (topLeftRect.w + topRightRect.w);
+        GPU_BlitRect(
+            texture->texture,
+            &centerRect,
+            toTarget,
+            &dstRect
+        );
+        dstRect.x += dstRect.w;
+        dstRect.w = centerRightRect.w;
+        GPU_BlitRect(
+            texture->texture,
+            &centerRightRect,
+            toTarget,
+            &dstRect
+        );
+        dstRect.x = bounds.left;
+        dstRect.y += dstRect.h;
+        dstRect.w = bottomLeftRect.w;
+        dstRect.h = bottomLeftRect.h;
+        GPU_BlitRect(
+            texture->texture,
+            &bottomLeftRect,
+            toTarget,
+            &dstRect
+        );
+        dstRect.x += dstRect.w;
+        dstRect.w = size.x - (topLeftRect.w + topRightRect.w);
+        GPU_BlitRect(
+            texture->texture,
+            &bottomCenterRect,
+            toTarget,
+            &dstRect
+        );
+        dstRect.x += dstRect.w;
+        dstRect.w = bottomRightRect.w;
+        GPU_BlitRect(
+            texture->texture,
+            &bottomRightRect,
+            toTarget,
+            &dstRect
+        );
+
+
+        GPU_UnsetColor(texture->texture);
     }
 };
 }

@@ -216,17 +216,20 @@ function M.load_sheet_data(dir_path)
       }
    end
 
-   local slices
+   local slices, centers
    if sprite_json.meta.slices then
-      slices = {}
+      slices, centers = {}, {}
       for _, slice in pairs(sprite_json.meta.slices) do
          -- For now, just get the first one
          local bounds = slice.keys[1].bounds
+         local center = slice.keys[1].center
+
          slices[slice.name] = IntRect.new(bounds.x, bounds.y, bounds.w, bounds.h)
+         centers[slice.name] = IntRect.new(center.x, center.y, center.w, center.h)
       end
    end
 
-   return animation_frames, slices
+   return animation_frames, slices, centers
 end
 
 function M.components.transformable.process_component(new_ent, comp, entity_name, parent)
@@ -274,6 +277,16 @@ function M.components.drawable.process_component(new_ent, comp, entity_name)
    elseif comp.kind == "text" then
       drawable = Text.new(comp.text.text, StaticFonts.main_font, comp.text.font_size or StaticFonts.font_size)
       drawable.fill_color = Color.White
+   elseif comp.kind == "9slice" then
+      -- TODO: maybe move this somewhere else or add a way to add more drawables easily
+      drawable = NineSliceSprite.new()
+      drawable.texture = assets.assets.textures[comp.texture_asset]
+      assets.used_assets[drawable] = comp.texture_asset
+      drawable.size = Vector2i.new(comp.size[1], comp.size[2])
+
+      local _, _, sl = M.load_sheet_data(comp.slice_sheet)
+
+      drawable.texture_rect = sl["9slice"]
    else
       error("Unknown kind of drawable in " .. tostring(entity_name) .. "." .. tostring(comp_name))
    end
