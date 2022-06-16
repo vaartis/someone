@@ -2,6 +2,7 @@
 
 #include "SDL_gpu.h"
 
+#include <map>
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -26,6 +27,19 @@ class Shader {
     GLuint program = 0;
 
     GPU_ShaderBlock block;
+
+    std::map<std::string, int> uniformLocations;
+
+    int getUniformLocation(const std::string &name) {
+        int location;
+        if (uniformLocations.contains(name)) {
+            location = uniformLocations[name];
+        } else {
+            location = GPU_GetUniformLocation(program, name.c_str());
+            uniformLocations[name] = location;
+        }
+        return location;
+    }
 public:
     enum Type {
         Fragment
@@ -103,7 +117,7 @@ public:
     void setUniform(std::string name, Vector2f value) {
         float values[] = { value.x, value.y };
         GPU_SetUniformfv(
-            GPU_GetUniformLocation(program, name.c_str()),
+            getUniformLocation(name),
             2,
             1,
             values
@@ -112,7 +126,7 @@ public:
 
     void setUniform(std::string name, float value) {
         GPU_SetUniformf(
-            GPU_GetUniformLocation(program, name.c_str()),
+            getUniformLocation(name),
             value
         );
     }
