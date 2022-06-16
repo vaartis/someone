@@ -106,11 +106,8 @@ public:
         GPU_SetVirtualResolution(target, mode.w, mode.h);
     }
 
-    void draw(RenderTexture &texture, Shader *shader = nullptr) {
-        texture.drawToTarget(target);
-
-        if (shader != nullptr)
-            shader->drawWithTexture(texture, target);
+    void draw(RenderTexture &texture, Shader *shader) {
+        shader->drawWithTexture(texture, target);
     }
 
     void draw(Drawable &drawable) override {

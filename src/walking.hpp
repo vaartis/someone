@@ -110,6 +110,8 @@ public:
                 // and go to the next one, if it's disabled, stop processing and don't run the shader
                 if (!enabled) continue;
 
+                shader->activate();
+
                 if (sol::optional<bool> need_screen_size = shader_tbl["need_screen_size"];
                     need_screen_size.has_value() && *need_screen_size) {
                     shader->setUniform("screenSize", sf::Vector2f(target_window.getSize()));
@@ -145,8 +147,10 @@ public:
                     spdlog::error("Parameter {} of unknown type in shader {}", name, shader_name);
                 }
 
-                if (enabled) target_window.draw(shaders_texture, shader);
+
+                target_window.draw(shaders_texture, shader);
             }
+            sf::Shader::deactivate();
         }
     }
 

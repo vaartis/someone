@@ -97,44 +97,29 @@ public:
         return true;
     }
 
+    void activate() { GPU_ActivateShaderProgram(program, &block); }
+    static void deactivate() { GPU_DeactivateShaderProgram(); }
+
     void setUniform(std::string name, Vector2f value) {
-        GPU_ShaderBlock block = GPU_LoadShaderBlock(program, "gpu_Vertex", "gpu_TexCoord", "gpu_Color", "gpu_ModelViewProjectionMatrix");
-
-        auto oldProgram = GPU_GetCurrentShaderProgram();
-        auto oldProgamBlock = GPU_GetShaderBlock();
-
         float values[] = { value.x, value.y };
-        GPU_ActivateShaderProgram(program, &block);
         GPU_SetUniformfv(
             GPU_GetUniformLocation(program, name.c_str()),
             2,
             1,
             values
         );
-        GPU_ActivateShaderProgram(oldProgram, &oldProgamBlock);
     }
 
     void setUniform(std::string name, float value) {
-        auto oldProgram = GPU_GetCurrentShaderProgram();
-        auto oldProgamBlock = GPU_GetShaderBlock();
-
-        GPU_ActivateShaderProgram(program, &block);
         GPU_SetUniformf(
             GPU_GetUniformLocation(program, name.c_str()),
             value
         );
-        GPU_ActivateShaderProgram(oldProgram, &oldProgamBlock);
     }
 
     void drawWithTexture(RenderTexture &renderTexture, GPU_Target *target)  {
         Texture &texture = renderTexture.texture;
-
-        GPU_ShaderBlock block = GPU_LoadShaderBlock(program, "gpu_Vertex", "gpu_TexCoord", "gpu_Color", "gpu_ModelViewProjectionMatrix");
-        GPU_ActivateShaderProgram(program, &block);
-
         GPU_Blit(texture.texture, nullptr, target, 0, 0);
-
-        GPU_DeactivateShaderProgram();
     }
 
 
