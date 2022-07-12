@@ -1,0 +1,4 @@
+pretty_name: "Hacking*Match"
+entrypoint_walking: hacking_match
+lua:
+  main: main.lua

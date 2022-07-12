@@ -194,7 +194,7 @@ target_link_libraries(someone_lib sol2)
 
 # ===
 
-# === Building lua
+# === BUILDING lua
 # TODO: might need to be built as C++: https://sol2.readthedocs.io/en/latest/errors.html#destructors-and-safety
 
 include(ExternalProject)
@@ -297,11 +297,12 @@ function(install_rocks)
       list(GET ARGV${current_arg_n} 0 name)
       list(GET ARGV${current_arg_n} 1 rockspec)
       list(GET ARGV${current_arg_n} 2 output)
-    elseif(${ARGC} EQUAL 2)
+    elseif(${arg_length} EQUAL 2)
       list(GET ARGV${current_arg_n} 0 name)
       unset(rockspec)
       list(GET ARGV${current_arg_n} 1 output)
     endif()
+    message(${output})
 
     set(full_output_path "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/${output}")
 
@@ -438,4 +439,12 @@ if (SOMEONE_TESTING)
   add_custom_target(cpp-test
     DEPENDS someone_tests
     COMMAND ./someone_tests)
+endif()
+
+# == Optional, networking
+
+option(SOMEONE_NETWORKING "Enable GameNetworkingSockets support" FALSE)
+
+if(SOMEONE_NETWORKING)
+  include(Networking)
 endif()

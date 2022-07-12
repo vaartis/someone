@@ -18,6 +18,10 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
     // ImGui
     register_imgui_usertypes(lua);
 
+#ifdef SOMEONE_NETWORKING
+    register_networking_usertypes(lua);
+#endif
+
     // Helper classes
 
     auto mod_data_type = lua.new_usertype<ModData>(

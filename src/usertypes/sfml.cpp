@@ -1,6 +1,3 @@
-#include <cstdint>
-#include <numeric>
-
 #include "SFML/Window/Window.hpp"
 #include "SFML/System/Vector2.hpp"
 #include "SFML/System/Vector3.hpp"
@@ -12,7 +9,6 @@
 #include "SFML/Graphics/Transformable.hpp"
 #include "SFML/Graphics/View.hpp"
 
-#include "sol/sol.hpp"
 #include <fmt/format.h>
 
 #include "usertypes.hpp"
