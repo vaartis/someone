@@ -38,6 +38,8 @@ struct Keyboard {
         M = SDL_SCANCODE_M,
         Q = SDL_SCANCODE_Q,
         B = SDL_SCANCODE_B,
+        J = SDL_SCANCODE_J,
+        K = SDL_SCANCODE_K,
         LControl = SDL_SCANCODE_LCTRL,
         LShift = SDL_SCANCODE_LSHIFT,
         Return = SDL_SCANCODE_RETURN,

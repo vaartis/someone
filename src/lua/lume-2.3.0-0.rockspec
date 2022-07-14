@@ -1,8 +1,7 @@
 package = "lume"
 version = "2.3.0-0"
 source = {
-   url = "git+https://github.com/rxi/lume",
-   tag = "v2.3.0"
+   url = "git+https://github.com/rxi/lume"
 }
 description = {
    summary = "A collection of functions for Lua, geared towards game development.",

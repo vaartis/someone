@@ -286,6 +286,8 @@ void register_sfml_usertypes(sol::state &lua, StaticFonts &fonts) {
         "R", sf::Keyboard::R,
         "M", sf::Keyboard::M,
         "Q", sf::Keyboard::Q,
+        "J", sf::Keyboard::J,
+        "K", sf::Keyboard::K,
         "LControl", sf::Keyboard::LControl,
         "LShift", sf::Keyboard::LShift,
         "Return", sf::Keyboard::Return,

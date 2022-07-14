@@ -4,27 +4,15 @@
 
 [entities.player.drawable]
 kind = "sprite"
-texture_asset = "mod.pad"
+texture_asset = "mod.player"
 z = 1
 
 [entities.player.transformable]
-position = [500, 500]
+position = [50, 500]
 
 [entities.player.hacking_match_player]
 
-[entities.player.collider]
-mode = "sprite"
+[entities.block_manager.hacking_match_block_manager]
 
-
-[entities.other_player.drawable]
-kind = "sprite"
-texture_asset = "mod.pad"
-z = 1
-
-[entities.other_player.transformable]
-position = [500, 800]
-
-[entities.other_player.hacking_match_other_player]
-
-[entities.other_player.collider]
-mode = "sprite"
+[entities.block_manager.transformable]
+position = [50, 64]
