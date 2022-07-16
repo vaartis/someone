@@ -1,9 +1,11 @@
-local collider_components = require("components.collider")
-local assets = require("components.assets")
 local util = require("util")
 local path = require("path")
-local interaction_components = require("components.interaction")
 local lume = require("lume")
+
+local collider_components = require("components.collider")
+local assets = require("components.assets")
+local interaction_components = require("components.interaction")
+local coroutines = require("coroutines")
 
 local pb = require("pb")
 local protoc = require("protoc")
@@ -31,7 +33,7 @@ M.components = {
    },
 
    hacking_match_block_manager = {
-      class = Component.create("HackingMatchBlockManager", {"seed", "offset"})
+      class = Component.create("HackingMatchBlockManager", {"seed", "offset", "break_pause"})
    },
 
    hacking_match_block = {
@@ -142,7 +144,7 @@ function M.components.hacking_match_other_player.process_component(new_ent, comp
 end
 
 function M.components.hacking_match_block_manager.process_component(new_ent, comp, entity_name)
-   new_ent:add(M.components.hacking_match_block_manager.class(100, 0))
+   new_ent:add(M.components.hacking_match_block_manager.class(100, 0, false))
 end
 
 function M.components.hacking_match_block.process_component(new_ent, comp, entity_name)
@@ -351,46 +353,6 @@ function HackingMatchBlockManagerSystem:update(dt)
          end
       end
 
-
-      manager.offset = manager.offset + 0.2
-
-      ::restart::
-      local empty_lines = {}
-      for line_n, line in ipairs(manager.block_entities) do
-         local any_blocks = false
-         -- Blocks can be nil
-         for block_n = 1, 6 do
-            local block = line[block_n]
-
-            if block then
-               any_blocks = true
-               local block_tf = block:get("Transformable")
-
-               block_tf.transformable.position.y = tf.transformable.position.y - ((line_n - 1) * 64) + manager.offset
-
-               local maybe_combo = self:combo(manager, line_n, block_n)
-               if #maybe_combo >= 4 then
-                  for _, combo_block in ipairs(maybe_combo) do
-                     util.rooms_mod().engine:removeEntity(combo_block.block)
-
-                     manager.block_entities[combo_block.line_n][combo_block.block_n] = nil
-                  end
-                  -- Make the blocks fall back into empty places
-                  self:process_fallthrough(manager, maybe_combo)
-               end
-            end
-         end
-      end
-      -- After all that, check for empty lines. Can't be done earlier because fallthrough blocks
-      -- may take that place
-      for line_n, line in ipairs(manager.block_entities) do
-         if lume.count(line) == 0 then table.insert(empty_lines, line_n) end
-      end
-      for _, empty in ipairs(empty_lines) do
-         table.remove(manager.block_entities, empty)
-         manager.offset = manager.offset - 64
-      end
-
       if manager.held then
          local held_tf = manager.held:get("Transformable")
 
@@ -401,6 +363,86 @@ function HackingMatchBlockManagerSystem:update(dt)
             held_tf.transformable.position.x = player_tf.transformable.position.x
             held_tf.transformable.position.y = player_tf.transformable.position.y - drawable.drawable.global_bounds.height
          end
+      end
+
+      if manager.break_pause then
+         return
+      end
+      manager.offset = manager.offset + 0.2
+
+      local function block_y_pos(line_n)
+         return tf.transformable.position.y - ((line_n - 1) * 64) + manager.offset
+      end
+
+      local found_combos = {}
+
+      for line_n, line in ipairs(manager.block_entities) do
+         local any_blocks = false
+         -- Blocks can be nil
+         for block_n = 1, 6 do
+            local block = line[block_n]
+
+            if block then
+               any_blocks = true
+               local block_tf = block:get("Transformable")
+
+               block_tf.transformable.position.y = block_y_pos(line_n)
+
+               local maybe_combo = self:combo(manager, line_n, block_n)
+               if #maybe_combo >= 4 then
+                  table.insert(found_combos, maybe_combo)
+
+                  for _, combo_block in ipairs(maybe_combo) do
+                     -- Remove the block from the list so the next combo check would not try it,
+                     -- but don't destroy the entity yet. This will happen later, when processing all the combos
+
+                     manager.block_entities[combo_block.line_n][combo_block.block_n] = nil
+                  end
+               end
+            end
+         end
+      end
+      if #found_combos > 0 then
+         coroutines.create_coroutine(
+            function()
+               manager.break_pause = true
+
+               for _, combo in ipairs(found_combos) do
+                  for _, combo_block in ipairs(combo) do
+                     util.rooms_mod().engine:removeEntity(combo_block.block)
+                  end
+
+                  local timer = 0.3
+                  local dt = 0
+
+                  while timer > 0 do
+                     dt = coroutine.yield()
+                     timer = timer - dt
+                  end
+
+                  local falling_blocks = self:process_fallthrough(manager, combo)
+                  for _, t in ipairs({0.2, 0.9, 1}) do
+                     for _, falling in ipairs(falling_blocks) do
+                        falling.block:get("Transformable").transformable.position.y = lume.lerp(block_y_pos(falling.from), block_y_pos(falling.to), t)
+                     end
+                     coroutine.yield()
+                  end
+
+                  timer = 0.1
+                  while timer > 0 do
+                     dt = coroutine.yield()
+                     timer = timer - dt
+                  end
+               end
+
+               manager.break_pause = false
+            end
+         )
+      end
+
+      if manager.block_entities[1] and lume.count(manager.block_entities[1]) == 0 then
+         table.remove(manager.block_entities, 1)
+         manager.offset = manager.offset - 64
       end
    end
 end
@@ -510,23 +552,33 @@ function HackingMatchBlockManagerSystem:process_fallthrough(manager, combo_block
    )
    local fallthrough_numbers = lume.unique(lume.map(combo_blocks, function (b) return b.block_n end))
 
+   local falling_blocks = {}
+
    ::restart::
-   -- Check lines below this one to see if anything needs to fall
    for fall_line_n = #manager.block_entities, 1, -1 do
       for _, block_n in ipairs(fallthrough_numbers) do
          -- There's a line and a block on that line
-         if manager.block_entities[fall_line_n] and manager.block_entities[fall_line_n + 1] then
-            if manager.block_entities[fall_line_n][block_n] and not manager.block_entities[fall_line_n + 1][block_n] then
-               local falling_block = manager.block_entities[fall_line_n][block_n]
-               manager.block_entities[fall_line_n][block_n] = nil
-               -- Place the block on the previous line
-               manager.block_entities[fall_line_n + 1][block_n] = falling_block
-
-               goto restart
+         if manager.block_entities[fall_line_n] and manager.block_entities[fall_line_n + 1]
+            and manager.block_entities[fall_line_n][block_n] and not manager.block_entities[fall_line_n + 1][block_n] then
+            local fall_to = fall_line_n
+            -- Find the deepest the block can fall
+            while manager.block_entities[fall_to + 1] and not manager.block_entities[fall_to + 1][block_n] do
+               fall_to = fall_to + 1
             end
+
+            local falling_block = manager.block_entities[fall_line_n][block_n]
+            manager.block_entities[fall_line_n][block_n] = nil
+            -- Place the block into the empty place
+            manager.block_entities[fall_to][block_n] = falling_block
+
+            table.insert(falling_blocks, { from = fall_line_n, to = fall_to, block = falling_block })
+
+            goto restart
          end
       end
    end
+
+   return falling_blocks
 end
 
 M.systems = {
