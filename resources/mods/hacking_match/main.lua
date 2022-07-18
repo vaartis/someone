@@ -37,7 +37,7 @@ M.components = {
    },
 
    hacking_match_block = {
-      class = Component.create("HackingMatchBlock", {"color"})
+      class = Component.create("HackingMatchBlock", {"color", "currently_swapping"})
    }
 }
 
@@ -148,7 +148,7 @@ function M.components.hacking_match_block_manager.process_component(new_ent, com
 end
 
 function M.components.hacking_match_block.process_component(new_ent, comp, entity_name)
-   new_ent:add(M.components.hacking_match_block.class(comp.color))
+   new_ent:add(M.components.hacking_match_block.class(comp.color, false))
 end
 
 function HackingMatchServerSystem:requires()
@@ -235,7 +235,7 @@ function HackingMatchPlayerSystem:update(dt)
       local drawable = ent:get("Drawable")
 
       if not player.base_position then
-         player.base_position = Vector2f.new(tf.transformable.position.x, tf.transformable.position.y)
+         player.base_position = tf.transformable.position:copy()
       end
 
       local moved = false
@@ -284,6 +284,10 @@ function HackingMatchPlayerSystem:update(dt)
          end
       end
    end
+end
+
+local function block_y_pos(manager_ent, line_n)
+   return manager_ent:get("Transformable").transformable.position.y - ((line_n - 1) * 64) + manager_ent:get("HackingMatchBlockManager").offset
 end
 
 
@@ -370,10 +374,6 @@ function HackingMatchBlockManagerSystem:update(dt)
       end
       manager.offset = manager.offset + 0.2
 
-      local function block_y_pos(line_n)
-         return tf.transformable.position.y - ((line_n - 1) * 64) + manager.offset
-      end
-
       local found_combos = {}
 
       for line_n, line in ipairs(manager.block_entities) do
@@ -386,7 +386,9 @@ function HackingMatchBlockManagerSystem:update(dt)
                any_blocks = true
                local block_tf = block:get("Transformable")
 
-               block_tf.transformable.position.y = block_y_pos(line_n)
+               if not block.currently_swapping then
+                  block_tf.transformable.position.y = block_y_pos(ent, line_n)
+               end
 
                local maybe_combo = self:combo(manager, line_n, block_n)
                if #maybe_combo >= 4 then
@@ -423,7 +425,8 @@ function HackingMatchBlockManagerSystem:update(dt)
                   local falling_blocks = self:process_fallthrough(manager, combo)
                   for _, t in ipairs({0.2, 0.9, 1}) do
                      for _, falling in ipairs(falling_blocks) do
-                        falling.block:get("Transformable").transformable.position.y = lume.lerp(block_y_pos(falling.from), block_y_pos(falling.to), t)
+                        falling.block:get("Transformable").transformable.position.y =
+                           lume.lerp(block_y_pos(ent, falling.from), block_y_pos(ent, falling.to), t)
                      end
                      coroutine.yield()
                   end
@@ -448,14 +451,40 @@ function HackingMatchBlockManagerSystem:update(dt)
 end
 function HackingMatchBlockManagerSystem.swap_at(pos)
    -- Multiplayer?
-   local manager = util.first(util.rooms_mod().engine:getEntitiesWithComponent("HackingMatchBlockManager")):get("HackingMatchBlockManager")
+   local manager_ent = util.first(util.rooms_mod().engine:getEntitiesWithComponent("HackingMatchBlockManager"))
+   local manager = manager_ent:get("HackingMatchBlockManager")
    for line_n, line in ipairs(manager.block_entities) do
       local block = line[pos]
 
       if block ~= nil and manager.block_entities[line_n + 1] and manager.block_entities[line_n + 1][pos] ~= nil then
          local other = manager.block_entities[line_n + 1][pos]
-         manager.block_entities[line_n + 1][pos] = block
-         line[pos] = other
+
+         coroutines.create_coroutine(
+            function()
+               block.currently_swapping = true
+               other.currently_swapping = true
+
+               local block_tf = block:get("Transformable").transformable
+               local other_tf = other:get("Transformable").transformable
+
+               local block_original = block_tf.position:copy()
+               local other_original = other_tf.position:copy()
+
+               for _, t in ipairs({0.2, 0.5, 1}) do
+                  block_tf.position.y =
+                     lume.lerp(block_y_pos(manager_ent, line_n), block_y_pos(manager_ent, line_n + 1), t)
+                  other_tf.position.y =
+                     lume.lerp(block_y_pos(manager_ent, line_n + 1), block_y_pos(manager_ent, line_n), t)
+                  coroutine.yield()
+               end
+
+               manager.block_entities[line_n + 1][pos] = block
+               line[pos] = other
+
+               block.currently_swapping = false
+               other.currently_swapping = false
+            end
+         )
 
          break
       end

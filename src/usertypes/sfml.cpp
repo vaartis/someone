@@ -73,6 +73,7 @@ decltype(auto) register_vector2(sol::state &lua, std::string name) {
 
     return lua.new_usertype<VecT>(
         name, sol::constructors<VecT(T, T)>(),
+        "copy", [](VecT &self) { return VecT(self.x, self.y); },
         "x", &VecT::x,
         "y", &VecT::y,
         sol::meta_function::addition, sol::resolve<VecT(ConstVecRefT, ConstVecRefT)>(&sf::operator+),
