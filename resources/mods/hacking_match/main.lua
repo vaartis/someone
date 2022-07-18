@@ -431,7 +431,7 @@ function HackingMatchBlockManagerSystem:update(dt)
                      coroutine.yield()
                   end
 
-                  timer = 0.1
+                  timer = 0.2
                   while timer > 0 do
                      dt = coroutine.yield()
                      timer = timer - dt
