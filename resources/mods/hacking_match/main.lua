@@ -450,22 +450,16 @@ function HackingMatchBlockManagerSystem.swap_at(pos)
    -- Multiplayer?
    local manager = util.first(util.rooms_mod().engine:getEntitiesWithComponent("HackingMatchBlockManager")):get("HackingMatchBlockManager")
    for line_n, line in ipairs(manager.block_entities) do
-      for block_n = 1, 6 do
-         local block = line[block_n]
+      local block = line[pos]
 
-         if block_n == pos and block ~= nil and manager.block_entities[line_n + 1]
-            and manager.block_entities[line_n + 1][block_n] ~= nil then
+      if block ~= nil and manager.block_entities[line_n + 1] and manager.block_entities[line_n + 1][pos] ~= nil then
+         local other = manager.block_entities[line_n + 1][pos]
+         manager.block_entities[line_n + 1][pos] = block
+         line[pos] = other
 
-            local other = manager.block_entities[line_n + 1][block_n]
-            manager.block_entities[line_n + 1][block_n] = block
-            line[block_n] = other
-
-            goto done
-         end
+         break
       end
    end
-
-   ::done::
 end
 function HackingMatchBlockManagerSystem.take_or_put(pos)
    -- Multiplayer?
