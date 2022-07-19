@@ -309,12 +309,14 @@ function HackingMatchBlockManagerSystem:update(dt)
       local manager = ent:get("HackingMatchBlockManager")
       local tf = ent:get("Transformable")
 
-      if not manager.blocks then
-         math.randomseed(manager.seed)
+      if not manager.block_entities or #manager.block_entities < 10 then
+         if not manager.block_entities then
+            -- Only set the seed once
+            math.randomseed(manager.seed)
+            manager.block_entities = {}
+         end
 
          local blocks = {}
-         manager.blocks = blocks
-
          for line = 1, 20 do
             blocks[line] = {}
             for block = 1, 6 do
@@ -322,10 +324,11 @@ function HackingMatchBlockManagerSystem:update(dt)
             end
          end
 
-         local block_entities = {}
-         manager.block_entities = block_entities
-
-         for line_n, line in ipairs(manager.blocks) do
+         local block_entities = manager.block_entities
+         -- Number of existing lines
+         local line_n_count = #block_entities
+         for line_n, line in ipairs(blocks) do
+            line_n = line_n_count + line_n
             block_entities[line_n] = {}
 
             for block_n, block_tbl in ipairs(line) do
