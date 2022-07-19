@@ -1,3 +1,4 @@
 [textures]
 block = "block.png"
+bomb = "bomb.png"
 player = "player.png"

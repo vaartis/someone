@@ -149,6 +149,7 @@ end
 
 function M.components.hacking_match_block.process_component(new_ent, comp, entity_name)
    new_ent:add(M.components.hacking_match_block.class(comp.color, false))
+   new_ent:get("HackingMatchBlock").bomb = comp.bomb
 end
 
 function HackingMatchServerSystem:requires()
@@ -290,6 +291,15 @@ local function block_y_pos(manager_ent, line_n)
    return manager_ent:get("Transformable").transformable.position.y - ((line_n - 1) * 64) + manager_ent:get("HackingMatchBlockManager").offset
 end
 
+local block_combo_min = 4
+local bomb_combo_min = 2
+local bomb_chance = 3
+
+local function is_breakable_combo(maybe_combo)
+   local bomb_combo = maybe_combo[1] and maybe_combo[1].bomb
+
+   return (not bomb_combo and #maybe_combo >= block_combo_min) or (bomb_combo and #maybe_combo >= bomb_combo_min)
+end
 
 function HackingMatchBlockManagerSystem:requires()
    return { manager = {"HackingMatchBlockManager"}, player = {"HackingMatchPlayer"} }
@@ -308,7 +318,7 @@ function HackingMatchBlockManagerSystem:update(dt)
          for line = 1, 20 do
             blocks[line] = {}
             for block = 1, 6 do
-               blocks[line][block] = math.random(1, 5)
+               blocks[line][block] = { color = math.random(1, 5), bomb = math.random(1, 100) <= bomb_chance }
             end
          end
 
@@ -318,21 +328,29 @@ function HackingMatchBlockManagerSystem:update(dt)
          for line_n, line in ipairs(manager.blocks) do
             block_entities[line_n] = {}
 
-            for block_n, block in ipairs(line) do
+            for block_n, block_tbl in ipairs(line) do
+               local block = block_tbl.color
                local block_pos = {tf.transformable.position.x + (block_n - 1) * 64, tf.transformable.position.y - (line_n - 1) * 64}
+
+               local block_texture
+               if block_tbl.bomb then
+                  block_texture = "mod.bomb"
+               else
+                  block_texture = "mod.block"
+               end
 
                local block_ent = util.entities_mod().instantiate_entity(
                   "block_" .. tostring(line_n) .. "_" .. tostring(block_n),
-                  { drawable = { kind = "sprite", texture_asset = "mod.block", z = 1 },
+                  { drawable = { kind = "sprite", texture_asset = block_texture, z = 1 },
                     transformable = { position = block_pos },
-                    hacking_match_block = { color = block }})
+                    hacking_match_block = { color = block, bomb = block_tbl.bomb }})
 
                -- 1 - Red, 2 - Yellow, 3 - Pink, 4 - Turquoise, 5 - Blue
 
                block_entities[line_n][block_n] = block_ent
 
                -- Break the initial-generation combo
-               while #self:combo(manager, line_n, block_n) >= 4 do
+               while is_breakable_combo(self:combo(manager, line_n, block_n)) do
                   block = math.random(1, 5)
                   block_ent:get("HackingMatchBlock").color = block
                end
@@ -391,8 +409,27 @@ function HackingMatchBlockManagerSystem:update(dt)
                end
 
                local maybe_combo = self:combo(manager, line_n, block_n)
-               if #maybe_combo >= 4 then
+               if is_breakable_combo(maybe_combo) then
                   table.insert(found_combos, maybe_combo)
+
+                  -- Also add every block of the color to the combo if it's a bomb
+                  if maybe_combo[1].bomb then
+                     local bomb_color = maybe_combo[1].block:get("HackingMatchBlock").color
+                     for line_n, line in ipairs(manager.block_entities) do
+                        for block_n, block in ipairs(line) do
+                           -- Only blow up the blocks visible on the screen, plus a bit upwards
+                           if block and block:get("Transformable").transformable.position.y < tf.transformable.position.y - (64 * 2) then
+                              goto bombdone
+                           end
+
+                           local tested_block = block and block:get("HackingMatchBlock")
+                           if tested_block and tested_block.color == bomb_color and not tested_block.bomb then
+                              table.insert(maybe_combo, { line_n = line_n, block_n = block_n, block = block, bomb = tested_block.bomb })
+                           end
+                        end
+                     end
+                  end
+                  ::bombdone::
 
                   for _, combo_block in ipairs(maybe_combo) do
                      -- Remove the block from the list so the next combo check would not try it,
@@ -534,22 +571,23 @@ function HackingMatchBlockManagerSystem.take_or_put(pos)
 end
 function HackingMatchBlockManagerSystem:combo(manager, line_n, block_n, known_combo)
    local block = manager.block_entities[line_n][block_n]
-   if known_combo == nil then
-      known_combo = { { line_n = line_n, block_n = block_n, block = block } }
-   end
+   local this_block = block:get("HackingMatchBlock")
 
-   local color = block:get("HackingMatchBlock").color
+   if known_combo == nil then
+      known_combo = { { line_n = line_n, block_n = block_n, block = block, bomb = this_block.bomb } }
+   end
 
    local function check(l, b)
       local maybe_other = manager.block_entities[l][b]
-      if maybe_other and maybe_other:get("HackingMatchBlock").color == color then
+      local maybe_other_block = maybe_other and maybe_other:get("HackingMatchBlock")
+      if maybe_other and maybe_other_block.color == this_block.color and maybe_other_block.bomb == this_block.bomb then
          -- If we already know this block is part of the combo, don't do anything
          if lume.match(known_combo, function(known) return known.block == maybe_other end) then
             return
          end
 
          -- Mark as known combo
-         table.insert(known_combo, { line_n = l, block_n = b, block = maybe_other })
+         table.insert(known_combo, { line_n = l, block_n = b, block = maybe_other, bomb = maybe_other_block.bomb })
 
          self:combo(manager, l, b, known_combo)
       end
