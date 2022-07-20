@@ -403,7 +403,11 @@ function HackingMatchBlockManagerSystem:update(dt)
       if manager.break_pause then
          return
       end
-      manager.offset = manager.offset + 0.2
+      if Keyboard.is_key_pressed(KeyboardKey.L) then
+         manager.offset = manager.offset + 0.4
+      else
+         manager.offset = manager.offset + 0.2
+      end
 
       local found_combos = {}
 
