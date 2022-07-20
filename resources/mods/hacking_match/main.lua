@@ -293,7 +293,7 @@ end
 
 local block_combo_min = 4
 local bomb_combo_min = 2
-local bomb_chance = 1
+local bomb_chance = 0.98
 
 local function is_breakable_combo(maybe_combo)
    local bomb_combo = maybe_combo[1] and maybe_combo[1].bomb
@@ -314,21 +314,20 @@ function HackingMatchBlockManagerSystem:update(dt)
             -- Only set the seed once
             math.randomseed(manager.seed)
             manager.block_entities = {}
-            manager.bomb_spawn_cd_counter = 0
          end
 
-         local bomb_spawn_cd = 5 * 3
+         local max_bombs = 1
+         local bomb_counter = 0
 
          local blocks = {}
          for line = 1, 20 do
             blocks[line] = {}
             for block = 1, 6 do
                blocks[line][block] = { color = math.random(1, 5) }
-               if math.random(1, 100) > 100 - bomb_chance and manager.bomb_spawn_cd_counter >= bomb_spawn_cd then
-                  manager.bomb_spawn_cd_counter = 0
+               if math.random() > bomb_chance and max_bombs < bomb_counter then
+                  bomb_counter = bomb_counter + 1
                   blocks[line][block].bomb = true
                else
-                  manager.bomb_spawn_cd_counter = manager.bomb_spawn_cd_counter + 1
                   blocks[line][block].bomb = false
                end
             end
