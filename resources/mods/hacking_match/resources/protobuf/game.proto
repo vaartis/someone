@@ -4,12 +4,21 @@ enum Event {
     Joined = 0;
     Left = 1;
 
-    IAmReady = 2;
-    EveryoneIsReady = 3;
+    // Sent after the player is ready to start the game
+    IAmReady = 3;
+    // Sent to the players when everyone else is also ready to start
+    EveryoneIsReady = 4;
+}
+
+enum MoveAction {
+    Movement = 0;
+    TakeOrPut = 1;
+    Swap = 2;
 }
 
 message Move {
     int32 position = 1;
+    MoveAction action = 2;
 }
 
 message BlockManagerSetup {
@@ -22,6 +31,8 @@ message Player {
     oneof EventType {
         Move move = 2;
         Event event = 3;
+        // Receiving this message means the game is about to start,
+        // so the player must send IAmReady after they set up
         BlockManagerSetup block_manager_setup = 4;
     }
 }

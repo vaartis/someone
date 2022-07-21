@@ -17,7 +17,7 @@ M = {}
 
 M.components = {
    hacking_match_server = {
-      class = Component.create("HackingMatchServer", {"socket", "clients", "poll_group"})
+      class = Component.create("HackingMatchServer", {"socket", "clients", "poll_group", "game_state"})
    },
 
    hacking_match_client = {
@@ -33,7 +33,7 @@ M.components = {
    },
 
    hacking_match_block_manager = {
-      class = Component.create("HackingMatchBlockManager", {"seed", "offset", "break_pause", "ready"})
+      class = Component.create("HackingMatchBlockManager", {"seed", "player", "offset", "break_pause"})
    },
 
    hacking_match_block = {
@@ -80,8 +80,6 @@ function M.components.hacking_match_server.process_component(new_ent, comp, enti
       server_identity,
       {},
       function(info)
-         local seed = 123456789
-
          local state = info.info.state
 
          if state == ESteamNetworkingConnectionState.Connecting then
@@ -113,11 +111,6 @@ function M.components.hacking_match_server.process_component(new_ent, comp, enti
                   )
                end
             end
-            sockets:send_message_to_connection(
-               info.handle,
-               pb.encode("Player", { block_manager_setup = { seed = seed } }),
-               SteamNetworkingSend.Reliable
-            )
          elseif state == ESteamNetworkingConnectionState.ClosedByPeer or state == ESteamNetworkingConnectionStateProblemDetectedLocally then
             print("[SERVER] Disconnected " .. info.info.connection_description)
             sockets:close_connection(info.handle, 0, "Disconnected", false);
@@ -127,7 +120,7 @@ function M.components.hacking_match_server.process_component(new_ent, comp, enti
       end
    )
 
-   new_ent:add(M.components.hacking_match_server.class(server_socket, server_clients, poll_group))
+   new_ent:add(M.components.hacking_match_server.class(server_socket, server_clients, poll_group, "lobby"))
 end
 
 function M.components.hacking_match_client.process_component(new_ent, comp, entity_name)
@@ -159,7 +152,7 @@ function M.components.hacking_match_other_player.process_component(new_ent, comp
 end
 
 function M.components.hacking_match_block_manager.process_component(new_ent, comp, entity_name)
-   new_ent:add(M.components.hacking_match_block_manager.class(comp.seed, 0, false, false))
+   new_ent:add(M.components.hacking_match_block_manager.class(comp.seed, comp.player, 0, false))
 end
 
 function M.components.hacking_match_block.process_component(new_ent, comp, entity_name)
@@ -184,7 +177,19 @@ function HackingMatchServerSystem:update()
          local player_data = pb.decode("Player", msg.data)
          player_data.id = id
 
-         send_to_all(server.clients, pb.encode("Player", player_data), id)
+         if server.game_state == "lobby" and player_data.event == "IAmReady" then
+            server.clients[msg.connection].ready = true
+
+            if lume.all(server.clients, function(c) return c.ready end) then
+               print("[SERVER] Everyone is ready")
+               send_to_all(server.clients, pb.encode("Player", { event = "EveryoneIsReady" }))
+
+               server.game_state = "game"
+            end
+         elseif server.game_state == "game" then
+            -- Replicate messages to other clients
+            send_to_all(server.clients, pb.encode("Player", player_data), id)
+         end
 
          msg:release()
       end
@@ -192,7 +197,7 @@ function HackingMatchServerSystem:update()
 end
 
 function HackingMatchClientSystem:requires()
-   return { client = {"HackingMatchClient"}, other_player = {"HackingMatchOtherPlayer"}}
+   return { client = {"HackingMatchClient"}, other_player = {"HackingMatchOtherPlayer"}, player = {"HackingMatchPlayer"} }
 end
 function HackingMatchClientSystem:update()
    sockets:run_callbacks()
@@ -225,28 +230,49 @@ function HackingMatchClientSystem:update()
                local other_tf = other:get("Transformable")
 
                if other_player.id == player_data.id then
+                  if player_data.move.action == "Movement" then
+                     other_player.position = player_data.move.position
 
-                  other_player.position = player_data.move.position
-
-                  other_tf.transformable.position =
-                     other_player.base_position + Vector2f.new(other_drawable.drawable.global_bounds.width * other_player.position, 0)
+                     other_tf.transformable.position =
+                        other_player.base_position +  Vector2f.new(other_drawable.drawable.global_bounds.width * other_player.position, 0)
+                  elseif player_data.move.action == "TakeOrPut" then
+                     HackingMatchBlockManagerSystem.take_or_put(other_player.block_manager, other_player.position + 1)
+                  elseif player_data.move.action == "Swap" then
+                     HackingMatchBlockManagerSystem.swap_at(other_player.block_manager, other_player.position + 1)
+                  end
                end
             end
          elseif player_data.block_manager_setup then
-            local block_ent = util.entities_mod().instantiate_entity(
-               "block_manager",
-               { hacking_match_block_manager = { seed = player_data.block_manager_setup.seed },
-                 transformable = { position = { 50, 64 } }})
-            -- We got our block manager, tell the server we're ready
+            client.block_manager_setup = player_data.block_manager_setup
+
+            -- We got our block manager info, tell the server we're ready
             sockets:send_message_to_connection(
                client.socket.socket,
                pb.encode("Player", { event = "IAmReady" }),
                SteamNetworkingSend.Reliable
             )
-         elseif player_data.event == "EveryoneReady" then
-            local manager_ent = util.first(util.rooms_mod().engine:getEntitiesWithComponent("HackingMatchBlockManager"))
-            local manager = manager_ent:get("HackingMatchBlockManager")
-            manager.ready = true
+            print("[CLIENT] Ready")
+         elseif player_data.event == "EveryoneIsReady" then
+            for _, player in pairs(self.targets.player) do
+               local block_manager_ent = util.entities_mod().instantiate_entity(
+                  "block_manager",
+                  { hacking_match_block_manager = { seed = client.block_manager_setup.seed, player = player },
+                    transformable = { position = { 50, 64 } }})
+               -- Set the block manager for the local player
+               local pl = player:get("HackingMatchPlayer")
+               pl.block_manager = block_manager_ent
+               pl.ready = true
+            end
+            for i, player in pairs(self.targets.other_player) do
+               local block_manager_ent = util.entities_mod().instantiate_entity(
+                  "block_manager_" .. i,
+                  { hacking_match_block_manager = { seed = client.block_manager_setup.seed, player = player },
+                    transformable = { position = { 500, 64 } }})
+               -- Set the block manager for the other player
+               player:get("HackingMatchOtherPlayer").block_manager = block_manager_ent
+            end
+
+            print("[CLIENT] Everyone is ready, starting the game")
          end
 
          msg:release()
@@ -264,6 +290,10 @@ function HackingMatchPlayerSystem:update(dt)
       local tf = ent:get("Transformable")
       local player = ent:get("HackingMatchPlayer")
       local drawable = ent:get("Drawable")
+
+      if not player.ready then
+         return
+      end
 
       if not player.base_position then
          player.base_position = tf.transformable.position:copy()
@@ -290,11 +320,29 @@ function HackingMatchPlayerSystem:update(dt)
       end
       if player.time_since_action >= 0.18 then
          if Keyboard.is_key_pressed(KeyboardKey.K) then
-            HackingMatchBlockManagerSystem.swap_at(player.position + 1)
+            HackingMatchBlockManagerSystem.swap_at(player.block_manager, player.position + 1)
+
+            for _, client_ent in pairs(self.targets.client) do
+               -- Notify the server about movement
+               sockets:send_message_to_connection(
+                  client_ent:get("HackingMatchClient").socket.socket,
+                  pb.encode("Player", { move = { action = "Swap" } }),
+                  SteamNetworkingSend.Reliable
+               )
+            end
 
             player.time_since_action = 0
          elseif Keyboard.is_key_pressed(KeyboardKey.J) then
-            HackingMatchBlockManagerSystem.take_or_put(player.position + 1)
+            HackingMatchBlockManagerSystem.take_or_put(player.block_manager, player.position + 1)
+
+            for _, client_ent in pairs(self.targets.client) do
+               -- Notify the server about movement
+               sockets:send_message_to_connection(
+                  client_ent:get("HackingMatchClient").socket.socket,
+                  pb.encode("Player", { move = { action = "TakeOrPut" } }),
+                  SteamNetworkingSend.Reliable
+               )
+            end
 
             player.time_since_action = 0
          end
@@ -309,7 +357,7 @@ function HackingMatchPlayerSystem:update(dt)
             -- Notify the server about movement
             sockets:send_message_to_connection(
                client.socket.socket,
-               pb.encode("Player", { move = { position = player.position } }),
+               pb.encode("Player", { move = { action = "Movement", position = player.position } }),
                SteamNetworkingSend.Reliable
             )
          end
@@ -332,17 +380,12 @@ local function is_breakable_combo(maybe_combo)
 end
 
 function HackingMatchBlockManagerSystem:requires()
-   return { manager = {"HackingMatchBlockManager"}, player = {"HackingMatchPlayer"} }
+   return { manager = {"HackingMatchBlockManager"} }
 end
 function HackingMatchBlockManagerSystem:update(dt)
    for _, ent in pairs(self.targets.manager) do
       local manager = ent:get("HackingMatchBlockManager")
       local tf = ent:get("Transformable")
-
-      -- Wait for everyone to be ready
-      if not manager.ready then
-         return
-      end
 
       if not manager.block_entities or #manager.block_entities < 10 then
          if not manager.block_entities then
@@ -425,13 +468,11 @@ function HackingMatchBlockManagerSystem:update(dt)
       if manager.held then
          local held_tf = manager.held:get("Transformable")
 
-         for _, player_ent in pairs(self.targets.player) do
-            local player_tf = player_ent:get("Transformable")
-            local drawable = player_ent:get("Drawable")
+         local player_tf = manager.player:get("Transformable")
+         local drawable = manager.player:get("Drawable")
 
-            held_tf.transformable.position.x = player_tf.transformable.position.x
-            held_tf.transformable.position.y = player_tf.transformable.position.y - drawable.drawable.global_bounds.height
-         end
+         held_tf.transformable.position.x = player_tf.transformable.position.x
+         held_tf.transformable.position.y = player_tf.transformable.position.y - drawable.drawable.global_bounds.height
       end
 
       if manager.break_pause then
@@ -537,9 +578,7 @@ function HackingMatchBlockManagerSystem:update(dt)
       end
    end
 end
-function HackingMatchBlockManagerSystem.swap_at(pos)
-   -- Multiplayer?
-   local manager_ent = util.first(util.rooms_mod().engine:getEntitiesWithComponent("HackingMatchBlockManager"))
+function HackingMatchBlockManagerSystem.swap_at(manager_ent, pos)
    local manager = manager_ent:get("HackingMatchBlockManager")
    for line_n, line in ipairs(manager.block_entities) do
       local block = line[pos]
@@ -578,10 +617,8 @@ function HackingMatchBlockManagerSystem.swap_at(pos)
       end
    end
 end
-function HackingMatchBlockManagerSystem.take_or_put(pos)
-   -- Multiplayer?
-   local manager = util.first(util.rooms_mod().engine:getEntitiesWithComponent("HackingMatchBlockManager")):get("HackingMatchBlockManager")
-   local player = util.first(util.rooms_mod().engine:getEntitiesWithComponent("HackingMatchPlayer")):get("HackingMatchPlayer")
+function HackingMatchBlockManagerSystem.take_or_put(manager_ent, pos)
+   local manager = manager_ent:get("HackingMatchBlockManager")
 
    if not manager.held then
       for line_n, line in ipairs(manager.block_entities) do
@@ -695,8 +732,14 @@ end
 
 M.interaction_callbacks = { }
 
+local setup_info = {
+   seed = os.time()
+}
+
 function M.interaction_callbacks.draw_gui()
-   ImGui.Begin("Hacking Match server")
+   ImGui.Begin("Hacking Match")
+
+   setup_info.seed = ImGui.InputInt("Seed", setup_info.seed)
 
    if ImGui.Button("Start server") then
       local ent = util.entities_mod().instantiate_entity(
@@ -708,6 +751,15 @@ function M.interaction_callbacks.draw_gui()
       local ent = util.entities_mod().instantiate_entity(
          "client",
          { hacking_match_client = {} } )
+   end
+
+   if ImGui.Button("Start game") then
+      local server = util.first(util.rooms_mod().engine:getEntitiesWithComponent("HackingMatchServer")):get("HackingMatchServer")
+      -- Ask everyone if they're ready
+      send_to_all(
+         server.clients,
+         pb.encode("Player", { block_manager_setup = { setup_info.seed } })
+      )
    end
 
    ImGui.End()
