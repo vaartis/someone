@@ -19,7 +19,6 @@ namespace sf {
 
 class Text;
 class Font {
-    std::string fontFile;
     std::map<unsigned int, TTF_Font *> fonts;
 
     bool loadFontSize(unsigned int size) {
@@ -37,6 +36,8 @@ class Font {
 
     friend class Text;
 public:
+    std::string fontFile;
+
     Font() {
         if (!TTF_WasInit())
             TTF_Init();

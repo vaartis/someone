@@ -241,10 +241,27 @@ int main(int argc, char **argv) {
     const auto &default_size = window_sizes[current_window_size];
     sf::RenderWindow window(sf::VideoMode(default_size.x, default_size.y), "Someone");
 
+    StaticFonts static_fonts;
+
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
     // Disable the ini file
     io.IniFilename = nullptr;
+
+    {
+        ImFontConfig config;
+        config.MergeMode = true;
+        io.Fonts->AddFontDefault();
+
+        static const ImWchar ranges[] = {
+            0x0400, 0x052F, // Cyrillic + Cyrillic Supplement
+            0x2DE0, 0x2DFF, // Cyrillic Extended-A
+            0xA640, 0xA69F, // Cyrillic Extended-B
+            0,
+        };
+        io.Fonts->AddFontDefault(&config);
+        io.Fonts->AddFontFromFileTTF(static_fonts.main_font.fontFile.c_str(), 13, &config, ranges);
+    }
 
     ImGui_ImplSDL2_InitForOpenGL(window.window, window.target->context->context);
     ImGui_ImplOpenGL3_Init(nullptr);
@@ -254,8 +271,6 @@ int main(int argc, char **argv) {
         auto winSize = window.getSize();
         target.create(winSize.x, winSize.y);
     }
-
-    StaticFonts static_fonts;
 
     sol::state lua;
     lua.open_libraries(sol::lib::base, sol::lib::table, sol::lib::string, sol::lib::package,

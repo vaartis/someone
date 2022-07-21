@@ -1,3 +1,7 @@
+#include <limits>
+
+#include "sol/object.hpp"
+#include "steam/isteamfriends.h"
 #ifdef SOMEONE_NETWORKING_STEAM
 #include <steam/steam_api.h>
 #else
@@ -231,9 +235,43 @@ void register_networking_usertypes(sol::state &lua) {
     );
 
     lua.new_usertype<SteamNetworkingIdentity>(
-        "SteamNetworkingIdentity",
+        "SteamNetworkingIdentity", sol::default_constructor,
+        "SetSteamID", &SteamNetworkingIdentity::SetSteamID,
         sol::meta_function::to_string, [](SteamNetworkingIdentity *ident) {
             return SteamNetworkingIdentityRender(*ident).c_str();
         }
     );
+
+#ifdef SOMEONE_NETWORKING_STEAM
+    lua["STEAM"] = lua.create_table_with(
+        "Friends", &SteamFriends
+    );
+
+    lua.new_usertype<ISteamFriends>(
+        "ISteamFriends",
+        "GetFriends", [&lua](ISteamFriends *self) {
+            auto count = self->GetFriendCount(k_EFriendFlagImmediate);
+
+            if (count == -1)
+                return sol::make_object(lua, std::make_tuple(sol::lua_nil, "Count returned -1, probably not logged in"));
+
+            std::vector<CSteamID> result;
+            for (int i = 0; i < count; i++) {
+                result.push_back(SteamFriends()->GetFriendByIndex(i, k_EFriendFlagImmediate));
+            }
+
+            return sol::make_object(lua, result);
+        },
+        "GetFriendPersonaState", &ISteamFriends::GetFriendPersonaState,
+        "GetFriendPersonaName", &ISteamFriends::GetFriendPersonaName
+    );
+
+    lua.new_usertype<CSteamID>("CSteamID");
+
+    lua.new_enum(
+        "EPersonaState",
+        "Online", k_EPersonaStateOnline,
+        "Offline", k_EPersonaStateOffline
+    );
+#endif
 }

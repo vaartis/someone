@@ -77,7 +77,7 @@ function M.components.hacking_match_server.process_component(new_ent, comp, enti
 
    local latest_id = 0
    local server_socket = sockets:create_listen_socket_p2p(
-      server_identity,
+      comp.server_identity,
       {},
       function(info)
          local state = info.info.state
@@ -125,7 +125,7 @@ end
 
 function M.components.hacking_match_client.process_component(new_ent, comp, entity_name)
    local client_socket = sockets:connect_p2p(
-      server_identity,
+      comp.server_identity,
       {},
       function(info)
          if info.info.state == ESteamNetworkingConnectionState.Connected then
@@ -733,24 +733,78 @@ end
 M.interaction_callbacks = { }
 
 local setup_info = {
-   seed = os.time()
+   seed = os.time(),
+   server_addr = "127.0.0.1:12345",
+
+   friend_list = nil,
+   friend_selected = -1
 }
+
+local function create_identity()
+   local server_identity
+   if NETWORKING.IS_STEAM then
+      server_identity = sockets:identity()
+   else
+      server_identity = SteamNetworkingIPAddr.new()
+      server_identity:parse_string(setup_info.server_addr)
+   end
+
+   return server_identity
+end
 
 function M.interaction_callbacks.draw_gui()
    ImGui.Begin("Hacking Match")
 
+   if not NETWORKING.IS_STEAM then
+      setup_info.server_addr = ImGui.InputText("Server address", setup_info.server_addr)
+   else
+      local friends = STEAM.Friends()
+      if not setup_info.friend_list then
+         setup_info.friend_list = {}
+         for _, friend in ipairs(friends:GetFriends()) do
+            if friends:GetFriendPersonaState(friend) == EPersonaState.Online then
+               table.insert(setup_info.friend_list, { id = friend, name = friends:GetFriendPersonaName(friend) })
+            end
+         end
+      end
+
+      local friend_names = lume.map(setup_info.friend_list, function(f) return f.name end)
+
+      ImGui.SetNextItemWidth(150)
+      setup_info.friend_selected = ImGui.ListBox("Connect to a friend", setup_info.friend_selected, friend_names)
+   end
+
    setup_info.seed = ImGui.InputInt("Seed", setup_info.seed)
 
    if ImGui.Button("Start server") then
-      local ent = util.entities_mod().instantiate_entity(
+      local ident = create_identity()
+      util.entities_mod().instantiate_entity(
          "server",
-         { hacking_match_server = {} } )
+         { hacking_match_server = { server_identity = ident } } )
+      util.entities_mod().instantiate_entity(
+         "client",
+         { hacking_match_client = { server_identity = ident } } )
    end
 
-   if ImGui.Button("Start client") then
-      local ent = util.entities_mod().instantiate_entity(
-         "client",
-         { hacking_match_client = {} } )
+   if not NETWORKING.IS_STEAM then
+      if ImGui.Button("Connect to server") then
+         local ent = util.entities_mod().instantiate_entity(
+            "client",
+            { hacking_match_client = { server_identity = create_identity() } } )
+      end
+   else
+      if setup_info.friend_selected == -1 then ImGui.BeginDisabled(true) end
+
+      if ImGui.Button("Connect to friend") then
+         local ident = SteamNetworkingIdentity.new()
+         ident:SetSteamID(setup_info.friend_list[setup_info.friend_selected].id)
+
+         local ent = util.entities_mod().instantiate_entity(
+            "client",
+            { hacking_match_client = { server_identity = ident } } )
+      end
+
+      if setup_info.friend_selected == -1 then ImGui.EndDisabled() end
    end
 
    if ImGui.Button("Start game") then

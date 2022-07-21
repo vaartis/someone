@@ -124,7 +124,10 @@ void register_imgui_usertypes(sol::state &lua) {
         },
         "EndTabItem", &ImGui::EndTabItem,
 
-        "SetNextItemWidth", &ImGui::SetNextItemWidth
+        "SetNextItemWidth", &ImGui::SetNextItemWidth,
+
+        "BeginDisabled", &ImGui::BeginDisabled,
+        "EndDisabled", &ImGui::EndDisabled
     );
     lua.new_enum(
         "ImGuiInputTextFlags",
