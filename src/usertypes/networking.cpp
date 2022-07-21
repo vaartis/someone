@@ -1,11 +1,10 @@
 #include <limits>
 
 #include "sol/object.hpp"
-#include "steam/isteamfriends.h"
 #ifdef SOMEONE_NETWORKING_STEAM
-#include <steam/steam_api.h>
+#include <steam/steam_api_flat.h>
 #else
-#include <steam/steamnetworkingsockets.h>
+#include <steam/steamnetworkingsockets_flat.h>
 #include <steam/isteamnetworkingutils.h>
 #endif
 
@@ -25,10 +24,11 @@ std::vector<SteamNetworkingConfigValue_t> socket_opts(uint32 id_for_this) {
     std::vector<SteamNetworkingConfigValue_t> resulting_options;
 
     SteamNetworkingConfigValue_t userdataOption;
-    userdataOption.SetInt32(k_ESteamNetworkingConfig_ConnectionUserData, id_for_this);
+    SteamAPI_SteamNetworkingConfigValue_t_SetInt32(&userdataOption, k_ESteamNetworkingConfig_ConnectionUserData, id_for_this);
 
     SteamNetworkingConfigValue_t statusChangedOption;
-    statusChangedOption.SetPtr(
+    SteamAPI_SteamNetworkingConfigValue_t_SetPtr(
+        &statusChangedOption,
         k_ESteamNetworkingConfig_Callback_ConnectionStatusChanged,
         (void*)+[](SteamNetConnectionStatusChangedCallback_t *info) {
             auto userdata_id = (uint32)info->m_info.m_nUserData;
@@ -57,8 +57,8 @@ void register_networking_usertypes(sol::state &lua) {
             if (!GameNetworkingSockets_Init( nullptr, errMsg))
                 spdlog::error("{}", errMsg);
 #endif
-
-            SteamNetworkingUtils()->SetDebugOutputFunction(
+            SteamAPI_ISteamNetworkingUtils_SetDebugOutputFunction(
+                SteamNetworkingUtils(),
                 k_ESteamNetworkingSocketsDebugOutputType_Everything,
                 [](ESteamNetworkingSocketsDebugOutputType type, const char *msg) {
                     switch (type) {
@@ -86,9 +86,9 @@ void register_networking_usertypes(sol::state &lua) {
 
     lua.new_usertype<SteamNetworkingIPAddr>(
         "SteamNetworkingIPAddr", sol::constructors<SteamNetworkingIPAddr()>(),
-        "clear", &SteamNetworkingIPAddr::Clear,
-        "port", &SteamNetworkingIPAddr::m_port,
-        "parse_string", &SteamNetworkingIPAddr::ParseString
+        "clear", &SteamAPI_SteamNetworkingIPAddr_Clear,
+        "parse_string", &SteamAPI_SteamNetworkingIPAddr_ParseString,
+        "port", &SteamNetworkingIPAddr::m_port
     );
 
     lua.new_usertype<SocketWrapper>(
@@ -120,9 +120,9 @@ void register_networking_usertypes(sol::state &lua) {
             return SocketWrapper {
                 .callback_id = id_for_this,
 #ifdef SOMEONE_NETWORKING_STEAM
-                .socket = self->CreateListenSocketP2P(0, resulting_options.size(), resulting_options.data())
+                .socket = SteamAPI_ISteamNetworkingSockets_CreateListenSocketP2P(self, 0, resulting_options.size(), resulting_options.data())
 #else
-                .socket = self->CreateListenSocketIP(addr, resulting_options.size(), resulting_options.data())
+                .socket = SteamAPI_ISteamNetworkingSockets_CreateListenSocketIP(self, addr, resulting_options.size(), resulting_options.data())
 #endif
             };
         },
@@ -145,40 +145,40 @@ void register_networking_usertypes(sol::state &lua) {
             return SocketWrapper {
                 .callback_id = id_for_this,
 #ifdef SOMEONE_NETWORKING_STEAM
-                .socket = self->ConnectP2P(ident, 0, resulting_options.size(), resulting_options.data())
+                .socket = SteamAPI_ISteamNetworkingSockets_ConnectP2P(self, ident, 0, resulting_options.size(), resulting_options.data())
 #else
-                .socket = self->ConnectByIPAddress(ident, resulting_options.size(), resulting_options.data())
+                .socket = SteamAPI_ISteamNetworkingSockets_ConnectByIPAddress(self, ident, resulting_options.size(), resulting_options.data())
 #endif
             };
         },
-        "close_listen_socket", &ISteamNetworkingSockets::CloseListenSocket,
-        "accept_connection", &ISteamNetworkingSockets::AcceptConnection,
-        "close_connection", &ISteamNetworkingSockets::CloseConnection,
+        "close_listen_socket", &SteamAPI_ISteamNetworkingSockets_CloseListenSocket,
+        "accept_connection", &SteamAPI_ISteamNetworkingSockets_AcceptConnection,
+        "close_connection", &SteamAPI_ISteamNetworkingSockets_CloseConnection,
         "send_message_to_connection", [](ISteamNetworkingSockets *self,
                                          HSteamNetConnection conn,
                                          std::string message, int networking_send) {
-            return self->SendMessageToConnection(conn, message.data(), message.length(), networking_send, nullptr);
+            return SteamAPI_ISteamNetworkingSockets_SendMessageToConnection(self, conn, message.data(), message.length(), networking_send, nullptr);
         },
-        "run_callbacks", &ISteamNetworkingSockets::RunCallbacks,
+        "run_callbacks", &SteamAPI_ISteamNetworkingSockets_RunCallbacks,
         "receive_messages_on_connection", [](ISteamNetworkingSockets *self, HSteamNetConnection conn) {
             SteamNetworkingMessage_t *outMessage = nullptr;
-            auto n = self->ReceiveMessagesOnConnection(conn, &outMessage, 1);
+            auto n = SteamAPI_ISteamNetworkingSockets_ReceiveMessagesOnConnection(self, conn, &outMessage, 1);
 
             return std::make_tuple(n, outMessage);
         },
 
-        "create_poll_group", &ISteamNetworkingSockets::CreatePollGroup,
-        "destroy_poll_group", &ISteamNetworkingSockets::DestroyPollGroup,
-        "set_connection_poll_group", &ISteamNetworkingSockets::SetConnectionPollGroup,
+        "create_poll_group", &SteamAPI_ISteamNetworkingSockets_CreatePollGroup,
+        "destroy_poll_group", &SteamAPI_ISteamNetworkingSockets_DestroyPollGroup,
+        "set_connection_poll_group", &SteamAPI_ISteamNetworkingSockets_SetConnectionPollGroup,
         "receive_messages_on_poll_group", [](ISteamNetworkingSockets *self, HSteamNetPollGroup group) {
             SteamNetworkingMessage_t *outMessage = nullptr;
-            auto n = self->ReceiveMessagesOnPollGroup(group, &outMessage, 1);
+            auto n =  SteamAPI_ISteamNetworkingSockets_ReceiveMessagesOnPollGroup(self, group, &outMessage, 1);
 
             return std::make_tuple(n, outMessage);
         },
         "identity", [](ISteamNetworkingSockets *self) {
             SteamNetworkingIdentity ident;
-            self->GetIdentity(&ident);
+            SteamAPI_ISteamNetworkingSockets_GetIdentity(self, &ident);
 
             return ident;
         }
@@ -223,7 +223,7 @@ void register_networking_usertypes(sol::state &lua) {
             return std::string((char*)self->m_pData, self->m_cbSize);
         }),
         "connection", &SteamNetworkingMessage_t::m_conn,
-        "release", &SteamNetworkingMessage_t::Release
+        "release", &SteamAPI_SteamNetworkingMessage_t_Release
     );
 
     lua.new_enum(
@@ -236,7 +236,7 @@ void register_networking_usertypes(sol::state &lua) {
 
     lua.new_usertype<SteamNetworkingIdentity>(
         "SteamNetworkingIdentity", sol::default_constructor,
-        "SetSteamID", &SteamNetworkingIdentity::SetSteamID,
+        "SetSteamID", &SteamAPI_SteamNetworkingIdentity_SetSteamID,
         sol::meta_function::to_string, [](SteamNetworkingIdentity *ident) {
             return SteamNetworkingIdentityRender(*ident).c_str();
         }
@@ -250,23 +250,21 @@ void register_networking_usertypes(sol::state &lua) {
     lua.new_usertype<ISteamFriends>(
         "ISteamFriends",
         "GetFriends", [&lua](ISteamFriends *self) {
-            auto count = self->GetFriendCount(k_EFriendFlagImmediate);
+            auto count = SteamAPI_ISteamFriends_GetFriendCount(self, k_EFriendFlagImmediate);
 
             if (count == -1)
                 return sol::make_object(lua, std::make_tuple(sol::lua_nil, "Count returned -1, probably not logged in"));
 
-            std::vector<CSteamID> result;
+            std::vector<uint64_steamid> result;
             for (int i = 0; i < count; i++) {
-                result.push_back(SteamFriends()->GetFriendByIndex(i, k_EFriendFlagImmediate));
+                result.push_back(SteamAPI_ISteamFriends_GetFriendByIndex(self, i, k_EFriendFlagImmediate));
             }
 
             return sol::make_object(lua, result);
         },
-        "GetFriendPersonaState", &ISteamFriends::GetFriendPersonaState,
-        "GetFriendPersonaName", &ISteamFriends::GetFriendPersonaName
+        "GetFriendPersonaState", &SteamAPI_ISteamFriends_GetFriendPersonaState,
+        "GetFriendPersonaName", &SteamAPI_ISteamFriends_GetFriendPersonaName
     );
-
-    lua.new_usertype<CSteamID>("CSteamID");
 
     lua.new_enum(
         "EPersonaState",
