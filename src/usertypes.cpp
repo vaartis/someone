@@ -111,7 +111,9 @@ void register_usertypes(sol::state &lua, StaticFonts &fonts) {
     lua["fs"] = lua.create_table_with(
         "isdir", [](const std::string &path) { return std::filesystem::is_directory(path); },
         "isfile", [](const std::string &path) { return std::filesystem::is_regular_file(path); },
-        "exists", [](const std::string &path) { return std::filesystem::exists(path); },
+        "exists", [](std::string path) {
+	  return std::filesystem::exists(path);
+	},
         "mkdir", [](const std::string &path) { return std::filesystem::create_directory(path); },
         "each", [](const std::string &path) { return std::filesystem::create_directory(path); },
         "dir", [&lua](const std::string &path) {

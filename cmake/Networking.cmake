@@ -3,7 +3,7 @@ include(FetchContent)
 if (SOMEONE_NETWORKING_STEAM)
   FetchContent_Declare(
     SteamworksSDK
-    URL "https://partner.steamgames.com/downloads/steamworks_sdk.zip"
+    URL "https://partner.steamgames.com/downloads/steamworks_sdk_154.zip"
   )
   FetchContent_MakeAvailable(SteamworksSDK)
 
