@@ -1,5 +1,9 @@
+#ifdef SOMEONE_NETWORKING_STEAM
+#include <steam/steam_api.h>
+#else
 #include <steam/steamnetworkingsockets.h>
 #include <steam/isteamnetworkingutils.h>
+#endif
 
 #include "sol/forward.hpp"
 #include "sol/raii.hpp"
@@ -42,9 +46,13 @@ struct SocketWrapper {
 void register_networking_usertypes(sol::state &lua) {
     lua["NETWORKING"] = lua.create_table_with(
         "init", []() {
+#ifdef SOMEONE_NETWORKING_STEAM
+            SteamAPI_Init();
+#else
             SteamDatagramErrMsg errMsg;
             if (!GameNetworkingSockets_Init( nullptr, errMsg))
                 spdlog::error("{}", errMsg);
+#endif
 
             SteamNetworkingUtils()->SetDebugOutputFunction(
                 k_ESteamNetworkingSocketsDebugOutputType_Everything,
@@ -67,6 +75,9 @@ void register_networking_usertypes(sol::state &lua) {
         },
 
         "INVALID_CONNECTION", k_HSteamNetConnection_Invalid
+#ifdef SOMEONE_NETWORKING_STEAM
+        , "IS_STEAM", true
+#endif
     );
 
     lua.new_usertype<SteamNetworkingIPAddr>(
@@ -86,10 +97,14 @@ void register_networking_usertypes(sol::state &lua) {
 
     lua.new_usertype<ISteamNetworkingSockets>(
         "ISteamNetworkingSockets",
-        "create_listen_socket_ip", [](ISteamNetworkingSockets *self,
-                                      SteamNetworkingIPAddr &addr,
-                                      sol::table options,
-                                      sol::protected_function connection_state_changed) {
+        "create_listen_socket_p2p", [](ISteamNetworkingSockets *self,
+#ifdef SOMEONE_NETWORKING_STEAM
+                                       SteamNetworkingIdentity &unused_ident,
+#else
+                                       SteamNetworkingIPAddr &addr,
+#endif
+                                       sol::table options,
+                                       sol::protected_function connection_state_changed) {
             auto id_for_this = callback_id++;
             connection_status_changed_callbacks[id_for_this] = connection_state_changed;
 
@@ -100,13 +115,21 @@ void register_networking_usertypes(sol::state &lua) {
 
             return SocketWrapper {
                 .callback_id = id_for_this,
+#ifdef SOMEONE_NETWORKING_STEAM
+                .socket = self->CreateListenSocketP2P(0, resulting_options.size(), resulting_options.data())
+#else
                 .socket = self->CreateListenSocketIP(addr, resulting_options.size(), resulting_options.data())
+#endif
             };
         },
-        "connect_by_ip_address", [](ISteamNetworkingSockets *self,
-                                    SteamNetworkingIPAddr &addr,
-                                    sol::table options,
-                                    sol::protected_function connection_state_changed) {
+        "connect_p2p", [](ISteamNetworkingSockets *self,
+#ifdef SOMEONE_NETWORKING_STEAM
+                          SteamNetworkingIdentity &ident,
+#else
+                          SteamNetworkingIPAddr &ident,
+#endif
+                          sol::table options,
+                          sol::protected_function connection_state_changed) {
             auto id_for_this = callback_id++;
             connection_status_changed_callbacks[id_for_this] = connection_state_changed;
 
@@ -117,7 +140,11 @@ void register_networking_usertypes(sol::state &lua) {
 
             return SocketWrapper {
                 .callback_id = id_for_this,
-                .socket = self->ConnectByIPAddress(addr, resulting_options.size(), resulting_options.data())
+#ifdef SOMEONE_NETWORKING_STEAM
+                .socket = self->ConnectP2P(ident, 0, resulting_options.size(), resulting_options.data())
+#else
+                .socket = self->ConnectByIPAddress(ident, resulting_options.size(), resulting_options.data())
+#endif
             };
         },
         "close_listen_socket", &ISteamNetworkingSockets::CloseListenSocket,
@@ -144,6 +171,12 @@ void register_networking_usertypes(sol::state &lua) {
             auto n = self->ReceiveMessagesOnPollGroup(group, &outMessage, 1);
 
             return std::make_tuple(n, outMessage);
+        },
+        "identity", [](ISteamNetworkingSockets *self) {
+            SteamNetworkingIdentity ident;
+            self->GetIdentity(&ident);
+
+            return ident;
         }
     );
 
@@ -195,5 +228,12 @@ void register_networking_usertypes(sol::state &lua) {
         "Connected", k_ESteamNetworkingConnectionState_Connected,
         "ClosedByPeer", k_ESteamNetworkingConnectionState_ClosedByPeer,
         "ProblemDetectedLocally", k_ESteamNetworkingConnectionState_ProblemDetectedLocally
+    );
+
+    lua.new_usertype<SteamNetworkingIdentity>(
+        "SteamNetworkingIdentity",
+        sol::meta_function::to_string, [](SteamNetworkingIdentity *ident) {
+            return SteamNetworkingIdentityRender(*ident).c_str();
+        }
     );
 }

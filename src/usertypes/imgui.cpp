@@ -11,9 +11,10 @@
 
 void register_imgui_usertypes(sol::state &lua) {
     lua["ImGui"] = lua.create_table_with(
-        "Begin", &ImGui::Begin,
+        "Begin", [](const char *label) {
+            return ImGui::Begin(label, nullptr, ImGuiWindowFlags_AlwaysAutoResize | ImGuiWindowFlags_NoCollapse);
+        },
         "End", &ImGui::End,
-
 
         "InputText", sol::overload(
             [](const char *label, std::string str) {

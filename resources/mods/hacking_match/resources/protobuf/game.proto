@@ -3,10 +3,17 @@ syntax = "proto3";
 enum Event {
     Joined = 0;
     Left = 1;
+
+    IAmReady = 2;
+    EveryoneIsReady = 3;
 }
 
 message Move {
     int32 position = 1;
+}
+
+message BlockManagerSetup {
+    int32 seed = 1;
 }
 
 message Player {
@@ -15,5 +22,6 @@ message Player {
     oneof EventType {
         Move move = 2;
         Event event = 3;
+        BlockManagerSetup block_manager_setup = 4;
     }
 }

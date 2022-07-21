@@ -33,7 +33,7 @@ M.components = {
    },
 
    hacking_match_block_manager = {
-      class = Component.create("HackingMatchBlockManager", {"seed", "offset", "break_pause"})
+      class = Component.create("HackingMatchBlockManager", {"seed", "offset", "break_pause", "ready"})
    },
 
    hacking_match_block = {
@@ -48,10 +48,16 @@ local HackingMatchClientSystem = class("HackingMatchClientSystem", System)
 local HackingMatchPlayerSystem = class("HackingMatchPlayerSystem", System)
 
 NETWORKING.init()
-local server_addr = SteamNetworkingIPAddr.new()
-server_addr:parse_string("127.0.0.1:12345")
 
 local sockets = NETWORKING.sockets()
+
+local server_identity
+if NETWORKING.IS_STEAM then
+   server_identity = sockets:identity()
+else
+   server_identity = SteamNetworkingIPAddr.new()
+   server_identity:parse_string("127.0.0.1:12345")
+end
 
 local function send_to_all(clients, msg, except)
    for handle, client in pairs(clients) do
@@ -70,10 +76,12 @@ function M.components.hacking_match_server.process_component(new_ent, comp, enti
    local poll_group = sockets:create_poll_group()
 
    local latest_id = 0
-   local server_socket = sockets:create_listen_socket_ip(
-      server_addr,
+   local server_socket = sockets:create_listen_socket_p2p(
+      server_identity,
       {},
       function(info)
+         local seed = 123456789
+
          local state = info.info.state
 
          if state == ESteamNetworkingConnectionState.Connecting then
@@ -89,11 +97,13 @@ function M.components.hacking_match_server.process_component(new_ent, comp, enti
 
             sockets:set_connection_poll_group(info.handle, poll_group)
 
+            -- Send info about this client to everyone
             send_to_all(
                server_clients,
                pb.encode("Player", { id = server_clients[info.handle].id, event = "Joined" }),
                server_clients[info.handle].id
             )
+            -- Send info about other clients to this client
             for _, other in pairs(server_clients) do
                if other.id ~= server_clients[info.handle].id then
                   sockets:send_message_to_connection(
@@ -103,6 +113,11 @@ function M.components.hacking_match_server.process_component(new_ent, comp, enti
                   )
                end
             end
+            sockets:send_message_to_connection(
+               info.handle,
+               pb.encode("Player", { block_manager_setup = { seed = seed } }),
+               SteamNetworkingSend.Reliable
+            )
          elseif state == ESteamNetworkingConnectionState.ClosedByPeer or state == ESteamNetworkingConnectionStateProblemDetectedLocally then
             print("[SERVER] Disconnected " .. info.info.connection_description)
             sockets:close_connection(info.handle, 0, "Disconnected", false);
@@ -116,8 +131,8 @@ function M.components.hacking_match_server.process_component(new_ent, comp, enti
 end
 
 function M.components.hacking_match_client.process_component(new_ent, comp, entity_name)
-   local client_socket = sockets:connect_by_ip_address(
-      server_addr,
+   local client_socket = sockets:connect_p2p(
+      server_identity,
       {},
       function(info)
          if info.info.state == ESteamNetworkingConnectionState.Connected then
@@ -144,7 +159,7 @@ function M.components.hacking_match_other_player.process_component(new_ent, comp
 end
 
 function M.components.hacking_match_block_manager.process_component(new_ent, comp, entity_name)
-   new_ent:add(M.components.hacking_match_block_manager.class(100, 0, false))
+   new_ent:add(M.components.hacking_match_block_manager.class(comp.seed, 0, false, false))
 end
 
 function M.components.hacking_match_block.process_component(new_ent, comp, entity_name)
@@ -217,6 +232,21 @@ function HackingMatchClientSystem:update()
                      other_player.base_position + Vector2f.new(other_drawable.drawable.global_bounds.width * other_player.position, 0)
                end
             end
+         elseif player_data.block_manager_setup then
+            local block_ent = util.entities_mod().instantiate_entity(
+               "block_manager",
+               { hacking_match_block_manager = { seed = player_data.block_manager_setup.seed },
+                 transformable = { position = { 50, 64 } }})
+            -- We got our block manager, tell the server we're ready
+            sockets:send_message_to_connection(
+               client.socket.socket,
+               pb.encode("Player", { event = "IAmReady" }),
+               SteamNetworkingSend.Reliable
+            )
+         elseif player_data.event == "EveryoneReady" then
+            local manager_ent = util.first(util.rooms_mod().engine:getEntitiesWithComponent("HackingMatchBlockManager"))
+            local manager = manager_ent:get("HackingMatchBlockManager")
+            manager.ready = true
          end
 
          msg:release()
@@ -308,6 +338,11 @@ function HackingMatchBlockManagerSystem:update(dt)
    for _, ent in pairs(self.targets.manager) do
       local manager = ent:get("HackingMatchBlockManager")
       local tf = ent:get("Transformable")
+
+      -- Wait for everyone to be ready
+      if not manager.ready then
+         return
+      end
 
       if not manager.block_entities or #manager.block_entities < 10 then
          if not manager.block_entities then
@@ -656,6 +691,26 @@ function HackingMatchBlockManagerSystem:process_fallthrough(manager, combo_block
    end
 
    return falling_blocks
+end
+
+M.interaction_callbacks = { }
+
+function M.interaction_callbacks.draw_gui()
+   ImGui.Begin("Hacking Match server")
+
+   if ImGui.Button("Start server") then
+      local ent = util.entities_mod().instantiate_entity(
+         "server",
+         { hacking_match_server = {} } )
+   end
+
+   if ImGui.Button("Start client") then
+      local ent = util.entities_mod().instantiate_entity(
+         "client",
+         { hacking_match_client = {} } )
+   end
+
+   ImGui.End()
 end
 
 M.systems = {

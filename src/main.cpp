@@ -129,9 +129,8 @@ void main_loop(void *ctx_) {
                 ctx.walking_env.add_event(event);
                 break;
             }
-        } else {
-            ImGui_ImplSDL2_ProcessEvent(&event.sdlEvent);
         }
+        ImGui_ImplSDL2_ProcessEvent(&event.sdlEvent);
     }
 
     ctx.window.clear();
@@ -174,11 +173,18 @@ void main_loop(void *ctx_) {
 
     ctx.target.display();
 
-    if (ctx.debug_menu) {
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplSDL2_NewFrame();
-        ImGui::NewFrame();
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplSDL2_NewFrame();
+    ImGui::NewFrame();
 
+    switch (ctx.current_state) {
+    case CurrentState::Walking:
+        ctx.walking_env.draw_imgui();
+        break;
+    default: break;
+    }
+
+    if (ctx.debug_menu) {
         ImGui::Begin("Debug menu", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
 
         switch (ctx.current_state) {
@@ -189,12 +195,11 @@ void main_loop(void *ctx_) {
             ctx.walking_env.debug_menu();
             break;
         }
-
         ImGui::End();
-
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
+
+    ImGui::Render();
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     ctx.window.display();
 }
@@ -279,7 +284,7 @@ int main(int argc, char **argv) {
 
     auto loaded_mods = terminal_env.parser.load_mods(lua);
 
-    auto current_state = CurrentState::Terminal;
+    auto current_state = CurrentState::Walking;
 
     auto current_state_type = lua.new_enum(
         "CurrentState",

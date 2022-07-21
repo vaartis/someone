@@ -302,7 +302,6 @@ function(install_rocks)
       unset(rockspec)
       list(GET ARGV${current_arg_n} 1 output)
     endif()
-    message(${output})
 
     set(full_output_path "${PROJECT_BINARY_DIR}/resources/lua/share/lua/${SOMEONE_LUA_VERSION}/${output}")
 
@@ -444,6 +443,7 @@ endif()
 # == Optional, networking
 
 option(SOMEONE_NETWORKING "Enable GameNetworkingSockets support" FALSE)
+option(SOMEONE_NETWORKING_STEAM "Use the Steamworks SDK version of GameNetworkingSockets" FALSE)
 
 if(SOMEONE_NETWORKING)
   include(Networking)

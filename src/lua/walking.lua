@@ -20,13 +20,17 @@ local function draw_overlay()
    rooms.engine:draw("overlay")
 end
 
+local function draw_imgui()
+   rooms.engine:draw("imgui")
+end
+
 return {
    load_room = rooms.load_room,
    room_shaders = rooms.room_shaders,
    add_event = interaction_components.add_event,
 
-   update = update, draw = draw, draw_overlay = draw_overlay,
+   update = update, draw = draw, draw_overlay = draw_overlay, draw_imgui = draw_imgui,
    clear_event_store = interaction_components.clear_event_store,
 
-   debug_menu = debug_components.debug_menu
+   debug_menu = debug_components.debug_menu,
 }

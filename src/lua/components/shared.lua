@@ -73,13 +73,20 @@ function RenderSystem:draw(layer)
          enabled = enabled()
       end
 
+      local draw_fnc
+      if drawable.kind == "function" then
+         draw_fnc = drawable.drawable
+      else
+         draw_fnc = function() GLOBAL.drawing_target:draw(drawable.drawable) end
+      end
+
       if enabled then
          if layer then
             -- If the layer is specified, only draw entities on the layer
-            if drawable.layer == layer then GLOBAL.drawing_target:draw(drawable.drawable) end
+            if drawable.layer == layer then draw_fnc() end
          else
             -- Otherwise draw those that don't have a layer
-            if not drawable.layer then GLOBAL.drawing_target:draw(drawable.drawable) end
+            if not drawable.layer then draw_fnc() end
          end
       end
    end
@@ -287,6 +294,12 @@ function M.components.drawable.process_component(new_ent, comp, entity_name)
       local _, _, sl = M.load_sheet_data(comp.slice_sheet)
 
       drawable.texture_rect = sl["9slice"]
+   elseif comp.kind == "function" then
+      drawable = interaction_components.process_interaction(
+         comp,
+         "draw_function",
+         { entity_name = entity_name, comp_name = comp_name, needed_for = "enabled" }
+   )
    else
       error("Unknown kind of drawable in " .. tostring(entity_name) .. "." .. tostring(comp_name))
    end

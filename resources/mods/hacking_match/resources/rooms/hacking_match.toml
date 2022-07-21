@@ -1,6 +1,6 @@
-[entities.server.hacking_match_server]
+#[entities.server.hacking_match_server]
 
-[entities.client.hacking_match_client]
+# [entities.client.hacking_match_client]
 
 [entities.player.drawable]
 kind = "sprite"
@@ -12,7 +12,8 @@ position = [50, 500]
 
 [entities.player.hacking_match_player]
 
-[entities.block_manager.hacking_match_block_manager]
-
-[entities.block_manager.transformable]
-position = [50, 64]
+[entities.gui.drawable]
+kind = "function"
+draw_function = { module = "mod.main", name = "draw_gui" }
+z = 1
+layer = "imgui"

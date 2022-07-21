@@ -39,6 +39,13 @@ function M.ModExitLine:initialize()
          end
       end
 
+      for name, loaded in pairs(package.loaded) do
+         if name:match("^mod.") then
+            -- Unload the packages
+            package.loaded[name] = nil
+         end
+      end
+
       if _G.mod then _G.mod = nil end
    end
 
@@ -101,6 +108,8 @@ function M.ModWrapperLine:initialize(data)
                   util.entities_mod().all_components,
                   into[name]
                )
+
+               package.loaded["mod." .. name] = into[name]
             end
          end
       end
