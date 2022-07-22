@@ -58,7 +58,7 @@ void register_networking_usertypes(sol::state &lua) {
                 spdlog::error("{}", errMsg);
 #endif
             SteamAPI_ISteamNetworkingUtils_SetDebugOutputFunction(
-                SteamNetworkingUtils(),
+                SteamNetworkingUtils_SteamAPI(),
                 k_ESteamNetworkingSocketsDebugOutputType_Everything,
                 [](ESteamNetworkingSocketsDebugOutputType type, const char *msg) {
                     switch (type) {
@@ -72,7 +72,7 @@ void register_networking_usertypes(sol::state &lua) {
                 }
             );
         },
-        "sockets", &SteamNetworkingSockets,
+        "sockets", &SteamNetworkingSockets_SteamAPI,
         "set_connection_status_changed_callback",
         [](uint32 conn, sol::protected_function callback) {
             connection_status_changed_callbacks[conn] = callback;
