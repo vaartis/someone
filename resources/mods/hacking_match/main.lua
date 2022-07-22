@@ -51,6 +51,14 @@ NETWORKING.init()
 
 local sockets = NETWORKING.sockets()
 
+local function run_callbacks()
+    if NETWORKING.IS_STEAM then
+        STEAM.run_callbacks()
+    end
+
+    sockets:run_callbacks()
+end
+
 local server_identity
 if NETWORKING.IS_STEAM then
    server_identity = sockets:identity()
@@ -164,7 +172,7 @@ function HackingMatchServerSystem:requires()
    return {"HackingMatchServer"}
 end
 function HackingMatchServerSystem:update()
-   sockets:run_callbacks()
+   run_callbacks()
 
    for _, ent in pairs(self.targets) do
       local server = ent:get("HackingMatchServer")
@@ -200,7 +208,7 @@ function HackingMatchClientSystem:requires()
    return { client = {"HackingMatchClient"}, other_player = {"HackingMatchOtherPlayer"}, player = {"HackingMatchPlayer"} }
 end
 function HackingMatchClientSystem:update()
-   sockets:run_callbacks()
+   run_callbacks()
 
    for _, ent in pairs(self.targets.client) do
       local client = ent:get("HackingMatchClient")
@@ -284,7 +292,7 @@ function HackingMatchPlayerSystem:requires()
    return { player = {"HackingMatchPlayer"}, client = {"HackingMatchClient"} }
 end
 function HackingMatchPlayerSystem:update(dt)
-   sockets:run_callbacks()
+   run_callbacks()
 
    for _, ent in pairs(self.targets.player) do
       local tf = ent:get("Transformable")

@@ -52,13 +52,21 @@ void register_networking_usertypes(sol::state &lua) {
         "init", []() {
 #ifdef SOMEONE_NETWORKING_STEAM
             SteamAPI_Init();
+	    SteamAPI_ISteamNetworkingUtils_InitRelayNetworkAccess(SteamNetworkingUtils());
+
+	    SteamAPI_ISteamUtils_SetWarningMessageHook(
+		SteamAPI_SteamUtils(),
+		[](int type, const char *msg) {
+		  spdlog::warn("{}", msg);
+		}
+	    );
 #else
             SteamDatagramErrMsg errMsg;
             if (!GameNetworkingSockets_Init( nullptr, errMsg))
                 spdlog::error("{}", errMsg);
 #endif
             SteamAPI_ISteamNetworkingUtils_SetDebugOutputFunction(
-                SteamNetworkingUtils_SteamAPI(),
+                SteamNetworkingUtils(),
                 k_ESteamNetworkingSocketsDebugOutputType_Everything,
                 [](ESteamNetworkingSocketsDebugOutputType type, const char *msg) {
                     switch (type) {
@@ -244,7 +252,8 @@ void register_networking_usertypes(sol::state &lua) {
 
 #ifdef SOMEONE_NETWORKING_STEAM
     lua["STEAM"] = lua.create_table_with(
-        "Friends", &SteamFriends
+	"Friends", &SteamFriends,
+        "run_callbacks", &SteamAPI_RunCallbacks
     );
 
     lua.new_usertype<ISteamFriends>(
