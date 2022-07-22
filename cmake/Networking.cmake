@@ -1,11 +1,7 @@
 include(FetchContent)
 
 if (SOMEONE_NETWORKING_STEAM)
-  FetchContent_Declare(
-    SteamworksSDK
-    URL "https://partner.steamgames.com/downloads/steamworks_sdk_154.zip"
-  )
-  FetchContent_MakeAvailable(SteamworksSDK)
+  set(steamworkssdk_SOURCE_DIR "${PROJECT_SOURCE_DIR}/deps/steamworks")
 
   target_include_directories(someone_lib PUBLIC "${steamworkssdk_SOURCE_DIR}/public/")
   add_compile_definitions(someone_lib PUBLIC SOMEONE_NETWORKING_STEAM)
