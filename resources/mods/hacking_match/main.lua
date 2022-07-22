@@ -755,10 +755,10 @@ end
 function M.interaction_callbacks.draw_gui()
    ImGui.Begin("Hacking Match")
 
+   local friends = STEAM.Friends()
    if not NETWORKING.IS_STEAM then
       setup_info.server_addr = ImGui.InputText("Server address", setup_info.server_addr)
    else
-      local friends = STEAM.Friends()
       if not setup_info.friend_list then
          setup_info.friend_list = {}
          for _, friend in ipairs(friends:GetFriends()) do
@@ -771,7 +771,7 @@ function M.interaction_callbacks.draw_gui()
       local friend_names = lume.map(setup_info.friend_list, function(f) return f.name end)
 
       ImGui.SetNextItemWidth(150)
-      setup_info.friend_selected = ImGui.ListBox("Connect to a friend", setup_info.friend_selected, friend_names)
+      setup_info.friend_selected = ImGui.ListBox("Connect to a friend", setup_info.friend_selected - 1, friend_names) + 1
    end
 
    setup_info.seed = ImGui.InputInt("Seed", setup_info.seed)
