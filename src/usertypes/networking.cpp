@@ -4,6 +4,7 @@
 #ifdef SOMEONE_NETWORKING_STEAM
 #include <steam/steam_api_flat.h>
 #else
+#include <steam/steamnetworkingsockets.h>
 #include <steam/steamnetworkingsockets_flat.h>
 #include <steam/isteamnetworkingutils.h>
 #endif
@@ -24,11 +25,10 @@ std::vector<SteamNetworkingConfigValue_t> socket_opts(uint32 id_for_this) {
     std::vector<SteamNetworkingConfigValue_t> resulting_options;
 
     SteamNetworkingConfigValue_t userdataOption;
-    SteamAPI_SteamNetworkingConfigValue_t_SetInt32(&userdataOption, k_ESteamNetworkingConfig_ConnectionUserData, id_for_this);
+    userdataOption.SetInt32(k_ESteamNetworkingConfig_ConnectionUserData, id_for_this);
 
     SteamNetworkingConfigValue_t statusChangedOption;
-    SteamAPI_SteamNetworkingConfigValue_t_SetPtr(
-        &statusChangedOption,
+    statusChangedOption.SetPtr(
         k_ESteamNetworkingConfig_Callback_ConnectionStatusChanged,
         (void*)+[](SteamNetConnectionStatusChangedCallback_t *info) {
             auto userdata_id = (uint32)info->m_info.m_nUserData;
@@ -52,14 +52,14 @@ void register_networking_usertypes(sol::state &lua) {
         "init", []() {
 #ifdef SOMEONE_NETWORKING_STEAM
             SteamAPI_Init();
-	    SteamAPI_ISteamNetworkingUtils_InitRelayNetworkAccess(SteamNetworkingUtils());
+            SteamAPI_ISteamNetworkingUtils_InitRelayNetworkAccess(SteamNetworkingUtils());
 
-	    SteamAPI_ISteamUtils_SetWarningMessageHook(
-		SteamAPI_SteamUtils(),
-		[](int type, const char *msg) {
-		  spdlog::warn("{}", msg);
-		}
-	    );
+            SteamAPI_ISteamUtils_SetWarningMessageHook(
+                SteamAPI_SteamUtils(),
+                [](int type, const char *msg) {
+                    spdlog::warn("{}", msg);
+                }
+            );
 #else
             SteamDatagramErrMsg errMsg;
             if (!GameNetworkingSockets_Init( nullptr, errMsg))
@@ -80,7 +80,7 @@ void register_networking_usertypes(sol::state &lua) {
                 }
             );
         },
-        "sockets", &SteamNetworkingSockets_SteamAPI,
+        "sockets", &SteamNetworkingSockets,
         "set_connection_status_changed_callback",
         [](uint32 conn, sol::protected_function callback) {
             connection_status_changed_callbacks[conn] = callback;

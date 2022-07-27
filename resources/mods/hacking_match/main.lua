@@ -242,11 +242,13 @@ function HackingMatchClientSystem:update()
                      other_player.position = player_data.move.position
 
                      other_tf.transformable.position =
-                        other_player.base_position +  Vector2f.new(other_drawable.drawable.global_bounds.width * other_player.position, 0)
+                        other_player.base_position + Vector2f.new(other_drawable.drawable.global_bounds.width * other_player.position, 0)
                   elseif player_data.move.action == "TakeOrPut" then
                      HackingMatchBlockManagerSystem.take_or_put(other_player.block_manager, other_player.position + 1)
                   elseif player_data.move.action == "Swap" then
                      HackingMatchBlockManagerSystem.swap_at(other_player.block_manager, other_player.position + 1)
+                  elseif player_data.move.action == "Speedup" then
+                     other_player.block_manager:get("HackingMatchBlockManager").offset = player_data.move.offset
                   end
                end
             end
@@ -355,6 +357,19 @@ function HackingMatchPlayerSystem:update(dt)
             player.time_since_action = 0
          end
       end
+      if Keyboard.is_key_pressed(KeyboardKey.L) then
+         local manager = player.block_manager:get("HackingMatchBlockManager")
+         manager.offset = manager.offset + 1
+
+         for _, client_ent in pairs(self.targets.client) do
+            -- Notify the server
+            sockets:send_message_to_connection(
+               client_ent:get("HackingMatchClient").socket.socket,
+               pb.encode("Player", { move = { action = "Speedup", offset = manager.offset } }),
+               SteamNetworkingSend.Unreliable
+            )
+         end
+      end
 
       if moved then
          tf.transformable.position = player.base_position + Vector2f.new((drawable.drawable.global_bounds.width * player.position), 0)
@@ -379,7 +394,7 @@ end
 
 local block_combo_min = 4
 local bomb_combo_min = 2
-local bomb_chance = 0.98
+local bomb_chance = 0.05
 
 local function is_breakable_combo(maybe_combo)
    local bomb_combo = maybe_combo[1] and maybe_combo[1].bomb
@@ -388,7 +403,7 @@ local function is_breakable_combo(maybe_combo)
 end
 
 function HackingMatchBlockManagerSystem:requires()
-   return { manager = {"HackingMatchBlockManager"} }
+   return { manager = {"HackingMatchBlockManager"}, client = {"HackingMatchClient"} }
 end
 function HackingMatchBlockManagerSystem:update(dt)
    for _, ent in pairs(self.targets.manager) do
@@ -410,7 +425,7 @@ function HackingMatchBlockManagerSystem:update(dt)
             blocks[line] = {}
             for block = 1, 6 do
                blocks[line][block] = { color = math.random(1, 5) }
-               if math.random() > bomb_chance and max_bombs < bomb_counter then
+               if math.random() > 1 - bomb_chance and bomb_counter < max_bombs then
                   bomb_counter = bomb_counter + 1
                   blocks[line][block].bomb = true
                else
@@ -486,11 +501,8 @@ function HackingMatchBlockManagerSystem:update(dt)
       if manager.break_pause then
          return
       end
-      if Keyboard.is_key_pressed(KeyboardKey.L) then
-         manager.offset = manager.offset + 0.4
-      else
-         manager.offset = manager.offset + 0.2
-      end
+
+      manager.offset = manager.offset + 0.2
 
       local found_combos = {}
 
@@ -763,10 +775,10 @@ end
 function M.interaction_callbacks.draw_gui()
    ImGui.Begin("Hacking Match")
 
-   local friends = STEAM.Friends()
    if not NETWORKING.IS_STEAM then
       setup_info.server_addr = ImGui.InputText("Server address", setup_info.server_addr)
    else
+      local friends = STEAM.Friends()
       if not setup_info.friend_list then
          setup_info.friend_list = {}
          for _, friend in ipairs(friends:GetFriends()) do
@@ -820,7 +832,7 @@ function M.interaction_callbacks.draw_gui()
       -- Ask everyone if they're ready
       send_to_all(
          server.clients,
-         pb.encode("Player", { block_manager_setup = { setup_info.seed } })
+         pb.encode("Player", { block_manager_setup = { seed = setup_info.seed } })
       )
    end
 

@@ -14,11 +14,15 @@ enum MoveAction {
     Movement = 0;
     TakeOrPut = 1;
     Swap = 2;
+    Speedup = 3;
 }
 
 message Move {
-    int32 position = 1;
-    MoveAction action = 2;
+    MoveAction action = 1;
+    // Only for Movement
+    int32 position = 2;
+    // Only for speedup
+    float offset = 3;
 }
 
 message BlockManagerSetup {
