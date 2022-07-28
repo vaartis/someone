@@ -28,12 +28,15 @@
 [submodule "deps/SDL"]
 	path = deps/SDL
 	url = https://github.com/libsdl-org/SDL
-[submodule "deps/SDL_mixer"]
-	path = deps/SDL_mixer
-	url = https://github.com/libsdl-org/SDL_mixer/
 [submodule "deps/SDL_ttf"]
 	path = deps/SDL_ttf
 	url = https://github.com/libsdl-org/SDL_ttf
 [submodule "deps/SDL_gpu"]
 	path = deps/SDL_gpu
 	url = https://github.com/grimfang4/sdl-gpu
+[submodule "deps/vorbis"]
+	path = deps/vorbis
+	url = https://github.com/xiph/vorbis
+[submodule "deps/ogg"]
+	path = deps/ogg
+	url = https://github.com/xiph/ogg

@@ -314,17 +314,21 @@ void register_sfml_usertypes(sol::state &lua, StaticFonts &fonts) {
 
     auto sound_buf_type = lua.new_usertype<someone::SoundBuffer>(
         "SoundBuffer", sol::constructors<someone::SoundBuffer()>(),
-        "load_from_file", &someone::SoundBuffer::loadFromFile
+        "load_from_file", sol::overload(
+            [](someone::SoundBuffer *self, const std::string &path) { return self->loadFromFile(path); },
+            [](someone::SoundBuffer *self, const std::string &path, bool isMusic) { return self->loadFromFile(path, isMusic); }
+        ),
+        "set_loop_points", &someone::SoundBuffer::setLoopPoints
     );
 
     auto sound_type = lua.new_usertype<someone::Sound>(
         "Sound", sol::constructors<someone::Sound()>(),
-        "buffer", &someone::Sound::buffer,
+        "buffer", sol::property(&someone::Sound::getBuffer, &someone::Sound::setBuffer),
         "play", &someone::Sound::play,
         "stop", &someone::Sound::stop,
         "status", sol::property(&someone::Sound::status),
         "volume", sol::property(&someone::Sound::getVolume, &someone::Sound::setVolume),
-        "loop", &someone::Sound::loop,
+        "loop", sol::property(&someone::Sound::getLoop, &someone::Sound::setLoop),
         "set_position", &someone::Sound::setPosition
     );
 

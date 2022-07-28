@@ -1,25 +1,58 @@
-#include "SDL.h"
-
+#include "al.h"
+#include "alc.h"
 #include "logger.hpp"
 #include "sound.hpp"
 
+#include "vorbis/vorbisfile.h"
+
+#ifndef NDEBUG
+  #define alCall(before, ...) before; checkALerror_impl(__FILE__, __LINE__);
+#else
+  #define alCall(before, ...) before;
+#endif
+
 namespace {
+
+#ifndef NDEBUG
+bool checkALerror_impl(const char *fileStr, int line) {
+    ALenum err = alGetError();
+
+    std::string file(fileStr);
+    if(err != AL_NO_ERROR) {
+        switch(err) {
+        case AL_INVALID_NAME:
+            spdlog::error("{}:{}, OpenAL error: AL_INVALID_NAME", file, line);
+            break;
+        case AL_INVALID_ENUM:
+            spdlog::error("{}:{} OpenAL error: AL_INVALID_ENUM", file, line);
+            break;
+        case AL_INVALID_VALUE:
+            spdlog::error("{}:{} OpenAL error: AL_INVALID_VALUE", file, line);
+            break;
+        case AL_INVALID_OPERATION:
+            spdlog::error("{}:{} OpenAL error: AL_INVALID_OPERATION", file, line);
+            break;
+        case AL_OUT_OF_MEMORY:
+            spdlog::error("{}:{} OpenAL error: AL_OUT_OF_MEMORY", file, line);
+            break;
+        default:
+            spdlog::error("{}:{} OpenAL error: {}", file, line, err);
+            break;
+        }
+    }
+
+    return err != AL_NO_ERROR;
+}
+#endif
 
 static bool audio_initiliazed = false;
 
 void ensure_audio_initialized() {
     if (!audio_initiliazed) {
-        if (SDL_Init(SDL_INIT_AUDIO) < 0) {
-            spdlog::error("Couldn't initialize SDL_mixer: {}", SDL_GetError());
-            return;
-        }
+        auto openALdevice = alcOpenDevice(nullptr);
+        auto openALContext = alcCreateContext(openALdevice, nullptr);
 
-        if (Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, MIX_DEFAULT_CHANNELS, 4096) < 0) {
-            spdlog::error("Couldn't open SDL_mixer audio: {}", SDL_GetError());
-            return;
-        }
-
-        Mix_ChannelFinished(someone::on_channel_finished);
+        alCall(alcMakeContextCurrent(openALContext));
 
         audio_initiliazed = true;
     }
@@ -33,92 +66,126 @@ SoundBuffer::SoundBuffer() {
     ensure_audio_initialized();
 }
 
-bool SoundBuffer::loadFromFile(const std::string &path) {
-    chunk = Mix_LoadWAV(path.data());
-    if (chunk == nullptr) {
-        spdlog::error("Failed to load audio file {}: {}", path, SDL_GetError());
+SoundBuffer::~SoundBuffer() {
+    alDeleteBuffers(1, &buffer);
+    // Flush the error stack, don't care if the buffer wasn't deleted
+    alGetError();
+}
+
+bool SoundBuffer::loadFromFile(const std::string &path, bool music) {
+    FILE *fileDescriptor = std::fopen(path.data(), "rb");
+    if (fileDescriptor == nullptr) {
+        spdlog::error("Failed to open audio file {}", path);
         return false;
     }
+
+    OggVorbis_File vorbisFile;
+    if (ov_open_callbacks(fileDescriptor, &vorbisFile, nullptr, 0, OV_CALLBACKS_NOCLOSE) < 0) {
+        spdlog::error("Failed to decode ogg file {}", path);
+        return false;
+    }
+
+    vorbis_info *vorbisInfo = ov_info(&vorbisFile, -1);
+    ALenum format = vorbisInfo->channels == 1 ? AL_FORMAT_MONO16 : AL_FORMAT_STEREO16;
+    // 2 for 16 bits
+    size_t fileLength = ov_pcm_total(&vorbisFile, -1) * vorbisInfo->channels * 2;
+    std::vector<short> dataVector(fileLength);
+    for (size_t size = 0, offset = 0, sel = 0;
+         (size = ov_read(&vorbisFile, (char*) dataVector.data() + offset, 4096, 0, sizeof(short), 1, (int*) &sel)) != 0;
+         offset += size) {
+        if (size < 0) {
+            spdlog::error("Error while reading ogg file {}", path);
+            return false;
+        }
+    }
+
+    alCall(alGenBuffers(1, &buffer));
+    alCall(alBufferData(buffer, format, dataVector.data(), fileLength, vorbisInfo->rate));
+
+    std::fclose(fileDescriptor);
+    ov_clear(&vorbisFile);
 
     return true;
 }
 
+void SoundBuffer::setLoopPoints(float start, float end) {
+    ALint freq;
+    alCall(alGetBufferi(buffer, AL_FREQUENCY, &freq));
+    ALint point = start * freq;
+    ALint point2 = end * freq;
+
+    ALint values[] = { point, point2 };
+    alCall(alBufferiv(buffer, AL_LOOP_POINTS_SOFT, values));
+}
+
+Sound::Sound() {
+    ensure_audio_initialized();
+
+    alCall(alGenSources(1, &source));
+}
+
+Sound::~Sound() {
+    stop();
+
+    alCall(alSourcei(source, AL_BUFFER, 0));
+    alCall(alDeleteSources(1, &source));
+}
+
 Sound::Status Sound::status() {
-    if (playing_sounds.contains(channel) && playing_sounds[channel] == this) {
+    ALint result;
+    alCall(alGetSourcei(source, AL_SOURCE_STATE, &result));
+
+    switch (result) {
+    case AL_PLAYING:
         return Status::Playing;
-    } else
+    case AL_STOPPED:
+    case AL_INITIAL:
+    default:
         return Status::Stopped;
+    }
 }
 
 void Sound::play() {
     if (status() == Status::Playing) return;
 
-    // Loop the sound if requested by passing -1
-    channel = Mix_PlayChannel(-1, buffer.chunk, loop ? -1 : 0);
-    if (channel == -1) {
-        spdlog::error("Could not play the sound: {}", SDL_GetError());
-        return;
-    }
-    playing_sounds[channel] = this;
-
-    Mix_Volume(channel, volume);
-
-    if (positioned) {
-        do_set_position();
-    }
+    alCall(alSourcePlay(source));
 }
 
 void Sound::stop() {
-    if (status() == Status::Playing) {
-        Mix_HaltChannel(channel);
-    }
+    alCall(alSourceStop(source));
 }
 
-// The volume functions convert from 100 to 255 and back for SDL_mixer
+// The volume functions convert from 100 to 1.0
 
 void Sound::setVolume(int volume) {
-    this->volume = (255 * volume) / 100;
-    if (status() == Status::Playing) {
-        Mix_Volume(channel, this->volume);
-    }
+    alCall(alSourcef(source, AL_GAIN, (float)volume / 100));
 }
 
 
 int Sound::getVolume() {
-    return (100 * volume) / 255;
+    ALfloat resFloat;
+    alCall(alGetSourcef(source, AL_GAIN, &resFloat));
+    return resFloat * 100;
 }
 
-
-void Sound::setPosition(int angle, int dist) {
-    if (angle == 0 && dist == 0) {
-        angle = 1;
-        dist = 0;
-    }
-
-    this->angle = angle;
-    this->distance = dist;
-
-    positioned = true;
-    if (status() == Status::Playing) {
-        do_set_position();
-    }
+void Sound::setPosition(sf::Vector3f position) {
+    alCall(alSource3f(source, AL_POSITION, position.x, position.y, position.z));
 }
 
-void Sound::do_set_position() {
-    if (Mix_SetPosition(channel, angle, distance) == 0) {
-        spdlog::error("Failed to set position on channel {} with angle = {}, distance = {}", channel, angle, distance);
-    }
-};
-
-void Sound::finished_playing() {
-    if (positioned) {
-        Mix_SetPosition(channel, 0, 0);
-    }
+void Sound::setBuffer(SoundBuffer *buf) {
+    this->buffer = buf;
+    alCall(alSourcei(source, AL_BUFFER, buf->buffer));
 }
 
-void on_channel_finished(int channel) {
-    playing_sounds[channel]->finished_playing();
-    playing_sounds.erase(channel);
+void Sound::setLoop(bool loop) {
+    alCall(alSourcei(source, AL_LOOPING, loop ? AL_TRUE : AL_FALSE));
+}
+
+bool Sound::getLoop() {
+    ALint result;
+    alCall(alGetSourcei(source, AL_LOOPING, &result));
+
+    return result == AL_TRUE;
 }
 
 }

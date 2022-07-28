@@ -138,7 +138,7 @@ sound = { asset = "radio", volume = 8 }
 [entities.water_sound.sound_player]
 sound_asset = "water"
 loop = true
-position = { distance = 245, angle = 0 }
+position = [0, -6, 0]
 
 # Text for talking
 [entities.talk_text]

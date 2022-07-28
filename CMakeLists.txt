@@ -97,13 +97,12 @@ if(NOT SOMEONE_TESTING)
   target_compile_definitions(someone_lib PUBLIC SOMEONE_EDITOR_BASE_PATH="${SOMEONE_EDITOR_BASE_PATH}")
 endif()
 
-# SDL / SDL_mixer
+# SDL
 
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_SOURCE_DIR}/cmake")
 include(SDL)
 
 target_link_libraries(someone_lib SDL2-static)
-target_link_libraries(someone_lib SDL2::mixer)
 target_link_libraries(someone_lib SDL2_ttf)
 target_link_libraries(someone_lib SDL_gpu)
 
@@ -148,7 +147,17 @@ if(NOT EMSCRIPTEN)
     target_link_libraries(someone_lib OpenGL::GLX)
   endif()
   target_link_libraries(someone_lib OpenGL::GL)
+
+  find_package(OpenAL REQUIRED)
+  target_link_libraries(someone_lib ${OPENAL_LIBRARY})
+  target_include_directories(someone_lib PUBLIC ${OPENAL_INCLUDE_DIR})
+else()
+  target_link_libraries(someone_lib "openal")
 endif()
+
+add_subdirectory("${PROJECT_SOURCE_DIR}/deps/ogg")
+add_subdirectory("${PROJECT_SOURCE_DIR}/deps/vorbis")
+target_link_libraries(someone_lib Vorbis::vorbisfile)
 
 # === fmt
 

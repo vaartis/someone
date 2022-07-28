@@ -100,4 +100,4 @@ callback = { module = "components.passage", name = "switch_room", self = true }
 [entities.wind_sound.sound_player]
 sound_asset = "wind"
 loop = true
-position = { distance = 240, angle = 0 }
+position = [0, 8, 0]

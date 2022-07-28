@@ -1,55 +1,67 @@
-#include <map>
+#pragma once
 
-#include "SDL_mixer.h"
+#include <string>
+#include <map>
+#include <vector>
+
+#ifndef SOMEONE_EMSCRIPTEN
+#include "al.h"
+#include "alc.h"
+#include "alext.h"
+#else
+#include "AL/al.h"
+#include "AL/alc.h"
+// Emscripten doesn't provide this constant for some reason
+#define AL_LOOP_POINTS_SOFT 0x2015
+#endif
+
+#include "SFML/System/Vector3.hpp"
 
 namespace someone {
 
-void on_channel_finished(int channel);
-
 class SoundBuffer {
-    Mix_Chunk *chunk;
+    ALuint buffer;
 
 public:
     SoundBuffer();
 
-    bool loadFromFile(const std::string &path);
+    bool loadFromFile(const std::string &path, bool music = false);
+    void setLoopPoints(float start, float end);
 
     friend class Sound;
+
+    ~SoundBuffer();
 };
 
 class Sound {
-    int channel = -1;
-    int volume = 240;
+    ALuint source;
 
-    int angle = 0, distance = 0;
-    bool positioned = false;
-
-    void do_set_position();
-    void finished_playing();
+    SoundBuffer *buffer = nullptr;
 public:
     enum class Status {
         Stopped,
         Playing
     };
 
-    bool loop = false;
-
-    SoundBuffer buffer;
-
-    Sound() { }
+    Sound();
 
     Status status();
 
     void play();
-
     void stop();
 
     void setVolume(int volume);
     int getVolume();
 
-    void setPosition(int angle, int dist);
+    void setPosition(sf::Vector3f pos);
 
-    friend void on_channel_finished(int channel);
+    SoundBuffer *getBuffer() { return buffer; };
+    void setBuffer(SoundBuffer *buf);
+
+    void setLoop(bool loop);
+    bool getLoop();
+
+    ~Sound();
 };
 
 static std::map<int, Sound*> playing_sounds;
