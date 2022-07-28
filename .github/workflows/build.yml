@@ -22,7 +22,7 @@ jobs:
 
         sudo apt-get update && sudo apt-get install -y build-essential cmake xorg-dev libgl-dev\
              libudev-dev libasound2-dev libpulse-dev libreadline-dev libncurses-dev libglew-dev\
-             xvfb
+             xvfb libopenal-dev
 
     # Uncomment to allow SSH access into the environment for debugging
     #- name: Setup tmate session
@@ -65,13 +65,13 @@ jobs:
 
         sudo apt-get update && sudo apt-get install -y build-essential cmake xorg-dev libgl-dev\
              libudev-dev libasound2-dev libpulse-dev libreadline-dev libncurses-dev libglew-dev\
-             xvfb
+             xvfb libopenal-dev
 
-    - name: Setup emsdk
-      uses: mymindstorm/setup-emsdk@v11
-      with:
-        version: 3.1.13
-        actions-cache-folder: 'emsdk-cache'
+    # - name: Setup emsdk
+    #   uses: mymindstorm/setup-emsdk@v11
+    #   with:
+    #     version: 3.1.13
+    #     actions-cache-folder: 'emsdk-cache'
 
     # - name: Build the HTML5 version
     #   run: |
@@ -88,7 +88,8 @@ jobs:
     - name: Build
       run: |
         mkdir $GITHUB_WORKSPACE/_build && cd $GITHUB_WORKSPACE/_build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang-14 -DCMAKE_CXX_COMPILER=clang++-14
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang-14 -DCMAKE_CXX_COMPILER=clang++-14 -DSOMEONE_NETWORKING=TRUE\
+                 -DSOMEONE_NETWORKING_STEAM=TRUE
         make -j $(nproc)
 
     - name: Copy the release to /someone/someone-${{github.sha}}/
@@ -148,8 +149,8 @@ jobs:
       with:
         update: true
         install: >-
-          mingw-w64-x86_64-cmake mingw-w64-x86_64-clang mingw-w64-x86_64-freetype mingw-w64-x86_64-glew
-          mingw-w64-i686-cmake mingw-w64-i686-clang mingw-w64-i686-freetype mingw-w64-i686-glew
+          mingw-w64-x86_64-cmake mingw-w64-x86_64-clang mingw-w64-x86_64-freetype mingw-w64-x86_64-glew mingw-w64-x86_64-openal
+          mingw-w64-i686-cmake mingw-w64-i686-clang mingw-w64-i686-freetype mingw-w64-i686-glew mingw-w64-i686-openal
           make
         path-type: inherit
 
@@ -157,7 +158,8 @@ jobs:
       shell: msys2 {0}
       run: |
         mkdir ${GITHUB_WORKSPACE}/_build && cd ${GITHUB_WORKSPACE}/_build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -G Unix\ Makefiles
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -G Unix\ Makefiles -DSOMEONE_NETWORKING=TRUE\
+                 -DSOMEONE_NETWORKING_STEAM=TRUE
         make -j $(nproc)
 
     - name: Copy the x86_64 release to /d/someone/someone-${{github.sha}}-x86_64/
@@ -166,8 +168,8 @@ jobs:
         cd ${GITHUB_WORKSPACE}/_build
         mkdir -p /d/someone-x86_64/someone-${{github.sha}}-x86_64/
         cp -r someone.exe resources\
-              deps/lua/src/lua/src/lua53.dll /mingw64/bin/{libgcc_s_seh-1.dll,libstdc++-6.dll,\
-	      libwinpthread-1.dll,zlib1.dll}\
+              deps/lua/src/lua/src/lua53.dll\
+              /mingw64/bin/{libgcc_s_seh-1.dll,libstdc++-6.dll,libwinpthread-1.dll,zlib1.dll,libopenal-1.dll} steam_api64.dll\
               /d/someone-x86_64/someone-${{github.sha}}-x86_64
 
     - name: Download butler
@@ -183,7 +185,8 @@ jobs:
       run: |
         rm -rf ${GITHUB_WORKSPACE}/_build
         mkdir ${GITHUB_WORKSPACE}/_build && cd ${GITHUB_WORKSPACE}/_build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -G Unix\ Makefiles
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -G Unix\ Makefiles -DSOMEONE_NETWORKING=TRUE\
+                 -DSOMEONE_NETWORKING_STEAM=TRUE
         make -j $(nproc)
 
     - name: Copy the i686 release to /d/someone/someone-${{github.sha}}-i686/
@@ -192,9 +195,8 @@ jobs:
         cd ${GITHUB_WORKSPACE}/_build
         mkdir -p /d/someone-i686/someone-${{github.sha}}-i686/
         cp -r someone.exe resources\
-              deps/lua/src/lua/src/lua53.dll /mingw32/bin/{libbrotlicommon.dll,libbrotlidec.dll,libbz2-1.dll,libfreetype-6.dll,\
-        libgcc_s_dw2-1.dll,libglib-2.0-0.dll,libgraphite2.dll,libharfbuzz-0.dll,libiconv-2.dll,libintl-8.dll,libpcre-1.dll,\
-        libpng16-16.dll,libstdc++-6.dll,libwinpthread-1.dll,zlib1.dll}\
+              deps/lua/src/lua/src/lua53.dll
+              /mingw32/bin/{libgcc_s_dw2-1.dll,libstdc++-6.dll,libwinpthread-1.dll,zlib1.dll,libopenal-1.dll} steam_api.dll\
               /d/someone-i686/someone-${{github.sha}}-i686
 
     - name: Upload the x86_64 release artifact
@@ -239,7 +241,8 @@ jobs:
     - name: Build
       run: |
         mkdir $GITHUB_WORKSPACE/_build && cd $GITHUB_WORKSPACE/_build
-        cmake .. -DCMAKE_BUILD_TYPE=Release
+        cmake .. -DCMAKE_BUILD_TYPE=Release -DSOMEONE_NETWORKING=TRUE\
+                 -DSOMEONE_NETWORKING_STEAM=TRUE
         make -j $(nproc) install
 
     - name: Copy the release to /Users/runner/someone/someone-${{github.sha}}/

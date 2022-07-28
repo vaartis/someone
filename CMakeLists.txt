@@ -157,7 +157,12 @@ endif()
 
 add_subdirectory("${PROJECT_SOURCE_DIR}/deps/ogg")
 add_subdirectory("${PROJECT_SOURCE_DIR}/deps/vorbis")
-target_link_libraries(someone_lib Vorbis::vorbisfile)
+
+if (NOT APPLE)
+  target_link_libraries(someone_lib Vorbis::vorbisfile)
+else()
+  target_link_libraries(someone_lib vorbis)
+endif()
 
 # === fmt
 
