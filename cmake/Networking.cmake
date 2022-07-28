@@ -18,8 +18,8 @@ if (SOMEONE_NETWORKING_STEAM)
       # 32 bits
     endif()
   elseif(APPLE)
-    # TODO
-    message(FATAL_ERROR "No MacOS support yet")
+    set(steam_lib "${steamworkssdk_SOURCE_DIR}/redistributable_bin/osx/libsteam_api.dylib")
+    set(steam_dynamic "${steamworkssdk_SOURCE_DIR}/redistributable_bin/osx/libsteam_api.dylib")
   else()
     set(steam_lib "${steamworkssdk_SOURCE_DIR}/redistributable_bin/linux64/libsteam_api.so")
     set(steam_dynamic "${steamworkssdk_SOURCE_DIR}/redistributable_bin/linux64/libsteam_api.so")
