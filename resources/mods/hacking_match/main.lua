@@ -25,11 +25,8 @@ M.components = {
    },
 
    hacking_match_player = {
-      class = Component.create("HackingMatchPlayer", {"position", "time_since_movement", "time_since_action"})
-   },
-
-   hacking_match_other_player = {
-      class = Component.create("HackingMatchOtherPlayer", {"id", "position", "base_position"})
+      class = Component.create("HackingMatchPlayer", {"position", "time_since_movement", "time_since_action",
+                                                      "id", "action_queue"})
    },
 
    hacking_match_block_manager = {
@@ -146,17 +143,7 @@ function M.components.hacking_match_client.process_component(new_ent, comp, enti
 end
 
 function M.components.hacking_match_player.process_component(new_ent, comp, entity_name)
-   new_ent:add(M.components.hacking_match_player.class(0, 0, 0))
-end
-
-function M.components.hacking_match_other_player.process_component(new_ent, comp, entity_name)
-   new_ent:add(
-      M.components.hacking_match_other_player.class(
-         comp.id,
-         0,
-         Vector2f.new(comp.base_position[1], comp.base_position[2])
-      )
-   )
+   new_ent:add(M.components.hacking_match_player.class(0, 0, 0, comp.id, {}))
 end
 
 function M.components.hacking_match_block_manager.process_component(new_ent, comp, entity_name)
@@ -205,7 +192,7 @@ function HackingMatchServerSystem:update()
 end
 
 function HackingMatchClientSystem:requires()
-   return { client = {"HackingMatchClient"}, other_player = {"HackingMatchOtherPlayer"}, player = {"HackingMatchPlayer"} }
+   return { client = {"HackingMatchClient"}, player = {"HackingMatchPlayer"} }
 end
 function HackingMatchClientSystem:update()
    run_callbacks()
@@ -220,35 +207,27 @@ function HackingMatchClientSystem:update()
          if player_data.event == "Joined" then
             local pos = {500, 500}
             util.entities_mod().instantiate_entity(
-               "other_player",
+               "other_player_" .. tostring(player_data.id),
                { drawable = { kind = "sprite", texture_asset = "mod.player", z = 1 },
                  transformable = { position = pos },
-                 hacking_match_other_player = { id = player_data.id, base_position = pos } })
+                 hacking_match_player = { id = player_data.id },
+                 tags = {"OtherPlayer"}})
          elseif player_data.event == "Left" then
-            for _, player_ent in pairs(self.targets.other_player) do
-               if player_ent:get("HackingMatchOtherPlayer").id == player_data.id then
+            for _, player_ent in pairs(self.targets.player) do
+               if player_ent:get("HackingMatchPlayer").id == player_data.id then
                   util.rooms_mod().engine:removeEntity(player_ent)
                   break
                end
             end
          elseif player_data.move then
-            for _, other in pairs(self.targets.other_player) do
-               local other_player = other:get("HackingMatchOtherPlayer")
-               local other_drawable = other:get("Drawable")
-               local other_tf = other:get("Transformable")
+            for _, other in pairs(self.targets.player) do
+               local other_player = other:get("HackingMatchPlayer")
 
                if other_player.id == player_data.id then
-                  if player_data.move.action == "Movement" then
-                     other_player.position = player_data.move.position
-
-                     other_tf.transformable.position =
-                        other_player.base_position + Vector2f.new(other_drawable.drawable.global_bounds.width * other_player.position, 0)
-                  elseif player_data.move.action == "TakeOrPut" then
-                     HackingMatchBlockManagerSystem.take_or_put(other_player.block_manager, other_player.position + 1)
-                  elseif player_data.move.action == "Swap" then
-                     HackingMatchBlockManagerSystem.swap_at(other_player.block_manager, other_player.position + 1)
-                  elseif player_data.move.action == "Speedup" then
+                  if player_data.move.action == "Speedup" then
                      other_player.block_manager:get("HackingMatchBlockManager").offset = player_data.move.offset
+                  else
+                     table.insert(other_player.action_queue, player_data.move)
                   end
                end
             end
@@ -264,22 +243,16 @@ function HackingMatchClientSystem:update()
             print("[CLIENT] Ready")
          elseif player_data.event == "EveryoneIsReady" then
             for _, player in pairs(self.targets.player) do
+               local player_x = player:get("Transformable").transformable.position.x
+
                local block_manager_ent = util.entities_mod().instantiate_entity(
                   "block_manager",
                   { hacking_match_block_manager = { seed = client.block_manager_setup.seed, player = player },
-                    transformable = { position = { 50, 64 } }})
+                    transformable = { position = { player_x, 64 } }})
                -- Set the block manager for the local player
                local pl = player:get("HackingMatchPlayer")
                pl.block_manager = block_manager_ent
                pl.ready = true
-            end
-            for i, player in pairs(self.targets.other_player) do
-               local block_manager_ent = util.entities_mod().instantiate_entity(
-                  "block_manager_" .. i,
-                  { hacking_match_block_manager = { seed = client.block_manager_setup.seed, player = player },
-                    transformable = { position = { 500, 64 } }})
-               -- Set the block manager for the other player
-               player:get("HackingMatchOtherPlayer").block_manager = block_manager_ent
             end
 
             print("[CLIENT] Everyone is ready, starting the game")
@@ -301,37 +274,71 @@ function HackingMatchPlayerSystem:update(dt)
       local player = ent:get("HackingMatchPlayer")
       local drawable = ent:get("Drawable")
 
-      if not player.ready then
-         return
-      end
+      if not player.ready then return end
 
       if not player.base_position then
          player.base_position = tf.transformable.position:copy()
       end
 
-      local moved = false
       player.time_since_movement = player.time_since_movement + dt
       player.time_since_action = player.time_since_action + dt
 
-      if player.time_since_movement >= 0.18 then
-         if Keyboard.is_key_pressed(KeyboardKey.D) then
-            if player.position < 5 then
-               player.position = player.position + 1
-               moved = true
+      local min_time_since_last_action = 0.18
+
+      local do_move = -1
+      local do_swap = false
+      local do_take_or_put = false
+
+      if ent:has("OtherPlayerTag") then
+         if #player.action_queue > 0 and player.action_queue[1].action == "Movement" then
+            do_move = player.action_queue[1].position
+         end
+      else
+         if player.time_since_movement >= 0.18 then
+            if Keyboard.is_key_pressed(KeyboardKey.D) then
+               if player.position < 5 then do_move = player.position + 1 end
+            elseif Keyboard.is_key_pressed(KeyboardKey.A) then
+               if player.position > 0 then do_move = player.position - 1 end
             end
-            player.time_since_movement = 0
-         elseif Keyboard.is_key_pressed(KeyboardKey.A) then
-            if player.position > 0 then
-               player.position = player.position - 1
-               moved = true
-            end
-            player.time_since_movement = 0
          end
       end
-      if player.time_since_action >= 0.18 then
-         if Keyboard.is_key_pressed(KeyboardKey.K) then
-            HackingMatchBlockManagerSystem.swap_at(player.block_manager, player.position + 1)
+      if do_move ~= -1 then
+         player.position = do_move
+         tf.transformable.position = player.base_position + Vector2f.new((drawable.drawable.global_bounds.width * player.position), 0)
+         player.time_since_movement = 0
 
+         if ent:has("OtherPlayerTag") then
+            table.remove(player.action_queue, 1)
+         else
+            for _, client_ent in pairs(self.targets.client) do
+               local client = client_ent:get("HackingMatchClient")
+
+               -- Notify the server about movement
+               sockets:send_message_to_connection(
+                  client.socket.socket,
+                  pb.encode("Player", { move = { action = "Movement", position = player.position } }),
+                  SteamNetworkingSend.Reliable
+               )
+            end
+         end
+
+         goto after_actions
+      end
+
+      if player.time_since_action >= min_time_since_last_action then
+         if ent:has("OtherPlayerTag") then
+            do_swap = #player.action_queue > 0 and player.action_queue[1].action == "Swap"
+         else
+            do_swap = Keyboard.is_key_pressed(KeyboardKey.K)
+         end
+      end
+      if do_swap then
+         HackingMatchBlockManagerSystem.swap_at(player.block_manager, player.position + 1)
+         player.time_since_action = 0
+
+         if ent:has("OtherPlayerTag") then
+            table.remove(player.action_queue, 1)
+         else
             for _, client_ent in pairs(self.targets.client) do
                -- Notify the server about movement
                sockets:send_message_to_connection(
@@ -340,11 +347,25 @@ function HackingMatchPlayerSystem:update(dt)
                   SteamNetworkingSend.Reliable
                )
             end
+         end
 
-            player.time_since_action = 0
-         elseif Keyboard.is_key_pressed(KeyboardKey.J) then
-            HackingMatchBlockManagerSystem.take_or_put(player.block_manager, player.position + 1)
+         goto after_actions
+      end
 
+      if player.time_since_action >= min_time_since_last_action then
+         if ent:has("OtherPlayerTag") then
+            do_take_or_put = #player.action_queue > 0 and player.action_queue[1].action == "TakeOrPut"
+         else
+            do_take_or_put = Keyboard.is_key_pressed(KeyboardKey.J)
+         end
+      end
+      if do_take_or_put then
+         HackingMatchBlockManagerSystem.take_or_put(player.block_manager, player.position + 1)
+         player.time_since_action = 0
+
+         if ent:has("OtherPlayerTag") then
+            table.remove(player.action_queue, 1)
+         else
             for _, client_ent in pairs(self.targets.client) do
                -- Notify the server about movement
                sockets:send_message_to_connection(
@@ -353,11 +374,14 @@ function HackingMatchPlayerSystem:update(dt)
                   SteamNetworkingSend.Reliable
                )
             end
-
-            player.time_since_action = 0
          end
+
+         goto after_actions
       end
-      if Keyboard.is_key_pressed(KeyboardKey.L) then
+
+      ::after_actions::
+
+      if not ent:has("OtherPlayerTag") and Keyboard.is_key_pressed(KeyboardKey.L) then
          local manager = player.block_manager:get("HackingMatchBlockManager")
          manager.offset = manager.offset + 1
 
@@ -367,21 +391,6 @@ function HackingMatchPlayerSystem:update(dt)
                client_ent:get("HackingMatchClient").socket.socket,
                pb.encode("Player", { move = { action = "Speedup", offset = manager.offset } }),
                SteamNetworkingSend.Unreliable
-            )
-         end
-      end
-
-      if moved then
-         tf.transformable.position = player.base_position + Vector2f.new((drawable.drawable.global_bounds.width * player.position), 0)
-
-         for _, client_ent in pairs(self.targets.client) do
-            local client = client_ent:get("HackingMatchClient")
-
-            -- Notify the server about movement
-            sockets:send_message_to_connection(
-               client.socket.socket,
-               pb.encode("Player", { move = { action = "Movement", position = player.position } }),
-               SteamNetworkingSend.Reliable
             )
          end
       end
@@ -411,9 +420,11 @@ function HackingMatchBlockManagerSystem:update(dt)
       local tf = ent:get("Transformable")
 
       if not manager.block_entities or #manager.block_entities < 10 then
+         -- Only set the seed once
+         math.randomseed(manager.seed)
+         manager.seed = manager.seed + 1
+
          if not manager.block_entities then
-            -- Only set the seed once
-            math.randomseed(manager.seed)
             manager.block_entities = {}
          end
 

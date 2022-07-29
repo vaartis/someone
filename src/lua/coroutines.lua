@@ -49,6 +49,11 @@ function M.run(dt)
    for n, cor in pairs(coroutines) do
       if need_to_wait(cor) then goto continue end
 
+      if coroutine.status(cor.cor) == "dead" then
+         table.insert(to_remove, n)
+         goto continue
+      end
+
       local results
       if not cor.started then
          results = { coroutine.resume(cor.cor, table.unpack(cor.args)) }
