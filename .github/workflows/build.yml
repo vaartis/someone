@@ -5,6 +5,23 @@ on:
   release:
     types: [ published ]
 
+env:
+  LINUX_DEPENDENCIES: >-
+    build-essential cmake xorg-dev libgl-dev
+    libudev-dev libasound2-dev libpulse-dev libreadline-dev libncurses-dev libglew-dev
+    xvfb libopenal-dev
+
+  WINDOWS_BUILD_SCRIPT: |-
+    mkdir ${GITHUB_WORKSPACE}/_build && cd ${GITHUB_WORKSPACE}/_build
+    cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -G Unix\ Makefiles -DSOMEONE_NETWORKING=TRUE\
+             -DSOMEONE_NETWORKING_STEAM=TRUE
+    make -j $(nproc)
+
+  WINDOWS_BUTLER_SCRIPT: |-
+    curl -L -o butler.zip https://broth.itch.ovh/butler/windows-amd64/LATEST/archive/default
+    unzip butler.zip && chmod +x butler.exe
+    ./butler push ${RELDIR} vaartis/someone:${CHANNEL} --userversion ${GITHUB_REF:10}
+
 jobs:
   test-linux:
     runs-on: ubuntu-18.04
@@ -20,9 +37,7 @@ jobs:
         chmod +x llvm.sh
         sudo ./llvm.sh 14
 
-        sudo apt-get update && sudo apt-get install -y build-essential cmake xorg-dev libgl-dev\
-             libudev-dev libasound2-dev libpulse-dev libreadline-dev libncurses-dev libglew-dev\
-             xvfb libopenal-dev
+        sudo apt-get update && sudo apt-get install -y ${LINUX_DEPENDENCIES}
 
     # Uncomment to allow SSH access into the environment for debugging
     #- name: Setup tmate session
@@ -63,9 +78,7 @@ jobs:
         chmod +x llvm.sh
         sudo ./llvm.sh 14
 
-        sudo apt-get update && sudo apt-get install -y build-essential cmake xorg-dev libgl-dev\
-             libudev-dev libasound2-dev libpulse-dev libreadline-dev libncurses-dev libglew-dev\
-             xvfb libopenal-dev
+        sudo apt-get update && sudo apt-get install -y ${LINUX_DEPENDENCIES}
 
     # - name: Setup emsdk
     #   uses: mymindstorm/setup-emsdk@v11
@@ -136,7 +149,6 @@ jobs:
       run: |
         ./butler push ${RELDIR} vaartis/someone:${CHANNEL} --userversion ${GITHUB_REF:10}
 
-
   build-windows:
     runs-on: windows-2019
     steps:
@@ -150,17 +162,13 @@ jobs:
         update: true
         install: >-
           mingw-w64-x86_64-cmake mingw-w64-x86_64-clang mingw-w64-x86_64-freetype mingw-w64-x86_64-glew mingw-w64-x86_64-openal
-          mingw-w64-i686-cmake mingw-w64-i686-clang mingw-w64-i686-freetype mingw-w64-i686-glew mingw-w64-i686-openal
           make
         path-type: inherit
 
     - name: Build x86_64
       shell: msys2 {0}
-      run: |
-        mkdir ${GITHUB_WORKSPACE}/_build && cd ${GITHUB_WORKSPACE}/_build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -G Unix\ Makefiles -DSOMEONE_NETWORKING=TRUE\
-                 -DSOMEONE_NETWORKING_STEAM=TRUE
-        make -j $(nproc)
+      run: |-
+        ${{ env.WINDOWS_BUILD_SCRIPT }}
 
     - name: Copy the x86_64 release to /d/someone/someone-${{github.sha}}-x86_64/
       shell: msys2 {0}
@@ -172,44 +180,11 @@ jobs:
               /mingw64/bin/{libgcc_s_seh-1.dll,libstdc++-6.dll,libwinpthread-1.dll,zlib1.dll,libopenal-1.dll} steam_api64.dll\
               /d/someone-x86_64/someone-${{github.sha}}-x86_64
 
-    - name: Download butler
-      if: ${{ github.event_name == 'release' }}
-      run: |
-        curl -L -o butler.zip https://broth.itch.ovh/butler/windows-amd64/LATEST/archive/default
-        unzip butler.zip && chmod +x butler.exe
-
-    - name: Build i686
-      env:
-        MSYSTEM: MINGW32
-      shell: msys2 {0}
-      run: |
-        rm -rf ${GITHUB_WORKSPACE}/_build
-        mkdir ${GITHUB_WORKSPACE}/_build && cd ${GITHUB_WORKSPACE}/_build
-        cmake .. -DCMAKE_BUILD_TYPE=Release -DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++ -G Unix\ Makefiles -DSOMEONE_NETWORKING=TRUE\
-                 -DSOMEONE_NETWORKING_STEAM=TRUE
-        make -j $(nproc)
-
-    - name: Copy the i686 release to /d/someone/someone-${{github.sha}}-i686/
-      shell: msys2 {0}
-      run: |
-        cd ${GITHUB_WORKSPACE}/_build
-        mkdir -p /d/someone-i686/someone-${{github.sha}}-i686/
-        cp -r someone.exe resources\
-              deps/lua/src/lua/src/lua53.dll
-              /mingw32/bin/{libgcc_s_dw2-1.dll,libstdc++-6.dll,libwinpthread-1.dll,zlib1.dll,libopenal-1.dll} steam_api.dll\
-              /d/someone-i686/someone-${{github.sha}}-i686
-
     - name: Upload the x86_64 release artifact
       uses: actions/upload-artifact@v2
       with:
         name: "someone-${{github.sha}}-windows-x86_64"
         path: "D:\\someone-x86_64"
-
-    - name: Upload the i686 release artifact
-      uses: actions/upload-artifact@v2
-      with:
-        name: "someone-${{github.sha}}-windows-i686"
-        path: "D:\\someone-i686"
 
     - name: Upload the x86_64 release to itch.io
       shell: msys2 {0}
@@ -219,7 +194,46 @@ jobs:
         CHANNEL: windows-x86_64
         RELDIR: "D:\\someone-x86_64"
       run: |
-        ./butler push ${RELDIR} vaartis/someone:${CHANNEL} --userversion ${GITHUB_REF:10}
+        ${{ env.WINDOWS_BUTLER_SCRIPT }}
+
+  build-windows-i686:
+    runs-on: windows-2019
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: recursive
+
+    - name: Install MSYS2 and dependencies
+      uses: msys2/setup-msys2@v2
+      with:
+        update: true
+        install: >-
+          mingw-w64-i686-cmake mingw-w64-i686-clang mingw-w64-i686-freetype mingw-w64-i686-glew mingw-w64-i686-openal
+          make
+        path-type: inherit
+
+    - name: Build i686
+      env:
+        MSYSTEM: MINGW32
+      shell: msys2 {0}
+      run: |-
+        ${{ env.WINDOWS_BUILD_SCRIPT }}
+
+    - name: Copy the i686 release to /d/someone/someone-${{github.sha}}-i686/
+      shell: msys2 {0}
+      run: |
+        cd ${GITHUB_WORKSPACE}/_build
+        mkdir -p /d/someone-i686/someone-${{github.sha}}-i686/
+        cp -r someone.exe resources\
+              deps/lua/src/lua/src/lua53.dll\
+              /mingw32/bin/{libgcc_s_dw2-1.dll,libstdc++-6.dll,libwinpthread-1.dll,zlib1.dll,libopenal-1.dll} steam_api.dll\
+              /d/someone-i686/someone-${{github.sha}}-i686
+
+    - name: Upload the i686 release artifact
+      uses: actions/upload-artifact@v2
+      with:
+        name: "someone-${{github.sha}}-windows-i686"
+        path: "D:\\someone-i686"
 
     - name: Upload the i686 release to itch.io
       shell: msys2 {0}
@@ -229,7 +243,7 @@ jobs:
         CHANNEL: windows-i686
         RELDIR: "D:\\someone-i686"
       run: |
-        ./butler push ${RELDIR} vaartis/someone:${CHANNEL} --userversion ${GITHUB_REF:10}
+        ${{ env.WINDOWS_BUTLER_SCRIPT }}
 
   build-macos:
     runs-on: macos-11
