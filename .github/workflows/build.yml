@@ -109,7 +109,7 @@ jobs:
       run: |
         sudo mkdir -p /someone/someone-${{github.sha}}/
         cd $GITHUB_WORKSPACE/_build/
-        sudo cp -r someone resources/ /someone/someone-${{github.sha}}/
+        sudo cp -r someone resources/ libsteam_api.so steam_appid.txt /someone/someone-${{github.sha}}/
 
     - name: Delete old artifacts
       uses: c-hive/gha-remove-artifacts@v1.1.0
@@ -178,6 +178,7 @@ jobs:
         cp -r someone.exe resources\
               deps/lua/src/lua/src/lua53.dll\
               /mingw64/bin/{libgcc_s_seh-1.dll,libstdc++-6.dll,libwinpthread-1.dll,zlib1.dll,libopenal-1.dll} steam_api64.dll\
+              steam_appid.txt\
               /d/someone-x86_64/someone-${{github.sha}}-x86_64
 
     - name: Upload the x86_64 release artifact
@@ -227,6 +228,7 @@ jobs:
         cp -r someone.exe resources\
               deps/lua/src/lua/src/lua53.dll\
               /mingw32/bin/{libgcc_s_dw2-1.dll,libstdc++-6.dll,libwinpthread-1.dll,zlib1.dll,libopenal-1.dll} steam_api.dll\
+              steam_appid.txt\
               /d/someone-i686/someone-${{github.sha}}-i686
 
     - name: Upload the i686 release artifact
