@@ -6,7 +6,8 @@ dependencies = {
    "luafilesystem==1.8.0",
    "lua-path==0.3.1",
    "lunajson==1.2.2",
-   "liluat==1.2.0"
+   "liluat==1.2.0",
+   "lrandom==20180729"
 }
 
 source = {

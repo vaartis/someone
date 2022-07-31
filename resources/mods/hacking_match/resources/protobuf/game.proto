@@ -21,7 +21,7 @@ message Move {
     MoveAction action = 1;
     // Only for Movement
     int32 position = 2;
-    // Only for speedup
+    // Sent with every message to synchronize the offset
     float offset = 3;
 }
 

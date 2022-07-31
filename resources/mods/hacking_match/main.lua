@@ -1,6 +1,7 @@
 local util = require("util")
 local path = require("path")
 local lume = require("lume")
+local lrandom = require("random")
 
 local collider_components = require("components.collider")
 local assets = require("components.assets")
@@ -224,9 +225,9 @@ function HackingMatchClientSystem:update()
                local other_player = other:get("HackingMatchPlayer")
 
                if other_player.id == player_data.id then
-                  if player_data.move.action == "Speedup" then
-                     other_player.block_manager:get("HackingMatchBlockManager").offset = player_data.move.offset
-                  else
+                  -- Synchronize the offset
+                  other_player.block_manager:get("HackingMatchBlockManager").offset = player_data.move.offset
+                  if player_data.move.action ~= "Speedup" then
                      table.insert(other_player.action_queue, player_data.move)
                   end
                end
@@ -276,6 +277,8 @@ function HackingMatchPlayerSystem:update(dt)
 
       if not player.ready then return end
 
+      local manager = player.block_manager:get("HackingMatchBlockManager")
+
       if not player.base_position then
          player.base_position = tf.transformable.position:copy()
       end
@@ -316,7 +319,7 @@ function HackingMatchPlayerSystem:update(dt)
                -- Notify the server about movement
                sockets:send_message_to_connection(
                   client.socket.socket,
-                  pb.encode("Player", { move = { action = "Movement", position = player.position } }),
+                  pb.encode("Player", { move = { action = "Movement", position = player.position, offset = manager.offset } }),
                   SteamNetworkingSend.Reliable
                )
             end
@@ -343,7 +346,7 @@ function HackingMatchPlayerSystem:update(dt)
                -- Notify the server about movement
                sockets:send_message_to_connection(
                   client_ent:get("HackingMatchClient").socket.socket,
-                  pb.encode("Player", { move = { action = "Swap" } }),
+                  pb.encode("Player", { move = { action = "Swap", offset = manager.offset } }),
                   SteamNetworkingSend.Reliable
                )
             end
@@ -370,7 +373,7 @@ function HackingMatchPlayerSystem:update(dt)
                -- Notify the server about movement
                sockets:send_message_to_connection(
                   client_ent:get("HackingMatchClient").socket.socket,
-                  pb.encode("Player", { move = { action = "TakeOrPut" } }),
+                  pb.encode("Player", { move = { action = "TakeOrPut", offset = manager.offset } }),
                   SteamNetworkingSend.Reliable
                )
             end
@@ -420,11 +423,9 @@ function HackingMatchBlockManagerSystem:update(dt)
       local tf = ent:get("Transformable")
 
       if not manager.block_entities or #manager.block_entities < 10 then
-         -- Only set the seed once
-         math.randomseed(manager.seed)
-         manager.seed = manager.seed + 1
-
          if not manager.block_entities then
+            manager.random = lrandom.new(manager.seed)
+
             manager.block_entities = {}
          end
 
@@ -435,8 +436,8 @@ function HackingMatchBlockManagerSystem:update(dt)
          for line = 1, 20 do
             blocks[line] = {}
             for block = 1, 6 do
-               blocks[line][block] = { color = math.random(1, 5) }
-               if math.random() > 1 - bomb_chance and bomb_counter < max_bombs then
+               blocks[line][block] = { color = manager.random:value(1, 5) }
+               if manager.random:value() > 1 - bomb_chance and bomb_counter < max_bombs then
                   bomb_counter = bomb_counter + 1
                   blocks[line][block].bomb = true
                else
@@ -475,7 +476,7 @@ function HackingMatchBlockManagerSystem:update(dt)
 
                -- Break the initial-generation combo
                while is_breakable_combo(self:combo(manager, line_n, block_n)) do
-                  block = math.random(1, 5)
+                  block = manager.random:value(1, 5)
                   block_ent:get("HackingMatchBlock").color = block
                end
 
